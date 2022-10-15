@@ -1,4 +1,4 @@
-package fr.nekotine.prelude.def.minigame;
+package fr.nekotine.vi6clean.def.game;
 
 import fr.nekotine.core.map.GameMap;
 import fr.nekotine.core.map.MapIdentifier;

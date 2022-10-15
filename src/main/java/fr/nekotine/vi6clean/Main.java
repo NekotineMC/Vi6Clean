@@ -1,4 +1,4 @@
-package fr.nekotine.prelude;
+package fr.nekotine.vi6clean;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,8 +18,8 @@ import fr.nekotine.core.projectile.ProjectileModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.usable.UsableModule;
 import fr.nekotine.core.visibility.EntityVisibilityModule;
-import fr.nekotine.prelude.def.minigame.GM_Vi6;
-import fr.nekotine.prelude.def.minigame.MAP_Vi6;
+import fr.nekotine.vi6clean.def.game.GM_Vi6;
+import fr.nekotine.vi6clean.def.game.MAP_Vi6;
 
 public class Main extends JavaPlugin implements Listener{
 	

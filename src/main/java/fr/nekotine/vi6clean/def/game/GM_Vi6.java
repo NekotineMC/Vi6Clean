@@ -1,4 +1,4 @@
-package fr.nekotine.prelude.def.minigame;
+package fr.nekotine.vi6clean.def.game;
 
 import java.util.List;
 import java.util.Map;
