@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    // PAPERMC
+    maven {
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    // PROTOCOLIB
+    maven {
+        url = uri('https://repo.dmulloy2.net/repository/public/')
+    }
+    // NBT-API for CommandAPI
+    maven {
+    	url = "https://repo.codemc.org/repository/maven-public/"
+    }
+}
+
+dependencies {
+	compileOnly project(':NekotineCore')
+	compileOnly group: "io.papermc.paper", name: "paper-api", version: "1.18.2-R0.1-SNAPSHOT"
+	compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0"
+	compileOnly group: "dev.jorel", name: "commandapi-core", version: "8.5.1"
+}
+
+// CONFIGURATION
+
+group = 'fr.nekotine'
+version = '0.0.1-SNAPSHOT'
+description = 'Vi6 avec du code plus propre'
+
+compileJava.options.encoding = 'UTF-8'
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+// DEFAULT TASKS
+
+defaultTasks 'build'
+
+// "UBER" TASKS
+
+tasks.register('dev') {
+	group = "developpement"
+	description = "Compile un jar et l'envoie sur le server de développement"
+	dependsOn('assemble', 'copyToDevServer')
+}
+
+// TASKS
+
+tasks.register('copyToDevServer', Copy) {
+	group = "developpement"
+	description = "Envoie le jar sur le server de développement"
+	from jar
+	into DevServerPluginDirectory
+}
