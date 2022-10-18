@@ -21,7 +21,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class GM_Vi6 extends Game{
 
-	private static final String PREPARATION_PHASE_KEY = "PreparationPhase";
+	public static final String PREPARATION_PHASE_KEY = "PreparationPhase";
 	
 	public static final GameModeIdentifier IDENTIFIER =
 			new GameModeIdentifier(
@@ -37,6 +37,10 @@ public class GM_Vi6 extends Game{
 	
 	private MapIdentifier mapId;
 	
+	private GameTeam _guardTeam;
+	
+	private GameTeam _thiefTeam;
+	
 	//---------------------RUNTIME
 	
 	private Map<Player, Snapshot<Player>> playersStatusSnapshot = new HashMap<>();
@@ -46,8 +50,10 @@ public class GM_Vi6 extends Game{
 	
 	@Override
 	public void registerTeams(List<GameTeam> teamList) {
-		teamList.add(new GameTeam(Component.translatable("color.minecraft.blue").color(NamedTextColor.BLUE)));
-		teamList.add(new GameTeam(Component.translatable("color.minecraft.red").color(NamedTextColor.RED)));
+		_guardTeam = new GameTeam(Component.translatable("color.minecraft.blue").color(NamedTextColor.BLUE));
+		_thiefTeam = new GameTeam(Component.translatable("color.minecraft.red").color(NamedTextColor.RED));
+		teamList.add(_guardTeam);
+		teamList.add(_thiefTeam);
 	}
 
 	@Override
@@ -66,9 +72,16 @@ public class GM_Vi6 extends Game{
 		map = (MAP_Vi6) ModuleManager.GetModule(MapModule.class).loadMap(mapId);
 		
 		for (var player : getPlayerList()) {
+			//SNAPSHOT
 			playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
+			/**
+			 * La majorité des modifications sont faites dans la phase
+			 */
+			// TODO Wrap Player (WrapperBase + le revoir est pas opti)
 		}
 		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap
+		
+		// TODO Enable Majordom
 		
 	}
 
@@ -105,5 +118,13 @@ public class GM_Vi6 extends Game{
 	public MapIdentifier getMapId()
 	{
 		return mapId;
+	}
+	
+	public GameTeam getGuardTeam() {
+		return _guardTeam;
+	}
+	
+	public GameTeam getThiefTeam() {
+		return _thiefTeam;
 	}
 }
