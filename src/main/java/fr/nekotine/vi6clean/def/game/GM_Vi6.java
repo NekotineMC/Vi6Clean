@@ -57,7 +57,7 @@ public class GM_Vi6 extends Game{
 	}
 
 	@Override
-	public void registerGamePhases(Map<String, GamePhase> _gamePhasesMap) {
+	public void registerGamePhases(Map<String, GamePhase<? extends Game>> _gamePhasesMap) {
 		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(this));
 	}
 	
