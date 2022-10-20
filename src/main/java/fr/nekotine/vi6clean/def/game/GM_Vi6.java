@@ -4,7 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.NameTagVisibility;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.Team.Option;
+import org.bukkit.scoreboard.Team.OptionStatus;
 
 import fr.nekotine.core.game.Game;
 import fr.nekotine.core.game.GamePhase;
@@ -41,6 +48,14 @@ public class GM_Vi6 extends Game{
 	
 	private GameTeam _thiefTeam;
 	
+	private Scoreboard _scoreboard;
+	
+	private Objective _scoreboardSidebarObjective;
+	
+	private Team _scoreboardGuardTeam;
+	
+	private Team _scoreboardThiefTeam;
+	
 	//---------------------RUNTIME
 	
 	private Map<Player, Snapshot<Player>> playersStatusSnapshot = new HashMap<>();
@@ -69,14 +84,35 @@ public class GM_Vi6 extends Game{
 	@Override
 	protected void setup() {
 		
+		// Scoreboard
+		_scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+		_scoreboardSidebarObjective = _scoreboard.registerNewObjective("ScoreboardSidebar", "dummy", IDENTIFIER.getName());
+		// guard team
+		_scoreboardGuardTeam = _scoreboard.registerNewTeam("guard");
+		_scoreboardGuardTeam.setAllowFriendlyFire(false);
+		_scoreboardGuardTeam.displayName(Component.text("Garde").color(NamedTextColor.BLUE));
+		_scoreboardGuardTeam.color(NamedTextColor.BLUE);
+		_scoreboardGuardTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
+		_scoreboardGuardTeam.setCanSeeFriendlyInvisibles(true);
+		// thief team
+		_scoreboardThiefTeam = _scoreboard.registerNewTeam("thief");
+		_scoreboardThiefTeam.setAllowFriendlyFire(false);
+		_scoreboardThiefTeam.displayName(Component.text("Voleur").color(NamedTextColor.RED));
+		_scoreboardThiefTeam.color(NamedTextColor.RED);
+		_scoreboardThiefTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
+		_scoreboardThiefTeam.setCanSeeFriendlyInvisibles(true);
+		
+		// Map
 		map = (MAP_Vi6) ModuleManager.GetModule(MapModule.class).loadMap(mapId);
 		
+		// Per player actions
 		for (var player : getPlayerList()) {
 			//SNAPSHOT
 			playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
 			/**
 			 * La majorité des modifications sont faites dans la phase
 			 */
+			player.setScoreboard(_scoreboard);
 			// TODO Wrap Player (WrapperBase + le revoir est pas opti)
 		}
 		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap
@@ -91,6 +127,7 @@ public class GM_Vi6 extends Game{
 			var snapshot = playersStatusSnapshot.get(player);
 			snapshot.patch(player);
 		}
+		_scoreboard = null;
 	}
 
 	@Override
@@ -126,5 +163,21 @@ public class GM_Vi6 extends Game{
 	
 	public GameTeam getThiefTeam() {
 		return _thiefTeam;
+	}
+	
+	public Scoreboard getScoreboard() {
+		return _scoreboard;
+	}
+	
+	public Objective getScoreboardSidebarObjective() {
+		return _scoreboardSidebarObjective;
+	}
+	
+	public Team getScoreboardGuardTeam() {
+		return _scoreboardGuardTeam;
+	}
+	
+	public Team getScoreboardThiefTeam() {
+		return _scoreboardThiefTeam;
 	}
 }
