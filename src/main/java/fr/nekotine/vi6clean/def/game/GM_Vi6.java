@@ -110,10 +110,17 @@ public class GM_Vi6 extends Game{
 	
 	@Override
 	protected void playerSetup(Player player, GameTeam team) {
-		//SNAPSHOT
+		// SNAPSHOT
 		playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
 		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap (pas opti de faire ca plein de fois mais bon...)
+		// Scoreboard
 		player.setScoreboard(_scoreboard);
+		// Team
+		if (team == _guardTeam) {
+			_scoreboardGuardTeam.addPlayer(player);
+		}else {
+			_scoreboardThiefTeam.addPlayer(player);
+		}
 		// TODO Wrap Player (WrapperBase + le revoir est pas opti)
 	}
 

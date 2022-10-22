@@ -35,7 +35,7 @@ public class PHASE_Vi6_Preparation extends GamePhase<GM_Vi6>{
 		EntityUtil.clearPotionEffects(player);
 		EntityUtil.defaultAllAttributes(player);
 		player.addPotionEffect(playerSaturationEffect);
-		if (team.equals(getGame().getThiefTeam())){
+		if (team == getGame().getThiefTeam()){
 			player.addPotionEffect(thiefNightVisionEffect);
 		}
 	}
