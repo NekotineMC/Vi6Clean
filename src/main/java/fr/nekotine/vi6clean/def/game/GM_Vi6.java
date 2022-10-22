@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -82,7 +81,7 @@ public class GM_Vi6 extends Game{
 	}
 	
 	@Override
-	protected void setup() {
+	protected void globalSetup() {
 		
 		// Scoreboard
 		_scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -105,29 +104,28 @@ public class GM_Vi6 extends Game{
 		// Map
 		map = (MAP_Vi6) ModuleManager.GetModule(MapModule.class).loadMap(mapId);
 		
-		// Per player actions
-		for (var player : getPlayerList()) {
-			//SNAPSHOT
-			playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
-			/**
-			 * La majorité des modifications sont faites dans la phase
-			 */
-			player.setScoreboard(_scoreboard);
-			// TODO Wrap Player (WrapperBase + le revoir est pas opti)
-		}
-		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap
-		
 		// TODO Enable Majordom
 		
 	}
+	
+	@Override
+	protected void playerSetup(Player player, GameTeam team) {
+		//SNAPSHOT
+		playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
+		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap (pas opti de faire ca plein de fois mais bon...)
+		player.setScoreboard(_scoreboard);
+		// TODO Wrap Player (WrapperBase + le revoir est pas opti)
+	}
 
 	@Override
-	protected void end() {
-		for (var player : getPlayerList()) {
-			var snapshot = playersStatusSnapshot.get(player);
-			snapshot.patch(player);
-		}
+	protected void globalEnd() {
 		_scoreboard = null;
+	}
+	
+	@Override
+	protected void playerEnd(Player player, GameTeam team) {
+		var snapshot = playersStatusSnapshot.get(player);
+		snapshot.patch(player);
 	}
 
 	@Override
@@ -139,8 +137,8 @@ public class GM_Vi6 extends Game{
 	}
 	
 	@Override
-	public void onPlayerPreLeave(Player player) {
-		super.onPlayerPreLeave(player);
+	public void onPlayerPostLeave(Player player) {
+		super.onPlayerPostLeave(player);
 		Abort();
 	}
 	
