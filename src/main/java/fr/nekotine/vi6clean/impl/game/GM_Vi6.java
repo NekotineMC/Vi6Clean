@@ -116,6 +116,8 @@ public class GM_Vi6 extends Game{
 		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap (pas opti de faire ca plein de fois mais bon...)
 		// Scoreboard
 		player.setScoreboard(_scoreboard);
+		//
+		player.setViewDistance(15); // Set back to normal
 		// Team
 		if (team == _guardTeam) {
 			_scoreboardGuardTeam.addPlayer(player);
