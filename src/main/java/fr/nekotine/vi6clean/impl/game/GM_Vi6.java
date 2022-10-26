@@ -22,6 +22,7 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.snapshot.PlayerStatusSnaphot;
 import fr.nekotine.core.snapshot.Snapshot;
 import fr.nekotine.vi6clean.impl.game.phase.PHASE_Vi6_Preparation;
+import fr.nekotine.vi6clean.impl.map.MAP_Vi6;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

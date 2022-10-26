@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.game;
+package fr.nekotine.vi6clean.impl.map;
 
 import fr.nekotine.core.map.GameMap;
 import fr.nekotine.core.map.MapIdentifier;

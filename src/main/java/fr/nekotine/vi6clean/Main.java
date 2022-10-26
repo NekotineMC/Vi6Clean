@@ -19,7 +19,7 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.usable.UsableModule;
 import fr.nekotine.core.visibility.EntityVisibilityModule;
 import fr.nekotine.vi6clean.impl.game.GM_Vi6;
-import fr.nekotine.vi6clean.impl.game.MAP_Vi6;
+import fr.nekotine.vi6clean.impl.map.MAP_Vi6;
 
 public class Main extends JavaPlugin implements Listener{
 	
