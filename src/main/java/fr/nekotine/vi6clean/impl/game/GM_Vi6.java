@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.def.game;
+package fr.nekotine.vi6clean.impl.game;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.snapshot.PlayerStatusSnaphot;
 import fr.nekotine.core.snapshot.Snapshot;
-import fr.nekotine.vi6clean.def.game.phase.PHASE_Vi6_Preparation;
+import fr.nekotine.vi6clean.impl.game.phase.PHASE_Vi6_Preparation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

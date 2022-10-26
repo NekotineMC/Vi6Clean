@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.def.game.phase;
+package fr.nekotine.vi6clean.impl.game.phase;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType;
 import fr.nekotine.core.game.GamePhase;
 import fr.nekotine.core.game.GameTeam;
 import fr.nekotine.core.util.EntityUtil;
-import fr.nekotine.vi6clean.def.game.GM_Vi6;
+import fr.nekotine.vi6clean.impl.game.GM_Vi6;
 
 public class PHASE_Vi6_Preparation extends GamePhase<GM_Vi6>{
 
