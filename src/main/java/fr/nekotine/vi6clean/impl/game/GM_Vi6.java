@@ -1,191 +1,132 @@
 package fr.nekotine.vi6clean.impl.game;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
+import org.jetbrains.annotations.Nullable;
 
 import fr.nekotine.core.game.Game;
+import fr.nekotine.core.game.GameMode;
 import fr.nekotine.core.game.GamePhase;
 import fr.nekotine.core.game.GameTeam;
-import fr.nekotine.core.lobby.GameModeIdentifier;
-import fr.nekotine.core.map.MapIdentifier;
-import fr.nekotine.core.map.MapModule;
-import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.snapshot.PlayerStatusSnaphot;
-import fr.nekotine.core.snapshot.Snapshot;
+import fr.nekotine.core.util.CollectionUtil;
 import fr.nekotine.vi6clean.impl.game.phase.PHASE_Vi6_Preparation;
-import fr.nekotine.vi6clean.impl.map.MAP_Vi6;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class GM_Vi6 extends Game{
-
+public class GM_Vi6 extends GameMode<GD_Vi6>{
+	
 	public static final String PREPARATION_PHASE_KEY = "PreparationPhase";
-	
-	public static final GameModeIdentifier IDENTIFIER =
-			new GameModeIdentifier(
-					"vi6",
-					Component.text("Voleur Industriel 6").color(NamedTextColor.BLUE)) {
-		@Override
-		public Game generateTypedGame() {
-			return new GM_Vi6();
-		}
-	};
-	
-	//---------------------
-	
-	private MapIdentifier mapId;
-	
-	private GameTeam _guardTeam;
-	
-	private GameTeam _thiefTeam;
-	
-	private Scoreboard _scoreboard;
-	
-	private Objective _scoreboardSidebarObjective;
-	
-	private Team _scoreboardGuardTeam;
-	
-	private Team _scoreboardThiefTeam;
 	
 	//---------------------RUNTIME
 	
-	private Map<Player, Snapshot<Player>> playersStatusSnapshot = new HashMap<>();
-	
-	@SuppressWarnings("unused")
-	private MAP_Vi6 map;
-	
 	@Override
-	public void registerTeams(List<GameTeam> teamList) {
-		_guardTeam = new GameTeam(Component.translatable("color.minecraft.blue").color(NamedTextColor.BLUE));
-		_thiefTeam = new GameTeam(Component.translatable("color.minecraft.red").color(NamedTextColor.RED));
-		teamList.add(_guardTeam);
-		teamList.add(_thiefTeam);
-	}
-
-	@Override
-	public void registerGamePhases(Map<String, GamePhase<? extends Game>> _gamePhasesMap) {
-		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(this));
+	public void registerTeams(Game<GD_Vi6> game) {
+		var guardTeam = new GameTeam(Component.translatable("color.minecraft.blue").color(NamedTextColor.BLUE));
+		var thiefTeam = new GameTeam(Component.translatable("color.minecraft.red").color(NamedTextColor.RED));
+		game.getTeams().add(guardTeam);
+		game.getTeams().add(thiefTeam);
+		var gd = game.getGameData();
+		gd.setGuardTeam(guardTeam);
+		gd.setThiefTeam(thiefTeam);
 	}
 	
 	@Override
-	public void GotoFirstPhase() {
-		GotoGamePhase(PREPARATION_PHASE_KEY);
+	public void GotoFirstPhase(Game<GD_Vi6> game) {
+		GotoGamePhase(game, PREPARATION_PHASE_KEY);
 	}
 	
 	@Override
-	protected void globalSetup() {
+	protected void globalSetup(Game<GD_Vi6> game) {
+		
+		var gd = game.getGameData();
 		
 		// Scoreboard
-		_scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-		_scoreboardSidebarObjective = _scoreboard.registerNewObjective("ScoreboardSidebar", "dummy", IDENTIFIER.getName());
+		var scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+		gd.setScoreboard(scoreboard);
+		gd.setScoreboardSidebarObjective(scoreboard.registerNewObjective("ScoreboardSidebar", "dummy", Component.text("vi6")));
 		// guard team
-		_scoreboardGuardTeam = _scoreboard.registerNewTeam("guard");
-		_scoreboardGuardTeam.setAllowFriendlyFire(false);
-		_scoreboardGuardTeam.displayName(Component.text("Garde").color(NamedTextColor.BLUE));
-		_scoreboardGuardTeam.color(NamedTextColor.BLUE);
-		_scoreboardGuardTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
-		_scoreboardGuardTeam.setCanSeeFriendlyInvisibles(true);
+		var scoreboardGuardTeam = scoreboard.registerNewTeam("guard");
+		scoreboardGuardTeam.setAllowFriendlyFire(false);
+		scoreboardGuardTeam.displayName(Component.text("Garde").color(NamedTextColor.BLUE));
+		scoreboardGuardTeam.color(NamedTextColor.BLUE);
+		scoreboardGuardTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
+		scoreboardGuardTeam.setCanSeeFriendlyInvisibles(true);
+		gd.setScoreboardGuardTeam(scoreboardGuardTeam);
 		// thief team
-		_scoreboardThiefTeam = _scoreboard.registerNewTeam("thief");
-		_scoreboardThiefTeam.setAllowFriendlyFire(false);
-		_scoreboardThiefTeam.displayName(Component.text("Voleur").color(NamedTextColor.RED));
-		_scoreboardThiefTeam.color(NamedTextColor.RED);
-		_scoreboardThiefTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
-		_scoreboardThiefTeam.setCanSeeFriendlyInvisibles(true);
+		var scoreboardThiefTeam = scoreboard.registerNewTeam("thief");
+		scoreboardThiefTeam.setAllowFriendlyFire(false);
+		scoreboardThiefTeam.displayName(Component.text("Voleur").color(NamedTextColor.RED));
+		scoreboardThiefTeam.color(NamedTextColor.RED);
+		scoreboardThiefTeam.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.NEVER);
+		scoreboardThiefTeam.setCanSeeFriendlyInvisibles(true);
+		gd.setScoreboardThiefTeam(scoreboardThiefTeam);
 		
 		// Map
-		map = (MAP_Vi6) ModuleManager.GetModule(MapModule.class).loadMap(mapId);
 		
 		// TODO Enable Majordom
 		
 	}
 	
 	@Override
-	protected void playerSetup(Player player, GameTeam team) {
+	protected void playerSetup(Game<GD_Vi6> game, Player player, GameTeam team) {
+		
+		var gd = game.getGameData();
+		
 		// SNAPSHOT
-		playersStatusSnapshot.put(player, new PlayerStatusSnaphot().deepSnapshot(player));
-		playersStatusSnapshot = new HashMap<>(playersStatusSnapshot); // Trim HashMap (pas opti de faire ca plein de fois mais bon...)
+		gd.getPreGamePlayersStatus().put(player, new PlayerStatusSnaphot().deepSnapshot(player));
+		// Trim HashMap (pas opti de faire ca plein de fois mais bon...)
+		gd.setPreGamePlayersStatus(CollectionUtil.trimHashMap(gd.getPreGamePlayersStatus()));
+	
 		// Scoreboard
-		player.setScoreboard(_scoreboard);
+		player.setScoreboard(gd.getScoreboard());
 		//
 		player.setViewDistance(15); // Set back to normal
 		// Team
-		if (team == _guardTeam) {
-			_scoreboardGuardTeam.addPlayer(player);
+		if (team == gd.getGuardTeam()) {
+			gd.getScoreboardGuardTeam().addPlayer(player);
 		}else {
-			_scoreboardThiefTeam.addPlayer(player);
+			gd.getScoreboardThiefTeam().addPlayer(player);
 		}
 		// TODO Wrap Player (WrapperBase + le revoir est pas opti)
 	}
 
 	@Override
-	protected void globalEnd() {
-		_scoreboard = null;
+	protected void globalEnd(Game<GD_Vi6> game) {
+		var gd = game.getGameData();
+		gd.setScoreboard(null); // Un scoreboard sans reference est supprimé.
 	}
 	
 	@Override
-	protected void playerEnd(Player player, GameTeam team) {
-		var snapshot = playersStatusSnapshot.get(player);
+	protected void playerEnd(Game<GD_Vi6> game, Player player, GameTeam team) {
+		var snapshot = game.getGameData().getPreGamePlayersStatus().get(player);
 		snapshot.patch(player);
 	}
 
 	@Override
-	protected void collectGameData() {
+	protected void collectGameData(Game<GD_Vi6> game) {
 	}
 
 	@Override
-	protected void asyncManageGameData() {
+	protected void asyncManageGameData(Game<GD_Vi6> game) {
 	}
 	
 	@Override
-	public void onPlayerPostLeave(Player player) {
-		super.onPlayerPostLeave(player);
-		Abort();
+	public void onPlayerPostLeave(Game<GD_Vi6> game, Player player) {
+		Abort(game);
 	}
-	
-	// Events Handling
-	
-	// Getter Setter
-	
-	public void setMapId(MapIdentifier mapId) {
-		this.mapId = mapId;
+
+	@Override
+	public void registerGamePhases(Map<String, GamePhase<GD_Vi6, ? extends GameMode<GD_Vi6>>> _gamePhasesMap) {
+		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(null));
 	}
-	
-	public MapIdentifier getMapId()
-	{
-		return mapId;
-	}
-	
-	public GameTeam getGuardTeam() {
-		return _guardTeam;
-	}
-	
-	public GameTeam getThiefTeam() {
-		return _thiefTeam;
-	}
-	
-	public Scoreboard getScoreboard() {
-		return _scoreboard;
-	}
-	
-	public Objective getScoreboardSidebarObjective() {
-		return _scoreboardSidebarObjective;
-	}
-	
-	public Team getScoreboardGuardTeam() {
-		return _scoreboardGuardTeam;
-	}
-	
-	public Team getScoreboardThiefTeam() {
-		return _scoreboardThiefTeam;
+
+	@Override
+	public Game<GD_Vi6> createGame(@Nullable Map<String, Object> flattenedGameData) {
+		return new Game<GD_Vi6>(this, new GD_Vi6(flattenedGameData));
 	}
 }

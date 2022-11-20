@@ -9,8 +9,8 @@ import fr.nekotine.core.bowcharge.BowChargeModule;
 import fr.nekotine.core.charge.ChargeModule;
 import fr.nekotine.core.damage.DamageModule;
 import fr.nekotine.core.effect.CustomEffectModule;
+import fr.nekotine.core.game.GameModeModule;
 import fr.nekotine.core.itemcharge.ItemChargeModule;
-import fr.nekotine.core.lobby.GameModeIdentifier;
 import fr.nekotine.core.lobby.LobbyModule;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
@@ -19,7 +19,6 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.usable.UsableModule;
 import fr.nekotine.core.visibility.EntityVisibilityModule;
 import fr.nekotine.vi6clean.impl.game.GM_Vi6;
-import fr.nekotine.vi6clean.impl.map.MAP_Vi6;
 
 public class Main extends JavaPlugin implements Listener{
 	
@@ -43,9 +42,9 @@ public class Main extends JavaPlugin implements Listener{
 		
 		ModuleManager.EnableAll();
 		
-		GameModeIdentifier.registerGameMode(GM_Vi6.IDENTIFIER);
+		ModuleManager.GetModule(GameModeModule.class).registerGameMode("vi6", new GM_Vi6());
 		
-		MapModule.registerMapTypes(MAP_Vi6.IDENTIFIER);
+		// MapModule.registerMapTypes(MAP_Vi6.IDENTIFIER);
 		
 		var mapModule = ModuleManager.GetModule(MapModule.class);
 		

@@ -7,8 +7,8 @@ import fr.nekotine.core.map.component.MapRectangleAreaElement;
 
 public class ArtefactMapComponent extends MapComponent {
 
-	@ComposingMap(Name = "Area")
-	private MapRectangleAreaElement area;
+	@ComposingMap(Name = "CaptureZone")
+	private MapRectangleAreaElement area = new MapRectangleAreaElement(getMap(), "CaptureZone");
 	
 	public ArtefactMapComponent(GameMap map, String name) {
 		super(map, name);

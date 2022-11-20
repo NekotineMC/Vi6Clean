@@ -1,5 +1,5 @@
-name: Prelude
+name: Vi6Clean
 version: 1.0
-main: fr.nekotine.prelude.Main
+main: fr.nekotine.vi6clean.Main
 api-version: 1.18
 depend: [NekotineCore,CommandAPI,ProtocolLib,LibsDisguises]
