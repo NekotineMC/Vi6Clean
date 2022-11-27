@@ -1,29 +1,23 @@
 package fr.nekotine.vi6clean.impl.map;
 
-import fr.nekotine.core.map.GameMap;
-import fr.nekotine.core.map.MapIdentifier;
-import fr.nekotine.core.map.MapTypeIdentifier;
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.vi6clean.impl.map.component.ArtefactMapComponent;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MAP_Vi6 extends GameMap{
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
+import org.jetbrains.annotations.NotNull;
 
-	private static final long serialVersionUID = "Vi6Map".hashCode();
-	
-	public static MapTypeIdentifier IDENTIFIER = new MapTypeIdentifier("Vi6Map", MAP_Vi6.class) {
+@SerializableAs("MAP_Vi6")
+public class MAP_Vi6 implements ConfigurationSerializable{
 
-		@Override
-		public GameMap generateTypedMap(MapIdentifier id) {
-			return new MAP_Vi6(id);
-		}
+	public MAP_Vi6(Map<String,Object> map) {
 		
-	};
+	}
 	
-	@ComposingMap(Name = "Artefacts")
-	private ArtefactMapComponent artefact = new ArtefactMapComponent(this, "Artefact1");
-
-	public MAP_Vi6(MapIdentifier type) {
-		super(type);
+	@Override
+	public @NotNull Map<String, Object> serialize() {
+		var map = new HashMap<String, Object>();
+		return map;
 	}
 
 	
