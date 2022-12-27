@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import fr.nekotine.core.game.GameData;
 import fr.nekotine.core.game.GameTeam;
 import fr.nekotine.core.snapshot.Snapshot;
+import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 
 public class GD_Vi6 extends GameData{
 
@@ -39,6 +40,8 @@ public class GD_Vi6 extends GameData{
 	private Team scoreboardThiefTeam;
 	
 	private Map<Player, Snapshot<Player>> preGamePlayersStatus = new HashMap<>();
+	
+	private ToolHandlerContainer toolHandlerContainer;
 	
 	// ---- Getter/Setter
 	
@@ -96,5 +99,13 @@ public class GD_Vi6 extends GameData{
 
 	public void setPreGamePlayersStatus(Map<Player, Snapshot<Player>> preGamePlayersStatus) {
 		this.preGamePlayersStatus = preGamePlayersStatus;
+	}
+	
+	public ToolHandlerContainer getToolHandlerContainer() {
+		return toolHandlerContainer;
+	}
+	
+	public void setToolHandlerContainer(ToolHandlerContainer toolHandlerContainer) {
+		this.toolHandlerContainer = toolHandlerContainer;
 	}
 }

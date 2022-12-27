@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
 import org.jetbrains.annotations.Nullable;
@@ -12,17 +13,24 @@ import fr.nekotine.core.game.Game;
 import fr.nekotine.core.game.GameMode;
 import fr.nekotine.core.game.GamePhase;
 import fr.nekotine.core.game.GameTeam;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.snapshot.PlayerStatusSnaphot;
 import fr.nekotine.core.util.CollectionUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.phase.PHASE_Vi6_Preparation;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class GM_Vi6 extends GameMode<GD_Vi6>{
-	
+
 	public static final String PREPARATION_PHASE_KEY = "PreparationPhase";
 	
 	//---------------------RUNTIME
+	
+	public GM_Vi6(JavaPlugin plugin) {
+		super(plugin);
+	}
 	
 	@Override
 	public void registerTeams(Game<GD_Vi6> game) {
@@ -92,7 +100,8 @@ public class GM_Vi6 extends GameMode<GD_Vi6>{
 		}else {
 			gd.getScoreboardThiefTeam().addPlayer(player);
 		}
-		// TODO Wrap Player (WrapperBase + le revoir est pas opti)
+		var wrapper = new PlayerWrapper(player);
+		ModuleManager.GetModule(WrappingModule.class).putWrapper(player, wrapper);
 	}
 
 	@Override
@@ -105,6 +114,8 @@ public class GM_Vi6 extends GameMode<GD_Vi6>{
 	protected void playerEnd(Game<GD_Vi6> game, Player player, GameTeam team) {
 		var snapshot = game.getGameData().getPreGamePlayersStatus().get(player);
 		snapshot.patch(player);
+		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+		ModuleManager.GetModule(WrappingModule.class).removeWrapper(player, PlayerWrapper.class);
 	}
 
 	@Override

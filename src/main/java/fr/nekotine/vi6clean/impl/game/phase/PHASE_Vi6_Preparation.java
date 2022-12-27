@@ -34,6 +34,7 @@ public class PHASE_Vi6_Preparation extends GamePhase<GD_Vi6, GM_Vi6>{
 	@Override
 	public void playerBegin(Game<GD_Vi6> game, Player player, GameTeam team) {
 		player.getInventory().clear();
+		player.setSprinting(false); // Le changements des attributs par défaut fera chier les gens qui sprint
 		EntityUtil.clearPotionEffects(player);
 		EntityUtil.defaultAllAttributes(player);
 		player.addPotionEffect(playerSaturationEffect);

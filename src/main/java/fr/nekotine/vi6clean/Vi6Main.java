@@ -7,27 +7,44 @@ import org.bukkit.plugin.java.JavaPlugin;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIConfig;
 import fr.nekotine.core.game.GameModeModule;
+import fr.nekotine.core.lobby.LobbyModule;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.visibility.EntityVisibilityModule;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.GM_Vi6;
 import fr.nekotine.vi6clean.impl.map.MAP_Vi6;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.artefact.BlockArtefactVisual;
 import fr.nekotine.vi6clean.impl.map.artefact.EntityArtefactVisual;
 
-public class Main extends JavaPlugin implements Listener{
+public class Vi6Main extends JavaPlugin implements Listener{
+	
+	private static Vi6Main main;
+	
+	/**
+	 * Récupère la dernière instance de Vi6Main créée.
+	 * Cette methode existe principalement pour permettre la création de NamespacedKey
+	 * @return
+	 */
+	public static Vi6Main getOneVi6Main() {
+		return main;
+	}
 	
 	@Override
 	public void onEnable() {
+		main = this;
 		super.onEnable();
 		
 		ModuleManager.Load(this,
-				EntityVisibilityModule.class
+				EntityVisibilityModule.class,
+				WrappingModule.class
 				);
 		
 		ModuleManager.EnableAll();
 		
-		ModuleManager.GetModule(GameModeModule.class).registerGameMode("vi6", new GM_Vi6());
+		ModuleManager.GetModule(GameModeModule.class).registerGameMode("vi6", new GM_Vi6(this));
+		
+		ModuleManager.GetModule(LobbyModule.class).registerCommands();
 		
 		registerConfigurationSerializables();
 		
