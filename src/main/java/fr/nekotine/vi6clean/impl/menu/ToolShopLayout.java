@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.menu;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -21,9 +22,9 @@ public class ToolShopLayout extends MenuLayout {
 
 	private static final int MINIMAL_NB_ROW = 3;
 	
-	private List<MenuItem> controlItems;
+	private List<MenuItem> controlItems = new LinkedList<>();
 	
-	private List<ToolShopTab> tabs;
+	private List<ToolShopTab> tabs = new LinkedList<>();
 	
 	private ItemStack separator;
 	
@@ -34,6 +35,9 @@ public class ToolShopLayout extends MenuLayout {
 	}
 	
 	public void addTab(ToolShopTab tab) {
+		tab.getIcon().setAction(() -> {
+			this.setActiveTab(tab);
+		});
 		tabs.add(tab);
 		if (activeTab == null) {
 			activeTab = tab;
@@ -47,6 +51,7 @@ public class ToolShopLayout extends MenuLayout {
 		}
 		activeTab = tab;
 		activeTab.displayActive(true);
+		// TODO Arrange
 	}
 	
 	public ToolShopLayout(Material separator) {

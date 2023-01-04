@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
+import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.util.MathUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
@@ -17,9 +19,13 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	
 	private boolean isReadyForInfiltration = false;
 	
+	private MenuInventory shopMenu;
+	
+	
 	public PlayerWrapper(Player wrapped) {
 		super(wrapped);
 	}
+	
 	
 	public Map<ToolHandler<?>, Integer> getSelectedItemsMap(){
 		return selectedItems;
@@ -45,4 +51,12 @@ public class PlayerWrapper extends WrapperBase<Player> {
 		isReadyForInfiltration = readyForInfiltration;
 	}
 
+	public @Nullable MenuInventory getShopMenu() {
+		return shopMenu;
+	}
+	
+	public void setShopMenu(@Nullable MenuInventory shopMenu) {
+		this.shopMenu = shopMenu;
+	}
+	
 }

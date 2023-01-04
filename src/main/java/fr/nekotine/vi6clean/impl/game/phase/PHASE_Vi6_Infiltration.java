@@ -52,7 +52,7 @@ public class PHASE_Vi6_Infiltration extends GamePhase<GD_Vi6, GM_Vi6>{
 				handler.attachNewToolToPlayer(wrapper);
 			}
 		}
-		// TODO Add player objects
+		// TODO Add player's tool
 		// TODO Teleport to spawn point
 		if (team == game.getGameData().getThiefTeam()){
 			// Voleur

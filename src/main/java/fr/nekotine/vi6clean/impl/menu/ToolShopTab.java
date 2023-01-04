@@ -20,11 +20,8 @@ public class ToolShopTab {
 	 * @param icon
 	 * @param layout
 	 */
-	public ToolShopTab(ItemStack icon, ToolShopLayout layout) {
-		this.icon = new MenuItem(icon, () -> {
-			layout.setActiveTab(this);
-		});
-		layout.addTab(this);
+	public ToolShopTab(ItemStack icon) {
+		this.icon = new MenuItem(icon, null);
 	}
 	
 	public List<MenuItem> getItems() {
@@ -38,7 +35,7 @@ public class ToolShopTab {
 	public void displayActive(boolean active) {
 		var item = icon.getItemStack();
 		if (active) {
-			ItemStackUtil.enchant(item, Enchantment.MENDING, 1);
+			item.addUnsafeEnchantment(Enchantment.MENDING, 1);
 			ItemStackUtil.hideAllFlags(item);
 		}else {
 			ItemStackUtil.clearEnchants(item);

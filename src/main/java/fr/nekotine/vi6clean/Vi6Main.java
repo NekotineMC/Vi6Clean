@@ -7,8 +7,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPIConfig;
 import fr.nekotine.core.game.GameModeModule;
+import fr.nekotine.core.inventory.menu.MenuModule;
 import fr.nekotine.core.lobby.LobbyModule;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.usable.UsableModule;
 import fr.nekotine.core.visibility.EntityVisibilityModule;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.GM_Vi6;
@@ -37,7 +39,9 @@ public class Vi6Main extends JavaPlugin implements Listener{
 		
 		ModuleManager.Load(this,
 				EntityVisibilityModule.class,
-				WrappingModule.class
+				WrappingModule.class,
+				UsableModule.class,
+				MenuModule.class
 				);
 		
 		ModuleManager.EnableAll();

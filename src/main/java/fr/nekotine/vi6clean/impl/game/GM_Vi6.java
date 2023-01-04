@@ -133,7 +133,7 @@ public class GM_Vi6 extends GameMode<GD_Vi6>{
 
 	@Override
 	public void registerGamePhases(Map<String, GamePhase<GD_Vi6, ? extends GameMode<GD_Vi6>>> _gamePhasesMap) {
-		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(null));
+		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(this));
 	}
 
 	@Override
