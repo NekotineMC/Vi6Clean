@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool;
 
+import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.bukkit.event.Listener;
 
 import fr.nekotine.core.game.Game;
 import fr.nekotine.vi6clean.impl.game.GD_Vi6;
+import fr.nekotine.vi6clean.impl.tool.exception.InvalidToolException;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 /**
@@ -19,10 +21,17 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
  */
 public abstract class ToolHandler<T extends Tool> implements Listener{
 
+	private final Constructor<T> toolConstructor;
+	
 	private List<T> tools = new LinkedList<>();
 	
-	public List<T> getToolList(){
-		return tools;
+	public ToolHandler(Class<T> toolType) {
+		try {
+			toolConstructor = toolType.getConstructor();
+			toolConstructor.trySetAccessible();
+		}catch(Exception e) {
+			throw new InvalidToolException("Une erreur est survenue lors de la recuperation du constructeur pour l'outil.",e);
+		}
 	}
 
 	/**
@@ -33,7 +42,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	public abstract void enableGlobal(Game<GD_Vi6> game);
 	
 	/**
-	 * Mise en place a la fin de la phase d'infiltration.
+	 * Nettoyage a la fin de la phase d'infiltration.
 	 * Au moment de cet appel, ce gestionnaire viens d'être retiré comme {@link org.bukkit.event.Listener Listener bukkit}.
 	 * @param game
 	 */
@@ -56,7 +65,13 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	 * Crée un nouvel outil.
 	 * @return
 	 */
-	protected abstract T makeNewTool();
+	protected final T makeNewTool() {
+		try {
+			return toolConstructor.newInstance();
+		}catch(Exception e) {
+		throw new InvalidToolException("Une erreur est survenue lors de la creation de l'outil via son constructeur.", e);
+		}
+	};
 	
 	public final void attachNewToolToPlayer(PlayerWrapper wrapper) {
 		var tool = makeNewTool();
@@ -68,5 +83,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	public final void detachToolFromPlayer(T tool, PlayerWrapper wrapper) {
 		tools.remove(tool);
 		disableTool(tool, wrapper);
+	}
+	
+	public List<T> getToolList(){
+		return tools;
 	}
 }

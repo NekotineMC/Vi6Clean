@@ -30,15 +30,15 @@ public class ToolHandlerContainer {
 	
 	public void enableToolHandlers(Game<GD_Vi6> game) {
 		for (var handler : toolHandlers) {
-			EventUtil.Register(game.getGameMode().getPlugin(), handler);
 			handler.enableGlobal(game);
+			EventUtil.Register(game.getGameMode().getPlugin(), handler);
 		}
 	}
 	
 	public void disableToolHandlers(Game<GD_Vi6> game) {
 		for (var handler : toolHandlers) {
 			EventUtil.Unregister(handler);
-			handler.enableGlobal(game);
+			handler.disableGlobal(game);
 		}
 	}
 	
