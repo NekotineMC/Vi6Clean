@@ -1,5 +1,5 @@
 name: Vi6Clean
 version: 1.0
 main: fr.nekotine.vi6clean.Vi6Main
-api-version: 1.18
-depend: [NekotineCore,CommandAPI,ProtocolLib,LibsDisguises]
+api-version: '1.20'
+depend: [CommandAPI,ProtocolLib]

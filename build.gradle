@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 repositories {
@@ -20,41 +21,38 @@ repositories {
 }
 
 dependencies {
-	compileOnly project(':NekotineCore')
-	compileOnly group: "io.papermc.paper", name: "paper-api", version: "1.18.2-R0.1-SNAPSHOT"
-	compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0"
-	compileOnly group: "dev.jorel", name: "commandapi-core", version: "8.5.1"
+	implementation project(':NekotineCore')
+	implementation group: "io.papermc.paper", name: "paper-api", version: "1.18.2-R0.1-SNAPSHOT"
+	implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0"
+	implementation group: "dev.jorel", name: "commandapi-core", version: "8.5.1"
 }
 
 // CONFIGURATION
 
 group = 'fr.nekotine'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 description = 'Vi6 avec du code plus propre'
 
 compileJava.options.encoding = 'UTF-8'
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+shadowJar{
+	/* <Workaround for https://github.com/johnrengelman/shadow/issues/448> */
+	project.configurations.implementation.canBeResolved = true
+    configurations = [project.configurations.implementation]
+    /* </Workaround> */
+    dependencies{
+    	include project(':NekotineCore')
+    }
+    archiveFileName = "${project.name}-${version}-coreShaded.jar"
 }
 
 // DEFAULT TASKS
 
 defaultTasks 'build'
 
-// "UBER" TASKS
-
-tasks.register('dev') {
-	group = "developpement"
-	description = "Compile un jar et l'envoie sur le server de développement"
-	dependsOn('assemble', 'copyToDevServer')
-}
-
-// TASKS
-
-tasks.register('copyToDevServer', Copy) {
+tasks.register('dev', Copy) {
 	group = "developpement"
 	description = "Envoie le jar sur le server de développement"
-	from jar
+	from shadowJar
 	into DevServerPluginDirectory
 }

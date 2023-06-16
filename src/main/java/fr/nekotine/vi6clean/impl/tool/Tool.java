@@ -1,13 +1,11 @@
 package fr.nekotine.vi6clean.impl.tool;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class Tool {
 	
-	/**
-	 * L'{@link org.bukkit.inventory.ItemStack ItemStack} qui est lié à cet outil et le représente visuellement.
-	 */
-	private final ItemStack itemStack;
+	private final ItemStack itemStack = new ItemStack(Material.STONE);
 	
 	private boolean markedForRemoval;
 	
