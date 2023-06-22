@@ -21,10 +21,10 @@ repositories {
 }
 
 dependencies {
-	implementation project(':NekotineCore')
-	implementation group: "io.papermc.paper", name: "paper-api", version: "1.18.2-R0.1-SNAPSHOT"
-	implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0"
-	implementation group: "dev.jorel", name: "commandapi-core", version: "8.5.1"
+	implementation project(":NekotineCore")
+	implementation group: "io.papermc.paper", name: "paper-api", version: "1.+"
+	implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
+	implementation group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
 }
 
 // CONFIGURATION
