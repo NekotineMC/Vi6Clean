@@ -1,5 +1,5 @@
 package fr.nekotine.vi6clean.impl.game;
-
+/*
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -9,15 +9,15 @@ import org.bukkit.scoreboard.Team.Option;
 import org.bukkit.scoreboard.Team.OptionStatus;
 import org.jetbrains.annotations.Nullable;
 
-import fr.nekotine.core.game.Game;
-import fr.nekotine.core.game.GameMode;
-import fr.nekotine.core.game.GamePhase;
-import fr.nekotine.core.game.GameTeam;
+import fr.nekotine.core.game.phase.Game;
+import fr.nekotine.core.game.phase.GameMode;
+import fr.nekotine.core.game.phase.GamePhase;
+import fr.nekotine.core.game.phase.GameTeam;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.snapshot.PlayerStatusSnaphot;
 import fr.nekotine.core.util.CollectionUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.game.phase.PHASE_Vi6_Preparation;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -133,7 +133,7 @@ public class GM_Vi6 extends GameMode<GD_Vi6>{
 
 	@Override
 	public void registerGamePhases(Map<String, GamePhase<GD_Vi6, ? extends GameMode<GD_Vi6>>> _gamePhasesMap) {
-		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new PHASE_Vi6_Preparation(this));
+		_gamePhasesMap.put(PREPARATION_PHASE_KEY, new Vi6PhasePreparation(this));
 	}
 
 	@Override
@@ -141,3 +141,4 @@ public class GM_Vi6 extends GameMode<GD_Vi6>{
 		return new Game<GD_Vi6>(this, new GD_Vi6(flattenedGameData));
 	}
 }
+*/

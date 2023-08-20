@@ -1,37 +1,23 @@
 package fr.nekotine.vi6clean.impl.map.artefact;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.BoundingBox;
-import org.jetbrains.annotations.NotNull;
 
+import fr.nekotine.core.map.annotation.ComposingMap;
+import fr.nekotine.core.map.element.MapBlockPositionElement;
+import fr.nekotine.core.map.element.MapPositionElement;
 import fr.nekotine.vi6clean.impl.map.util.SerializableBoundingBox;
 
-@SerializableAs("Artefact")
-public class Artefact implements ConfigurationSerializable{
+public class Artefact{
 
-	// ---------------------- Serialization
+	private ArtefactVisual sousArtefact;
 	
-	public static Artefact deserialize(Map<String,Object> map) {
-		var visual 		= (ArtefactVisual) 			map.get("visual");
-		var boundingBox = (SerializableBoundingBox) map.get("boundingBox");
-		return new Artefact(visual, boundingBox);
-	}
+	@ComposingMap()
+	private MapPositionElement position = new MapPositionElement();
 	
-	@Override
-	public @NotNull Map<String, Object> serialize() {
-		var map = new HashMap<String, Object>();
-		map.put("visual", visual);
-		map.put("boundingBox", boundingBox);
-		return map;
-	}
+	@ComposingMap()
+	private MapBlockPositionElement blockPosition = new MapBlockPositionElement();
 	
-	// ----------------------
-	
-	private final SerializableBoundingBox boundingBox;
+	private SerializableBoundingBox boundingBox;
 	
 	private ArtefactVisual visual;
 	
@@ -40,6 +26,9 @@ public class Artefact implements ConfigurationSerializable{
 		this.boundingBox = boundingBox;
 	}
 	
+	public Artefact() {
+	}
+
 	public void setVisual(ArtefactVisual visual) {
 		this.visual = visual;
 	}

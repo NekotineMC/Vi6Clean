@@ -1,25 +1,24 @@
 package fr.nekotine.vi6clean.impl.map;
 
-import java.util.HashMap;
-import java.util.Map;
+import fr.nekotine.core.map.annotation.ComposingMap;
+import fr.nekotine.core.map.annotation.MapElementTyped;
+import fr.nekotine.core.map.element.MapBlockPositionElement;
+import fr.nekotine.core.map.element.MapDictionaryElement;
+import fr.nekotine.core.map.element.MapPositionElement;
+import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
-import org.jetbrains.annotations.NotNull;
-
-@SerializableAs("MAP_Vi6")
-public class MAP_Vi6 implements ConfigurationSerializable{
-
-	public MAP_Vi6(Map<String,Object> map) {
-		
-	}
+public class MAP_Vi6{
 	
-	@Override
-	public @NotNull Map<String, Object> serialize() {
-		var map = new HashMap<String, Object>();
-		return map;
-	}
-
+	@MapElementTyped(MapBlockPositionElement.class)
+	@ComposingMap()
+	private MapDictionaryElement<Artefact> artefacts = new MapDictionaryElement<>();
 	
+	@MapElementTyped(MapPositionElement.class)
+	@ComposingMap()
+	private MapDictionaryElement<MapPositionElement> guardSpawns = new MapDictionaryElement<>();
+	
+	@MapElementTyped(MapPositionElement.class)
+	@ComposingMap()
+	private MapDictionaryElement<MapPositionElement> thiefMinimapSpawns = new MapDictionaryElement<>();
 	
 }

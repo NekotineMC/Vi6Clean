@@ -50,7 +50,7 @@ public class EntityArtefactVisual implements ArtefactVisual{
 	
 	@Override
 	public void place() {
-		entity = Bukkit.getUnsafe().deserializeEntity(serializedEntity, loc.getWorld());
+		//entity = Bukkit.getUnsafe().deserializeEntity(serializedEntity, loc.getWorld());
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 package fr.nekotine.vi6clean.impl.menu;
-
+/*
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,21 +8,21 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.menu.InvalidLayoutSizeException;
-import fr.nekotine.core.inventory.menu.MenuItem;
 import fr.nekotine.core.inventory.menu.MenuLayout;
+import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
 import fr.nekotine.core.util.InventoryUtil;
 import net.kyori.adventure.text.Component;
 
 /**
- * Layout composé d'une rangée de {@link fr.nekotine.core.inventory.menu.MenuItem MenuItem} de control et de plusieurs tabs de {@link fr.nekotine.core.inventory.menu.MenuItem MenuItem}
+ * Layout composé d'une rangée de {@link fr.nekotine.core.inventory.menu.item.ActionMenuItem MenuItem} de control et de plusieurs tabs de {@link fr.nekotine.core.inventory.menu.item.ActionMenuItem MenuItem}
  * @author XxGoldenbluexX
  *
- */
+ *//*
 public class ToolShopLayout extends MenuLayout {
 
 	private static final int MINIMAL_NB_ROW = 3;
 	
-	private List<MenuItem> controlItems = new LinkedList<>();
+	private List<ActionMenuItem> controlItems = new LinkedList<>();
 	
 	private List<ToolShopTab> tabs = new LinkedList<>();
 	
@@ -30,7 +30,7 @@ public class ToolShopLayout extends MenuLayout {
 	
 	private ToolShopTab activeTab;
 	
-	public void addControlButton(MenuItem item) {
+	public void addControlButton(ActionMenuItem item) {
 		controlItems.add(item);
 	}
 	
@@ -79,7 +79,7 @@ public class ToolShopLayout extends MenuLayout {
 	}
 
 	@Override
-	public MenuItem toMenuItem(ItemStack item) {
+	public ActionMenuItem toMenuItem(ItemStack item) {
 		var first = controlItems.stream().filter(i -> i.getItemStack().equals(item)).findFirst();
 		if (first.isPresent()) {
 			return first.get();
@@ -112,3 +112,4 @@ public class ToolShopLayout extends MenuLayout {
 	}
 
 }
+*/

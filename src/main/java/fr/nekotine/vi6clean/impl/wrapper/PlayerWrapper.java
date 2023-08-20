@@ -1,5 +1,5 @@
 package fr.nekotine.vi6clean.impl.wrapper;
-
+/*
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -60,3 +60,4 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	}
 	
 }
+*/

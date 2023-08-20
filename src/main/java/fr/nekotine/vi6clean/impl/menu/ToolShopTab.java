@@ -1,34 +1,34 @@
 package fr.nekotine.vi6clean.impl.menu;
-
+/*
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.inventory.menu.MenuItem;
+import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
 import fr.nekotine.core.util.ItemStackUtil;
 
 public class ToolShopTab {
 
-	private List<MenuItem> items = new LinkedList<>();
+	private List<ActionMenuItem> items = new LinkedList<>();
 	
-	private MenuItem icon;
+	private ActionMenuItem icon;
 	
 	/**
 	 * Créée le tab à partir de son icon et l'ajout à la liste du layout donné.
 	 * @param icon
 	 * @param layout
-	 */
+	 *//*
 	public ToolShopTab(ItemStack icon) {
-		this.icon = new MenuItem(icon, null);
+		this.icon = new ActionMenuItem(icon, null);
 	}
 	
-	public List<MenuItem> getItems() {
+	public List<ActionMenuItem> getItems() {
 		return items;
 	}
 	
-	public MenuItem getIcon() {
+	public ActionMenuItem getIcon() {
 		return icon;
 	}
 	
@@ -43,3 +43,4 @@ public class ToolShopTab {
 	}
 	
 }
+*/

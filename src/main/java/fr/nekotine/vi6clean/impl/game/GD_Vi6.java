@@ -1,5 +1,5 @@
 package fr.nekotine.vi6clean.impl.game;
-
+/*
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,8 +9,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import fr.nekotine.core.game.GameData;
-import fr.nekotine.core.game.GameTeam;
+import fr.nekotine.core.game.phase.GameData;
+import fr.nekotine.core.game.phase.GameTeam;
 import fr.nekotine.core.snapshot.Snapshot;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 
@@ -109,3 +109,4 @@ public class GD_Vi6 extends GameData{
 		this.toolHandlerContainer = toolHandlerContainer;
 	}
 }
+*/

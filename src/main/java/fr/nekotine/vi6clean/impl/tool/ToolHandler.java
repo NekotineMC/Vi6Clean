@@ -1,12 +1,12 @@
 package fr.nekotine.vi6clean.impl.tool;
-
+/*
 import java.lang.reflect.Constructor;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.event.Listener;
 
-import fr.nekotine.core.game.Game;
+import fr.nekotine.core.game.phase.Game;
 import fr.nekotine.vi6clean.impl.game.GD_Vi6;
 import fr.nekotine.vi6clean.impl.tool.exception.InvalidToolException;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -18,7 +18,7 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
  * @author XxGoldenbluexX
  *
  * @param <T>
- */
+ *//*
 public abstract class ToolHandler<T extends Tool> implements Listener{
 
 	private final Constructor<T> toolConstructor;
@@ -38,33 +38,33 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	 * Mise en place au lancement de la phase d'infiltration.
 	 * Au moment de cet appel, ce gestionnaire viens d'être ajouté comme {@link org.bukkit.event.Listener Listener bukkit}.
 	 * @param game
-	 */
+	 *//*
 	public abstract void enableGlobal(Game<GD_Vi6> game);
 	
 	/**
 	 * Nettoyage a la fin de la phase d'infiltration.
 	 * Au moment de cet appel, ce gestionnaire viens d'être retiré comme {@link org.bukkit.event.Listener Listener bukkit}.
 	 * @param game
-	 */
+	 *//*
 	public abstract void disableGlobal(Game<GD_Vi6> game);
 	
 	/**
 	 * Activation de l'outil (par exemple quand le joueur entre dans la map).
 	 * L'ItemStack représentant l'outil est déja dans l'inventaire du joueur a ce moment.
 	 * @param tool
-	 */
+	 *//*
 	protected abstract void enableTool(T tool, PlayerWrapper wrapper);
 	
 	/**
 	 * Activation de l'outil (par exemble quand le joueur sort de la map)
 	 * @param tool
-	 */
+	 *//*
 	protected abstract void disableTool(T tool, PlayerWrapper wrapper);
 	
 	/**
 	 * Crée un nouvel outil.
 	 * @return
-	 */
+	 *//*
 	protected final T makeNewTool() {
 		try {
 			return toolConstructor.newInstance();
@@ -89,3 +89,4 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 		return tools;
 	}
 }
+*/
