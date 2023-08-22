@@ -3,25 +3,24 @@ package fr.nekotine.vi6clean.impl.map.artefact;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.element.MapBlockPositionElement;
+import fr.nekotine.core.map.element.MapBlockLocationElement;
+import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.map.element.MapPositionElement;
-import fr.nekotine.vi6clean.impl.map.util.SerializableBoundingBox;
 
 public class Artefact{
-
-	private ArtefactVisual sousArtefact;
 	
-	@ComposingMap()
+	@ComposingMap
 	private MapPositionElement position = new MapPositionElement();
 	
-	@ComposingMap()
-	private MapBlockPositionElement blockPosition = new MapBlockPositionElement();
+	@ComposingMap
+	private MapBlockLocationElement blockPosition = new MapBlockLocationElement();
 	
-	private SerializableBoundingBox boundingBox;
+	@ComposingMap
+	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
 	
 	private ArtefactVisual visual;
 	
-	public Artefact(ArtefactVisual visual, SerializableBoundingBox boundingBox) {
+	public Artefact(ArtefactVisual visual, MapBoundingBoxElement boundingBox) {
 		this.visual = visual;
 		this.boundingBox = boundingBox;
 	}

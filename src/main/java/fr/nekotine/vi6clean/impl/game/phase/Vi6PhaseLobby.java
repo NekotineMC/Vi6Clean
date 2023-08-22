@@ -13,7 +13,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.eventargs.PhaseFailureEventArgs;
 import fr.nekotine.core.inventory.menu.MenuInventory;
@@ -21,7 +20,6 @@ import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
 import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.usable.Usable;
-import fr.nekotine.core.usable.UsableModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -76,14 +74,14 @@ public class Vi6PhaseLobby extends CollectionPhase<Player>{
 				lobbyMenu.displayTo(e.getPlayer());
 				e.setCancelled(true);
 			}
-		};
-		NekotineCore.MODULES.get(UsableModule.class).register(openMenuUsable);
+		}.register();
 	}
 
 	@Override
 	protected void globalTearDown() {
 		scoreboardPlayerListingObjective.unregister();
 		scoreboardPlayerListingObjective = null;
+		openMenuUsable.unregister();
 	}
 
 	@Override
