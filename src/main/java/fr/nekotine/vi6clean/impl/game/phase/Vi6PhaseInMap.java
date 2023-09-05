@@ -56,7 +56,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			}
 			mapName = maps.get(0).getName();
 		}
-		map = NekotineCore.MODULES.get(MapModule.class).getMapFinder().findByName(Vi6Map.class, game.getMapName()).loadConfig();
+		map = NekotineCore.MODULES.get(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
 		for (var artefactName : artefacts.keySet()) {
