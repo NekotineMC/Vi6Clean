@@ -1,14 +1,24 @@
 package fr.nekotine.vi6clean.impl.game.team;
 
+import java.util.Map;
+
+import org.bukkit.entity.Player;
+
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.team.Team;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
+import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class ThiefTeam extends Team{
 
 	public void spawnInMinimap() {
-		var map = Vi6Main.IOC.resolve(Vi6Game.class).getMap();
-		var spawns = map.getGuardSpawns();
+		var inMapPhase = Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+		var map = inMapPhase.getMap();
+		var spawns = map.getThiefMinimapSpawns();
 		if (spawns.size() < 1) {
 			throw new RuntimeException("Impossible de teleporter les voleurs dans la minimap, aucun spawn n'est configure");
 		}
@@ -18,6 +28,21 @@ public class ThiefTeam extends Team{
 			thief.teleport(loc.toLocation(thief.getWorld()));
 			if (!spawnsIte.hasNext()) {
 				spawnsIte = spawns.iterator();
+			}
+		}
+	}
+	
+	public void spawnToEntrances(Map<Player, Entrance> entranceMap) {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		for(var thief : this){
+			var loc = entranceMap.get(thief).getSpawnPoint().toLocation(game.getWorld());
+			thief.teleport(loc);
+			var wrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
+			wrap.setCanLeaveMap(true);
+			wrap.setInside(false);
+			for (var guard : game.getGuards()) {
+				guard.hideEntity(NekotineCore.getAttachedPlugin(), thief);
 			}
 		}
 	}

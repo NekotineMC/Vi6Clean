@@ -1,8 +1,7 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,45 +12,43 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
-import fr.nekotine.core.game.phase.eventargs.PhaseFailureEventArgs;
-import fr.nekotine.core.inventory.menu.MenuInventory;
-import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
-import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
-import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
+import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.state.ItemState;
+import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.usable.Usable;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class Vi6PhaseLobby extends CollectionPhase<Player>{
+public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player>{
 
 	private Objective scoreboardPlayerListingObjective;
 	
-	private MenuInventory lobbyMenu;
-	
 	private Usable openMenuUsable;
 	
-	public Vi6PhaseLobby(Runnable onSuccess, Consumer<PhaseFailureEventArgs> onFailure, Supplier<Stream<Player>> source) {
-		super(onSuccess, onFailure, source);
-	}
-	
-	public Vi6PhaseLobby(Runnable onSuccess, Consumer<PhaseFailureEventArgs> onFailure) {
-		super(onSuccess, onFailure);
-	}
-	
-	public Vi6PhaseLobby(Runnable onSuccess) {
-		super(onSuccess);
-	}
-	
-	public Vi6PhaseLobby(Consumer<PhaseFailureEventArgs> onFailure) {
-		super(onFailure);
+	public Vi6PhaseLobby(IPhaseMachine machine) {
+		super(machine);
 	}
 	
 	@Override
-	protected void globalSetup() {
+	public Class<Vi6PhaseGlobal> getParentType() {
+		return Vi6PhaseGlobal.class;
+	}
+
+	@Override
+	public ObservableCollection<Player> getItemCollection() {
+		return Vi6Main.IOC.resolve(Vi6Game.class).getPlayerList();
+	}
+	
+	@Override
+	protected void globalSetup(Object inputData) {
 		var scoreboard = Vi6Main.IOC.resolve(Vi6Game.class).getScoreboard();
 		scoreboardPlayerListingObjective = scoreboard.getObjective("playerListing");
 		if (scoreboardPlayerListingObjective == null) {
@@ -61,17 +58,16 @@ public class Vi6PhaseLobby extends CollectionPhase<Player>{
 					RenderType.INTEGER);
 		}
 		scoreboardPlayerListingObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-		setupMenu();
 		openMenuUsable = new Usable(ItemStackUtil.make(Material.BEACON, Component.text("Menu Vi6", NamedTextColor.GOLD))) {
 			@Override
 			protected void OnInteract(PlayerInteractEvent e) {
-				lobbyMenu.displayTo(e.getPlayer());
+				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).getMenu().displayTo(e.getPlayer());
 				e.setCancelled(true);
 			}
 			
 			@Override
 			protected void OnDrop(PlayerDropItemEvent e) {
-				lobbyMenu.displayTo(e.getPlayer());
+				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).getMenu().displayTo(e.getPlayer());
 				e.setCancelled(true);
 			}
 		}.register();
@@ -86,21 +82,31 @@ public class Vi6PhaseLobby extends CollectionPhase<Player>{
 
 	@Override
 	public void itemSetup(Player item) {
+		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		wrappingModule.getWrapper(item, LobbyPhasePlayerWrapper.class).setReadyForNextPhase(false);
 		scoreboardPlayerListingObjective.getScore(item).setScore(0);
 		item.getInventory().addItem(openMenuUsable.getItemStack());
 	}
 
 	@Override
 	public void itemTearDown(Player item) {
+		scoreboardPlayerListingObjective.getScore(item).resetScore();
 		item.getInventory().clear();
 	}
 	
-	private void setupMenu() {
-		var launchGameItem = new ActionMenuItem(ItemStackUtil.make(Material.SUNFLOWER, Component.text("Lancer la partie", NamedTextColor.GOLD)), this::complete);
-		var wrapLayout = new WrapMenuLayout();
-		wrapLayout.addMenuElement(launchGameItem);
-		var border = new BorderMenuLayout(ItemStackUtil.make(Material.GREEN_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
-		lobbyMenu = new MenuInventory(border,3);
+	@Override
+	protected List<ItemState<Player>> makeAppliedItemStates() {
+		var list = new LinkedList<ItemState<Player>>();
+		list.add(new ItemWrappingState<>(LobbyPhasePlayerWrapper::new));
+		return list;
+	}
+
+	public void checkForCompletion() {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		if (game.getPlayerList().stream().allMatch(p -> wrappingModule.getWrapper(p, LobbyPhasePlayerWrapper.class).isReadyForNextPhase())) {
+			complete();
+		}
 	}
 
 }

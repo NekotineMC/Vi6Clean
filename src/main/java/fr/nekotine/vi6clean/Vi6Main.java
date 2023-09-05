@@ -15,8 +15,10 @@ import fr.nekotine.core.ioc.IocProvider;
 import fr.nekotine.core.logging.FormatingRemoteLogger;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.text.Text;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 
 public class Vi6Main extends JavaPlugin implements Listener{
@@ -30,7 +32,6 @@ public class Vi6Main extends JavaPlugin implements Listener{
 		super.onLoad();
 		((FormatingRemoteLogger)LOGGER).setRemote(getLogger());
 		NekotineCore.setupFor(this);
-		NekotineCore.MODULES.load(MapModule.class);
 		var commandGenerator = NekotineCore.MODULES.get(MapModule.class).getGenerator();
 		commandGenerator.generateFor(Vi6Map.class);
 		commandGenerator.register();
@@ -39,12 +40,11 @@ public class Vi6Main extends JavaPlugin implements Listener{
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		var game = new Vi6Game((failureEvt) -> 
-			LOGGER.log(Level.WARNING, "Une erreur est survenue lors de la phase Vi6Game: "+failureEvt.info(),failureEvt.exception())
-			);
+		NekotineCore.MODULES.load(TickingModule.class);
+		var game = new Vi6Game();
 		IOC.registerSingleton(game);
 		try {
-			game.setup();
+			game.getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
 		}catch(Exception e){
 			LOGGER.log(Level.SEVERE, "Une erreur est survenue lor du chargement de la game (methode \"setup\")", e);
 		}
@@ -55,8 +55,8 @@ public class Vi6Main extends JavaPlugin implements Listener{
 	public void onDisable() {
 		EventUtil.unregister(this);
 		var game = IOC.resolve(Vi6Game.class);
-		if (game != null && game.isRunning()) {
-			game.abort("Désactivation du plugin", null);
+		if (game != null && game.getPhaseMachine().isRunning()) {
+			game.getPhaseMachine().end();
 		}
 		NekotineCore.MODULES.unloadAll();
 		super.onDisable();

@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapElementTyped;
-import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.map.element.MapDictionaryElement;
 import fr.nekotine.core.map.element.MapPositionElement;
@@ -12,7 +11,7 @@ import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 
 public class Vi6Map{
 	
-	@MapElementTyped(MapBlockLocationElement.class)
+	@MapElementTyped(Artefact.class)
 	@ComposingMap
 	private MapDictionaryElement<Artefact> artefacts = new MapDictionaryElement<>();
 	
