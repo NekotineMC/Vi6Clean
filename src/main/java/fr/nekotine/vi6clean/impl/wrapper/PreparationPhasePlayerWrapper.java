@@ -3,12 +3,14 @@ package fr.nekotine.vi6clean.impl.wrapper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.item.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
@@ -49,7 +51,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
-		if (readyForNextPhase && selectedEntrance == null) {
+		if (readyForNextPhase && selectedEntrance == null && !getParentWrapper().isInside()) {
 			wrapped.sendMessage(Component.text("Vous devez sélectionner une entrée.", NamedTextColor.RED));
 			return;
 		}
@@ -66,6 +68,10 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	public void setSelectedEntrance(Entrance selectedEntrance) {
 		this.selectedEntrance = selectedEntrance;
 		wrapped.sendMessage(Component.text("Entrée "+selectedEntrance.getName()+" sélectionnée", NamedTextColor.DARK_GREEN));
+	}
+	
+	public InMapPhasePlayerWrapper getParentWrapper() {
+		return NekotineCore.MODULES.get(WrappingModule.class).getWrapper(wrapped, InMapPhasePlayerWrapper.class);
 	}
 	
 }
