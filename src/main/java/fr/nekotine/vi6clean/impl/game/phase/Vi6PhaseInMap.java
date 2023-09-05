@@ -18,6 +18,7 @@ import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
@@ -47,7 +48,16 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@Override
 	public void globalSetup(Object inputData) {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var mapName = game.getMapName();
+		if (mapName == null) {
+			var maps = NekotineCore.MODULES.get(MapModule.class).getMapFinder().list();
+			if (maps.size() <= 0) {
+				throw new IllegalStateException("Aucune map n'est disponible");
+			}
+			mapName = maps.get(0).getName();
+		}
 		map = NekotineCore.MODULES.get(MapModule.class).getMapFinder().findByName(Vi6Map.class, game.getMapName()).loadConfig();
+		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
 		for (var artefactName : artefacts.keySet()) {
 			artefacts.get(artefactName).setName(artefactName);
