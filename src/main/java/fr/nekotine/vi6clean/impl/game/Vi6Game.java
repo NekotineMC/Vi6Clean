@@ -16,7 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.game.phase.PhaseMachine;
 import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.game.team.GuardTeam;
 import fr.nekotine.vi6clean.impl.game.team.ThiefTeam;
 import net.kyori.adventure.audience.Audience;
@@ -70,7 +72,9 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		
 		//
 		
-		phaseMachine.registerPhase(Vi6PhaseLobby::new);
+		phaseMachine.registerPhase(Vi6PhaseLobby.class, Vi6PhaseLobby::new);
+		phaseMachine.registerPhase(Vi6PhasePreparation.class, Vi6PhasePreparation::new);
+		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
 		
 		// TODO Setup majordom to Vi6Main.IOC
 	}

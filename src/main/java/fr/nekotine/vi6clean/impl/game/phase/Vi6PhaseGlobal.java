@@ -9,6 +9,7 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
+import fr.nekotine.core.state.PlayerScoreboardState;
 import fr.nekotine.core.state.PlayerSnapshotState;
 import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
@@ -53,9 +54,11 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player>{
 	
 	@Override
 	protected List<ItemState<Player>> makeAppliedItemStates() {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var list = new LinkedList<ItemState<Player>>();
 		list.add(new ItemWrappingState<>(PlayerWrapper::new));
 		list.add(new PlayerSnapshotState());
+		list.add(new PlayerScoreboardState(game.getScoreboard()));
 		return list;
 	}
 

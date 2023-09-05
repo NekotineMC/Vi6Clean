@@ -97,7 +97,7 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player>{
 	@Override
 	protected List<ItemState<Player>> makeAppliedItemStates() {
 		var list = new LinkedList<ItemState<Player>>();
-		list.add(new ItemWrappingState<>(LobbyPhasePlayerWrapper::new));
+		list.add(new ItemWrappingState<>(LobbyPhasePlayerWrapper.class, LobbyPhasePlayerWrapper::new));
 		return list;
 	}
 

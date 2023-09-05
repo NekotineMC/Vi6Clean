@@ -9,6 +9,9 @@ import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
+import fr.nekotine.vi6clean.Vi6Main;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.Entrance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -51,6 +54,9 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 			return;
 		}
 		this.readyForNextPhase = readyForNextPhase;
+		if (readyForNextPhase) {
+			Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();
+		}
 	}
 
 	public Entrance getSelectedEntrance() {

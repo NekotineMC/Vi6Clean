@@ -13,6 +13,7 @@ import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -66,6 +67,9 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
 		this.readyForNextPhase = readyForNextPhase;
+		if (readyForNextPhase) {
+			Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class).checkForCompletion();
+		}
 	}
 	
 }
