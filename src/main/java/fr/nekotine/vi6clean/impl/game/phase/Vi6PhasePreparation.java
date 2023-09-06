@@ -17,10 +17,13 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
@@ -38,6 +41,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> implements Listener{
+	
+	private final ItemStack guardSword = new ItemStackBuilder(Material.DIAMOND_SWORD)
+			.name(Component.text("Épée de garde", NamedTextColor.GOLD))
+			.unbreakable()
+			.oldPvpAtkSpd()
+			.flags(ItemFlag.values())
+			.build();
 	
 	private Map<ArmorStand, Entrance> minimapEntrancesIndicator = new HashMap<>();
 	
@@ -105,10 +115,13 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 
 	@Override
 	public void itemSetup(Player item) {
+		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(item, PlayerWrapper.class);
 		var inv = item.getInventory();
 		inv.clear();
 		inv.addItem(openMenuUsable.getItemStack());
-		
+		if (!wrap.isThief()) {
+			item.getInventory().addItem(guardSword);
+		}
 	}
 
 	@Override
