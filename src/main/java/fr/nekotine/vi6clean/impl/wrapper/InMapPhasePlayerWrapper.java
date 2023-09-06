@@ -38,12 +38,12 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void thiefScheduleCanLeaveMap() {
-		canLeaveMap = false;
+		setCanLeaveMap(false);
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
-				canLeaveMap = true;
+				setCanLeaveMap(true);
 				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuire", NamedTextColor.GOLD));
 			}
 			

@@ -3,6 +3,9 @@ package fr.nekotine.vi6clean.impl.game.phase;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,6 +22,7 @@ import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.AssertUtil;
+import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
@@ -30,6 +34,8 @@ import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
 	private Vi6Map map;
+	
+	private List<BlockDisplay> debugDisplays = new LinkedList<>();
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
@@ -59,18 +65,35 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		map = NekotineCore.MODULES.get(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
+		var world = game.getWorld();
 		for (var artefactName : artefacts.keySet()) {
-			artefacts.get(artefactName).setName(artefactName);
+			var artefact = artefacts.get(artefactName);
+			artefact.setName(artefactName);
+			if (game.isDebug()) {
+				debugDisplays.add(DebugUtil.debugBoundingBox(world, artefact.getBoundingBox(), Bukkit.createBlockData(Material.GLASS)));
+			}
 		}
 		var entrances = map.getEntrances().backingMap();
 		for (var entranceName : entrances.keySet()) {
-			entrances.get(entranceName).setName(entranceName);
+			var entrance = entrances.get(entranceName);
+			entrance.setName(entranceName);
+			if (game.isDebug()) {
+				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getBlockingBox().get(), Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS)));
+			}
+		}
+		if (game.isDebug()) {
+			for (var exit : map.getExits().backingMap().values()) {
+				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));
+			}
 		}
 	}
 
 	@Override
 	public void globalTearDown() {
 		map = null;
+		for (var display : debugDisplays) {
+			display.remove();
+		}
 	}
 	
 	@Override
@@ -119,7 +142,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var destVect = evt.getTo().toVector();
 		if (wrapper.isInside()) {
 			if (!wrapper.canLeaveMap()) {
-				if (map.getEntrances().backingMap().values().stream().map(e -> e.getBlockingBox()).anyMatch(bb -> bb.contains(destVect))){
+				if (map.getEntrances().backingMap().values().stream().map(e -> e.getBlockingBox()).anyMatch(bb -> bb.get().contains(destVect))){
 					evt.setCancelled(true);
 					return;
 				}
@@ -142,7 +165,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				}
 			});
 		}else {
-			var entrance = map.getEntrances().backingMap().values().stream().filter(e -> e.getBlockingBox().contains(destVect)).findFirst();
+			var entrance = map.getEntrances().backingMap().values().stream().filter(e -> e.getBlockingBox().get().contains(destVect)).findFirst();
 			if (entrance.isPresent()) {
 				wrapper.thiefEnterInside(entrance.get());
 			}

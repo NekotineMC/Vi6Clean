@@ -46,6 +46,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private String mapName;
 	
+	private boolean debug = true;
+	
 	public Vi6Game() {
 		
 		// add/remove players from scoreboard team
@@ -187,6 +189,14 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		if (o instanceof Player t) {
 			tearDownThief(t);
 		}
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 	
 }

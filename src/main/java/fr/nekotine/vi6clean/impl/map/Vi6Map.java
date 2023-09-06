@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapElementTyped;
-import fr.nekotine.core.map.element.MapBoundingBoxElement;
+import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
 import fr.nekotine.core.map.element.MapDictionaryElement;
 import fr.nekotine.core.map.element.MapPositionElement;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
@@ -19,9 +19,9 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<Entrance> entrances = new MapDictionaryElement<>();
 	
-	@MapElementTyped(MapBoundingBoxElement.class)
+	@MapElementTyped(MapBlockBoundingBoxElement.class)
 	@ComposingMap
-	private MapDictionaryElement<MapBoundingBoxElement> exits = new MapDictionaryElement<>();
+	private MapDictionaryElement<MapBlockBoundingBoxElement> exits = new MapDictionaryElement<>();
 	
 	@MapElementTyped(MapPositionElement.class)
 	@ComposingMap
@@ -47,7 +47,7 @@ public class Vi6Map{
 		return entrances;
 	}
 
-	public MapDictionaryElement<MapBoundingBoxElement> getExits() {
+	public MapDictionaryElement<MapBlockBoundingBoxElement> getExits() {
 		return exits;
 	}
 	

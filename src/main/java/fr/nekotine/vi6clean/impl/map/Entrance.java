@@ -1,8 +1,7 @@
 package fr.nekotine.vi6clean.impl.map;
 
-import org.bukkit.util.BoundingBox;
-
 import fr.nekotine.core.map.annotation.ComposingMap;
+import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.map.element.MapLocationElement;
 import fr.nekotine.core.map.element.MapPositionElement;
@@ -21,7 +20,7 @@ public class Entrance {
 	private MapBoundingBoxElement entranceTriggerBox = new MapBoundingBoxElement();
 	
 	@ComposingMap
-	private MapBoundingBoxElement blockingBox = new MapBoundingBoxElement();
+	private MapBlockBoundingBoxElement blockingBox = new MapBlockBoundingBoxElement();
 	
 	public MapPositionElement getSpawnPoint() {
 		return spawnPoint;
@@ -35,8 +34,8 @@ public class Entrance {
 		return entranceTriggerBox;
 	}
 
-	public BoundingBox getBlockingBox() {
-		return blockingBox.get();
+	public MapBlockBoundingBoxElement getBlockingBox() {
+		return blockingBox;
 	}
 
 	public String getName() {

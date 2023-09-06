@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
@@ -32,6 +32,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -118,8 +119,22 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	@Override
 	protected Object handleComplete() {
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
-		return itemCollection.stream().collect(Collectors.toMap(Function.identity(),
+		return itemCollection.stream()
+				.filter(p -> wrappingModule.getWrapper(p, PlayerWrapper.class).isThief())
+				.peek(p -> {
+					var wrap = wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class);
+					if (wrap.getSelectedEntrance() == null) {
+						wrap.setSelectedEntrance(randomEntrance());
+					}
+				})
+				.collect(Collectors.toMap(p -> p,
 				p -> wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class).getSelectedEntrance()));
+	}
+	
+	private Entrance randomEntrance() {
+		var rand = new Random();
+		var entrances = getParent().getMap().getEntrances().backingMap().values();
+		return entrances.stream().skip(rand.nextInt(entrances.size()+1)-1).findFirst().orElse(null);
 	}
 	
 	@Override

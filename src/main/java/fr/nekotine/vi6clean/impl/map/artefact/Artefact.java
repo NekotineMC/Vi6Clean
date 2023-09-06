@@ -9,11 +9,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.block.BlockPatch;
+import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
-import fr.nekotine.core.tempblock.AppliedBlockPatch;
-import fr.nekotine.core.tempblock.BlockPatch;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -33,7 +33,7 @@ public class Artefact{
 	
 	private boolean isCaptured;
 	
-	private AppliedBlockPatch blockPatch;
+	private AppliedTempBlockPatch blockPatch;
 	
 	@ComposingMap
 	private MapBlockLocationElement blockPosition = new MapBlockLocationElement();
