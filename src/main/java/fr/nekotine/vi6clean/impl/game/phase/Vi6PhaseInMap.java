@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
+import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
@@ -79,6 +81,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			entrance.setName(entranceName);
 			if (game.isDebug()) {
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getBlockingBox().get(), Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS)));
+				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox().get(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS)));
 			}
 		}
 		if (game.isDebug()) {
@@ -94,15 +97,19 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		for (var display : debugDisplays) {
 			display.remove();
 		}
+		for (var artefact : map.getArtefacts().backingMap().values()) {
+			artefact.clean();
+		}
 	}
 	
 	@Override
 	public void itemSetup(Player item) {
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
 		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
+		item.setGameMode(GameMode.ADVENTURE);
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(false);
-			wrap.setInside(true);
+			wrap.updateMapLeaveBlocker();
 		}
 	}
 
@@ -142,7 +149,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var destVect = evt.getTo().toVector();
 		if (wrapper.isInside()) {
 			if (!wrapper.canLeaveMap()) {
-				if (map.getEntrances().backingMap().values().stream().map(e -> e.getBlockingBox()).anyMatch(bb -> bb.get().contains(destVect))){
+				if (map.getEntrances().backingMap().values().stream().map(e -> e.getBlockingBox().get()).anyMatch(bb -> bb.contains(destVect))){
 					evt.setCancelled(true);
 					return;
 				}
@@ -164,8 +171,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					zone.remove(player);
 				}
 			});
-		}else {
-			var entrance = map.getEntrances().backingMap().values().stream().filter(e -> e.getBlockingBox().get().contains(destVect)).findFirst();
+		}else if (wrapper.getState() == InMapState.ENTERING){
+			var entrance = map.getEntrances().backingMap().values().stream().filter(e -> e.getEntranceTriggerBox().get().contains(destVect)).findFirst();
 			if (entrance.isPresent()) {
 				wrapper.thiefEnterInside(entrance.get());
 			}

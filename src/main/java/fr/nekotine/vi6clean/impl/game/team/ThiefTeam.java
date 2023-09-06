@@ -8,6 +8,7 @@ import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.team.Team;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
+import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.map.Entrance;
@@ -40,7 +41,7 @@ public class ThiefTeam extends Team{
 			thief.teleport(loc);
 			var wrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
 			wrap.setCanLeaveMap(true);
-			wrap.setInside(false);
+			wrap.setState(InMapState.ENTERING);
 			for (var guard : game.getGuards()) {
 				guard.hideEntity(NekotineCore.getAttachedPlugin(), thief);
 			}

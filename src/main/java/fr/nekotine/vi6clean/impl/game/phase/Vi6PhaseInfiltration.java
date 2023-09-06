@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.game.phase;
 import java.time.Duration;
 import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import fr.nekotine.core.NekotineCore;
@@ -57,6 +58,15 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		NekotineCore.MODULES.get(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
 	}
 	
+	@Override
+	protected Object handleComplete() {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		for (var player : game.getPlayerList()) {
+			player.setGameMode(GameMode.SPECTATOR);
+		}
+		return null;
+	}
+	
 	public void checkForCompletion() {
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
 		if (Vi6Main.IOC.resolve(Vi6Game.class).getGuards().stream().allMatch(
@@ -64,7 +74,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				) {
 			var game = Vi6Main.IOC.resolve(Vi6Game.class);
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
-			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(), Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
+			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
+					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
+			complete();
 		}
 	}
 

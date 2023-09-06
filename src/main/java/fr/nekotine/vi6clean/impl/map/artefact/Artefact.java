@@ -10,7 +10,6 @@ import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.block.BlockPatch;
-import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
@@ -33,7 +32,7 @@ public class Artefact{
 	
 	private boolean isCaptured;
 	
-	private AppliedTempBlockPatch blockPatch;
+	private final BlockPatch blockPatch = new BlockPatch(s -> s.setType(Material.AIR)); // For now
 	
 	@ComposingMap
 	private MapBlockLocationElement blockPosition = new MapBlockLocationElement();
@@ -58,8 +57,7 @@ public class Artefact{
 	}
 	
 	public void capture() {
-		blockPatch = new BlockPatch(s -> s.setType(Material.AIR))
-				.patch(Vi6Main.IOC.resolve(Vi6Game.class).getWorld().getBlockAt(
+		blockPatch.patch(Vi6Main.IOC.resolve(Vi6Game.class).getWorld().getBlockAt(
 						blockPosition.getX(),
 						blockPosition.getY(),
 						blockPosition.getZ())
@@ -68,9 +66,7 @@ public class Artefact{
 	}
 	
 	public void clean() {
-		if (blockPatch != null) {
-			blockPatch.unpatch();
-		}
+		blockPatch.unpatchAll();
 		isCaptured = false;
 		capture_advancement = 0;
 	}

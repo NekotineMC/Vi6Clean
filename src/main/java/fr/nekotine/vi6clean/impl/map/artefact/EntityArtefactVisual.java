@@ -3,7 +3,6 @@ package fr.nekotine.vi6clean.impl.map.artefact;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Entity;
