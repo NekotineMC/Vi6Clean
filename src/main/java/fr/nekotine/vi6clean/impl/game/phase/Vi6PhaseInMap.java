@@ -35,6 +35,8 @@ import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
+	private boolean listeningEvents; // Some events are called while teardown is occuring
+	
 	private Vi6Map map;
 	
 	private List<BlockDisplay> debugDisplays = new LinkedList<>();
@@ -89,10 +91,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));
 			}
 		}
+		listeningEvents = true;
 	}
 
 	@Override
 	public void globalTearDown() {
+		listeningEvents = false;
 		for (var display : debugDisplays) {
 			display.remove();
 		}
@@ -140,6 +144,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
+		if (!listeningEvents) {
+			return;
+		}
 		var player = evt.getPlayer();
 		var optWrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 		if (optWrapper.isEmpty()) {
@@ -181,11 +188,17 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		if (!listeningEvents) {
+			return;
+		}
 		map.getArtefacts().backingMap().values().stream().forEach(Artefact::tick);
 	}
 
 	@EventHandler
 	private void onPlayerDeath(PlayerDeathEvent evt) {
+		if (!listeningEvents) {
+			return;
+		}
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var player = evt.getPlayer();
 		if (game.getThiefs().contains(evt.getPlayer())){
