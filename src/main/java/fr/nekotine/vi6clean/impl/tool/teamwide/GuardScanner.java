@@ -75,7 +75,7 @@ public class GuardScanner {
 			pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, new ItemStack(Material.NETHERITE_BOOTS)));
 			equipPacket.getSlotStackPairLists().write(0, pairList);
 			
-			for (var thief : game.getPlayerList()) {
+			for (var thief : game.getThiefs()) {
 				pmanager.sendServerPacket(thief, createPacket);
 				pmanager.sendServerPacket(thief, metadataPacket);
 				pmanager.sendServerPacket(thief, equipPacket);
@@ -92,7 +92,7 @@ public class GuardScanner {
 				var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 				destroyPacket.getIntLists().write(0, idList);
 				
-				for (var thief : game.getPlayerList()) {
+				for (var thief : game.getThiefs()) {
 					pmanager.sendServerPacket(thief, destroyPacket);
 				}
 			}

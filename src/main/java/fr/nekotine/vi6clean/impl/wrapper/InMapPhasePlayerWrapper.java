@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.wrapper;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -90,7 +91,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			@Override
 			public void run() {
 				canCaptureArtefact = true;
-				wrapped.sendMessage(Component.text("Vous pouvez désormais vous voler des artefacts", NamedTextColor.GOLD));
+				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
 			}
 			
 		}.runTaskLater(NekotineCore.getAttachedPlugin(), 30*20);
@@ -109,8 +110,24 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void thiefLeaveMap() {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
-		var infiltrationPhase = Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+		wrapped.setGameMode(GameMode.SPECTATOR);
+		
+		// Send message
+		var infiltrationWrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(wrapped, InfiltrationPhasePlayerWrapper.class);
+		if (infiltrationWrapper.isPresent()) {
+			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+					.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
+					.append(Component.text(infiltrationWrapper.get().getStolenArtefacts().size(), NamedTextColor.AQUA))
+					.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+		}else {
+			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+					.append(Component.text(" s'est échappé!", NamedTextColor.GOLD)));
+		}
+		
+		// Check for game end
+		var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
 		if (infiltrationPhase != null) {
 			infiltrationPhase.checkForCompletion();
 		}

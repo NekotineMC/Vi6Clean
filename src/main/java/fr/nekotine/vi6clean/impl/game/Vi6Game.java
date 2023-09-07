@@ -13,8 +13,10 @@ import org.bukkit.scoreboard.Team.OptionStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.game.phase.PhaseMachine;
+import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
@@ -68,7 +70,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		Set.of(scoreboardGuard, scoreboardThief).forEach(team ->{
 			team.setAllowFriendlyFire(false);
 			team.setCanSeeFriendlyInvisibles(true);
-			team.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.FOR_OWN_TEAM);
+			team.setOption(Option.NAME_TAG_VISIBILITY, OptionStatus.FOR_OTHER_TEAMS);
 			team.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
 		});
 		
@@ -165,6 +167,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void setupGuard(Player player) {
 		scoreboardGuard.addPlayer(player);
+		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		for (var guard : guards) {
+			glowModule.glowEntityFor(guard, player);
+			glowModule.glowEntityFor(player, guard);
+		}
 	}
 	
 	private void tearDownPotentialGuard(Object o) {
@@ -175,14 +182,29 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void tearDownGuard(Player player) {
 		scoreboardGuard.removePlayer(player);
+		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		for (var guard : guards) {
+			glowModule.unglowEntityFor(guard, player);
+			glowModule.unglowEntityFor(player, guard);
+		}
 	}
 	
 	private void setupThief(Player player) {
 		scoreboardThief.addPlayer(player);
+		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		for (var thief : thiefs) {
+			glowModule.glowEntityFor(thief, player);
+			glowModule.glowEntityFor(player, thief);
+		}
 	}
 	
 	private void tearDownThief(Player player) {
 		scoreboardThief.removePlayer(player);
+		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		for (var thief : thiefs) {
+			glowModule.unglowEntityFor(thief, player);
+			glowModule.unglowEntityFor(player, thief);
+		}
 	}
 	
 	private void tearDownPotentialThief(Object o) {
