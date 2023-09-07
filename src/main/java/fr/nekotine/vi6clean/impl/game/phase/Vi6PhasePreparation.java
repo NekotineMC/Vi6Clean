@@ -126,7 +126,6 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 
 	@Override
 	public void itemTearDown(Player item) {
-		item.getInventory().clear();
 	}
 	
 	@Override
