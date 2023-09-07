@@ -93,13 +93,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@Override
 	public void globalTearDown() {
-		map = null;
 		for (var display : debugDisplays) {
 			display.remove();
 		}
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			artefact.clean();
 		}
+		map = null;
 	}
 	
 	@Override
