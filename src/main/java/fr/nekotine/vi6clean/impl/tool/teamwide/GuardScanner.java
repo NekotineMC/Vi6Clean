@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.teamwide;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -23,17 +24,21 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import io.papermc.paper.util.Tick;
 
 public class GuardScanner {
 
 	private @NotNull BukkitTask task;
 	
+	private Duration scanDelay = Duration.ofSeconds(10); // normal = 30s reduced = 10s
+	
 	public void startScanning() {
-		task = Bukkit.getScheduler().runTaskTimer(NekotineCore.getAttachedPlugin(), this::scan, 0, 20 * 5);// normal = 30s reduced = 10s
+		task = Bukkit.getScheduler().runTaskTimer(NekotineCore.getAttachedPlugin(), this::scan, 0, Tick.tick().fromDuration(scanDelay));
 	}
 	
 	public void stopScanning() {
 		task.cancel();
+		task = null;
 	}
 	
 	public void scan() {
@@ -97,6 +102,27 @@ public class GuardScanner {
 				}
 			}
 		}.runTaskLater(NekotineCore.getAttachedPlugin(), 7 * 20);
+	}
+
+	public Duration getScanDelay() {
+		return scanDelay;
+	}
+	
+	public void setScanDelaySeconds(long seconds) {
+		setScanDelay(Duration.ofSeconds(seconds));
+	}
+	
+	public void setScanDelayTicks(long ticks) {
+		setScanDelay(Tick.of(ticks));
+	}
+
+	public void setScanDelay(Duration duration) {
+		var delta = this.scanDelay.minus(duration).abs();
+		scanDelay = duration;
+		if (task != null && Tick.tick().fromDuration(delta) >= 1) {
+			stopScanning();
+			startScanning();
+		}
 	}
 	
 }

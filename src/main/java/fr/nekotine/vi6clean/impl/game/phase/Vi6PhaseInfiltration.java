@@ -74,7 +74,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	
 	public void checkForCompletion() {
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
-		if (Vi6Main.IOC.resolve(Vi6Game.class).getGuards().stream().allMatch(
+		if (Vi6Main.IOC.resolve(Vi6Game.class).getThiefs().stream().allMatch(
 				guard -> !wrappingModule.getWrapper(guard, InMapPhasePlayerWrapper.class).isInside())
 				) {
 			var game = Vi6Main.IOC.resolve(Vi6Game.class);
