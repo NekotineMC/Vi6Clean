@@ -45,7 +45,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	private final ItemStack guardSword = new ItemStackBuilder(Material.DIAMOND_SWORD)
 			.name(Component.text("Épée de garde", NamedTextColor.GOLD))
 			.unbreakable()
-			.oldPvpAtkSpd()
+			.oldPvp()
 			.flags(ItemFlag.values())
 			.build();
 	
