@@ -119,7 +119,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		var inv = item.getInventory();
 		inv.clear();
 		inv.addItem(openMenuUsable.getItemStack());
-		if (!wrap.isThief()) {
+		if (!wrap.isGuard()) {
 			inv.addItem(guardSword);
 		}
 	}
@@ -131,8 +131,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	@Override
 	protected Object handleComplete() {
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
-		return itemCollection.stream()
-				.filter(p -> wrappingModule.getWrapper(p, PlayerWrapper.class).isThief())
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		return game.getThiefs().stream()
 				.peek(p -> {
 					var wrap = wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class);
 					if (wrap.getSelectedEntrance() == null) {
