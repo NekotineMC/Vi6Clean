@@ -1,15 +1,16 @@
 package fr.nekotine.vi6clean.impl.tool;
-/*
-import java.lang.reflect.Constructor;
+
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.function.Supplier;
 
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 
-import fr.nekotine.core.game.phase.Game;
-import fr.nekotine.vi6clean.impl.game.GD_Vi6;
-import fr.nekotine.vi6clean.impl.tool.exception.InvalidToolException;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import fr.nekotine.core.util.EventUtil;
 
 /**
  * Gestionnaire d'outil pour une partie de Vi6.
@@ -18,75 +19,110 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
  * @author XxGoldenbluexX
  *
  * @param <T>
- *//*
+ */
 public abstract class ToolHandler<T extends Tool> implements Listener{
 
-	private final Constructor<T> toolConstructor;
+	private final ToolType type;
 	
-	private List<T> tools = new LinkedList<>();
+	private final Supplier<T> toolSupplier;
 	
-	public ToolHandler(Class<T> toolType) {
-		try {
-			toolConstructor = toolType.getConstructor();
-			toolConstructor.trySetAccessible();
-		}catch(Exception e) {
-			throw new InvalidToolException("Une erreur est survenue lors de la recuperation du constructeur pour l'outil.",e);
-		}
+	private final Collection<T> tools = new LinkedList<>();
+	
+	public ToolHandler(ToolType type, Supplier<T> toolSupplier) {
+		this.type = type;
+		this.toolSupplier = toolSupplier;
 	}
 
-	/**
-	 * Mise en place au lancement de la phase d'infiltration.
-	 * Au moment de cet appel, ce gestionnaire viens d'être ajouté comme {@link org.bukkit.event.Listener Listener bukkit}.
-	 * @param game
-	 *//*
-	public abstract void enableGlobal(Game<GD_Vi6> game);
+	public final void startHandling() {
+		EventUtil.register(this);
+	}
 	
-	/**
-	 * Nettoyage a la fin de la phase d'infiltration.
-	 * Au moment de cet appel, ce gestionnaire viens d'être retiré comme {@link org.bukkit.event.Listener Listener bukkit}.
-	 * @param game
-	 *//*
-	public abstract void disableGlobal(Game<GD_Vi6> game);
-	
-	/**
-	 * Activation de l'outil (par exemple quand le joueur entre dans la map).
-	 * L'ItemStack représentant l'outil est déja dans l'inventaire du joueur a ce moment.
-	 * @param tool
-	 *//*
-	protected abstract void enableTool(T tool, PlayerWrapper wrapper);
-	
-	/**
-	 * Activation de l'outil (par exemble quand le joueur sort de la map)
-	 * @param tool
-	 *//*
-	protected abstract void disableTool(T tool, PlayerWrapper wrapper);
-	
-	/**
-	 * Crée un nouvel outil.
-	 * @return
-	 *//*
-	protected final T makeNewTool() {
-		try {
-			return toolConstructor.newInstance();
-		}catch(Exception e) {
-		throw new InvalidToolException("Une erreur est survenue lors de la creation de l'outil via son constructeur.", e);
+	public final void stopHandling() {
+		for (var tool : tools) {
+			detachFromOwner(tool);
 		}
-	};
-	
-	public final void attachNewToolToPlayer(PlayerWrapper wrapper) {
-		var tool = makeNewTool();
-		tools.add(tool);
-		wrapper.GetWrapped().getInventory().addItem(tool.getItemStack());
-		enableTool(tool, wrapper);
+		tools.clear();
+		EventUtil.unregister(this);
 	}
 	
-	public final void detachToolFromPlayer(T tool, PlayerWrapper wrapper) {
+	/**
+	 * Try to make and attach new tool to player. Attachment can be denied if there is a limit on this type of tool.
+	 * If tool attachment is denied, the new tool is discarded.
+	 * @param player
+	 * @return If tool could be attached.
+	 */
+	public final boolean attachNewToPlayer(Player player) {
+		var tool = toolSupplier.get();
+		if (attachToPlayer(tool, player)) {
+			player.getInventory().addItem(tool.getItemStack());
+			tools.add(tool);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Try to attach tool to player. Attachment can be denied if there is a limit on this type of tool
+	 * @param player
+	 * @return If tool could be attached.
+	 */
+	public final boolean attachToPlayer(T tool, Player player) {
+		if (type.getLimite() <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
+			return false;
+		}
+		tool.setOwner(player);
+		onAttachedToPlayer(tool, player);
+		return true;
+	}
+	
+	public final void detachFromOwner(T tool) {
+		if (tool.getOwner() == null) {
+			return;
+		}
+		onDetachFromPlayer(tool, tool.getOwner());
+		tool.setOwner(null);
+	}
+	
+	public final void remove(T tool) {
+		detachFromOwner(tool);
 		tools.remove(tool);
-		disableTool(tool, wrapper);
 	}
 	
-	public List<T> getToolList(){
+	protected abstract void onAttachedToPlayer(T tool, Player player);
+	
+	protected abstract void onDetachFromPlayer(T tool, Player player);
+	
+	public Collection<T> getTools(){
 		return tools;
 	}
+
+	public ToolType getType() {
+		return type;
+	}
+	
+	@EventHandler
+	private void onPlayerDrop(PlayerDropItemEvent evt) {
+		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack())).findFirst();
+		if (optionalTool.isEmpty()) {
+			return;
+		}
+		var tool = optionalTool.get();
+		if (evt.getPlayer().equals(tool.getOwner())) {
+			detachFromOwner(tool);
+		}
+	}
+	
+	@EventHandler
+	private void onPlayerPickup(EntityPickupItemEvent evt) {
+		if (!(evt.getEntity() instanceof Player player)) {
+			return;
+		}
+		var optionalTool = tools.stream().filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
+		if (optionalTool.isEmpty()) {
+			return;
+		}
+		if (!attachToPlayer(optionalTool.get(), player)) {
+			evt.setCancelled(true);
+		}
+	}
 }
-*/

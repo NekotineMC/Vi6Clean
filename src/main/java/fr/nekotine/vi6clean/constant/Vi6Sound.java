@@ -20,6 +20,9 @@ public enum Vi6Sound {
 	
 	SCANNER_SCAN(new Sound[] {
 		Sound.sound(Key.key("block.beacon.power_select"), Sound.Source.VOICE, 1, 1)
+	}),
+	INVISNEAK_REVEALED(new Sound[] {
+		Sound.sound(Key.key("block.lava.extinguish"), Sound.Source.MASTER, 0.1f, 2)
 	});
 	
 	private Sound[] sounds;

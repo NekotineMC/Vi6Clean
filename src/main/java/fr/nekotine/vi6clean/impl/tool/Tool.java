@@ -1,24 +1,35 @@
 package fr.nekotine.vi6clean.impl.tool;
 
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import fr.nekotine.core.util.InventoryUtil;
 
 public abstract class Tool {
 	
-	private final ItemStack itemStack = new ItemStack(Material.STONE);
+	private ItemStack itemStack = makeInitialItemStack();
 	
-	private boolean markedForRemoval;
+	private Player owner;
+	
+	protected abstract ItemStack makeInitialItemStack();
 	
 	public final ItemStack getItemStack() {
 		return itemStack;
 	}
 	
-	public final void setMarkedForRemoval(boolean markedForRemoval) {
-		this.markedForRemoval = markedForRemoval;
+	public final void setItemStack(ItemStack stack) {
+		if (owner != null) {
+			InventoryUtil.replaceItem(owner.getInventory(), itemStack, stack);
+		}
+		itemStack = stack;
 	}
-	
-	public final boolean isMarkedForRemoval() {
-		return markedForRemoval;
+
+	public Player getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Player owner) {
+		this.owner = owner;
 	}
 	
 }

@@ -122,6 +122,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		if (!wrap.isGuard()) {
 			inv.addItem(guardSword);
 		}
+		Vi6PhaseInMap.tempHandler.attachNewToPlayer(item);
 	}
 
 	@Override
