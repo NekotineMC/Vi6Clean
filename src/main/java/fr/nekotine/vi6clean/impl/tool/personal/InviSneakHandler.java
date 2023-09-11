@@ -14,8 +14,8 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6EffectType;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -35,8 +35,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
-			Placeholder.parsed("statusname", Vi6EffectType.INVISIBLE.getStatusName()),
-			Placeholder.component("statusdescription", Vi6EffectType.INVISIBLE.getDescription())
+			Placeholder.parsed("statusname", InvisibleStatusFlag.getStatusName())
 			);
 	
 	public static final ItemStack VISIBLE_ITEM = ItemStackUtil.make(Material.WHITE_STAINED_GLASS_PANE,

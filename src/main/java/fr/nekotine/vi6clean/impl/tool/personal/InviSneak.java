@@ -5,10 +5,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
 public class InviSneak extends Tool{
@@ -66,14 +69,18 @@ public class InviSneak extends Tool{
 	}
 	
 	private void statusUpdate() {
+		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
 		if (sneaking) {
 			if (revealed) {
 				setItemStack(InviSneakHandler.REVEALED_ITEM);
+				flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 			}else {
 				setItemStack(InviSneakHandler.INVISIBLE_ITEM);
+				flagModule.addFlag(getOwner(), InvisibleStatusFlag.get());
 			}
 		}else {
 			setItemStack(InviSneakHandler.VISIBLE_ITEM);
+			flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 		}
 	}
 }
