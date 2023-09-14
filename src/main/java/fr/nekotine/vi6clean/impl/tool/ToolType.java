@@ -3,10 +3,16 @@ package fr.nekotine.vi6clean.impl.tool;
 import java.util.function.Supplier;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.inventory.menu.MenuElement;
+import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
+import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -19,7 +25,9 @@ public enum ToolType {
 			1 			// LIMIT
 			);
 	
-	private final ItemStack menuItem;
+	private ToolHandler<?> handler;
+	
+	private final MenuElement shopItem;
 	
 	private final Supplier<ToolHandler<?>> handlerSupplier;
 	
@@ -28,26 +36,48 @@ public enum ToolType {
 	private final int limite;
 	
 	private ToolType(ItemStack menuItem, Supplier<ToolHandler<?>> handlerSupplier, int price, int limite) {
-		this.menuItem = menuItem;
+		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 		this.handlerSupplier = handlerSupplier;
 		this.price = price;
 		this.limite = limite;
 	}
 	
-	public ItemStack getMenuItem() {
-		return menuItem;
+	public MenuElement getShopMenuItem() {
+		return shopItem;
 	}
 	
 	public int getLimite() {
 		return limite;
 	}
 	
-	public Supplier<ToolHandler<?>> getHandlerSupplier(){
-		return handlerSupplier;
+	public ToolHandler<?> getHandler(){
+		if (handler == null) {
+			handler = handlerSupplier.get();
+		}
+		return handler;
 	}
 
 	public int getPrice() {
 		return price;
+	}
+	
+	/**
+	 * 
+	 * @param player
+	 * @return buy succesfull
+	 */
+	public boolean tryBuy(Player player) {
+		var optionalWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optionalWrap.isEmpty()) {
+			return false;
+		}
+		var wrap = optionalWrap.get();
+		if (wrap.getMoney() < price) {
+			return false;
+		}
+		wrap.setMoney(wrap.getMoney() - price);
+		getHandler().attachNewToPlayer(player);
+		return true;
 	}
 	
 }

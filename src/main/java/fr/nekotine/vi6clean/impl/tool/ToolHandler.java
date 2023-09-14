@@ -38,11 +38,15 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	}
 	
 	public final void stopHandling() {
+		EventUtil.unregister(this);
+	}
+	
+	public final void removeAll() {
 		for (var tool : tools) {
 			detachFromOwner(tool);
+			tool.cleanup();
 		}
 		tools.clear();
-		EventUtil.unregister(this);
 	}
 	
 	/**
@@ -85,6 +89,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	
 	public final void remove(T tool) {
 		detachFromOwner(tool);
+		tool.cleanup();
 		tools.remove(tool);
 	}
 	

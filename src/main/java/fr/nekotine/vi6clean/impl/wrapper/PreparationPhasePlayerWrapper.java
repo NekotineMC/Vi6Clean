@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.item.BooleanInputMenuItem;
-import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
+import fr.nekotine.core.inventory.menu.layout.ToolbarMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
@@ -15,11 +15,14 @@ import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
+	private int money = 1000;
+	
 	private MenuInventory menu;
 	
 	private boolean readyForNextPhase;
@@ -33,9 +36,12 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
 		var wrapLayout = new WrapMenuLayout();
-		wrapLayout.addMenuElement(readyItem);
-		var border = new BorderMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
-		menu = new MenuInventory(border,3);
+		for (var tool : ToolType.values()){
+			wrapLayout.addMenuElement(tool.getShopMenuItem());
+		}
+		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
+		toolbar.addTool(readyItem);
+		menu = new MenuInventory(toolbar,6);
 	}
 
 	public MenuInventory getMenu() {
@@ -72,6 +78,14 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public InMapPhasePlayerWrapper getParentWrapper() {
 		return NekotineCore.MODULES.get(WrappingModule.class).getWrapper(wrapped, InMapPhasePlayerWrapper.class);
+	}
+
+	public int getMoney() {
+		return money;
+	}
+
+	public void setMoney(int money) {
+		this.money = money;
 	}
 	
 }

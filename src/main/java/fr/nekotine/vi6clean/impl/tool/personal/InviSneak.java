@@ -52,6 +52,9 @@ public class InviSneak extends Tool{
 			return;
 		}
 		var player = getOwner();
+		if (player == null) {
+			return;
+		}
 		var loc = player.getLocation();
 		if (revealed) {
 			var world = Vi6Main.IOC.resolve(Vi6Game.class).getWorld();
@@ -82,5 +85,11 @@ public class InviSneak extends Tool{
 			setItemStack(InviSneakHandler.VISIBLE_ITEM);
 			flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 		}
+	}
+
+	@Override
+	protected void cleanup() {
+		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 	}
 }

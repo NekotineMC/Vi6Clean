@@ -13,6 +13,8 @@ public abstract class Tool {
 	
 	protected abstract ItemStack makeInitialItemStack();
 	
+	protected abstract void cleanup();
+	
 	public final ItemStack getItemStack() {
 		return itemStack;
 	}
