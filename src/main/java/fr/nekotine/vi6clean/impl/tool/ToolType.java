@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
-import fr.nekotine.core.inventory.menu.MenuElement;
-import fr.nekotine.core.inventory.menu.item.ActionMenuItem;
+import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
+import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
@@ -72,12 +72,11 @@ public enum ToolType {
 			return false;
 		}
 		var wrap = optionalWrap.get();
-		if (wrap.getMoney() < price) {
-			return false;
+		if (wrap.getMoney() >= price && getHandler().attachNewToPlayer(player)) {
+			wrap.setMoney(wrap.getMoney() - price);
+			return true;
 		}
-		wrap.setMoney(wrap.getMoney() - price);
-		getHandler().attachNewToPlayer(player);
-		return true;
+		return false;
 	}
 	
 }

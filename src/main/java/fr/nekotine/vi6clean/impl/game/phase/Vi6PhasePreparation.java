@@ -119,7 +119,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		var inv = item.getInventory();
 		inv.clear();
 		inv.addItem(openMenuUsable.getItemStack());
-		if (!wrap.isGuard()) {
+		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 		}
 	}

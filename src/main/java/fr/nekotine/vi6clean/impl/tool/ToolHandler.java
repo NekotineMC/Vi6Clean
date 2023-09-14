@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,23 +12,25 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.Vi6Main;
 
 /**
- * Gestionnaire d'outil pour une partie de Vi6.
- * Une instance par partie.
- * L'objectif de cette classe est de fournir le comportemant attendu à tous les outils d'un même type.
+ * Gestionnaire d'outil pour une partie de Vi6. Une instance par partie.
+ * L'objectif de cette classe est de fournir le comportemant attendu à tous les
+ * outils d'un même type.
+ * 
  * @author XxGoldenbluexX
  *
  * @param <T>
  */
-public abstract class ToolHandler<T extends Tool> implements Listener{
+public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	private final ToolType type;
-	
+
 	private final Supplier<T> toolSupplier;
-	
+
 	private final Collection<T> tools = new LinkedList<>();
-	
+
 	public ToolHandler(ToolType type, Supplier<T> toolSupplier) {
 		this.type = type;
 		this.toolSupplier = toolSupplier;
@@ -36,22 +39,32 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 	public final void startHandling() {
 		EventUtil.register(this);
 	}
-	
+
 	public final void stopHandling() {
 		EventUtil.unregister(this);
 	}
-	
+
 	public final void removeAll() {
 		for (var tool : tools) {
-			detachFromOwner(tool);
-			tool.cleanup();
+			try {
+				detachFromOwner(tool);
+			}catch(Exception e) {
+				Vi6Main.LOGGER.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+type, e);
+			}
+			try {
+				tool.cleanup();
+			}catch(Exception e) {
+				Vi6Main.LOGGER.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+type, e);
+			}
 		}
 		tools.clear();
 	}
-	
+
 	/**
-	 * Try to make and attach new tool to player. Attachment can be denied if there is a limit on this type of tool.
-	 * If tool attachment is denied, the new tool is discarded.
+	 * Try to make and attach new tool to player. Attachment can be denied if there
+	 * is a limit on this type of tool. If tool attachment is denied, the new tool
+	 * is discarded.
+	 * 
 	 * @param player
 	 * @return If tool could be attached.
 	 */
@@ -64,9 +77,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Try to attach tool to player. Attachment can be denied if there is a limit on this type of tool
+	 * Try to attach tool to player. Attachment can be denied if there is a limit on
+	 * this type of tool
+	 * 
 	 * @param player
 	 * @return If tool could be attached.
 	 */
@@ -78,7 +93,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 		onAttachedToPlayer(tool, player);
 		return true;
 	}
-	
+
 	public final void detachFromOwner(T tool) {
 		if (tool.getOwner() == null) {
 			return;
@@ -86,28 +101,29 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 		onDetachFromPlayer(tool, tool.getOwner());
 		tool.setOwner(null);
 	}
-	
+
 	public final void remove(T tool) {
 		detachFromOwner(tool);
 		tool.cleanup();
 		tools.remove(tool);
 	}
-	
+
 	protected abstract void onAttachedToPlayer(T tool, Player player);
-	
+
 	protected abstract void onDetachFromPlayer(T tool, Player player);
-	
-	public Collection<T> getTools(){
+
+	public Collection<T> getTools() {
 		return tools;
 	}
 
 	public ToolType getType() {
 		return type;
 	}
-	
+
 	@EventHandler
 	private void onPlayerDrop(PlayerDropItemEvent evt) {
-		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack())).findFirst();
+		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
+				.findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
 		}
@@ -116,13 +132,14 @@ public abstract class ToolHandler<T extends Tool> implements Listener{
 			detachFromOwner(tool);
 		}
 	}
-	
+
 	@EventHandler
 	private void onPlayerPickup(EntityPickupItemEvent evt) {
 		if (!(evt.getEntity() instanceof Player player)) {
 			return;
 		}
-		var optionalTool = tools.stream().filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
+		var optionalTool = tools.stream()
+				.filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
 		}

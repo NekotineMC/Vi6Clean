@@ -2,10 +2,12 @@ package fr.nekotine.vi6clean.impl.wrapper;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.MenuInventory;
-import fr.nekotine.core.inventory.menu.item.BooleanInputMenuItem;
+import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
+import fr.nekotine.core.inventory.menu.element.ComponentDisplayMenuItem;
 import fr.nekotine.core.inventory.menu.layout.ToolbarMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.util.ItemStackUtil;
@@ -31,15 +33,17 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
+		var moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
 		var readyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
 		var wrapLayout = new WrapMenuLayout();
 		for (var tool : ToolType.values()){
-			wrapLayout.addMenuElement(tool.getShopMenuItem());
+			wrapLayout.addElement(tool.getShopMenuItem());
 		}
 		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
+		toolbar.addTool(moneyIndicator);
 		toolbar.addTool(readyItem);
 		menu = new MenuInventory(toolbar,6);
 	}
@@ -82,6 +86,10 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public int getMoney() {
 		return money;
+	}
+	
+	public Component getMoneyDisplay() {
+		return Component.text("Argent: "+money, NamedTextColor.GOLD);
 	}
 
 	public void setMoney(int money) {

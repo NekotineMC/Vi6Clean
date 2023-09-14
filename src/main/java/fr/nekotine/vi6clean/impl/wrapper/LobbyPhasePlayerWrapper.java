@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.MenuInventory;
-import fr.nekotine.core.inventory.menu.item.BooleanInputMenuItem;
+import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
 import fr.nekotine.core.util.ItemStackUtil;
@@ -43,8 +43,8 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
 		var wrapLayout = new WrapMenuLayout();
-		wrapLayout.addMenuElement(readyItem);
-		wrapLayout.addMenuElement(changeTeamItem);
+		wrapLayout.addElement(readyItem);
+		wrapLayout.addElement(changeTeamItem);
 		var border = new BorderMenuLayout(ItemStackUtil.make(Material.GREEN_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
 		menu = new MenuInventory(border,3);
 	}
