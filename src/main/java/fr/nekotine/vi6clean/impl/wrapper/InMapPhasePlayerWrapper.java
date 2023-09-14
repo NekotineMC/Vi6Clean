@@ -73,6 +73,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public void thiefScheduleCanLeaveMap() {
 		setCanLeaveMap(false);
+		wrapped.sendMessage(Component.text("Vous pouvez pas vous enfuire avant 30s", NamedTextColor.RED));
 		new BukkitRunnable() {
 			
 			@Override
@@ -86,6 +87,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public void thiefScheduleCanCaptureArtefact() {
 		canCaptureArtefact = false;
+		wrapped.sendMessage(Component.text("Vous pouvez pas voler d'artefacts avant 30s", NamedTextColor.RED));
 		new BukkitRunnable() {
 			
 			@Override
@@ -138,7 +140,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public boolean canCaptureArtefact() {
-		return canCaptureArtefact;
+		return canCaptureArtefact && isInside();
 	}
 
 	public void setCanCaptureArtefact(boolean canCaptureArtefact) {

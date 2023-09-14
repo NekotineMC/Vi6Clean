@@ -14,7 +14,6 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Entrance;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.tool.teamwide.GuardScanner;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
@@ -52,10 +51,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	@Override
 	protected void globalTearDown() {
 		scanner.stopScanning();
-		for (var tool : ToolType.values()) {
-			tool.getHandler().stopHandling();
-			tool.getHandler().removeAll();
-		}
 	}
 
 	@Override

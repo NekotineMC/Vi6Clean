@@ -16,6 +16,7 @@ import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -81,6 +82,7 @@ public class Artefact{
 	
 	public void tick() {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var wrapping = NekotineCore.MODULES.get(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5, blockPosition.getY()+0.5, blockPosition.getZ()+0.5, 1, 0.5, 0.5, 0.5, 0);
 		}else {
@@ -105,6 +107,10 @@ public class Artefact{
 					player.sendActionBar(guardMsg);
 				}
 				if (game.getThiefs().contains(player)) {
+					var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+					if (optWrapper.isEmpty() || !optWrapper.get().canCaptureArtefact()) {
+						continue;
+					}
 					tickAdvancement++;
 					firstThief = player;
 					player.sendActionBar(thiefMsg);

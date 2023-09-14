@@ -35,7 +35,6 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Entrance;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -103,9 +102,6 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				e.setCancelled(true);
 			}
 		}.register();
-		for (var tool : ToolType.values()) {
-			tool.getHandler().startHandling();
-		}
 	}
 
 	@Override
@@ -126,7 +122,6 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		if (!wrap.isGuard()) {
 			inv.addItem(guardSword);
 		}
-		Vi6PhaseInMap.tempHandler.attachNewToPlayer(item);
 	}
 
 	@Override

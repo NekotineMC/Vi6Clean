@@ -31,12 +31,10 @@ import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
-import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
+import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
-	
-	public static InviSneakHandler tempHandler = new InviSneakHandler();
 	
 	private boolean listeningEvents; // Some events are called while teardown is occuring
 	
@@ -94,14 +92,19 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));
 			}
 		}
-		tempHandler.startHandling();
+		for (var tool : ToolType.values()) {
+			tool.getHandler().startHandling();
+		}
 		listeningEvents = true;
 	}
 
 	@Override
 	public void globalTearDown() {
 		listeningEvents = false;
-		tempHandler.stopHandling();
+		for (var tool : ToolType.values()) {
+			tool.getHandler().stopHandling();
+			tool.getHandler().removeAll();
+		}
 		for (var display : debugDisplays) {
 			display.remove();
 		}
