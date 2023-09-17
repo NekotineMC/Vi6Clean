@@ -43,8 +43,8 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
 		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
-		toolbar.addTool(moneyIndicator);
 		toolbar.addTool(readyItem);
+		toolbar.addTool(moneyIndicator);
 		menu = new MenuInventory(toolbar,6);
 	}
 
