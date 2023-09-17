@@ -82,6 +82,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		phaseMachine.registerPhase(Vi6PhaseLobby.class, Vi6PhaseLobby::new);
 		phaseMachine.registerPhase(Vi6PhasePreparation.class, Vi6PhasePreparation::new);
 		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
+		phaseMachine.setLooping(true);
 		
 		// TODO Setup majordom to Vi6Main.IOC
 	}
