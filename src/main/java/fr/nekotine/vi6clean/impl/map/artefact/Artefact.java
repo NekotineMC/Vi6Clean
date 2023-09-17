@@ -84,9 +84,9 @@ public class Artefact{
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var wrapping = NekotineCore.MODULES.get(WrappingModule.class);
 		if(isCaptured) {
-			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(), 1, 0.5, 0.5, 0.5, 0);
+			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
 		}else {
-			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(), 2, 0.5, 0.5, 0.5);
+			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 2, 0.5, 0.5, 0.5);
 			int tickAdvancement = 0;
 			boolean guardCanceling = false;
 			Player firstThief = null;
