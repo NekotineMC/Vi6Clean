@@ -37,6 +37,9 @@ public class GuardScanner {
 	}
 	
 	public void stopScanning() {
+		if (task == null) {
+			return;
+		}
 		task.cancel();
 		task = null;
 	}
