@@ -2,8 +2,10 @@ package fr.nekotine.vi6clean.impl.wrapper;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 
 import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
@@ -25,13 +27,13 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public LobbyPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var playerWrapper = getParentWrapper();
 		var changeTeamItem = new BooleanInputMenuItem(
 				ItemStackUtil.make(Material.RED_BANNER, Component.text("Voleur", NamedTextColor.RED)),
 				ItemStackUtil.make(Material.BLUE_BANNER, Component.text("Garde", NamedTextColor.BLUE)),
 				playerWrapper::isThief,
 				(isThief) -> {
-					var game = Vi6Main.IOC.resolve(Vi6Game.class);
 					if (isThief) {
 						game.addPlayerInThiefs(wrapped);
 					}else {
@@ -42,9 +44,15 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
+		var debugItem = new BooleanInputMenuItem(
+				new ItemStackBuilder(Material.GOLDEN_PICKAXE).flags(ItemFlag.values()).enchant().name(Component.text("Débug activé", NamedTextColor.YELLOW)).build(),
+				ItemStackUtil.make(Material.GOLDEN_PICKAXE, Component.text("Débug désactivé", NamedTextColor.GRAY)),
+				game::isDebug,
+				game::setDebug);
 		var wrapLayout = new WrapMenuLayout();
 		wrapLayout.addElement(readyItem);
 		wrapLayout.addElement(changeTeamItem);
+		wrapLayout.addElement(debugItem);
 		var border = new BorderMenuLayout(ItemStackUtil.make(Material.GREEN_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
 		menu = new MenuInventory(border,3);
 	}
