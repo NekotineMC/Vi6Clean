@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
@@ -19,6 +21,8 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Vi6PhaseGlobal extends CollectionPhase<Void, Player>{
 
+	private final PotionEffect saturation = new PotionEffect(PotionEffectType.SATURATION, -1, 0, false, false, false);
+	
 	public Vi6PhaseGlobal(IPhaseMachine machine) {
 		super(machine);
 	}
@@ -46,6 +50,7 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player>{
 		EntityUtil.clearPotionEffects(item);
 		EntityUtil.defaultAllAttributes(item);
 		item.getInventory().clear();
+		item.addPotionEffect(saturation);
 	}
 
 	@Override
