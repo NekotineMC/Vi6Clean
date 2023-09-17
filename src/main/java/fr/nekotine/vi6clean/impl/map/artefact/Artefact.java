@@ -11,6 +11,7 @@ import org.bukkit.util.BoundingBox;
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.map.annotation.ComposingMap;
+import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -27,7 +28,9 @@ public class Artefact{
 	
 	private int capture_advancement;
 	
-	private String name;
+	@MapDictKey
+	@ComposingMap
+	private String name = "";
 	
 	private Set<Player> inside = new HashSet<>(8);
 	
@@ -51,10 +54,6 @@ public class Artefact{
 
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public void capture() {

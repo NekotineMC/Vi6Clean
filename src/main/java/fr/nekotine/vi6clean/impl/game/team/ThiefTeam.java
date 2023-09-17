@@ -11,7 +11,7 @@ import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
-import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class ThiefTeam extends Team{
@@ -33,11 +33,11 @@ public class ThiefTeam extends Team{
 		}
 	}
 	
-	public void spawnToEntrances(Map<Player, Entrance> entranceMap) {
+	public void spawnInMap(Map<Player, ThiefSpawn> spawnMap) {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
 		for(var thief : this){
-			var loc = entranceMap.get(thief).getSpawnPoint().toLocation(game.getWorld());
+			var loc = spawnMap.get(thief).getSpawnPoint().toLocation(game.getWorld());
 			thief.teleport(loc);
 			var wrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
 			wrap.setCanLeaveMap(true);

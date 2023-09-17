@@ -19,6 +19,10 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<Entrance> entrances = new MapDictionaryElement<>();
 	
+	@MapElementTyped(ThiefSpawn.class)
+	@ComposingMap
+	private MapDictionaryElement<ThiefSpawn> thiefSpawns = new MapDictionaryElement<>();
+	
 	@MapElementTyped(MapBlockBoundingBoxElement.class)
 	@ComposingMap
 	private MapDictionaryElement<MapBlockBoundingBoxElement> exits = new MapDictionaryElement<>();
@@ -45,6 +49,10 @@ public class Vi6Map{
 
 	public MapDictionaryElement<Entrance> getEntrances() {
 		return entrances;
+	}
+	
+	public MapDictionaryElement<ThiefSpawn> getThiefSpawns() {
+		return thiefSpawns;
 	}
 
 	public MapDictionaryElement<MapBlockBoundingBoxElement> getExits() {

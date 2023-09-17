@@ -34,7 +34,7 @@ import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -49,7 +49,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			.flags(ItemFlag.values())
 			.build();
 	
-	private Map<ArmorStand, Entrance> minimapEntrancesIndicator = new HashMap<>();
+	private Map<ArmorStand, ThiefSpawn> minimapSpawnIndicators = new HashMap<>();
 	
 	private Usable openMenuUsable;
 	
@@ -72,8 +72,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		var world = game.getWorld();
 		var map = getParent().getMap();
-		minimapEntrancesIndicator.clear();
-		map.getEntrances().backingMap().values().stream().forEach(entrance -> {
+		minimapSpawnIndicators.clear();
+		map.getThiefSpawns().backingMap().values().stream().forEach(entrance -> {
 			var pos = entrance.getMinimapPosition();
 			var armorStand = (ArmorStand)world.spawnEntity(pos.toLocation(world), EntityType.ARMOR_STAND);
 			armorStand.setVisible(false);
@@ -81,7 +81,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			armorStand.setGravity(false);
 			armorStand.setVisualFire(true);
 			armorStand.addDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HAND,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.OFF_HAND);
-			minimapEntrancesIndicator.put(armorStand, entrance);
+			minimapSpawnIndicators.put(armorStand, entrance);
 		});
 		game.getGuards().spawnInMap();
 		game.getThiefs().spawnInMinimap();
@@ -106,10 +106,10 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 
 	@Override
 	public void globalTearDown() {
-		for (var armorStand : minimapEntrancesIndicator.keySet()) {
+		for (var armorStand : minimapSpawnIndicators.keySet()) {
 			armorStand.remove();
 		}
-		minimapEntrancesIndicator.clear();
+		minimapSpawnIndicators.clear();
 		openMenuUsable.unregister();
 	}
 
@@ -136,18 +136,18 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		return game.getThiefs().stream()
 				.peek(p -> {
 					var wrap = wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class);
-					if (wrap.getSelectedEntrance() == null) {
-						wrap.setSelectedEntrance(randomEntrance());
+					if (wrap.getSelectedSpawn() == null) {
+						wrap.setSelectedSpawn(randomSpawn());
 					}
 				})
 				.collect(Collectors.toMap(p -> p,
-				p -> wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class).getSelectedEntrance()));
+				p -> wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class).getSelectedSpawn()));
 	}
 	
-	private Entrance randomEntrance() {
+	private ThiefSpawn randomSpawn() {
 		var rand = new Random();
-		var entrances = getParent().getMap().getEntrances().backingMap().values();
-		return entrances.stream().skip(rand.nextInt(entrances.size()+1)-1).findFirst().orElse(null);
+		var spawns = getParent().getMap().getThiefSpawns().backingMap().values();
+		return spawns.stream().skip(rand.nextInt(spawns.size()+1)-1).findFirst().orElse(null);
 	}
 	
 	@Override
@@ -174,10 +174,10 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	
 	@EventHandler
 	public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent e) {
-		var entrance = minimapEntrancesIndicator.get(e.getRightClicked());
+		var entrance = minimapSpawnIndicators.get(e.getRightClicked());
 		if (entrance != null) {
 			var wrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
-			wrapper.setSelectedEntrance(entrance);
+			wrapper.setSelectedSpawn(entrance);
 		}
 	}
 

@@ -16,7 +16,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
-import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,7 +29,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private boolean readyForNextPhase;
 	
-	private Entrance selectedEntrance;
+	private ThiefSpawn selectedSpawn;
 	
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
@@ -61,7 +61,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
-		if (readyForNextPhase && selectedEntrance == null && !getParentWrapper().isInside()) {
+		if (readyForNextPhase && selectedSpawn == null && !getParentWrapper().isInside()) {
 			wrapped.sendMessage(Component.text("Vous devez sélectionner une entrée.", NamedTextColor.RED));
 			return;
 		}
@@ -71,13 +71,13 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 	}
 
-	public Entrance getSelectedEntrance() {
-		return selectedEntrance;
+	public ThiefSpawn getSelectedSpawn() {
+		return selectedSpawn;
 	}
 
-	public void setSelectedEntrance(Entrance selectedEntrance) {
-		this.selectedEntrance = selectedEntrance;
-		wrapped.sendMessage(Component.text("Entrée "+selectedEntrance.getName()+" sélectionnée", NamedTextColor.DARK_GREEN));
+	public void setSelectedSpawn(ThiefSpawn selectedSpawn) {
+		this.selectedSpawn = selectedSpawn;
+		wrapped.sendMessage(Component.text("Entrée "+selectedSpawn.getName()+" sélectionnée", NamedTextColor.DARK_GREEN));
 	}
 	
 	public InMapPhasePlayerWrapper getParentWrapper() {

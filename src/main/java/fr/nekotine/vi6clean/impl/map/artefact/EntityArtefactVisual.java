@@ -44,6 +44,7 @@ public class EntityArtefactVisual implements ArtefactVisual{
 	
 	public EntityArtefactVisual(Location location, byte[] serializedEntity) {
 		loc = location;
+		loc.getBlock();
 		this.serializedEntity = serializedEntity;
 	}
 	
