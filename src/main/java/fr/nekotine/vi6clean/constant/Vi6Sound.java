@@ -23,6 +23,19 @@ public enum Vi6Sound {
 	}),
 	INVISNEAK_REVEALED(new Sound[] {
 		Sound.sound(Key.key("block.lava.extinguish"), Sound.Source.MASTER, 0.1f, 2)
+	}),
+	OMNICAPTEUR_PLACE(new Sound[] {
+	Sound.sound(Key.key("entity.vex.hurt"), Sound.Source.MASTER, 2, 0.1F),
+	Sound.sound(Key.key("item.flintandsteel.use"), Sound.Source.MASTER, 2, 0.1F)
+	}),
+	OMNICAPTEUR_PICKUP(new Sound[] {
+	Sound.sound(Key.key("block.ladder.hit"), Sound.Source.MASTER, 0.8f, 2F),
+	Sound.sound(Key.key("block.note_block.hat"), Sound.Source.MASTER, 1f, 0.1F)
+	}),
+	OMNICAPTEUR_DETECT(new Sound[] {
+	Sound.sound(Key.key("block.note_block.bell"), Sound.Source.MASTER, 0.3f, 0.1F),
+	Sound.sound(Key.key("block.note_block.cow_bell"), Sound.Source.MASTER, 2, 0.5F),
+	Sound.sound(Key.key("block.note_block.bass"), Sound.Source.MASTER, 2, 0.1F)
 	});
 	
 	private Sound[] sounds;

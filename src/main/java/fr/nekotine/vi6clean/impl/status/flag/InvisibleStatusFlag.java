@@ -7,6 +7,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.status.flag.StatusFlag;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
@@ -29,6 +30,9 @@ public class InvisibleStatusFlag implements StatusFlag{
 	
 	@Override
 	public void applyStatus(LivingEntity appliedTo) {
+		if (NekotineCore.MODULES.get(StatusFlagModule.class).hasAny(appliedTo, OmniCaptedStatusFlag.get())) {
+			return;
+		}
 		appliedTo.addPotionEffect(invisibleEffect);
 		if (!(appliedTo instanceof Player player)) {
 			return;

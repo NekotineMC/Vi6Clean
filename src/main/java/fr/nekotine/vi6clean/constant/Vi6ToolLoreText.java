@@ -21,6 +21,11 @@ public enum Vi6ToolLoreText {
 			"<lore>lorsque vous êtes <important>accroupis (<key:key.sneak>).</important>",
 			"<lore>Vous êtes visible si un ennemi est",
 			"<lore>à moins de <variable><range></variable> de vous"
+	),
+	OMNICAPTOR("<lore>Pose un capteur qui affiche",
+			"<lore>en <variable><statusname></variable> les ennemis",
+			"<lore>à moins de <variable><range></variable>.",
+			"<lore>Peut être récupéré et déplacé."
 	);
 	
 	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(

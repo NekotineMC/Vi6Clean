@@ -3,11 +3,12 @@ package fr.nekotine.vi6clean.impl.tool;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.InventoryUtil;
 
 public abstract class Tool {
 	
-	private ItemStack itemStack = makeInitialItemStack();
+	private ItemStack itemStack;
 	
 	private Player owner;
 	
@@ -16,10 +17,14 @@ public abstract class Tool {
 	protected abstract void cleanup();
 	
 	public final ItemStack getItemStack() {
+		if (itemStack == null) {
+			itemStack = makeInitialItemStack();
+		}
 		return itemStack;
 	}
 	
 	public final void setItemStack(ItemStack stack) {
+		AssertUtil.nonNull(stack);
 		if (owner != null) {
 			InventoryUtil.replaceItem(owner.getInventory(), itemStack, stack);
 		}

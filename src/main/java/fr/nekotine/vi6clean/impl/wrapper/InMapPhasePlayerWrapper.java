@@ -73,13 +73,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public void thiefScheduleCanLeaveMap() {
 		setCanLeaveMap(false);
-		wrapped.sendMessage(Component.text("Vous pouvez pas vous enfuire avant 30s", NamedTextColor.RED));
+		wrapped.sendMessage(Component.text("Vous pouvez pas vous enfuir avant 30s", NamedTextColor.RED));
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				setCanLeaveMap(true);
-				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuire", NamedTextColor.GOLD));
+				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuir", NamedTextColor.GOLD));
 			}
 			
 		}.runTaskLater(NekotineCore.getAttachedPlugin(), 30*20);

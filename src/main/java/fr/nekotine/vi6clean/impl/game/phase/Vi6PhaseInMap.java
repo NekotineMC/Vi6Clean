@@ -14,6 +14,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.map.MapModule;
@@ -57,6 +58,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@Override
 	public void globalSetup(Object inputData) {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		game.getWorld().setTime(DayTime.MIDNIGHT);
 		var mapName = game.getMapName();
 		if (mapName == null) {
 			var maps = NekotineCore.MODULES.get(MapModule.class).getMapFinder().list();
@@ -95,6 +97,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@Override
 	public void globalTearDown() {
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		game.getWorld().setTime(DayTime.NOON);
 		for (var display : debugDisplays) {
 			display.remove();
 		}

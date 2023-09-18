@@ -12,6 +12,7 @@ import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,6 +24,12 @@ public enum ToolType {
 			InviSneakHandler::new,
 			400, 		// PRICE
 			1 			// LIMIT
+			),
+	OMNICAPTOR(
+			ItemStackUtil.make(Material.REDSTONE_TORCH, Component.text("OmniCapteur", NamedTextColor.GOLD), OmniCaptorHandler.LORE),
+			OmniCaptorHandler::new,
+			250, 		// PRICE
+			2 			// LIMIT
 			);
 	
 	private ToolHandler<?> handler;
