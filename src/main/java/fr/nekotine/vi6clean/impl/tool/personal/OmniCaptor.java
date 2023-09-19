@@ -2,6 +2,8 @@ package fr.nekotine.vi6clean.impl.tool.personal;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -53,7 +55,7 @@ public class OmniCaptor extends Tool{
 	
 	private Collection<Player> ennemiesInRange = new LinkedList<>();
 	
-	private Collection<Player> enemyTeam;
+	private Supplier<Stream<Player>> enemyTeam;
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -97,7 +99,7 @@ public class OmniCaptor extends Tool{
 		var ploc = player.getLocation();
 		if (placed == null) {
 			if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
-				enemyTeam = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ennemiTeam();
+				enemyTeam = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
 				placed = (ArmorStand) ploc.getWorld().spawnEntity(ploc, EntityType.ARMOR_STAND);
 				placed.setArms(false);
 				placed.setMarker(true);
@@ -158,7 +160,7 @@ public class OmniCaptor extends Tool{
 		return ennemiesInRange;
 	}
 
-	public Collection<Player> getEnemyTeam() {
-		return enemyTeam;
+	public Stream<Player> getEnemyTeam() {
+		return enemyTeam.get();
 	}
 }

@@ -69,12 +69,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 	
 	private boolean isEnnemiNear(PlayerWrapper wrap) {
 		var player = wrap.GetWrapped();
-		for (var ennemi : wrap.ennemiTeam()) {
-			if (player.getLocation().distanceSquared(ennemi.getLocation()) <= DETECTION_RANGE_SQUARED) {
-				return true;
-			}
-		}
-		return false;
+		return wrap.ennemiTeamInMap().anyMatch(ennemi -> player.getLocation().distanceSquared(ennemi.getLocation()) <= DETECTION_RANGE_SQUARED);
 	}
 	
 	@EventHandler

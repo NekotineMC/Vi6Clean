@@ -13,6 +13,7 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,6 +31,12 @@ public enum ToolType {
 			OmniCaptorHandler::new,
 			250, 		// PRICE
 			2 			// LIMIT
+			),
+	SONAR(
+			ItemStackUtil.make(Material.CLOCK, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE),
+			SonarHandler::new,
+			400, 		// PRICE
+			1 			// LIMIT
 			);
 	
 	private ToolHandler<?> handler;
@@ -43,6 +50,10 @@ public enum ToolType {
 	private final int limite;
 	
 	private ToolType(ItemStack menuItem, Supplier<ToolHandler<?>> handlerSupplier, int price, int limite) {
+		var lore = menuItem.lore();
+		lore.add(0,Component.empty());
+		lore.add(0, Component.text("Prix: "+price,NamedTextColor.GOLD));
+		menuItem.lore(lore);
 		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 		this.handlerSupplier = handlerSupplier;
 		this.price = price;

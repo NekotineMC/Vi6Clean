@@ -2,10 +2,13 @@ package fr.nekotine.vi6clean.impl.wrapper;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.wrapper.WrapperBase;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -44,6 +47,17 @@ public class PlayerWrapper extends WrapperBase<Player> {
 		default:
 			return Collections.emptySet();
 		}
+	}
+	
+	public Stream<Player> ennemiTeamInMap() {
+		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		return ennemiTeam().stream().filter(e -> {
+			var opt = wrappingModule.getWrapperOptional(e, InMapPhasePlayerWrapper.class);
+			if (opt.isPresent()) {
+				return opt.get().isInside();
+			}
+			return false;
+		});
 	}
 	
 	public Collection<Player> ourTeam() {

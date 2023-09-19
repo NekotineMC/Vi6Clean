@@ -77,13 +77,9 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	}
 	
 	private Collection<Player> inRange(ArmorStand as, OmniCaptor captor) {
-		var col = new LinkedList<Player>();
-		for (var ennemi : captor.getEnemyTeam()) {
-			if (ennemi.getLocation().distanceSquared(as.getLocation()) <= DETECTION_RANGE_SQUARED) {
-				col.add(ennemi);
-			}
-		}
-		return col;
+		return captor.getEnemyTeam()
+		.filter(ennemi -> ennemi.getLocation().distanceSquared(as.getLocation()) <= DETECTION_RANGE_SQUARED)
+		.collect(Collectors.toCollection(LinkedList::new));
 	}
 	
 	@EventHandler
@@ -111,7 +107,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 			}
 			for (var p : inRange) {
 				flagModule.addFlag(p, OmniCaptedStatusFlag.get());
-				tool.getEnnemiesInRange().add(p);
+				oldInRange.add(p);
 				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				var own = tool.getOwner();
 				if (own != null) {

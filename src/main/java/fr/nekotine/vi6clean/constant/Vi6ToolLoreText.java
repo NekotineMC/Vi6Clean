@@ -26,6 +26,10 @@ public enum Vi6ToolLoreText {
 			"<lore>en <variable><statusname></variable> les ennemis",
 			"<lore>à moins de <variable><range></variable>.",
 			"<lore>Peut être récupéré et déplacé."
+	),
+	SONAR(	"<lore>Détecte un ennemi à",
+			"<lore>moins de <variable><range></variable>",
+			"<lore>toutes les <variable><delay></variable>."
 	);
 	
 	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(

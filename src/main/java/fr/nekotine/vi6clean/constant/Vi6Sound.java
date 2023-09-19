@@ -36,6 +36,14 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("block.note_block.bell"), Sound.Source.MASTER, 0.3f, 0.1F),
 	Sound.sound(Key.key("block.note_block.cow_bell"), Sound.Source.MASTER, 2, 0.5F),
 	Sound.sound(Key.key("block.note_block.bass"), Sound.Source.MASTER, 2, 0.1F)
+	}),
+	SONAR_NEGATIVE(new Sound[] {
+	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.VOICE, 1, 0.5f),
+	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.VOICE, 2, 0)
+	}),
+	SONAR_POSITIVE(new Sound[] {
+	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 1, 2),
+	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 2, 1)
 	});
 	
 	private Sound[] sounds;
