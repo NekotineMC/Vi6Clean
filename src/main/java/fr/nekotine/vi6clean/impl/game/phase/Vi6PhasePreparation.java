@@ -118,7 +118,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(item, PlayerWrapper.class);
 		var inv = item.getInventory();
 		inv.clear();
-		inv.addItem(openMenuUsable.getItemStack());
+		inv.setItem(8, openMenuUsable.getItemStack());
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 		}

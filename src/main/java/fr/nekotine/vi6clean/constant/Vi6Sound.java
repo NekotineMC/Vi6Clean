@@ -44,6 +44,13 @@ public enum Vi6Sound {
 	SONAR_POSITIVE(new Sound[] {
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 1, 2),
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 2, 1)
+	}),
+	DOUBLE_JUMP(new Sound[] {
+	Sound.sound(Key.key("item.firecharge.use"), Sound.Source.AMBIENT, 0.3F, 1.5F),
+	Sound.sound(Key.key("item.hoe.till"), Sound.Source.AMBIENT, 1.0F, 0.1F)
+	}),
+	TAZER_SHOCKING(new Sound[] {
+	Sound.sound(Key.key("block.beehive.work"), Sound.Source.MASTER, 2, 0.1f),		
 	});
 	
 	private Sound[] sounds;

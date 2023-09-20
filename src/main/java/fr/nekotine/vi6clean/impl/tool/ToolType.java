@@ -11,6 +11,8 @@ import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
 import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.personal.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
@@ -36,6 +38,12 @@ public enum ToolType {
 			ItemStackUtil.make(Material.CLOCK, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE),
 			SonarHandler::new,
 			400, 		// PRICE
+			1 			// LIMIT
+			),
+	DOUBLEJUMP(
+			ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make()),
+			DoubleJumpHandler::new,
+			300, 		// PRICE
 			1 			// LIMIT
 			);
 	

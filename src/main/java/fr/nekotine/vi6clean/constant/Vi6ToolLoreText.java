@@ -30,6 +30,10 @@ public enum Vi6ToolLoreText {
 	SONAR(	"<lore>Détecte un ennemi à",
 			"<lore>moins de <variable><range></variable>",
 			"<lore>toutes les <variable><delay></variable>."
+	),
+	DOUBLEJUMP(	"<lore>Permet de sauter une fois",
+			"<lore>en l'air, en appuyant",
+			"<lore>deux fois sur <important><key:key.sneak></important>."
 	);
 	
 	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(
