@@ -43,6 +43,7 @@ public class Sonar extends Tool{
 				(x, y, z) -> {
 					player.spawnParticle(Particle.CRIT_MAGIC, x, y, z, 1, 0, 0, 0, 0, null);
 				});
+		player.setCooldown(getItemStack().getType(), SonarHandler.DELAY_SECOND*20);
 	}
 	
 	@Override
