@@ -5,7 +5,9 @@ import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
@@ -17,6 +19,7 @@ public class SonarHandler extends ToolHandler<Sonar>{
 
 	public SonarHandler() {
 		super(ToolType.SONAR, Sonar::new);
+		NekotineCore.MODULES.tryLoad(TickingModule.class);
 	}
 	
 	public static final int DETECTION_BLOCK_RANGE = 5;

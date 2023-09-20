@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -27,6 +28,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 
 	public InviSneakHandler() {
 		super(ToolType.INVISNEAK, InviSneak::new);
+		NekotineCore.MODULES.tryLoad(TickingModule.class);
 	}
 	
 	public static final int DETECTION_BLOCK_RANGE = 3;

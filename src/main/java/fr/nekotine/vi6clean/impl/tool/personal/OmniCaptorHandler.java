@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
@@ -30,6 +31,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 
 	public OmniCaptorHandler() {
 		super(ToolType.OMNICAPTOR, OmniCaptor::new);
+		NekotineCore.MODULES.tryLoad(TickingModule.class);
 	}
 	
 	public static final int DETECTION_BLOCK_RANGE = 3;
@@ -38,7 +40,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
-			Placeholder.parsed("statusname", "surbrillance")
+			Placeholder.parsed("statusname", OmniCaptedStatusFlag.getStatusName())
 			);
 	
 	@Override
