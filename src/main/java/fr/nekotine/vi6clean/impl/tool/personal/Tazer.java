@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal;
 
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -50,18 +52,21 @@ public class Tazer extends Tool{
 		var eyeDir = eyeLoc.getDirection();
 		var world = player.getWorld();
 		var range = 100d;
-		var trace = world.rayTrace(eyeLoc, eyeDir, range, 1.1, e -> !e.equals(player) && e instanceof LivingEntity);
-		if (trace != null && trace.getHitEntity() != null) {
-			var hit = (LivingEntity)trace.getHitEntity();
-			range = hit.getLocation().distance(eyeLoc);
-			NekotineCore.MODULES.get(StatusEffectModule.class).addEffect(hit, tazedEffect);
+		var trace = world.rayTrace(eyeLoc, eyeDir, range, FluidCollisionMode.NEVER, true,1.1, e -> !e.equals(player) && e instanceof LivingEntity);
+		var hite = trace.getHitEntity();
+		var hitp = trace.getHitPosition();
+		if (trace != null && hite != null && hite instanceof LivingEntity hit) {
+			EntityUtil.fakeDamage(hit);
 			if (optWrap.get().ennemiTeamInMap().anyMatch(e -> e.equals(hit))) {
-				//NekotineCore.MODULES.get(StatusEffectModule.class).addEffect(hit, tazedEffect);
+				NekotineCore.MODULES.get(StatusEffectModule.class).addEffect(hit, tazedEffect);
 			}
 		}
-		SpatialUtil.line3DFromDir(eyeLoc.toVector(), eyeLoc.getDirection(), range, 0.5,
+		if (hitp != null) {
+			range = hitp.distance(eyeLoc.toVector());
+		}
+		SpatialUtil.line3DFromDir(eyeLoc.toVector(), eyeLoc.getDirection(), range, 4,
 				(vec) -> world.spawnParticle(Particle.FIREWORKS_SPARK, vec.getX(), vec.getY(), vec.getZ(), 0,
-						eyeDir.getX(), eyeDir.getY(), eyeDir.getZ(), 1f));
+						0, 0, 0, 0f));
 		cooldown = TazerHandler.COOLDOWN_TICK;
 		player.setCooldown(getItemStack().getType(), cooldown);
 		return true;
