@@ -33,7 +33,11 @@ public enum Vi6ToolLoreText {
 	),
 	DOUBLEJUMP(	"<lore>Permet de sauter une fois",
 			"<lore>en l'air, en appuyant",
-			"<lore>deux fois sur <important><key:key.sneak></important>."
+			"<lore>deux fois sur <important><key:key.jump></important>."
+	),
+	TAZER(	"<lore>Rend <variable><statusname></variable> les ennemis en ligne de mire.",
+			"<lore>Utilisez <important><key:key.attack></important> pour tirer.",
+			"<lore>Temps de recharge: <variable><cooldown></variable>"
 	);
 	
 	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(

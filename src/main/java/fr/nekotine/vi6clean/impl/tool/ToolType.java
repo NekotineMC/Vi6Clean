@@ -16,6 +16,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.TazerHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -43,6 +44,12 @@ public enum ToolType {
 	DOUBLEJUMP(
 			ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make()),
 			DoubleJumpHandler::new,
+			300, 		// PRICE
+			1 			// LIMIT
+			),
+	TAZER(
+			ItemStackUtil.make(Material.SHEARS, Component.text("Tazer", NamedTextColor.GOLD), TazerHandler.LORE),
+			TazerHandler::new,
 			300, 		// PRICE
 			1 			// LIMIT
 			);

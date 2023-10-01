@@ -22,6 +22,7 @@ import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.DebugUtil;
@@ -43,6 +44,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
+		NekotineCore.MODULES.tryLoad(TickingModule.class);
 	}
 
 	@Override

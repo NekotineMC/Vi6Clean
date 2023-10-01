@@ -86,7 +86,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	 * @return If tool could be attached.
 	 */
 	public final boolean attachToPlayer(T tool, Player player) {
-		if (type.getLimite() <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
+		var lim = type.getLimite();
+		if (lim >=0 && lim <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
 			return false;
 		}
 		tool.setOwner(player);
