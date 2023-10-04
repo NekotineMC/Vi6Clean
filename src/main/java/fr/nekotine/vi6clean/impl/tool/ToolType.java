@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
@@ -99,7 +100,10 @@ public enum ToolType {
 	 * @param player
 	 * @return buy succesfull
 	 */
-	public boolean tryBuy(Player player) {
+	public boolean tryBuy(InventoryClickEvent evt) {
+		if (!(evt.getWhoClicked() instanceof Player player)) {
+			return false;
+		}
 		var optionalWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return false;

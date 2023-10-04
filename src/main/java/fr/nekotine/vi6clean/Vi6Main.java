@@ -46,7 +46,7 @@ public class Vi6Main extends JavaPlugin implements Listener{
 		try {
 			game.getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
 		}catch(Exception e){
-			LOGGER.log(Level.SEVERE, "Une erreur est survenue lor du chargement de la game (methode \"setup\")", e);
+			LOGGER.log(Level.SEVERE, "Une erreur est survenue lors du chargement de la game (methode \"setup\")", e);
 		}
 		EventUtil.register(this, this);
 	}
