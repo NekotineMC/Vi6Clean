@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -20,6 +21,10 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 
 	@Override
 	protected void onDetachFromPlayer(DoubleJump tool, Player player) {
+		var gm = player.getGameMode();
+		if (gm == GameMode.ADVENTURE || gm == GameMode.SURVIVAL) {
+			player.setAllowFlight(false);
+		}
 	}
 	
 	@EventHandler
