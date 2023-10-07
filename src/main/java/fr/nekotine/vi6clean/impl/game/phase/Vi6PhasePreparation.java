@@ -173,7 +173,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	}
 	
 	@EventHandler
-	public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent e) {
+	private void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent e) {
 		var entrance = minimapSpawnIndicators.get(e.getRightClicked());
 		if (entrance != null) {
 			var wrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);

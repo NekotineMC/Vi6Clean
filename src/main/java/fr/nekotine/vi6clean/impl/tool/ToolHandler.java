@@ -9,10 +9,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
+import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 
 /**
  * Gestionnaire d'outil pour une partie de Vi6. Une instance par partie.
@@ -96,10 +101,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	public final void detachFromOwner(T tool) {
-		if (tool.getOwner() == null) {
+		var owner = tool.getOwner();
+		if (owner == null) {
 			return;
 		}
-		onDetachFromPlayer(tool, tool.getOwner());
+		owner.getInventory().remove(tool.getItemStack());
+		onDetachFromPlayer(tool, owner);
 		tool.setOwner(null);
 	}
 
@@ -122,8 +129,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	@EventHandler
-	private void onPlayerDrop(PlayerDropItemEvent evt) {
-		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
+	public void onPlayerDrop(PlayerDropItemEvent evt) {
+		var optionalTool = tools.stream().peek(t -> System.out.println("peek t itemstack="+t.getItemStack()))
+				.peek(t -> System.out.println("peek evt itemstack="+evt.getItemDrop().getItemStack()))
+				.filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
 				.findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
@@ -135,11 +144,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	@EventHandler
-	private void onPlayerPickup(EntityPickupItemEvent evt) {
+	public void onPlayerPickup(EntityPickupItemEvent evt) {
 		if (!(evt.getEntity() instanceof Player player)) {
 			return;
 		}
-		var optionalTool = tools.stream()
+		var optionalTool = tools.stream().peek(t -> System.out.println("peek t itemstack="+t.getItemStack()))
+				.peek(t -> System.out.println("peek evt itemstack="+evt.getItem().getItemStack()))
 				.filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
@@ -147,5 +157,23 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!attachToPlayer(optionalTool.get(), player)) {
 			evt.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent evt) {
+		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction.PICKUP_HALF) {
+			return;
+		}
+		var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
+			return;
+		}
+		var match = tools.stream().filter(t -> t.getItemStack().equals(evt.getCurrentItem())).findFirst();
+		if (match.isEmpty()) {
+			return;
+		}
+		var wrap = optWrap.get();
+		remove(match.get());
+		wrap.setMoney(wrap.getMoney() + type.getPrice());
 	}
 }
