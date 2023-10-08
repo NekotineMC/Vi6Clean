@@ -38,6 +38,9 @@ public enum Vi6ToolLoreText {
 	TAZER(	"<lore>Rend <variable><statusname></variable> les ennemis en ligne de mire.",
 			"<lore>Utilisez <important><key:key.attack></important> pour tirer.",
 			"<lore>Temps de recharge: <variable><cooldown></variable>"
+	),
+	LANTERN(	"<lore>Permet de poser jusqu'a <variable><maxlantern></variable> lanternes",
+			"<lore>que vos alliés peuvent prendre pour se téléporter à vous."
 	);
 	
 	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(

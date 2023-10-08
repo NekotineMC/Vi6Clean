@@ -15,6 +15,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.personal.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.TazerHandler;
@@ -52,6 +53,12 @@ public enum ToolType {
 			ItemStackUtil.make(Material.SHEARS, Component.text("Tazer", NamedTextColor.GOLD), TazerHandler.LORE),
 			TazerHandler::new,
 			300, 		// PRICE
+			1 			// LIMIT
+			),
+	LANTERN(
+			ItemStackUtil.make(Material.LANTERN, Component.text("Lanterne", NamedTextColor.GOLD), LanternHandler.LORE),
+			LanternHandler::new,
+			200, 		// PRICE
 			1 			// LIMIT
 			);
 	
