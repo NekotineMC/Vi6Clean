@@ -57,17 +57,19 @@ public class InviSneak extends Tool{
 		}
 		var loc = player.getLocation();
 		var y = loc.getZ();
+		var x = loc.getX();
+		var z = loc.getZ();
 		if (revealed) {
 			var world = Vi6Main.IOC.resolve(Vi6Game.class).getWorld();
 			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
-					(x, z) -> {
-						player.spawnParticle(Particle.FALLING_DUST, x, y, z, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
+			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
+					(offsetX, offsetZ) -> {
+						player.spawnParticle(Particle.FALLING_DUST, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
 					});
 		}else {
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
-					(x, z) -> {
-						player.spawnParticle(Particle.SMOKE_NORMAL, x, y, z, 1, 0, 0, 0, 0, null);
+			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
+					(offsetX, offsetZ) -> {
+						player.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 		}
 	}

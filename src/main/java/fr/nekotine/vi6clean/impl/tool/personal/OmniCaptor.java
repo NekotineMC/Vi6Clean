@@ -88,10 +88,12 @@ public class OmniCaptor extends Tool{
 				return;
 			}
 			var loc = player.getLocation();
+			var x = loc.getX();
 			var y = loc.getY();
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), OmniCaptorHandler.DETECTION_BLOCK_RANGE, 5, 0,
-					(x, z) -> {
-						player.spawnParticle(Particle.FIREWORKS_SPARK, x, y, z, 1, 0, 0, 0, 0, null);
+			var z = loc.getZ();
+			SpatialUtil.circle2DDensity(OmniCaptorHandler.DETECTION_BLOCK_RANGE, 5, 0,
+					(offsetX, offsetZ) -> {
+						player.spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 		}
 	}
