@@ -60,12 +60,12 @@ public class InviSneak extends Tool{
 		if (revealed) {
 			var world = Vi6Main.IOC.resolve(Vi6Game.class).getWorld();
 			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5,
+			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
 					(x, z) -> {
 						player.spawnParticle(Particle.FALLING_DUST, x, y, z, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
 					});
 		}else {
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5,
+			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
 					(x, z) -> {
 						player.spawnParticle(Particle.SMOKE_NORMAL, x, y, z, 1, 0, 0, 0, 0, null);
 					});

@@ -34,14 +34,14 @@ public class Sonar extends Tool{
 		var y = loc.getY() + 0.1;
 		if (opt.get().ennemiTeamInMap().anyMatch(e -> player.getLocation().distanceSquared(e.getLocation()) <= SonarHandler.DETECTION_RANGE_SQUARED)) {
 			Vi6Sound.SONAR_POSITIVE.play(player.getLocation().getWorld(), player.getLocation());
-			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), SonarHandler.DETECTION_BLOCK_RANGE, 5,
+			SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), SonarHandler.DETECTION_BLOCK_RANGE, 5, 0,
 					(x, z) -> {
 						player.spawnParticle(Particle.CRIT, x, y, z, 1, 0, 0, 0, 0, null);
 					});
 			return;
 		}
 		Vi6Sound.SONAR_NEGATIVE.play(player);
-		SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), SonarHandler.DETECTION_BLOCK_RANGE, 5,
+		SpatialUtil.circle2DDensity(loc.getX(), loc.getZ(), SonarHandler.DETECTION_BLOCK_RANGE, 5, 0,
 				(x, z) -> {
 					player.spawnParticle(Particle.CRIT_MAGIC, x, y, z, 1, 0, 0, 0, 0, null);
 				});
