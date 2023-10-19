@@ -1,16 +1,12 @@
 package fr.nekotine.vi6clean.constant;
 
-import java.util.LinkedList;
 import java.util.List;
 
+import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.tree.Leaf;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.format.TextDecoration.State;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 
 public enum Vi6ToolLoreText {
 	
@@ -39,32 +35,37 @@ public enum Vi6ToolLoreText {
 			"<lore>Utilisez <important><key:key.attack></important> pour tirer.",
 			"<lore>Temps de recharge: <variable><cooldown></variable>"
 	),
-	LANTERN(	"<lore>Permet de poser jusqu'a <variable><maxlantern></variable> lanternes",
+	LANTERN(	"<lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes",
 			"<lore>que vos alliés peuvent prendre pour se téléporter à vous."
+	),
+	RADAR(	"<lore>Permet de poser un radar qui, après <variable><chargeTime></bariable>,",
+			"<lore>indique le nombre de voleurs dans un rayon de <variable><range></variable>."
 	);
-	
-	private static final MiniMessage loreMiniMessage = MiniMessage.builder().tags(TagResolver.builder().resolvers(
-			StandardTags.defaults(),
-			TagResolver.resolver("lore",Tag.styling(b -> b.color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, State.NOT_SET))),
-			TagResolver.resolver("variable", Tag.styling(NamedTextColor.GREEN)),
-			TagResolver.resolver("important", Tag.styling(NamedTextColor.AQUA))
-			).build()
-			)
-			.build();
+
+	//
 	
 	private String[] minimessageFormatted;
-	
 	private Vi6ToolLoreText(String ... messages) {
 		minimessageFormatted = messages;
 	}
 	
-	public List<Component> make(TagResolver ... tagResolvers) {
-		var resolver = TagResolver.builder().resolvers(tagResolvers).build();
-		var list = new LinkedList<Component>();
-		for (var msg : minimessageFormatted) {
-			list.add(loreMiniMessage.deserialize(msg, resolver));
-		}
-		return list;
+	//
+	
+	public String[] text(){
+		return minimessageFormatted;
+	}
+	public List<Component> make(TagResolver... additionalStyles){
+		return NekotineCore.MODULES.get(TextModule.class).message(
+			Leaf.builder()
+				.addLine(minimessageFormatted)
+				.addStyle(Vi6Styles.TOOL_LORE)
+				.addStyle(additionalStyles)
+			).build();
 	}
 	
+	//
+	
+	public static final void loadStyle() {
+		NekotineCore.MODULES.get(TextModule.class).registerStyle(Vi6Styles.TOOL_LORE, Vi6Styles.TOOL_LORE.getStyle());
+	}
 }

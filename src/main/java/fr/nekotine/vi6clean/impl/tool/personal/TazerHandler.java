@@ -22,9 +22,9 @@ public class TazerHandler extends ToolHandler<Tazer>{
 	public static final int COOLDOWN_TICK = 200 / 4;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.TAZER.make(
-			Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes"),
-			Placeholder.parsed("statusname", TazedStatusFlag.getStatusName())
-			);
+		Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes"),
+		Placeholder.parsed("statusname", TazedStatusFlag.getStatusName())
+	);
 	
 	public TazerHandler() {
 		super(ToolType.TAZER, Tazer::new);

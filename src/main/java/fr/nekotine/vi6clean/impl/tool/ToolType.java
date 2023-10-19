@@ -17,6 +17,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.RadarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.TazerHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
@@ -60,7 +61,14 @@ public enum ToolType {
 			LanternHandler::new,
 			200, 		// PRICE
 			1 			// LIMIT
-			);
+			),
+	RADAR (
+			ItemStackUtil.make(Material.LIGHTNING_ROD, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
+			RadarHandler::new,
+			200,		// PRICE
+			1 			// LIMIT
+			)
+	;
 	
 	private ToolHandler<?> handler;
 	
