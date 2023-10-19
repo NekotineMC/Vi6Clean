@@ -17,7 +17,7 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -28,6 +28,9 @@ public class Lantern extends Tool{
 	private ArmorStand fallingArmorStand;
 	
 	private List<BlockDisplay> displayedLanterns = new LinkedList<>();
+	
+	private static final ItemStack NOLANTERN_ITEMSTACK = ItemStackUtil.make(Material.CHAIN, 1,
+			Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make());
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -41,6 +44,17 @@ public class Lantern extends Tool{
 		}
 		if (fallingArmorStand != null) {
 			fallingArmorStand.remove();
+		}
+	}
+	
+	public void updateItemStack() {
+		var amount = LanternHandler.MAX_LANTERN-displayedLanterns.size();
+		if (amount <= 0) {
+			setItemStack(NOLANTERN_ITEMSTACK);
+		}else {
+			setItemStack(
+					ItemStackUtil.make(Material.LANTERN, LanternHandler.MAX_LANTERN-displayedLanterns.size(),
+							Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make()));
 		}
 	}
 	
@@ -70,16 +84,39 @@ public class Lantern extends Tool{
 		fallingArmorStand.setInvulnerable(true);
 		fallingArmorStand.setSmall(true);
 		displayedLanterns.add(lantern);
-		getItemStack().setAmount(LanternHandler.MAX_LANTERN-displayedLanterns.size());
+		updateItemStack();
 		return true;
 	}
 	
-	public boolean tryPickup(Player picking) {
-		return false;
+	public void allyTryPickup(Player picking) {
+		var owner = getOwner();
+		if (owner == null) {
+			return;
+		}
+		var ite = displayedLanterns.iterator();
+		while (ite.hasNext()) {
+			var lantern = ite.next();
+			var lanternLoc = lantern.getLocation();
+			if (picking.getLocation().distanceSquared(lanternLoc) <= LanternHandler.SQUARED_PICKUP_BLOCK_RANGE) {
+				var w = lanternLoc.getWorld();
+				Vi6Sound.LANTERNE_PRE_TELEPORT.play(w, lanternLoc);
+				if (!owner.equals(picking)) {
+					var ownerLoc = owner.getLocation();
+					w.spawnParticle(Particle.EXPLOSION_LARGE, lanternLoc, 1);
+					picking.teleport(ownerLoc);
+					Vi6Sound.LANTERNE_POST_TELEPORT.play(w, ownerLoc);
+				}
+				lantern.remove();
+				ite.remove();
+				break;
+			}
+		}
+		updateItemStack();
 	}
 	
 	public void tryRemoveFallingArmorStand() {
 		if (fallingArmorStand != null && fallingArmorStand.isOnGround()) {
+			Vi6Sound.LANTERNE_POSE.play(fallingArmorStand.getWorld(), fallingArmorStand.getLocation());
 			fallingArmorStand.remove();
 			fallingArmorStand = null;
 		}
@@ -89,28 +126,19 @@ public class Lantern extends Tool{
 		return displayedLanterns;
 	}
 	
-	public void lanternSmokes() {
+	public void lanternSmokes(double offsetX, double offsetZ) {
 		var owner = getOwner();
 		if (owner == null) {
 			return;
 		}
 		var w = owner.getWorld();
-		var dist = Math.random();
 		for (var lantern : displayedLanterns) {
 			var loc = lantern.getLocation();
 			var x = loc.getX();
 			var y = loc.getY() - 0.74f;
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(1.5, 0.5, Math.random() * 6, (offsetX, offsetZ) -> {
-				var scalledOffsetX = offsetX * dist;
-				var scalledOffsetZ = offsetZ * dist;
-				w.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, x+scalledOffsetX, y, z+scalledOffsetZ, 0, 
-						-offsetX, 0, -offsetZ, 0.01 * dist);
-			});
-			SpatialUtil.circle2DDensity(1.5, 3, Math.random() * 6, (offsetX, offsetZ) -> {
-				w.spawnParticle(Particle.ASH, x+offsetX, y, z+offsetZ, 0, 
-						-offsetX, 0, -offsetZ, 0.01 * dist);
-			});
+			w.spawnParticle(Particle.FIREWORKS_SPARK, x+offsetX, y, z+offsetZ, 0, 
+					0, 0, 0, 0f);
 		}
 	}
 
