@@ -17,6 +17,7 @@ import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.text.Text;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
@@ -40,6 +41,7 @@ public class Vi6Main extends JavaPlugin implements Listener{
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		Vi6Styles.load();
 		NekotineCore.MODULES.load(TickingModule.class);
 		var game = new Vi6Game();
 		IOC.registerSingleton(game);

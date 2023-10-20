@@ -62,10 +62,4 @@ public enum Vi6ToolLoreText {
 				.addStyle(additionalStyles)
 			).build();
 	}
-	
-	//
-	
-	public static final void loadStyle() {
-		NekotineCore.MODULES.get(TextModule.class).registerStyle(Vi6Styles.TOOL_LORE, Vi6Styles.TOOL_LORE.getStyle());
-	}
 }
