@@ -2,26 +2,30 @@ package fr.nekotine.vi6clean.impl.tool.personal;
 
 import java.util.List;
 
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class LanternHandler extends ToolHandler<Lantern>{
 
-	public static final int MAX_LANTERN = 30;
+	public static final int MAX_LANTERN = 2;
+	
+	public static final double SQUARED_PICKUP_BLOCK_RANGE = 2.25;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.LANTERN.make(
 			Placeholder.unparsed("maxlantern", Integer.toString(MAX_LANTERN))
@@ -37,15 +41,7 @@ public class LanternHandler extends ToolHandler<Lantern>{
 
 	@Override
 	protected void onDetachFromPlayer(Lantern tool, Player player) {
-		var gm = player.getGameMode();
-		if (gm == GameMode.ADVENTURE || gm == GameMode.SURVIVAL) {
-			player.setAllowFlight(false);
-		}
-	}
-	
-	@EventHandler
-	private void onPlayerMove(PlayerMoveEvent evt) {
-		
+		tool.cleanup();
 	}
 	
 	@EventHandler
@@ -54,6 +50,16 @@ public class LanternHandler extends ToolHandler<Lantern>{
 			return;
 		}
 		var evtP = evt.getPlayer();
+		var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(evtP, PlayerWrapper.class);
+		if (optWrap.isEmpty()) {
+			return;
+		}
+		
+		// Pickup check
+		var allies = optWrap.get().ourTeam();
+		getTools().stream().filter(t -> allies.contains(t.getOwner())).forEach(tool -> tool.allyTryPickup(evtP));
+		
+		// Drop check
 		var optionalTool = getTools().stream().filter(t -> evtP.equals(t.getOwner()) && t.getItemStack().isSimilar(evt.getItem())).findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
@@ -65,11 +71,10 @@ public class LanternHandler extends ToolHandler<Lantern>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		// kill falling armor stand
 		for (var tool : getTools()) {
 			tool.tryRemoveFallingArmorStand();
-			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
-				tool.lanternSmokes();
+			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
+				SpatialUtil.circle2DDensity(1.5, 3, Math.random() * 6, tool::lanternSmokes);
 			}
 		}
 	}

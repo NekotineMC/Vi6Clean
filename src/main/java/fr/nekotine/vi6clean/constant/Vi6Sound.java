@@ -51,6 +51,17 @@ public enum Vi6Sound {
 	}),
 	TAZER_SHOCKING(new Sound[] {
 	Sound.sound(Key.key("block.beehive.work"), Sound.Source.MASTER, 2, 0.1f),		
+	}),
+	LANTERNE_POSE(new Sound[] {
+	Sound.sound(Key.key("block.anvil.place"), Sound.Source.MASTER, 1, 2)
+	}),
+	LANTERNE_PRE_TELEPORT(new Sound[] {
+	Sound.sound(Key.key("block.anvil.use"), Sound.Source.MASTER, 1, 1.6f)
+	}),
+	LANTERNE_POST_TELEPORT(new Sound[] {
+	Sound.sound(Key.key("block.anvil.use"), Sound.Source.MASTER, 1, 1.6f),
+	Sound.sound(Key.key("entity.shulker.shoot"), Sound.Source.MASTER, 2, 0.1f),
+	Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 1, 1.5f)
 	});
 	
 	private Sound[] sounds;
