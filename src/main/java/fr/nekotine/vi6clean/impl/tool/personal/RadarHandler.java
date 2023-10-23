@@ -79,6 +79,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 			return;
 		}
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPlace()) {
+			counter = 0;
 			evt.setCancelled(true);
 		}
 	}

@@ -38,7 +38,7 @@ public enum Vi6ToolLoreText {
 	LANTERN(	"<lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes",
 			"<lore>que vos alliés peuvent prendre pour se téléporter à vous."
 	),
-	RADAR(	"<lore>Permet de poser un radar qui, après <variable><chargeTime></bariable>,",
+	RADAR(	"<lore>Permet de poser un radar qui, après <variable><delay></variable>,",
 			"<lore>indique le nombre de voleurs dans un rayon de <variable><range></variable>."
 	);
 
