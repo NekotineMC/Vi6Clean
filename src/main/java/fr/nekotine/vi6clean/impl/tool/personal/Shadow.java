@@ -28,15 +28,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Shadow extends Tool{
 
-	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.REPEATER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
+	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.WITHER_SKELETON_SKULL)
+			.name(Component.text("Ombre - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
 			.lore(OmniCaptorHandler.LORE)
 			.unstackable()
 			.flags(ItemFlag.values())
 			.build();
 	
-	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.LEVER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Placé", NamedTextColor.GRAY)))
+	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.SKELETON_SKULL)
+			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Placée", NamedTextColor.GRAY)))
 			.lore(OmniCaptorHandler.LORE)
 			.unstackable()
 			.flags(ItemFlag.values())
@@ -51,7 +51,7 @@ public class Shadow extends Tool{
 	
 	private boolean sneaking;
 	
-	private ArmorStand placed;
+	private ArmorStand shadow;
 	
 	private Collection<Player> ennemiesInRange = new LinkedList<>();
 	
