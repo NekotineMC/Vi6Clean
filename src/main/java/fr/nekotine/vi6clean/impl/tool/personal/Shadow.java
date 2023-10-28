@@ -61,39 +61,17 @@ public class Shadow extends Tool{
 	protected ItemStack makeInitialItemStack() {
 		return DISPONIBLE_ITEM;
 	}
-
-	public boolean isSneaking() {
-		return sneaking;
-	}
-
-	public void setSneaking(boolean sneaking) {
-		if (this.sneaking != sneaking) {
-			this.sneaking = sneaking;
-			if (placed == null) {
-				return;
-			}
-			var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
-			if (sneaking) {
-				glowModule.glowEntityFor(placed, getOwner());
-			}else {
-				glowModule.unglowEntityFor(placed, getOwner());
-			}
-		}
-	}
 	
 	public void lowTick() {
-		if (placed == null) {
-			var player = getOwner();
-			if (player == null || !sneaking) {
-				return;
-			}
-			var loc = player.getLocation();
+		if (shadow != null) {
+			var loc = shadow.getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(OmniCaptorHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			var w = loc.getWorld();
+			SpatialUtil.circle2DDensity(0.5, 3, Math.random(),
 					(offsetX, offsetZ) -> {
-						player.spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+						w.spawnParticle(Particle.SMOKE_LARGE, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 		}
 	}
