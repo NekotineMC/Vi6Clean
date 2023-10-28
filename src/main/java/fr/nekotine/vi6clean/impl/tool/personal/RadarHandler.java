@@ -65,11 +65,11 @@ public class RadarHandler extends ToolHandler<Radar>{
 	public RadarHandler() {
 		super(ToolType.RADAR, Radar::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
-		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.5, 
+		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.5, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
-		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 1, 
+		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 1, SpatialUtil.SphereAlgorithm.FIBONACCI,
 				(offsetX, offsetY, offsetZ) -> {
 					SPHERE.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
@@ -81,7 +81,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	private void onTick(TickElapsedEvent evt) {
 		for(var tool : getTools()) {
 			tool.tickCharge();
-			if(evt.timeStampReached(TickTimeStamp.QuartSecond))
+			if(evt.timeStampReached(TickTimeStamp.HalfSecond))
 				tool.tickParticle();
 			if(evt.timeStampReached(TickTimeStamp.Second))
 				tool.tickSound();
