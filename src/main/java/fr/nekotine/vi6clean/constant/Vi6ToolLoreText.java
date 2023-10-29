@@ -40,6 +40,9 @@ public enum Vi6ToolLoreText {
 	),
 	RADAR(	"<lore>Permet de poser un radar qui, après <variable><delay></variable>,",
 			"<lore>indique le nombre de voleurs dans un rayon de <variable><range></variable>."
+	),
+	SHADOW(	"<lore>Placer une ombre pour revenir plus tard,",
+			"<lore>et mourrez si un garde la trouve!"
 	);
 
 	//

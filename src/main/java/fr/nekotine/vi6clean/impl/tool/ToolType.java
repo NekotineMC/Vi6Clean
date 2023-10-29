@@ -18,6 +18,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.RadarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.TazerHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
@@ -65,6 +66,12 @@ public enum ToolType {
 	RADAR (
 			ItemStackUtil.make(Material.LIGHTNING_ROD, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
 			RadarHandler::new,
+			200,		// PRICE
+			1 			// LIMIT
+			),
+	SHADOW (
+			ItemStackUtil.make(Material.WITHER_SKELETON_SKULL, Component.text("Ombre", NamedTextColor.GOLD), Vi6ToolLoreText.SHADOW.make()),
+			ShadowHandler::new,
 			200,		// PRICE
 			1 			// LIMIT
 			)
