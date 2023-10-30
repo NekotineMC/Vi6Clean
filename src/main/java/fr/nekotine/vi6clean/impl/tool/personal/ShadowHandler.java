@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool.personal;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 import fr.nekotine.core.NekotineCore;
@@ -11,11 +12,16 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class ShadowHandler extends ToolHandler<Shadow>{
 
+	public static final double SHADOW_KILL_RANGE_BLOCK = 1;
+	
 	public ShadowHandler() {
 		super(ToolType.OMNICAPTOR, Shadow::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
@@ -27,6 +33,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 
 	@Override
 	protected void onDetachFromPlayer(Shadow tool, Player player) {
+		tool.tryUse();
 	}
 	
 	@EventHandler
@@ -46,6 +53,25 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 				remove(tool);
 			}else if (tool.tryPlace()) {
 				evt.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
+	private void onPlayerMove(PlayerMoveEvent evt) {
+		var player = evt.getPlayer();
+		var ite = getTools().iterator();
+		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		while (ite.hasNext()) {
+			var tool = ite.next();
+			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+			if (tool.getPlaced() == null || !wrap.isPresent() || !wrap.get().ennemiTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
+				continue;
+			}
+			if (tool.getPlaced().getLocation().distanceSquared(player.getLocation()) <= 100) {
+				tool.getOwner().damage(1000, evt.getPlayer());
+				Vi6Sound.SHADOW_KILL.play(player.getWorld());
+				remove(tool);
 			}
 		}
 	}

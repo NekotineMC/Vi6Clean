@@ -62,6 +62,13 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("block.anvil.use"), Sound.Source.MASTER, 1, 1.6f),
 	Sound.sound(Key.key("entity.shulker.shoot"), Sound.Source.MASTER, 2, 0.1f),
 	Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 1, 1.5f)
+	}),
+	SHADOW_KILL(new Sound[] {
+	Sound.sound(Key.key("entity.wither.spawn"), Sound.Source.MASTER, 0.5F, 1.0F),
+	Sound.sound(Key.key("entity.zombie_villager.cure"), Sound.Source.MASTER, 0.5F, 1.0F)
+	}),
+	SHADOW_TELEPORT(new Sound[] {
+	Sound.sound(Key.key("entity.enderman.teleport"), Sound.Source.MASTER, 1.0F, 1.0F)
 	});
 	
 	private Sound[] sounds;

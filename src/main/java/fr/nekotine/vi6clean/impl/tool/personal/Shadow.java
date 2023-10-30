@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -47,7 +48,7 @@ public class Shadow extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			var w = loc.getWorld();
-			SpatialUtil.circle2DDensity(1, 3, Math.random(),
+			SpatialUtil.circle2DDensity(ShadowHandler.SHADOW_KILL_RANGE_BLOCK, 3, Math.random(),
 					(offsetX, offsetZ) -> {
 						w.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
@@ -93,6 +94,8 @@ public class Shadow extends Tool{
 	public boolean tryUse() {
 		var player = getOwner();
 		if (shadow != null) {
+			Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), player.getLocation());
+			Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), shadow.getLocation());
 			player.teleport(shadow);
 			shadow.remove();
 			shadow = null;
