@@ -73,7 +73,7 @@ public enum ToolType {
 			ItemStackUtil.make(Material.WITHER_SKELETON_SKULL, Component.text("Ombre", NamedTextColor.GOLD), Vi6ToolLoreText.SHADOW.make()),
 			ShadowHandler::new,
 			250,		// PRICE
-			1 			// LIMIT
+			2 			// LIMIT
 			)
 	;
 	
