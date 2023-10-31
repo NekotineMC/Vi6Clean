@@ -1,8 +1,10 @@
 package fr.nekotine.vi6clean.impl.tool.personal;
 
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
@@ -89,6 +91,15 @@ public class Radar extends Tool{
 			
 			//Faire un message avec le nombre de joueurs
 			
+			Location loc = bottom.getLocation();
+			var x = loc.getX();
+			var y = loc.getY();
+			var z = loc.getZ();
+			RadarHandler.BALL.forEach(
+				triplet -> {loc.getWorld().spawnParticle(
+						(ennemiNear>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
+						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, new DustOptions(Color.RED, 2));
+			});
 			cleanup();
 			placed = false;
 			updateItem();
@@ -114,7 +125,7 @@ public class Radar extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			RadarHandler.BALL.forEach(
-				triplet -> {loc.getWorld().spawnParticle(Particle.COMPOSTER, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
+				triplet -> {loc.getWorld().spawnParticle(Particle.WAX_ON, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
 			});
 			
 			
@@ -124,7 +135,7 @@ public class Radar extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			RadarHandler.SPHERE.forEach(
-				triplet -> {getOwner().spawnParticle(Particle.COMPOSTER, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
+				triplet -> {getOwner().spawnParticle(Particle.WAX_ON, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
 			});
 		}
 	}
