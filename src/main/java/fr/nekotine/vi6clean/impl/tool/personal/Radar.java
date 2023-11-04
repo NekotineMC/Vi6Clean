@@ -83,14 +83,16 @@ public class Radar extends Tool{
 		if(placed) {
 			
 			var opt = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-			long ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
+			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
 			
 			//Faire un son custom
 			if(ennemiNear > 0)
 				Vi6Sound.SONAR_POSITIVE.play(bottom.getWorld(), bottom.getLocation());
 			
-			//Faire un message avec le nombre de joueurs
+			//Message
+			getOwner().sendMessage(RadarHandler.DETECTION_MESSAGE(ennemiNear));
 			
+			//Particules
 			Location loc = bottom.getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
@@ -100,6 +102,7 @@ public class Radar extends Tool{
 						(ennemiNear>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
 						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, new DustOptions(Color.RED, 2));
 			});
+			
 			cleanup();
 			placed = false;
 			updateItem();
