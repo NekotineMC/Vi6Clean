@@ -74,6 +74,12 @@ public enum ToolType {
 			ShadowHandler::new,
 			250,		// PRICE
 			2 			// LIMIT
+			),
+	WATCHER (
+			ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG, Component.text("Observateur", NamedTextColor.GOLD), Vi6ToolLoreText.SHADOW.make()),
+			ShadowHandler::new,
+			250,		// PRICE
+			2 			// LIMIT
 			)
 	;
 	
