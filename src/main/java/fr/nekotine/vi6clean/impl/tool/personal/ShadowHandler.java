@@ -68,7 +68,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 			if (tool.getPlaced() == null || !wrap.isPresent() || !wrap.get().ennemiTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
 				continue;
 			}
-			if (tool.getPlaced().getLocation().distanceSquared(player.getLocation()) <= 100) {
+			if (tool.getPlaced().getLocation().distanceSquared(player.getLocation()) <= SHADOW_KILL_RANGE_BLOCK) {
 				tool.getOwner().damage(1000, evt.getPlayer());
 				Vi6Sound.SHADOW_KILL.play(player.getWorld());
 				remove(tool);
