@@ -10,14 +10,10 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.NekotineCore;
-import fr.nekotine.core.util.EntityUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Radar extends Tool{
 	private boolean placed = false;
@@ -26,12 +22,13 @@ public class Radar extends Tool{
 	private ItemDisplay mid;
 	private ItemDisplay top;
 	private int chargeTime;
+	private int cooldown;
 	
 	//
 
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.LIGHTNING_ROD, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE);
+		return RadarHandler.UNPLACED;
 	}
 	@Override
 	protected void cleanup() {
@@ -45,13 +42,14 @@ public class Radar extends Tool{
 	//
 	
 	protected boolean tryPlace() {
-		Location ploc = getOwner().getLocation();
-		
-		if(placed || !EntityUtil.IsOnGround(getOwner()) || ploc.getBlock().getType().isSolid() || ploc.add(0, 1, 0).getBlock().getType().isSolid())
+		if(cooldown > 0)
 			return false;
-		placed = true;
+
+		Location ploc = getOwner().getLocation();
+		if (placed || !ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid())
+			return false;
 			
-		bottom = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.subtract(0, 0.5, 0), EntityType.ITEM_DISPLAY);
+		bottom = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.add(0, 0.6, 0), EntityType.ITEM_DISPLAY);
 		mid = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.add(0, 1, 0), EntityType.ITEM_DISPLAY);
 		top = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.add(0,0.8,0), EntityType.ITEM_DISPLAY);
 
@@ -62,14 +60,12 @@ public class Radar extends Tool{
 		
 		bottom.setItemStack(new ItemStack(Material.ORANGE_SHULKER_BOX));;
 		mid.setItemStack(new ItemStack(Material.LIGHTNING_ROD));
-		top.setItemStack(new ItemStack(Material.DAYLIGHT_DETECTOR));
+		top.setItemStack(new ItemStack(Material.CALIBRATED_SCULK_SENSOR));
 		
-		//Faire un son
-		
-		updateItem();
-		
+		placed = true;
 		chargeTime = 0;
-		
+		Vi6Sound.RADAR_POSE.play(bottom.getWorld(), bottom.getLocation());
+		updateItem();
 		return true;
 	}
 	protected void updateItem() {
@@ -83,14 +79,19 @@ public class Radar extends Tool{
 		if(placed) {
 			
 			var opt = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-			long ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
+			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
 			
-			//Faire un son custom
-			if(ennemiNear > 0)
-				Vi6Sound.SONAR_POSITIVE.play(bottom.getWorld(), bottom.getLocation());
+			//Son
+			if(ennemiNear > 0) {
+				Vi6Sound.RADAR_POSITIVE.play(bottom.getWorld(), bottom.getLocation());
+			}else {
+				Vi6Sound.RADAR_NEGATIVE.play(bottom.getWorld(), bottom.getLocation());
+			}
 			
-			//Faire un message avec le nombre de joueurs
+			//Message
+			getOwner().sendMessage(RadarHandler.DETECTION_MESSAGE(ennemiNear));
 			
+			//Particules
 			Location loc = bottom.getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
@@ -100,6 +101,10 @@ public class Radar extends Tool{
 						(ennemiNear>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
 						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, new DustOptions(Color.RED, 2));
 			});
+			
+			cooldown = RadarHandler.COOLDOWN_TICK;
+			getOwner().setCooldown(getItemStack().getType(), cooldown);
+			
 			cleanup();
 			placed = false;
 			updateItem();
@@ -125,7 +130,7 @@ public class Radar extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			RadarHandler.BALL.forEach(
-				triplet -> {loc.getWorld().spawnParticle(Particle.WAX_ON, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
+				triplet -> {loc.getWorld().spawnParticle(Particle.SPELL_WITCH, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
 			});
 			
 			
@@ -135,16 +140,20 @@ public class Radar extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			RadarHandler.SPHERE.forEach(
-				triplet -> {getOwner().spawnParticle(Particle.WAX_ON, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
+				triplet -> {getOwner().spawnParticle(Particle.SPELL_WITCH, x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, null);
 			});
 		}
 	}
 	protected void tickSound() {
 		if(placed) {
 			//Faire un son custom
-			Vi6Sound.SONAR_NEGATIVE.play(bottom.getWorld(), bottom.getLocation());
+			Vi6Sound.RADAR_SCAN.play(bottom.getWorld(), bottom.getLocation());
 			
 		}
+	}
+	protected void tickCooldown() {
+		if(cooldown > 0)
+			cooldown--;
 	}
 	protected boolean isPlaced() {
 		return placed;

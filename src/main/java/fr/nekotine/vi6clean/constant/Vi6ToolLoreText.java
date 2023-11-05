@@ -39,7 +39,8 @@ public enum Vi6ToolLoreText {
 			"<lore>que vos alliés peuvent prendre pour se téléporter à vous."
 	),
 	RADAR(	"<lore>Permet de poser un radar qui, après <variable><delay></variable>,",
-			"<lore>indique le nombre de voleurs dans un rayon de <variable><range></variable>."
+			"<lore>indique le nombre de voleurs dans un rayon de <variable><range></variable>.",
+			"<lore>Temps de recharge: <variable><cooldown></variable>"
 	),
 	SHADOW(	"<lore>Placer une ombre pour revenir plus tard,",
 			"<lore>et mourrez si un garde la trouve!"
