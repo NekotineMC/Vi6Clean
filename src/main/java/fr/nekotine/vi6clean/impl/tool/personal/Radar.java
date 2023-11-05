@@ -96,10 +96,12 @@ public class Radar extends Tool{
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
+			
 			RadarHandler.BALL.forEach(
 				triplet -> {loc.getWorld().spawnParticle(
 						(ennemiNear>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
-						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, new DustOptions(Color.RED, 2));
+						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, 
+						(ennemiNear>0 ? null:new DustOptions(Color.RED, 2)));
 			});
 			
 			cooldown = RadarHandler.COOLDOWN_TICK;
