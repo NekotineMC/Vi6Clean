@@ -64,7 +64,7 @@ public enum ToolType {
 			1 			// LIMIT
 			),
 	RADAR (
-			ItemStackUtil.make(Material.LIGHTNING_ROD, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
+			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
 			RadarHandler::new,
 			200,		// PRICE
 			1 			// LIMIT
