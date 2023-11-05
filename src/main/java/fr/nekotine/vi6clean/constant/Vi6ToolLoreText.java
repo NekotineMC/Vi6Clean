@@ -43,7 +43,12 @@ public enum Vi6ToolLoreText {
 	),
 	SHADOW(	"<lore>Placer une ombre pour revenir plus tard,",
 			"<lore>et mourrez si un garde la trouve!"
-	);
+	),
+	WATCHER("<lore>Pose une balise qui affiche en surbrillance les gardes à proximité.",
+			"<lore>Les gardes peuvent détruire les balises en marchant dessus.",
+			"<lore>Vous pouvez en poser <variable><nbMax></variable> simultanément.",
+			"<lore>La portée est de <variable><range></variable>"
+	),;
 
 	//
 	

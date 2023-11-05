@@ -1,98 +1,56 @@
 package fr.nekotine.vi6clean.impl.tool.personal;
 
-import org.bukkit.Bukkit;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Silverfish;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
-import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.vi6clean.Vi6Main;
-import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
+import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Watcher extends Tool{
 
-	private boolean sneaking;
+	private List<Silverfish> watchers = new LinkedList<>();
 	
-	private boolean revealed;
+	private boolean isSneaking;
+	
+	private Collection<Player> ennemiesInRange = new LinkedList<>();
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return InviSneakHandler.VISIBLE_ITEM;
-	}
-
-	public boolean isSneaking() {
-		return sneaking;
-	}
-
-	public void setSneaking(boolean sneaking) {
-		if (this.sneaking != sneaking) {
-			this.sneaking = sneaking;
-			statusUpdate();
-		}
-	}
-
-	public boolean isRevealed() {
-		return revealed;
-	}
-
-	public void setRevealed(boolean revealed) {
-		if (this.revealed != revealed) {
-			this.revealed = revealed;
-			statusUpdate();
-		}
+		return ItemStackUtil.make(Material.WHITE_STAINED_GLASS_PANE,
+				Component.text("Observateur",NamedTextColor.GOLD),
+				Vi6ToolLoreText.WATCHER.make());
 	}
 	
-	public void lowTick() {
-		if (!sneaking) {
-			return;
-		}
-		var player = getOwner();
-		if (player == null) {
-			return;
-		}
-		var loc = player.getLocation();
-		var y = loc.getZ();
-		var x = loc.getX();
-		var z = loc.getZ();
-		if (revealed) {
-			var world = Vi6Main.IOC.resolve(Vi6Game.class).getWorld();
-			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
-			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
-					(offsetX, offsetZ) -> {
-						player.spawnParticle(Particle.FALLING_DUST, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
-					});
-		}else {
-			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
-					(offsetX, offsetZ) -> {
-						player.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
-					});
-		}
-	}
-	
-	private void statusUpdate() {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
-		if (sneaking) {
-			if (revealed) {
-				setItemStack(InviSneakHandler.REVEALED_ITEM);
-				flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
-			}else {
-				setItemStack(InviSneakHandler.INVISIBLE_ITEM);
-				flagModule.addFlag(getOwner(), InvisibleStatusFlag.get());
-			}
-		}else {
-			setItemStack(InviSneakHandler.VISIBLE_ITEM);
-			flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
-		}
+	public void dropWatcher() {
+		
 	}
 
+	public List<Silverfish> getWatcherList(){
+		return watchers;
+	}
+	
 	@Override
 	protected void cleanup() {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
-		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
+		for (var watcher : watchers) {
+			watcher.remove();
+		}
+		watchers.clear();
+	}
+	
+	public void setSneaking(boolean sneaking) {
+		isSneaking = sneaking;
+	}
+	
+	public boolean isSneaking() {
+		return isSneaking;
 	}
 }

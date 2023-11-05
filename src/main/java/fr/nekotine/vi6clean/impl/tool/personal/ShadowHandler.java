@@ -23,7 +23,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 	public static final double SHADOW_KILL_RANGE_BLOCK = 1;
 	
 	public ShadowHandler() {
-		super(ToolType.OMNICAPTOR, Shadow::new);
+		super(ToolType.SHADOW, Shadow::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
 	}
 	
