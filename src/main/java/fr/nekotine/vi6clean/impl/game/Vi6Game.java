@@ -115,11 +115,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		if (!players.contains(player)) {
 			players.add(player);
 		}
-		if (!guards.contains(player)) {
-			guards.add(player);
-		}
 		if(thiefs.contains(player)) {
 			thiefs.remove(player);
+		}
+		if (!guards.contains(player)) {
+			guards.add(player);
 		}
 	}
 	
@@ -127,11 +127,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		if (!players.contains(player)) {
 			players.add(player);
 		}
-		if (!thiefs.contains(player)) {
-			thiefs.add(player);
-		}
 		if(guards.contains(player)) {
 			guards.remove(player);
+		}
+		if (!thiefs.contains(player)) {
+			thiefs.add(player);
 		}
 	}
 	

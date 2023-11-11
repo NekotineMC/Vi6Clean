@@ -103,6 +103,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 			for (var sf : toRemove) {
 				sf.remove();
 				watchers.remove(sf);
+				tool.itemUpdate();
 			}
 			
 			Collection<Player> inRange = enemiTeam.get().filter(
