@@ -90,6 +90,9 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 		for (var tool : getTools()) {
 			var as = tool.getPlaced();
 			if (as == null) {
+				if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
+					tool.lowTick();
+				}
 				continue;
 			}
 			var inRange = inRange(as, tool);
@@ -117,11 +120,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 				}
 			}
 			tool.itemUpdate();
-		}
-		if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
-			for (var tool : getTools()) {
-				tool.lowTick();
-			}
 		}
 	}
 	

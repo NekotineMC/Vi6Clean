@@ -18,6 +18,9 @@ import org.joml.Vector3f;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.style.NekotineStyles;
+import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
@@ -34,11 +37,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class RadarHandler extends ToolHandler<Radar>{
+	protected static final String DETECTION_SUCCESS = "<gold>Radar>></gold> <aqua><number></aqua> <green>voleurs détéctés à proximité !</green>";
+	protected static final String DETECTION_FAIL = "<gold>Radar>></gold> <aqua>0</aqua> <red>voleurs détéctés à proximité !</red>";
+
 	protected static final int DETECTION_BLOCK_RANGE = 20;
 	protected static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	protected static final int DELAY_SECOND = 5;
+	protected static final int COOLDOWN_TICK = 20 * 20;
 	
-	protected static final ItemStack UNPLACED = new ItemStackBuilder(Material.LIGHTNING_ROD)
+	protected static final ItemStack UNPLACED = new ItemStackBuilder(Material.CALIBRATED_SCULK_SENSOR)
 			.unstackable()
 			.name(Component.text("Radar", NamedTextColor.GOLD))
 			.lore(RadarHandler.LORE)
@@ -57,7 +64,8 @@ public class RadarHandler extends ToolHandler<Radar>{
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.RADAR.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
-			Placeholder.parsed("delay", DELAY_SECOND+" secondes")
+			Placeholder.parsed("delay", DELAY_SECOND+" secondes"),
+			Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes")
 	);
 	
 	//
@@ -81,7 +89,8 @@ public class RadarHandler extends ToolHandler<Radar>{
 	private void onTick(TickElapsedEvent evt) {
 		for(var tool : getTools()) {
 			tool.tickCharge();
-			if(evt.timeStampReached(TickTimeStamp.HalfSecond))
+			tool.tickCooldown();
+			if(evt.timeStampReached(TickTimeStamp.QuartSecond))
 				tool.tickParticle();
 			if(evt.timeStampReached(TickTimeStamp.Second))
 				tool.tickSound();
@@ -118,5 +127,16 @@ public class RadarHandler extends ToolHandler<Radar>{
 	}
 	@Override
 	protected void onDetachFromPlayer(Radar tool, Player player) {
+	}
+	
+	//
+	
+	protected static Component DETECTION_MESSAGE(int nbDetected) {
+		String message = nbDetected>0 ? DETECTION_SUCCESS : DETECTION_FAIL;
+		return NekotineCore.MODULES.get(TextModule.class).message(Leaf.builder()
+				.addStyle(Placeholder.unparsed("number", String.valueOf(nbDetected)))
+				.addStyle(NekotineStyles.STANDART)
+				.addLine(message)
+				).buildFirst();
 	}
 }

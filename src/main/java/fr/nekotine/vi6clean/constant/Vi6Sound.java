@@ -19,11 +19,13 @@ public enum Vi6Sound {
 	// TODO Normaliser les catégories sonores (Sound.Source)
 	
 	SCANNER_SCAN(new Sound[] {
-		Sound.sound(Key.key("block.beacon.power_select"), Sound.Source.VOICE, 1, 1)
+			Sound.sound(Key.key("block.beacon.power_select"), Sound.Source.VOICE, 1, 1)
 	}),
+	
 	INVISNEAK_REVEALED(new Sound[] {
-		Sound.sound(Key.key("block.lava.extinguish"), Sound.Source.MASTER, 0.1f, 2)
+			Sound.sound(Key.key("block.lava.extinguish"), Sound.Source.MASTER, 0.1f, 2)
 	}),
+	
 	OMNICAPTEUR_PLACE(new Sound[] {
 	Sound.sound(Key.key("entity.vex.hurt"), Sound.Source.MASTER, 2, 0.1F),
 	Sound.sound(Key.key("item.flintandsteel.use"), Sound.Source.MASTER, 2, 0.1F)
@@ -37,6 +39,7 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("block.note_block.cow_bell"), Sound.Source.MASTER, 2, 0.5F),
 	Sound.sound(Key.key("block.note_block.bass"), Sound.Source.MASTER, 2, 0.1F)
 	}),
+	
 	SONAR_NEGATIVE(new Sound[] {
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.VOICE, 1, 0.5f),
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.VOICE, 2, 0)
@@ -45,13 +48,16 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 1, 2),
 	Sound.sound(Key.key("block.note_block.bit"), Sound.Source.MASTER, 2, 1)
 	}),
+	
 	DOUBLE_JUMP(new Sound[] {
 	Sound.sound(Key.key("item.firecharge.use"), Sound.Source.AMBIENT, 0.3F, 1.5F),
 	Sound.sound(Key.key("item.hoe.till"), Sound.Source.AMBIENT, 1.0F, 0.1F)
 	}),
+	
 	TAZER_SHOCKING(new Sound[] {
 	Sound.sound(Key.key("block.beehive.work"), Sound.Source.MASTER, 2, 0.1f),		
 	}),
+	
 	LANTERNE_POSE(new Sound[] {
 	Sound.sound(Key.key("block.anvil.place"), Sound.Source.MASTER, 1, 2)
 	}),
@@ -63,13 +69,29 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("entity.shulker.shoot"), Sound.Source.MASTER, 2, 0.1f),
 	Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 1, 1.5f)
 	}),
+	
 	SHADOW_KILL(new Sound[] {
 	Sound.sound(Key.key("entity.wither.spawn"), Sound.Source.MASTER, 0.5F, 1.0F),
 	Sound.sound(Key.key("entity.zombie_villager.cure"), Sound.Source.MASTER, 0.5F, 1.0F)
 	}),
 	SHADOW_TELEPORT(new Sound[] {
 	Sound.sound(Key.key("entity.enderman.teleport"), Sound.Source.MASTER, 1.0F, 1.0F)
-	});
+	}),
+	
+	RADAR_POSE(new Sound[] {
+	Sound.sound(Key.key("item.armor.equip_elytra"), Sound.Source.MASTER, 1.0F, 0F)
+	//Sound.sound(Key.key("entity.warden.dig"), Sound.Source.MASTER, 1.0F, 2F)
+	}),
+	RADAR_SCAN(new Sound[] {
+	Sound.sound(Key.key("entity.warden.heartbeat"), Sound.Source.MASTER, 2F, 0.75F)
+	}),
+	RADAR_NEGATIVE(new Sound[] {
+	Sound.sound(Key.key("entity.warden.heartbeat"), Sound.Source.MASTER, 2F, 2F)
+	}),
+	RADAR_POSITIVE(new Sound[] {
+	Sound.sound(Key.key("entity.warden.death"), Sound.Source.MASTER, 2F, 0.5F)
+	})
+	;
 	
 	private Sound[] sounds;
 	
