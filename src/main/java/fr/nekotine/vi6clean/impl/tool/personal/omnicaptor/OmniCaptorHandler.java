@@ -38,7 +38,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
-	public static final List<Component> LORE = Vi6ToolLoreText.OMNICAPTOR.make(
+	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
 			Placeholder.parsed("statusname", OmniCaptedStatusFlag.getStatusName())
 			);
@@ -90,6 +90,9 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 		for (var tool : getTools()) {
 			var as = tool.getPlaced();
 			if (as == null) {
+				if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
+					tool.lowTick();
+				}
 				continue;
 			}
 			var inRange = inRange(as, tool);
@@ -117,11 +120,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 				}
 			}
 			tool.itemUpdate();
-		}
-		if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
-			for (var tool : getTools()) {
-				tool.lowTick();
-			}
 		}
 	}
 	

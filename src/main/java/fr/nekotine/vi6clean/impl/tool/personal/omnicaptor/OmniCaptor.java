@@ -84,7 +84,7 @@ public class OmniCaptor extends Tool{
 	public void lowTick() {
 		if (placed == null) {
 			var player = getOwner();
-			if (player == null || !sneaking) {
+			if (player == null || !sneaking || !player.getInventory().getItemInMainHand().isSimilar(getItemStack())) {
 				return;
 			}
 			var loc = player.getLocation();
