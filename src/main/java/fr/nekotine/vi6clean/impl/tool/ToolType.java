@@ -22,7 +22,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.warner.WarnerHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.WatcherHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.watcher.WatcherHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
