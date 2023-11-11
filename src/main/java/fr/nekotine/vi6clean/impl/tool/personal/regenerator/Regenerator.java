@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.regenerator;
 
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,6 +12,7 @@ public class Regenerator extends Tool{
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return RegeneratorHandler.IDLE_ITEM();
+		
 	}
 	@Override
 	protected void cleanup() {
@@ -19,17 +21,20 @@ public class Regenerator extends Tool{
 		if(healing) {
 			if(++tickCount >= RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS) {
 				tickCount = 0;
+				getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
 				getOwner().setHealth(Math.min(getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), getOwner().getHealth() + RegeneratorHandler.REGENERATION_AMOUNT));
 			}
 		}else {
 			if(++tickCount >= RegeneratorHandler.DELAY_BEFORE_REGENERATING_TICKS) {
 				tickCount = 0;
 				healing = true;
+				getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
 				setItemStack(RegeneratorHandler.HEALING_ITEM());
 			}
 		}
 	}
 	public void onDamage() {
+		getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BEFORE_REGENERATING_TICKS);
 		tickCount = 0;
 		healing = false;
 		setItemStack(RegeneratorHandler.IDLE_ITEM());
