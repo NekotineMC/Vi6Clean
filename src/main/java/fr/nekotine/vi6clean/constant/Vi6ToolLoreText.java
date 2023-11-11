@@ -52,6 +52,8 @@ public enum Vi6ToolLoreText {
 			"<lore>Les gardes peuvent détruire les balises en marchant dessus.",
 			"<lore>Vous pouvez en poser <variable><nbmax></variable> simultanément.",
 			"<lore>La portée est de <variable><range></variable>"
+	),
+	REGENERATOR( "<lore>Régénerez-vous après <variable><delay></variable> sans prendre de dégâts"
 	),;
 
 	//

@@ -18,6 +18,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.radar.RadarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.regenerator.RegeneratorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
@@ -83,11 +84,17 @@ public enum ToolType {
 			200,		// PRICE
 			1 			// LIMIT
 			),
-	WARNER(
+	WARNER (
 			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
 			WarnerHandler::new,
 			250,		// PRICE
-			2
+			0
+			),
+	REGENERATOR (
+			ItemStackUtil.make(Material.CAMPFIRE, Component.text("Régénérateur", NamedTextColor.GOLD), RegeneratorHandler.LORE),
+			RegeneratorHandler::new,
+			150,		// PRICE
+			0 			// LIMIT
 			)
 	;
 	

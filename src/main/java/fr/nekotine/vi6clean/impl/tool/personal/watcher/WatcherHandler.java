@@ -47,7 +47,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.WATCHER.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
+			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
 			Placeholder.parsed("nbmax", Integer.toString(NB_MAX_WATCHER))
 			);
 	
