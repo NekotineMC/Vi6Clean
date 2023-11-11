@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.omnicaptor;
 
 import java.util.Collection;
 import java.util.LinkedList;

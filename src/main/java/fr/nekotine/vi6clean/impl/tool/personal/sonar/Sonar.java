@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.sonar;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
