@@ -56,7 +56,21 @@ public class Warner extends Tool{
 		placed = true;
 		return true;
 	}
-	protected void tick() {
+	protected void tickWarning() {
+		if(placed && watched.isCaptured()) {
+			warn_delay++;
+			if(warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
+				cleanup();
+				Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
+				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
+					p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
+				);
+				handler.detachFromOwner(this);
+				handler.remove(this);
+			}
+		}
+	}
+	protected void tickDisplay() {
 		if(placed) {
 			n = (n+1) % 8;
 			eye_item1.setInterpolationDelay(0);
@@ -65,29 +79,16 @@ public class Warner extends Tool{
 			eye_item2.setInterpolationDelay(0);
 			eye_item2.setInterpolationDuration(11);
 			eye_item2.setTransformation(getTransform(n + 4));
-			if(watched.isCaptured()) {
-				warn_delay++;
-				if(warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
-					cleanup();
-					Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
-					NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
-						p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
-					);
-					handler.detachFromOwner(this);
-					handler.remove(this);
-				}
-			}
-		}else {
-			if(!inHand || !sneaking)
-				return;
+		}
+	}
+	protected void tickParticles() {
+		if(inHand && sneaking) {
 			var loc = getOwner().getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(WarnerHandler.PLACE_RANGE, 5, 0,
-					(offsetX, offsetZ) -> {
-						getOwner().spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
-					});
+			SpatialUtil.circle2DDensity(WarnerHandler.PLACE_RANGE, 5, 0,(offsetX, offsetZ) -> {
+			getOwner().spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);});
 		}
 	}
 	protected void setInHand(boolean inHand) {

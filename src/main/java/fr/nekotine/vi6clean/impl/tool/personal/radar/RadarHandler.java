@@ -74,11 +74,11 @@ public class RadarHandler extends ToolHandler<Radar>{
 	public RadarHandler() {
 		super(ToolType.RADAR, Radar::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
-		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.25f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
+		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.125f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
-		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.5f, SpatialUtil.SphereAlgorithm.FIBONACCI,
+		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.25f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 				(offsetX, offsetY, offsetZ) -> {
 					SPHERE.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
