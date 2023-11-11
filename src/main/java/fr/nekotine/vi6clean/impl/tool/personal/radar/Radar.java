@@ -18,6 +18,7 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 public class Radar extends Tool{
 	private boolean placed = false;
 	private boolean sneaking = false;
+	private boolean inHand = false;
 	private ItemDisplay bottom;
 	private ItemDisplay mid;
 	private ItemDisplay top;
@@ -136,7 +137,7 @@ public class Radar extends Tool{
 			});
 			
 			
-		}else if(sneaking) {
+		}else if(sneaking && inHand) {
 			Location loc = getOwner().getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
@@ -162,5 +163,8 @@ public class Radar extends Tool{
 	}
 	protected void setSneaking(boolean sneaking) {
 		this.sneaking = sneaking;
+	}
+	protected void setInHand(boolean inHand) {
+		this.inHand = inHand;
 	}
 }

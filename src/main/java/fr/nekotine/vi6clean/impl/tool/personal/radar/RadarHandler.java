@@ -9,6 +9,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -115,9 +116,16 @@ public class RadarHandler extends ToolHandler<Radar>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPlace()) {
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPlace()) {
 			evt.setCancelled(true);
 		}
+	}
+	@EventHandler
+	private void onHandChange(PlayerItemHeldEvent evt) {
+		var evtP = evt.getPlayer();
+		ItemStack newHeld = evtP.getInventory().getItem(evt.getNewSlot());
+		getTools().stream().filter(t -> evtP.equals(t.getOwner())).forEach(
+				t -> t.setInHand(t.getItemStack().isSimilar(newHeld)));
 	}
 
 	//
