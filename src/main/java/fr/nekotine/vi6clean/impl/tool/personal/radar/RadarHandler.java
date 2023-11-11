@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.radar;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +63,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	//
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.RADAR.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
+			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
 			Placeholder.parsed("delay", DELAY_SECOND+" secondes"),
 			Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes")
 	);
@@ -73,11 +73,11 @@ public class RadarHandler extends ToolHandler<Radar>{
 	public RadarHandler() {
 		super(ToolType.RADAR, Radar::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
-		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.5, SpatialUtil.SphereAlgorithm.FIBONACCI, 
+		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.25f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
-		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 1, SpatialUtil.SphereAlgorithm.FIBONACCI,
+		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.5f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 				(offsetX, offsetY, offsetZ) -> {
 					SPHERE.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});

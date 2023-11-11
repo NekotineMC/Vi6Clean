@@ -13,14 +13,15 @@ import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
-import fr.nekotine.vi6clean.impl.tool.personal.DoubleJumpHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.InviSneakHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.LanternHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.OmniCaptorHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.RadarHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.ShadowHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.SonarHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.TazerHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.doublejump.DoubleJumpHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.radar.RadarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.warner.WarnerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.WatcherHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -81,6 +82,12 @@ public enum ToolType {
 			WatcherHandler::new,
 			200,		// PRICE
 			1 			// LIMIT
+			),
+	WARNER(
+			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
+			WarnerHandler::new,
+			250,		// PRICE
+			2
 			)
 	;
 	

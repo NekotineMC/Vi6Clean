@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.invisneak;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

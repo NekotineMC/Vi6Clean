@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.shadow;
 
 import org.bukkit.Color;
 import org.bukkit.Material;

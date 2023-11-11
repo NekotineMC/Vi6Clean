@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.invisneak;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 	private static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
+			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
 			Placeholder.parsed("statusname", InvisibleStatusFlag.getStatusName())
 			);
 	

@@ -35,7 +35,7 @@ public enum Vi6ToolLoreText {
 			"<lore>Utilisez <important><key:key.attack></important> pour tirer.",
 			"<lore>Temps de recharge: <variable><cooldown></variable>"
 	),
-	LANTERN(	"<lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes",
+	LANTERN("<lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes",
 			"<lore>que vos alliés peuvent prendre pour se téléporter à vous."
 	),
 	RADAR(	"<lore>Permet de poser un radar qui, après <variable><delay></variable>,",
@@ -44,6 +44,9 @@ public enum Vi6ToolLoreText {
 	),
 	SHADOW(	"<lore>Placer une ombre pour revenir plus tard,",
 			"<lore>et mourrez si un garde la trouve!"
+	),
+	WARNER( "<lore>S'attache à un artéfact et avertit lorsqu'il est volé.",
+			"<lore>Délai du message: <variable><delay></variable>"
 	),
 	WATCHER("<lore>Pose une balise qui affiche en surbrillance les gardes à proximité.",
 			"<lore>Les gardes peuvent détruire les balises en marchant dessus.",

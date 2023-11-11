@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
