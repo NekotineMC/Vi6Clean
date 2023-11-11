@@ -12,25 +12,25 @@ public class Regenerator extends Tool{
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return RegeneratorHandler.IDLE_ITEM();
-		
 	}
 	@Override
 	protected void cleanup() {
 	}
 	public void tick() {
-		if(healing) {
-			if(++tickCount >= RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS) {
-				tickCount = 0;
-				getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
-				getOwner().setHealth(Math.min(getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), getOwner().getHealth() + RegeneratorHandler.REGENERATION_AMOUNT));
-			}
-		}else {
-			if(++tickCount >= RegeneratorHandler.DELAY_BEFORE_REGENERATING_TICKS) {
-				tickCount = 0;
-				healing = true;
-				getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
-				setItemStack(RegeneratorHandler.HEALING_ITEM());
-			}
+		if(healing)
+			return;
+		if(++tickCount >= RegeneratorHandler.DELAY_BEFORE_REGENERATING_TICKS) {
+			healing = true;
+			setItemStack(RegeneratorHandler.HEALING_ITEM());
+		}
+	}
+	public void heal() {
+		if(!healing)
+			return;
+		double maxHealth = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double newHealth = Math.min(maxHealth, getOwner().getHealth() + RegeneratorHandler.REGENERATION_AMOUNT);
+		if(newHealth!=maxHealth) {
+			getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
 		}
 	}
 	public void onDamage() {

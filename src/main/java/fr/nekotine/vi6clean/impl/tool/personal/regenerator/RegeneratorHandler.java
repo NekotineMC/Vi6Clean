@@ -42,8 +42,9 @@ public class RegeneratorHandler extends ToolHandler<Regenerator>{
 		.build();
 	}
 	public static final List<Component> LORE = Vi6ToolLoreText.REGENERATOR.make(
-			Placeholder.unparsed("delay", (int)(DELAY_BEFORE_REGENERATING_TICKS/20)+" secondes"));
-			
+	Placeholder.unparsed("delay", (int)(DELAY_BEFORE_REGENERATING_TICKS/20)+" secondes"));
+	
+	private int healingTick = 0;
 	//
 	
 	public RegeneratorHandler() {
@@ -62,6 +63,10 @@ public class RegeneratorHandler extends ToolHandler<Regenerator>{
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		for (var tool : getTools()) {
+			if(++healingTick >= DELAY_BETWEEN_HEALING_TICKS) {
+				healingTick = 0;
+				tool.heal();
+			}
 			tool.tick();
 		}
 	}

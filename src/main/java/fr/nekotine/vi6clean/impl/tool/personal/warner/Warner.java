@@ -57,17 +57,14 @@ public class Warner extends Tool{
 		return true;
 	}
 	protected void tickWarning() {
-		if(placed && watched.isCaptured()) {
-			warn_delay++;
-			if(warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
-				cleanup();
-				Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
-				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
-					p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
-				);
-				handler.detachFromOwner(this);
-				handler.remove(this);
-			}
+		if(placed && watched.isCaptured() && ++warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
+			Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
+			NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
+				p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
+			);
+			cleanup();
+			handler.detachFromOwner(this);
+			handler.remove(this);
 		}
 	}
 	protected void tickDisplay() {
@@ -82,7 +79,7 @@ public class Warner extends Tool{
 		}
 	}
 	protected void tickParticles() {
-		if(inHand && sneaking) {
+		if(!placed && inHand && sneaking) {
 			var loc = getOwner().getLocation();
 			var x = loc.getX();
 			var y = loc.getY();
