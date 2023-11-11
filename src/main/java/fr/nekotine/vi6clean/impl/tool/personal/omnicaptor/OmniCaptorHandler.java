@@ -38,8 +38,8 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
-	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
+	public static final List<Component> LORE = Vi6ToolLoreText.OMNICAPTOR.make(
+			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
 			Placeholder.parsed("statusname", OmniCaptedStatusFlag.getStatusName())
 			);
 	
