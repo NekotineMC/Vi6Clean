@@ -90,6 +90,13 @@ public enum Vi6Sound {
 	}),
 	RADAR_POSITIVE(new Sound[] {
 	Sound.sound(Key.key("entity.warden.death"), Sound.Source.MASTER, 2F, 0.5F)
+	}),
+	WARNER_POSE(new Sound[] {
+	Sound.sound(Key.key("entity.slime.jump"), Sound.Source.VOICE, 1, 2),
+	Sound.sound(Key.key("entity.shulker_bullet.hit"), Sound.Source.VOICE, 0.5f, 2)
+	}),
+	WARNER_TRIGGER(new Sound[] {
+	Sound.sound(Key.key("entity.vindicator.celebrate"), Sound.Source.VOICE, 0.5f, 1.5f)
 	})
 	;
 	

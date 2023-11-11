@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.map.artefact;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -127,6 +128,7 @@ public class Artefact{
 			}
 			if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
 				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
+				Bukkit.getPluginManager().callEvent(new ArtefactStealEvent(this, firstThief));
 			}
 		}
 	}

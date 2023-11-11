@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.tazer;
 
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Material;

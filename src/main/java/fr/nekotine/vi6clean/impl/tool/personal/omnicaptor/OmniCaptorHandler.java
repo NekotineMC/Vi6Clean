@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.omnicaptor;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -38,7 +38,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
-	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
+	public static final List<Component> LORE = Vi6ToolLoreText.OMNICAPTOR.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
 			Placeholder.parsed("statusname", OmniCaptedStatusFlag.getStatusName())
 			);

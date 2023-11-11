@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal;
+package fr.nekotine.vi6clean.impl.tool.personal.sonar;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class SonarHandler extends ToolHandler<Sonar>{
 	
 	public static final int DELAY_SECOND = 3;
 	
-	public static final List<Component> LORE = Vi6ToolLoreText.INVISNEAK.make(
+	public static final List<Component> LORE = Vi6ToolLoreText.SONAR.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
 			Placeholder.parsed("delay", DELAY_SECOND+" secondes")
 			);
