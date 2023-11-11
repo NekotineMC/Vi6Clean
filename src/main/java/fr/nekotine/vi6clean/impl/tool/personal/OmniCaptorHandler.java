@@ -62,13 +62,13 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		System.out.println("OMNI ACTION = "+evt.getAction());
+		System.out.println("OMNI ACTION = "+evt.getAction());/*
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPlace()) {
 			evt.setCancelled(true);
 		}
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPickup()) {
 			evt.setCancelled(true);
-		}
+		}*/
 	}
 	
 	@EventHandler
