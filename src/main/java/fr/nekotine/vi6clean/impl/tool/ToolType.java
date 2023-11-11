@@ -22,6 +22,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.regenerator.RegeneratorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.tracker.TrackerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.warner.WarnerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.watcher.WatcherHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
@@ -87,7 +88,7 @@ public enum ToolType {
 	WARNER (
 			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
 			WarnerHandler::new,
-			250,		// PRICE
+			150,		// PRICE
 			0
 			),
 	REGENERATOR (
@@ -95,7 +96,13 @@ public enum ToolType {
 			RegeneratorHandler::new,
 			150,		// PRICE
 			0 			// LIMIT
-			)
+			),
+	TRACKER (
+			ItemStackUtil.make(Material.RECOVERY_COMPASS, Component.text("Traceur", NamedTextColor.GOLD), Vi6ToolLoreText.TRACKER.make()),
+			TrackerHandler::new,
+			100,		// PRICE
+			0
+			),
 	;
 	
 	private ToolHandler<?> handler;
