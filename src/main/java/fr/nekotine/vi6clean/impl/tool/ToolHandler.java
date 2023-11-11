@@ -130,8 +130,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent evt) {
-		var optionalTool = tools.stream().peek(t -> System.out.println("peek t itemstack="+t.getItemStack()))
-				.peek(t -> System.out.println("peek evt itemstack="+evt.getItemDrop().getItemStack()))
+		var optionalTool = tools.stream()
 				.filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
 				.findFirst();
 		if (optionalTool.isEmpty()) {
@@ -148,8 +147,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getEntity() instanceof Player player)) {
 			return;
 		}
-		var optionalTool = tools.stream().peek(t -> System.out.println("peek t itemstack="+t.getItemStack()))
-				.peek(t -> System.out.println("peek evt itemstack="+evt.getItem().getItemStack()))
+		var optionalTool = tools.stream()
 				.filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
 		if (optionalTool.isEmpty()) {
 			return;

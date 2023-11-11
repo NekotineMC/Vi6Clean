@@ -22,6 +22,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.warner.WarnerHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.watcher.WatcherHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -75,6 +76,12 @@ public enum ToolType {
 			ShadowHandler::new,
 			250,		// PRICE
 			2 			// LIMIT
+			),
+	WATCHER (
+			ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG, Component.text("Observateur", NamedTextColor.GOLD), Vi6ToolLoreText.WATCHER.make()),
+			WatcherHandler::new,
+			200,		// PRICE
+			1 			// LIMIT
 			),
 	WARNER(
 			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
