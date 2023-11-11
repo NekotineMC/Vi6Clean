@@ -38,8 +38,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class RadarHandler extends ToolHandler<Radar>{
-	protected static final String DETECTION_SUCCESS = "<gold>Radar>></gold> <aqua><number></aqua> <green>voleurs détéctés à proximité !</green>";
-	protected static final String DETECTION_FAIL = "<gold>Radar>></gold> <aqua>0</aqua> <red>voleurs détéctés à proximité !</red>";
+	protected static final String DETECTION_SUCCESS = "<gold>Radar>></gold> <aqua><number></aqua> <green>ennemis détéctés à proximité !</green>";
+	protected static final String DETECTION_FAIL = "<gold>Radar>></gold> <aqua>0</aqua> <red>ennemis détéctés à proximité !</red>";
 
 	protected static final int DETECTION_BLOCK_RANGE = 20;
 	protected static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
@@ -74,11 +74,11 @@ public class RadarHandler extends ToolHandler<Radar>{
 	public RadarHandler() {
 		super(ToolType.RADAR, Radar::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
-		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.125f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
+		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
-		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.25f, SpatialUtil.SphereAlgorithm.FIBONACCI,
+		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 				(offsetX, offsetY, offsetZ) -> {
 					SPHERE.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
