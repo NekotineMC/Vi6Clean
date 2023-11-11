@@ -88,13 +88,13 @@ public enum ToolType {
 			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
 			WarnerHandler::new,
 			250,		// PRICE
-			0
+			-1
 			),
 	REGENERATOR (
 			ItemStackUtil.make(Material.CAMPFIRE, Component.text("Régénérateur", NamedTextColor.GOLD), RegeneratorHandler.LORE),
 			RegeneratorHandler::new,
 			150,		// PRICE
-			0 			// LIMIT
+			-1 			// LIMIT
 			)
 	;
 	
