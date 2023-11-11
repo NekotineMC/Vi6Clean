@@ -109,6 +109,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		thiefScheduleCanLeaveMap();
 		thiefScheduleCanCaptureArtefact();
+		var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+		if (infiltrationPhase != null) {
+			infiltrationPhase.setIngameScannerDelay();
+		}
 	}
 	
 	public void thiefLeaveMap() {

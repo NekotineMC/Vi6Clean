@@ -63,6 +63,10 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		NekotineCore.MODULES.get(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
 	}
 	
+	public void setIngameScannerDelay() {
+		scanner.setScanDelaySeconds(30);
+	}
+	
 	@Override
 	protected Object handleComplete() {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
