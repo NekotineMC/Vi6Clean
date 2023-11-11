@@ -47,7 +47,7 @@ public enum Vi6ToolLoreText {
 	),
 	WATCHER("<lore>Pose une balise qui affiche en surbrillance les gardes à proximité.",
 			"<lore>Les gardes peuvent détruire les balises en marchant dessus.",
-			"<lore>Vous pouvez en poser <variable><nbMax></variable> simultanément.",
+			"<lore>Vous pouvez en poser <variable><nbmax></variable> simultanément.",
 			"<lore>La portée est de <variable><range></variable>"
 	),;
 

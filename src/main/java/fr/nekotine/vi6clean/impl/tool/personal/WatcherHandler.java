@@ -3,34 +3,32 @@ package fr.nekotine.vi6clean.impl.tool.personal;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Silverfish;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.status.effect.StatusEffect;
-import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
-import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
-import fr.nekotine.vi6clean.impl.status.flag.OmniCaptedStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class WatcherHandler extends ToolHandler<Watcher>{
@@ -46,11 +44,11 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	
 	public static final int NB_MAX_WATCHER = 3;
 	
-	private static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
+	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.WATCHER.make(
 			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" block"),
-			Placeholder.parsed("nbMax", Integer.toString(NB_MAX_WATCHER))
+			Placeholder.parsed("nbmax", Integer.toString(NB_MAX_WATCHER))
 			);
 	
 	@Override
@@ -64,6 +62,25 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	}
 	
 	@EventHandler
+	private void onPlayerInterract(PlayerInteractEvent evt) {
+		if (evt.getHand() != EquipmentSlot.HAND) {
+			return;
+		}
+		var evtP = evt.getPlayer();
+		var optionalTool = getTools().stream().filter(t -> evtP.equals(t.getOwner()) && t.getItemStack().isSimilar(evt.getItem())).findFirst();
+		if (optionalTool.isEmpty()) {
+			return;
+		}
+		System.out.println("ACTION = "+evt.getAction());
+		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryDropWatcher()) {
+			evt.setCancelled(true);
+		}
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPickupWatcher()) {
+			evt.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
 	private void onPlayerToggleSneak(PlayerToggleSneakEvent evt) {
 		var tools = getTools().stream().filter(t -> evt.getPlayer().equals(t.getOwner())).collect(Collectors.toUnmodifiableSet());
 		for (var tool : tools) {
@@ -71,20 +88,28 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		}
 	}
 	
-	private Collection<Player> inRange(Silverfish sf, OmniCaptor captor) {
-		return captor.getEnemyTeam()
-		.filter(ennemi -> ennemi.getLocation().distanceSquared(sf.getLocation()) <= DETECTION_RANGE_SQUARED)
-		.collect(Collectors.toCollection(LinkedList::new));
-	}
-	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+		var statusEffectModule = NekotineCore.MODULES.get(StatusEffectModule.class);
 		for (var tool : getTools()) {
-			for (var sf : tool.getWatcherList()) {
-				
+			if (tool.getOwner() == null) {
+				continue;
 			}
-			var inRange = inRange(as, tool);
+			Supplier<Stream<Player>> enemiTeam =
+					NekotineCore.MODULES.get(WrappingModule.class).getWrapper(tool.getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
+			var watchers = tool.getWatcherList();
+			var toRemove = watchers.stream().filter(sf ->enemiTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
+			.collect(Collectors.toCollection(LinkedList::new));
+			for (var sf : toRemove) {
+				sf.remove();
+				watchers.remove(sf);
+			}
+			
+			Collection<Player> inRange = enemiTeam.get().filter(
+					ennemi -> watchers.stream().anyMatch(
+							sf -> ennemi.getLocation().distanceSquared(sf.getLocation())<= DETECTION_RANGE_SQUARED)
+					)
+			.collect(Collectors.toCollection(LinkedList::new));
 			var oldInRange = tool.getEnnemiesInRange();
 			if (inRange.size() <= 0 && oldInRange.size() <= 0) {
 				continue;
@@ -95,12 +120,12 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 				if (inRange.contains(p)) {
 					inRange.remove(p);
 				}else {
-					flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
+					statusEffectModule.removeEffect(p, glowEffect);
 					ite.remove();
 				}
 			}
 			for (var p : inRange) {
-				flagModule.addFlag(p, OmniCaptedStatusFlag.get());
+				statusEffectModule.addEffect(p, glowEffect);
 				oldInRange.add(p);
 				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				var own = tool.getOwner();
@@ -108,7 +133,6 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 					Vi6Sound.OMNICAPTEUR_DETECT.play(own);
 				}
 			}
-			tool.itemUpdate();
 		}
 		if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
 			for (var tool : getTools()) {
