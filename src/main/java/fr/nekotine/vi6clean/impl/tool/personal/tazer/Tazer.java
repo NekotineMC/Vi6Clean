@@ -77,5 +77,4 @@ public class Tazer extends Tool{
 			cooldown--;
 		}
 	}
-	
 }

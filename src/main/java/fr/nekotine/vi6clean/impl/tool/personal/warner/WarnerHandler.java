@@ -78,10 +78,6 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	
 	//
 	
-	
-	
-	//
-	
 	public WarnerHandler() {
 		super(ToolType.WARNER, Warner::new);
 		NekotineCore.MODULES.tryLoad(TickingModule.class);
