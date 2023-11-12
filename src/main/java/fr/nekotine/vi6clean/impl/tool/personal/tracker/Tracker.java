@@ -1,6 +1,7 @@
 package fr.nekotine.vi6clean.impl.tool.personal.tracker;
 
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,7 +33,7 @@ public class Tracker extends Tool{
 	protected boolean shoot(TrackerHandler handler) {
 		if(hit)
 			return false;
-		var ennemiTeam = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ennemiTeamInMap();
+		var ownWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class);
 		var eyeLoc = getOwner().getEyeLocation();
 		RayTraceResult res = getOwner().getWorld().rayTrace(
 				eyeLoc, 
@@ -41,36 +42,34 @@ public class Tracker extends Tool{
 				FluidCollisionMode.NEVER, 
 				true, 
 				TrackerHandler.RAY_SIZE, 
-				hit -> ennemiTeam.anyMatch(ennemi -> ennemi.equals(hit)));
+				hit -> ownWrap.ennemiTeamInMap().anyMatch(ennemi -> ennemi.equals(hit)));
 		
-		var hitB = res.getHitBlock();
-		var hitE = res.getHitEntity();
-		var range = hitB==null ?
-					(hitE==null ?
-					TrackerHandler.RAY_DISTANCE :
-					hitE.getLocation().distance(getOwner().getLocation())):
-					hitB.getLocation().distance(getOwner().getLocation());
+		var range = TrackerHandler.RAY_DISTANCE;
+		if(res!=null) {
+			var hitP = res.getHitPosition();
+			range = eyeLoc.distance(new Location(eyeLoc.getWorld(), hitP.getX(), hitP.getY(), hitP.getZ()));
+		}
 		SpatialUtil.line3DFromDir(
-				eyeLoc.getX(),
-				eyeLoc.getY(),
-				eyeLoc.getZ(),
-				eyeLoc.getDirection(),
-				range, 
-				4, 
-				(x,y,z) -> getOwner().spawnParticle(Particle.FIREWORKS_SPARK, x, y, z, 1));
-		if(hitE==null) {
+			eyeLoc.getX(),
+			eyeLoc.getY(),
+			eyeLoc.getZ(),
+			eyeLoc.getDirection(),
+			range, 
+			4, 
+			(vec) -> getOwner().spawnParticle(Particle.FIREWORKS_SPARK, vec.getX(), vec.getY(), vec.getZ(), 0, 0, 0, 0, 0f));
+		
+		if(res == null || res.getHitEntity()==null) {
+			Vi6Sound.TRACKER_FAIL.play(getOwner());
 			handler.detachFromOwner(this);
 			handler.remove(this);
-			Vi6Sound.TRACKER_FAIL.play(getOwner());
 			return true;
 		}
+		
 		playerHit = (Player)res.getHitEntity();
 		hit = true;
 		Vi6Sound.TRACKER_SUCCESS.play(getOwner());
-		
 		//kb & animation
 		playerHit.playHurtAnimation(getOwner().getEyeLocation().getYaw() + playerHit.getLocation().getYaw());
-		
 		setCompassItem();
 		return true;
 		

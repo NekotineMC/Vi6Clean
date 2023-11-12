@@ -67,6 +67,12 @@ public enum ToolType {
 			200, 		// PRICE
 			1 			// LIMIT
 			),
+	TRACKER (
+			ItemStackUtil.make(Material.RECOVERY_COMPASS, Component.text("Traceur", NamedTextColor.GOLD), Vi6ToolLoreText.TRACKER.make()),
+			TrackerHandler::new,
+			100,		// PRICE
+			-1
+			),
 	RADAR (
 			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
 			RadarHandler::new,
@@ -96,12 +102,6 @@ public enum ToolType {
 			RegeneratorHandler::new,
 			150,		// PRICE
 			0 			// LIMIT
-			),
-	TRACKER (
-			ItemStackUtil.make(Material.RECOVERY_COMPASS, Component.text("Traceur", NamedTextColor.GOLD), Vi6ToolLoreText.TRACKER.make()),
-			TrackerHandler::new,
-			100,		// PRICE
-			0
 			),
 	;
 	

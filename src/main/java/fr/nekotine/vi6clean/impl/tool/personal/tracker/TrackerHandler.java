@@ -29,7 +29,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class TrackerHandler extends ToolHandler<Tracker>{
 	private static final int REFRESH_DELAY_SECOND = 2;
-	protected static final int RAY_DISTANCE = 0;
+	protected static final double RAY_DISTANCE = 100;
 	protected static final int RAY_SIZE = 0;
 	protected static final ItemStack GUN_ITEM() {
 		return new ItemStackBuilder(Material.CROSSBOW)
