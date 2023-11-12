@@ -97,7 +97,15 @@ public enum Vi6Sound {
 	}),
 	WARNER_TRIGGER(new Sound[] {
 	Sound.sound(Key.key("entity.vindicator.celebrate"), Sound.Source.VOICE, 0.5f, 1.5f)
-	})
+	}),
+	TRACKER_SUCCESS(new Sound[] {
+	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 1),
+	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 2)
+	}),
+	TRACKER_FAIL(new Sound[] {
+	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 1),
+	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 0)
+	}),
 	;
 	
 	private Sound[] sounds;
