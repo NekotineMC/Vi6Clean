@@ -65,7 +65,6 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player>{
 		list.add(new ItemWrappingState<>(PlayerWrapper::new));
 		list.add(new PlayerSnapshotState());
 		list.add(new PlayerScoreboardState(game.getScoreboard()));
-		list.add(new PotionEffectState<Player>(new PotionEffect(PotionEffectType.SATURATION, -1, 0, false, false, false)));
 		return list;
 	}
 

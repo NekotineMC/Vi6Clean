@@ -12,6 +12,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.constant.DayTime;
@@ -20,6 +22,7 @@ import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
+import fr.nekotine.core.state.PotionEffectState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
 import fr.nekotine.core.ticking.TickingModule;
@@ -141,6 +144,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	protected List<ItemState<Player>> makeAppliedItemStates() {
 		var list = new LinkedList<ItemState<Player>>();
 		list.add(new ItemWrappingState<>(InMapPhasePlayerWrapper::new));
+		list.add(new PotionEffectState<Player>(new PotionEffect(PotionEffectType.SATURATION, -1, 0, false, false, false)));
 		return list;
 	}
 	
