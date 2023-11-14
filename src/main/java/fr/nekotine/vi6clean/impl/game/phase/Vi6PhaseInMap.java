@@ -34,6 +34,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
@@ -98,10 +99,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		for (var tool : ToolType.values()) {
 			tool.getHandler().startHandling();
 		}
+		Vi6Main.IOC.resolve(Majordom.class).enable();
 	}
 
 	@Override
 	public void globalTearDown() {
+		Vi6Main.IOC.resolve(Majordom.class).revertThenDisable();
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		game.getWorld().setTime(DayTime.NOON);
 		for (var display : debugDisplays) {

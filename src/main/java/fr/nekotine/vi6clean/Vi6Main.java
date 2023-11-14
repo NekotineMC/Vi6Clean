@@ -20,6 +20,7 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
+import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 
 public class Vi6Main extends JavaPlugin implements Listener{
@@ -45,6 +46,7 @@ public class Vi6Main extends JavaPlugin implements Listener{
 		NekotineCore.MODULES.load(TickingModule.class);
 		var game = new Vi6Game();
 		IOC.registerSingleton(game);
+		IOC.registerSingleton(new Majordom());
 		try {
 			game.getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
 		}catch(Exception e){
