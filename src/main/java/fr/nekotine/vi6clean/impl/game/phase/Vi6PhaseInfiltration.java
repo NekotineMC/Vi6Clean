@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
@@ -57,6 +59,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	@Override
 	public void itemSetup(Player item) {
 		NekotineCore.MODULES.get(WrappingModule.class).makeWrapper(item, InfiltrationPhasePlayerWrapper::new);
+		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,20*15,0,false,false,true));
 	}
 
 	@Override
