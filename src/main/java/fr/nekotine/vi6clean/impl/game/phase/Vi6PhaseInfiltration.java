@@ -46,6 +46,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>)inputData);
 		scanner.startScanning();
+		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
 	}
 
 	@Override
