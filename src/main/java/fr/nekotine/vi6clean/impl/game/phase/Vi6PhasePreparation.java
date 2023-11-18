@@ -109,6 +109,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		for (var armorStand : minimapSpawnIndicators.keySet()) {
 			armorStand.remove();
 		}
+		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		game.getPlayerList().forEach(p -> p.closeInventory());
 		minimapSpawnIndicators.clear();
 		openMenuUsable.unregister();
 	}

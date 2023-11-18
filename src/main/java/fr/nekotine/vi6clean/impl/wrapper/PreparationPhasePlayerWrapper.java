@@ -31,9 +31,11 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private ThiefSpawn selectedSpawn;
 	
+	private ComponentDisplayMenuItem moneyIndicator;
+	
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
-		var moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
+		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
 		var readyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase,
@@ -94,6 +96,6 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setMoney(int money) {
 		this.money = money;
+		moneyIndicator.askRedraw();
 	}
-	
 }

@@ -80,7 +80,7 @@ public enum ToolType {
 			2 			// LIMIT
 			),
 	WATCHER (
-			ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG, Component.text("Observateur", NamedTextColor.GOLD), Vi6ToolLoreText.WATCHER.make()),
+			ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG, Component.text("Observateur", NamedTextColor.GOLD), WatcherHandler.LORE),
 			WatcherHandler::new,
 			200,		// PRICE
 			1 			// LIMIT
