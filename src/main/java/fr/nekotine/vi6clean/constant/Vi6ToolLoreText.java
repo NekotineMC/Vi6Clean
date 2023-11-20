@@ -56,7 +56,9 @@ public enum Vi6ToolLoreText {
 	REGENERATOR( "<lore>Régénerez-vous après <variable><delay></variable> sans prendre de dégâts"
 	),
 	TRACKER ("<lore>Tire un projectile à grande vitesse",
-			 "<lore>Obtenez une boussole qui pointe vers l'ennemi touché");
+			 "<lore>Obtenez une boussole qui pointe vers l'ennemi touché"),
+	SCANNER ("<lore>Vous permet de détecter les enemis",
+			 "<lore>toutes les <variable><delay></variable>");
 
 	//
 	
