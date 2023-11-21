@@ -42,11 +42,13 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	public final void startHandling() {
+		onStartHandling();
 		EventUtil.register(this);
 	}
 
 	public final void stopHandling() {
 		EventUtil.unregister(this);
+		onStopHandling();
 	}
 
 	public final void removeAll() {
@@ -114,6 +116,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		detachFromOwner(tool);
 		tool.cleanup();
 		tools.remove(tool);
+	}
+	
+	protected void onStartHandling() {
+	}
+	
+	protected void onStopHandling() {
 	}
 
 	protected abstract void onAttachedToPlayer(T tool, Player player);
