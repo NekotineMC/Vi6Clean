@@ -16,7 +16,6 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
-import fr.nekotine.vi6clean.impl.tool.teamwide.GuardScanner;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -25,8 +24,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>{
-
-	private GuardScanner scanner = new GuardScanner();
 	
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
@@ -47,13 +44,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	protected void globalSetup(Object inputData) {
 		var game = Vi6Main.IOC.resolve(Vi6Game.class);
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>)inputData);
-		scanner.startScanning();
 		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
 	}
 
 	@Override
 	protected void globalTearDown() {
-		scanner.stopScanning();
 	}
 
 	@Override
@@ -68,7 +63,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	}
 	
 	public void setIngameScannerDelay() {
-		scanner.setScanDelaySeconds(30);
 	}
 	
 	@Override
