@@ -19,6 +19,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.radar.RadarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.regenerator.RegeneratorHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.scanner.ScannerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.sonar.SonarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.tazer.TazerHandler;
@@ -102,6 +103,12 @@ public enum ToolType {
 			TrackerHandler::new,
 			100,		// PRICE
 			-1			// LIMIT
+			),
+	SCANNER (
+			ItemStackUtil.make(Material.CLOCK, Component.text("Scanner", NamedTextColor.GOLD), ScannerHandler.LORE),
+			ScannerHandler::new,
+			500,		// PRICE
+			1			// LIMIT
 			)
 	;
 	
