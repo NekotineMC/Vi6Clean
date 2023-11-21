@@ -45,7 +45,7 @@ public enum ToolType {
 			2 			// LIMIT
 			),
 	SONAR(
-			ItemStackUtil.make(Material.CLOCK, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE),
+			ItemStackUtil.make(Material.TARGET, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE),
 			SonarHandler::new,
 			400, 		// PRICE
 			1 			// LIMIT

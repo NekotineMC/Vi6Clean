@@ -18,7 +18,7 @@ public class Sonar extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.CLOCK, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE);
+		return ItemStackUtil.make(Material.TARGET, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE);
 	}
 
 	public void pulse() {
