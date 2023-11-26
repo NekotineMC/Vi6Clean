@@ -1,8 +1,10 @@
 package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
@@ -13,6 +15,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class DoubleJump extends Tool{
 	
 	private boolean canDoubleJump;
+	
+	private double power = Ioc.resolve(Configuration.class).getDouble("tool.double_jump.power", 0.5d);
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -35,7 +39,7 @@ public class DoubleJump extends Tool{
 	public void doubleJump() {
 		var player = getOwner();
 		var loc = player.getLocation();
-		player.setVelocity(player.getVelocity().setY(0.5D));
+		player.setVelocity(player.getVelocity().setY(power));
 		Vi6Sound.DOUBLE_JUMP.play(loc.getWorld(), loc);
 		setCanDoubleJump(false);
 	}

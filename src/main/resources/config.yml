@@ -1,1 +1,4 @@
 update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clean.jar'
+tool:
+   double_jump:
+      power: 0.5
