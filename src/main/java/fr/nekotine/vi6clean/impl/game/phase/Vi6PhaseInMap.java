@@ -15,11 +15,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.MapModule;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.PotionEffectState;
@@ -31,7 +32,6 @@ import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
@@ -48,7 +48,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 
 	@Override
@@ -58,22 +58,22 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@Override
 	public ObservableCollection<Player> getItemCollection() {
-		return Vi6Main.IOC.resolve(Vi6Game.class).getPlayerList();
+		return Ioc.resolve(Vi6Game.class).getPlayerList();
 	}
 	
 	@Override
 	public void globalSetup(Object inputData) {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		game.getWorld().setTime(DayTime.MIDNIGHT);
 		var mapName = game.getMapName();
 		if (mapName == null) {
-			var maps = NekotineCore.MODULES.get(MapModule.class).getMapFinder().list();
+			var maps = Ioc.resolve(MapModule.class).getMapFinder().list();
 			if (maps.size() <= 0) {
 				throw new IllegalStateException("Aucune map n'est disponible");
 			}
 			mapName = maps.get(0).getName();
 		}
-		map = NekotineCore.MODULES.get(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
+		map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
 		var world = game.getWorld();
@@ -99,13 +99,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		for (var tool : ToolType.values()) {
 			tool.getHandler().startHandling();
 		}
-		Vi6Main.IOC.resolve(Majordom.class).enable();
+		Ioc.resolve(Majordom.class).enable();
 	}
 
 	@Override
 	public void globalTearDown() {
-		Vi6Main.IOC.resolve(Majordom.class).revertThenDisable();
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		Ioc.resolve(Majordom.class).revertThenDisable();
+		var game = Ioc.resolve(Vi6Game.class);
 		game.getWorld().setTime(DayTime.NOON);
 		for (var display : debugDisplays) {
 			display.remove();
@@ -123,7 +123,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	@Override
 	public void itemSetup(Player item) {
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
 		item.setGameMode(GameMode.ADVENTURE);
 		if (!wrap.getParentWrapper().isThief()) {
@@ -161,7 +161,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var player = evt.getPlayer();
-		var optWrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+		var optWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 		if (optWrapper.isEmpty()) {
 			return;
 		}
@@ -209,10 +209,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@EventHandler
 	private void onPlayerDeath(PlayerDeathEvent evt) {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		var player = evt.getPlayer();
 		if (game.getThiefs().contains(evt.getPlayer())){
-			var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+			var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrap.isPresent()) {
 				optWrap.get().thiefLeaveMap();
 			}

@@ -4,16 +4,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.layout.BorderMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import net.kyori.adventure.text.Component;
@@ -27,7 +26,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public LobbyPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		var playerWrapper = getParentWrapper();
 		var changeTeamItem = new BooleanInputMenuItem(
 				ItemStackUtil.make(Material.RED_BANNER, Component.text("Voleur", NamedTextColor.RED)),
@@ -58,7 +57,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public PlayerWrapper getParentWrapper() {
-		return NekotineCore.MODULES.get(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class);
+		return Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class);
 	}
 
 	public MenuInventory getMenu() {
@@ -76,7 +75,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
 		this.readyForNextPhase = readyForNextPhase;
 		if (readyForNextPhase) {
-			Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class).checkForCompletion();
+			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class).checkForCompletion();
 		}
 	}
 	

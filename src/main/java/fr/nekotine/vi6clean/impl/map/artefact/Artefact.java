@@ -9,14 +9,13 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.block.BlockPatch;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
@@ -58,7 +57,7 @@ public class Artefact{
 	}
 	
 	public void capture() {
-		blockPatch.patch(Vi6Main.IOC.resolve(Vi6Game.class).getWorld().getBlockAt(
+		blockPatch.patch(Ioc.resolve(Vi6Game.class).getWorld().getBlockAt(
 						blockPosition.getX(),
 						blockPosition.getY(),
 						blockPosition.getZ())
@@ -81,8 +80,8 @@ public class Artefact{
 	}
 	
 	public void tick() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
-		var wrapping = NekotineCore.MODULES.get(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var wrapping = Ioc.resolve(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
 		}else {
@@ -127,7 +126,7 @@ public class Artefact{
 				capture_advancement = 0;
 			}
 			if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
-				NekotineCore.MODULES.get(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
+				Ioc.resolve(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
 				Bukkit.getPluginManager().callEvent(new ArtefactStealEvent(this, firstThief));
 			}
 		}

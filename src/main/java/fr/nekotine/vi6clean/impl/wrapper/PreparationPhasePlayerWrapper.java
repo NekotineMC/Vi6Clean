@@ -4,16 +4,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.element.ComponentDisplayMenuItem;
 import fr.nekotine.core.inventory.menu.layout.ToolbarMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
@@ -69,7 +68,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		this.readyForNextPhase = readyForNextPhase;
 		if (readyForNextPhase) {
-			Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();
+			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();
 		}
 	}
 
@@ -83,7 +82,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public InMapPhasePlayerWrapper getParentWrapper() {
-		return NekotineCore.MODULES.get(WrappingModule.class).getWrapper(wrapped, InMapPhasePlayerWrapper.class);
+		return Ioc.resolve(WrappingModule.class).getWrapper(wrapped, InMapPhasePlayerWrapper.class);
 	}
 
 	public int getMoney() {

@@ -1,7 +1,8 @@
 package fr.nekotine.vi6clean.impl.majordom;
 
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
@@ -16,7 +17,7 @@ import fr.nekotine.core.util.EventUtil;
 
 public final class Majordom implements Listener {
 
-	private final List<Block> toClose = new LinkedList<>();
+	private final Set<Block> toClose = new HashSet<>();
 	
 	public final void enable() {
 		EventUtil.register(this);

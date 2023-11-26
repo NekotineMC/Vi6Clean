@@ -2,10 +2,11 @@ package fr.nekotine.vi6clean.impl.status.flag;
 
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlag;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -30,19 +31,19 @@ public class InvisibleStatusFlag implements StatusFlag{
 	
 	@Override
 	public void applyStatus(LivingEntity appliedTo) {
-		if (NekotineCore.MODULES.get(StatusFlagModule.class).hasAny(appliedTo, OmniCaptedStatusFlag.get())) {
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, OmniCaptedStatusFlag.get())) {
 			return;
 		}
 		appliedTo.addPotionEffect(invisibleEffect);
 		if (!(appliedTo instanceof Player player)) {
 			return;
 		}
-		var optionalWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return;
 		}
 		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			ennemi.hideEntity(NekotineCore.getAttachedPlugin(), player);
+			ennemi.hideEntity(Ioc.resolve(JavaPlugin.class), player);
 		}
 	}
 
@@ -52,12 +53,12 @@ public class InvisibleStatusFlag implements StatusFlag{
 		if (!(appliedTo instanceof Player player)) {
 			return;
 		}
-		var optionalWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return;
 		}
 		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			ennemi.showEntity(NekotineCore.getAttachedPlugin(), player);
+			ennemi.showEntity(Ioc.resolve(JavaPlugin.class), player);
 		}
 	}
 

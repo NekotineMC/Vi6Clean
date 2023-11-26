@@ -5,10 +5,9 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import net.kyori.adventure.text.Component;
@@ -29,8 +28,8 @@ public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void capture(Artefact artefact) {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		for (var thief : game.getThiefs()) {
 			var wrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
 			wrap.thiefScheduleCanCaptureArtefact();

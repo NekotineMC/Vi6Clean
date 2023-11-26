@@ -2,6 +2,8 @@ package fr.nekotine.vi6clean.impl.game;
 
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -13,10 +15,11 @@ import org.bukkit.scoreboard.Team.OptionStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.game.phase.PhaseMachine;
 import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -25,6 +28,7 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.game.team.GuardTeam;
 import fr.nekotine.vi6clean.impl.game.team.ThiefTeam;
+import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
@@ -32,6 +36,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6Game implements ForwardingAudience, AutoCloseable{
+	
+	private final Logger logger = new NekotineLogger(getClass());
 	
 	private final World world = Bukkit.getWorlds().get(0);
 	
@@ -84,14 +90,27 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
 		phaseMachine.setLooping(true);
 		
-		// TODO Setup majordom to Vi6Main.IOC
+		Ioc.getProvider().registerSingleton(new Majordom());
+	}
+	
+	public final void start() {
+		// Launch game
+		try {
+			phaseMachine.goTo(Vi6PhaseLobby.class, null);
+		}catch(Exception e){
+			logger.log(Level.SEVERE, "Une erreur est survenue lors du chargement de la game", e);
+		}
 	}
 
 	@Override
-	public void close() throws Exception {
-		phaseMachine.end();
-		scoreboardGuard.unregister();
-		scoreboardThief.unregister();
+	public void close(){
+		try {
+			phaseMachine.end();
+			scoreboardGuard.unregister();
+			scoreboardThief.unregister();
+		}catch(Exception e) {
+			logger.log(Level.SEVERE, "Un erreur est survenur lors du déchargement de la game", e);
+		}
 	}
 	
 	public ObservableCollection<Player> getPlayerList(){
@@ -171,9 +190,9 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void setupGuard(Player player) {
 		scoreboardGuard.addPlayer(player);
-		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
+		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
 		wrap.setTeam(Vi6Team.GUARD);
-		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var guard : guards) {
 			glowModule.glowEntityFor(guard, player);
 			glowModule.glowEntityFor(player, guard);
@@ -188,11 +207,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void tearDownGuard(Player player) {
 		scoreboardGuard.removePlayer(player);
-		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
 		if (wrap.isPresent()) {
 			wrap.get().setTeam(Vi6Team.SPECTATOR);
 		}
-		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var guard : guards) {
 			glowModule.unglowEntityFor(guard, player);
 			glowModule.unglowEntityFor(player, guard);
@@ -201,9 +220,9 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void setupThief(Player player) {
 		scoreboardThief.addPlayer(player);
-		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
+		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
 		wrap.setTeam(Vi6Team.THIEF);
-		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var thief : thiefs) {
 			glowModule.glowEntityFor(thief, player);
 			glowModule.glowEntityFor(player, thief);
@@ -212,11 +231,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private void tearDownThief(Player player) {
 		scoreboardThief.removePlayer(player);
-		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
 		if (wrap.isPresent()) {
 			wrap.get().setTeam(Vi6Team.SPECTATOR);
 		}
-		var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var thief : thiefs) {
 			glowModule.unglowEntityFor(thief, player);
 			glowModule.unglowEntityFor(player, thief);

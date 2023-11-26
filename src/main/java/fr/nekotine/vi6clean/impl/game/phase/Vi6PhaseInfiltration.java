@@ -8,12 +8,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
@@ -36,13 +35,13 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 	@Override
 	public ObservableCollection<Player> getItemCollection() {
-		return Vi6Main.IOC.resolve(Vi6Game.class).getPlayerList();
+		return Ioc.resolve(Vi6Game.class).getPlayerList();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void globalSetup(Object inputData) {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>)inputData);
 		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
 	}
@@ -53,13 +52,13 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 	@Override
 	public void itemSetup(Player item) {
-		NekotineCore.MODULES.get(WrappingModule.class).makeWrapper(item, InfiltrationPhasePlayerWrapper::new);
+		Ioc.resolve(WrappingModule.class).makeWrapper(item, InfiltrationPhasePlayerWrapper::new);
 		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,20*15,0,false,false,true));
 	}
 
 	@Override
 	public void itemTearDown(Player item) {
-		NekotineCore.MODULES.get(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
+		Ioc.resolve(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
 	}
 	
 	public void setIngameScannerDelay() {
@@ -67,7 +66,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	
 	@Override
 	protected Object handleComplete() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		for (var player : game.getPlayerList()) {
 			player.setGameMode(GameMode.SPECTATOR);
 		}
@@ -75,11 +74,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	}
 	
 	public void checkForCompletion() {
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
-		if (Vi6Main.IOC.resolve(Vi6Game.class).getThiefs().stream().allMatch(
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		if (game.getThiefs().stream().allMatch(
 				guard -> !wrappingModule.getWrapper(guard, InMapPhasePlayerWrapper.class).isInside())
 				) {
-			var game = Vi6Main.IOC.resolve(Vi6Game.class);
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));

@@ -6,14 +6,14 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.fakeblock.AppliedFakeBlockPatch;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
@@ -43,7 +43,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void updateMapLeaveBlocker() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		var map = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
 		if (canLeaveMap) {
 			for (var blocker : mapLeaveBlockers) {
@@ -82,7 +82,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuir", NamedTextColor.GOLD));
 			}
 			
-		}.runTaskLater(NekotineCore.getAttachedPlugin(), 30*20);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), 30*20);
 	}
 	
 	public void thiefScheduleCanCaptureArtefact() {
@@ -96,16 +96,16 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
 			}
 			
-		}.runTaskLater(NekotineCore.getAttachedPlugin(), 30*20);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), 30*20);
 	}
 	
 	public void thiefEnterInside(Entrance entrance) {
 		state = InMapState.INSIDE;
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().sendMessage(wrapped.displayName().color(NamedTextColor.AQUA).append(Component.text(" est entré dans la carte par l'entrée ", NamedTextColor.GOLD).append(Component.text(entrance.getName(), NamedTextColor.AQUA))));
 		game.getGuards().sendMessage(wrapped.displayName().color(NamedTextColor.AQUA).append(Component.text(" est rentré dans la carte", NamedTextColor.GOLD)));
 		for (var guard : game.getGuards()) {
-			guard.showEntity(NekotineCore.getAttachedPlugin(), wrapped);
+			guard.showEntity(Ioc.resolve(JavaPlugin.class), wrapped);
 		}
 		thiefScheduleCanLeaveMap();
 		thiefScheduleCanCaptureArtefact();
@@ -116,12 +116,12 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void thiefLeaveMap() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
 		wrapped.setGameMode(GameMode.SPECTATOR);
 		
 		// Send message
-		var infiltrationWrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(wrapped, InfiltrationPhasePlayerWrapper.class);
+		var infiltrationWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, InfiltrationPhasePlayerWrapper.class);
 		if (infiltrationWrapper.isPresent()) {
 			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
 					.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
@@ -140,7 +140,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public PlayerWrapper getParentWrapper() {
-		return NekotineCore.MODULES.get(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class);
+		return Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class);
 	}
 
 	public boolean canCaptureArtefact() {

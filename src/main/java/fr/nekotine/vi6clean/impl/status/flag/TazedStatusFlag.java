@@ -10,7 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlag;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
@@ -37,7 +38,7 @@ public class TazedStatusFlag implements StatusFlag, Listener{
 	
 	private TazedStatusFlag() {
 		EventUtil.register(this);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	@Override

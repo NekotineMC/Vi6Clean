@@ -1,6 +1,6 @@
 package fr.nekotine.vi6clean.constant;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.TextStyle;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,7 +31,7 @@ public enum Vi6Styles {
 	//
 	
 	public static void load() {
-		TextModule module = NekotineCore.MODULES.get(TextModule.class);
+		TextModule module = Ioc.resolve(TextModule.class);
 		for(Vi6Styles style : Vi6Styles.values())
 			module.registerStyle(style, style.getStyle());
 	}

@@ -20,10 +20,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
@@ -32,7 +32,6 @@ import fr.nekotine.core.usable.Usable;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -64,12 +63,12 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 
 	@Override
 	public ObservableCollection<Player> getItemCollection() {
-		return Vi6Main.IOC.resolve(Vi6Game.class).getPlayerList();
+		return Ioc.resolve(Vi6Game.class).getPlayerList();
 	}
 	
 	@Override
 	public void globalSetup(Object inputData) {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		var world = game.getWorld();
 		var map = getParent().getMap();
 		minimapSpawnIndicators.clear();
@@ -90,14 +89,14 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				Component.text("Intéragir pour ouvrir le magasin", NamedTextColor.LIGHT_PURPLE))) {
 			@Override
 			protected void OnInteract(PlayerInteractEvent e) {
-				var  wrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
+				var  wrapper = Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
 				wrapper.getMenu().displayTo(e.getPlayer());
 				e.setCancelled(true);
 			}
 			
 			@Override
 			protected void OnDrop(PlayerDropItemEvent e) {
-				var  wrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
+				var  wrapper = Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
 				wrapper.getMenu().displayTo(e.getPlayer());
 				e.setCancelled(true);
 			}
@@ -109,7 +108,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		for (var armorStand : minimapSpawnIndicators.keySet()) {
 			armorStand.remove();
 		}
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		game.getPlayerList().forEach(p -> p.closeInventory());
 		minimapSpawnIndicators.clear();
 		openMenuUsable.unregister();
@@ -117,7 +116,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 
 	@Override
 	public void itemSetup(Player item) {
-		var wrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(item, PlayerWrapper.class);
+		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(item, PlayerWrapper.class);
 		var inv = item.getInventory();
 		inv.clear();
 		inv.setItem(8, openMenuUsable.getItemStack());
@@ -133,8 +132,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	
 	@Override
 	protected Object handleComplete() {
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		return game.getThiefs().stream()
 				.peek(p -> {
 					var wrap = wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class);
@@ -167,8 +166,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	}
 	
 	public void checkForCompletion() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		if (game.getPlayerList().stream().allMatch(p -> wrappingModule.getWrapper(p, PreparationPhasePlayerWrapper.class).isReadyForNextPhase())) {
 			complete();
 		}
@@ -178,7 +177,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	private void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent e) {
 		var entrance = minimapSpawnIndicators.get(e.getRightClicked());
 		if (entrance != null) {
-			var wrapper = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
+			var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), PreparationPhasePlayerWrapper.class);
 			wrapper.setSelectedSpawn(entrance);
 		}
 	}

@@ -6,10 +6,9 @@ import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 
@@ -38,7 +37,7 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public Collection<Player> ennemiTeam() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		switch(team) {
 		case GUARD:
 			return game.getThiefs();
@@ -50,7 +49,7 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public Stream<Player> ennemiTeamInMap() {
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		return ennemiTeam().stream().filter(e -> {
 			var opt = wrappingModule.getWrapperOptional(e, InMapPhasePlayerWrapper.class);
 			if (opt.isPresent()) {
@@ -61,7 +60,7 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public Collection<Player> ourTeam() {
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		switch(team) {
 		case GUARD:
 			return game.getGuards();

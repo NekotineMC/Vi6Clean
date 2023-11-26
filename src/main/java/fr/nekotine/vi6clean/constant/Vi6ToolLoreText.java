@@ -2,7 +2,7 @@ package fr.nekotine.vi6clean.constant;
 
 import java.util.List;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.tree.Leaf;
 import net.kyori.adventure.text.Component;
@@ -73,7 +73,7 @@ public enum Vi6ToolLoreText {
 		return minimessageFormatted;
 	}
 	public List<Component> make(TagResolver... additionalStyles){
-		return NekotineCore.MODULES.get(TextModule.class).message(
+		return Ioc.resolve(TextModule.class).message(
 			Leaf.builder()
 				.addLine(minimessageFormatted)
 				.addStyle(Vi6Styles.TOOL_LORE)
