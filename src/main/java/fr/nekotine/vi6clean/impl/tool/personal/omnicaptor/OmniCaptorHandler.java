@@ -12,7 +12,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
@@ -31,7 +32,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 
 	public OmniCaptorHandler() {
 		super(ToolType.OMNICAPTOR, OmniCaptor::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	public static final int DETECTION_BLOCK_RANGE = 3;
@@ -86,7 +87,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			var as = tool.getPlaced();
 			if (as == null) {

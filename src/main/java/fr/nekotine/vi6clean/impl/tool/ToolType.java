@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
 import fr.nekotine.core.inventory.menu.element.MenuElement;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
@@ -161,7 +161,7 @@ public enum ToolType {
 		if (!(evt.getWhoClicked() instanceof Player player)) {
 			return false;
 		}
-		var optionalWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return false;
 		}

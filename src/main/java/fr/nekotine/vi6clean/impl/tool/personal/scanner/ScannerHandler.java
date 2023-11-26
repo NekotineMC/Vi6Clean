@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +26,9 @@ import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
@@ -63,7 +63,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 	}
 	
 	public void startScanning() {
-		task = Bukkit.getScheduler().runTaskTimer(NekotineCore.getAttachedPlugin(), this::performScan, 0, Tick.tick().fromDuration(scanDelay));
+		task = Bukkit.getScheduler().runTaskTimer(Ioc.resolve(JavaPlugin.class), this::performScan, 0, Tick.tick().fromDuration(scanDelay));
 	}
 	
 	public void stopScanning() {
@@ -86,8 +86,8 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 	
 	public void performScan() {
 		var pmanager = ProtocolLibrary.getProtocolManager();
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var guardOwners = getTools().stream()
 				.filter(t -> t.getOwner() != null)
 				.map(Tool::getOwner)
@@ -125,7 +125,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 						pmanager.sendServerPacket(guard, destroyPacket);
 					}
 				}
-			}.runTaskLater(NekotineCore.getAttachedPlugin(), Tick.tick().fromDuration(scanLifetime));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(scanLifetime));
 		}
 		if (thiefOwners.size() > 0) {
 			var guardScansIds = new LinkedList<Integer>();
@@ -150,7 +150,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 						pmanager.sendServerPacket(thief, destroyPacket);
 					}
 				}
-			}.runTaskLater(NekotineCore.getAttachedPlugin(), Tick.tick().fromDuration(scanLifetime));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(scanLifetime));
 		}
 		Vi6Sound.SCANNER_SCAN.play(game);
 	}

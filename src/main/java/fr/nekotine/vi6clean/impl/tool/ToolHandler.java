@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Supplier;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,10 +14,10 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 
 /**
@@ -30,6 +31,8 @@ import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
  */
 public abstract class ToolHandler<T extends Tool> implements Listener {
 
+	protected final Logger logger = new NekotineLogger(getClass());
+	
 	private final ToolType type;
 
 	private final Supplier<T> toolSupplier;
@@ -56,12 +59,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			try {
 				detachFromOwner(tool);
 			}catch(Exception e) {
-				Vi6Main.LOGGER.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+type, e);
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+type, e);
 			}
 			try {
 				tool.cleanup();
 			}catch(Exception e) {
-				Vi6Main.LOGGER.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+type, e);
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+type, e);
 			}
 		}
 		tools.clear();
@@ -170,7 +173,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction.PICKUP_HALF) {
 			return;
 		}
-		var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
 		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
 			return;
 		}

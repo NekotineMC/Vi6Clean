@@ -9,7 +9,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.Tool;
@@ -79,7 +79,7 @@ public class Radar extends Tool{
 	protected void detect() {
 		if(placed) {
 			
-			var opt = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
+			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
 			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
 			
 			//Son

@@ -9,7 +9,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
@@ -59,7 +59,7 @@ public class Warner extends Tool{
 	protected void tickWarning() {
 		if(placed && watched.isCaptured() && ++warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
 			Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
-			NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
+			Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
 				p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
 			);
 			cleanup();

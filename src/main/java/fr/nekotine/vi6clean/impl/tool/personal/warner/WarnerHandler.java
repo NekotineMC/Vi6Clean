@@ -15,8 +15,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
@@ -25,7 +26,6 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
@@ -55,7 +55,7 @@ public class WarnerHandler extends ToolHandler<Warner>{
 		.build();
 	}
 	protected static Component BUILD_WARN_MESSAGE(String artefactName) {
-		return NekotineCore.MODULES.get(TextModule.class).message(Leaf.builder()
+		return Ioc.resolve(TextModule.class).message(Leaf.builder()
 				.addStyle(Placeholder.unparsed("name", artefactName))
 				.addStyle(NekotineStyles.STANDART)
 				.addLine(WARN_MESSAGE)
@@ -80,8 +80,8 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	
 	public WarnerHandler() {
 		super(ToolType.WARNER, Warner::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
-		map = Vi6Main.IOC.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
+		map = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
 	}
 	
 	//

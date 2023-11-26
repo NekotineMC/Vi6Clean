@@ -5,10 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
@@ -60,7 +59,7 @@ public class InviSneak extends Tool{
 		var x = loc.getX();
 		var z = loc.getZ();
 		if (revealed) {
-			var world = Vi6Main.IOC.resolve(Vi6Game.class).getWorld();
+			var world = Ioc.resolve(Vi6Game.class).getWorld();
 			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
 			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
 					(offsetX, offsetZ) -> {
@@ -75,7 +74,7 @@ public class InviSneak extends Tool{
 	}
 	
 	private void statusUpdate() {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		if (sneaking) {
 			if (revealed) {
 				setItemStack(InviSneakHandler.REVEALED_ITEM);
@@ -92,7 +91,7 @@ public class InviSneak extends Tool{
 
 	@Override
 	protected void cleanup() {
-		var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 	}
 }

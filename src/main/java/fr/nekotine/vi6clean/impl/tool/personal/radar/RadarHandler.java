@@ -17,8 +17,9 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
@@ -73,7 +74,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	
 	public RadarHandler() {
 		super(ToolType.RADAR, Radar::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
@@ -141,7 +142,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	
 	protected static Component DETECTION_MESSAGE(int nbDetected) {
 		String message = nbDetected>0 ? DETECTION_SUCCESS : DETECTION_FAIL;
-		return NekotineCore.MODULES.get(TextModule.class).message(Leaf.builder()
+		return Ioc.resolve(TextModule.class).message(Leaf.builder()
 				.addStyle(Placeholder.unparsed("number", String.valueOf(nbDetected)))
 				.addStyle(NekotineStyles.STANDART)
 				.addLine(message)

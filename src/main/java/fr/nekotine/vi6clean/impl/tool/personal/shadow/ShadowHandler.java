@@ -6,7 +6,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
@@ -24,7 +25,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 	
 	public ShadowHandler() {
 		super(ToolType.OMNICAPTOR, Shadow::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	@Override
@@ -61,7 +62,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var player = evt.getPlayer();
 		var ite = getTools().iterator();
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		while (ite.hasNext()) {
 			var tool = ite.next();
 			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);

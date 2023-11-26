@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -19,9 +20,8 @@ import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import io.papermc.paper.util.Tick;
@@ -33,7 +33,7 @@ public class GuardScanner {
 	private Duration scanDelay = Duration.ofSeconds(10); // normal = 30s reduced = 10s
 	
 	public void startScanning() {
-		task = Bukkit.getScheduler().runTaskTimer(NekotineCore.getAttachedPlugin(), this::scan, 0, Tick.tick().fromDuration(scanDelay));
+		task = Bukkit.getScheduler().runTaskTimer(Ioc.resolve(JavaPlugin.class), this::scan, 0, Tick.tick().fromDuration(scanDelay));
 	}
 	
 	public void stopScanning() {
@@ -46,7 +46,7 @@ public class GuardScanner {
 	
 	public void scan() {
 		var pmanager = ProtocolLibrary.getProtocolManager();
-		var game = Vi6Main.IOC.resolve(Vi6Game.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		var idList = new ArrayList<Integer>(game.getGuards().size());
 		for (var guard : game.getGuards()) {
 			var ploc = guard.getLocation();
@@ -104,7 +104,7 @@ public class GuardScanner {
 					pmanager.sendServerPacket(thief, destroyPacket);
 				}
 			}
-		}.runTaskLater(NekotineCore.getAttachedPlugin(), 7 * 20);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), 7 * 20);
 	}
 
 	public Duration getScanDelay() {

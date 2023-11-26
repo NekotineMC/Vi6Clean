@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -72,7 +72,7 @@ public class OmniCaptor extends Tool{
 			if (placed == null) {
 				return;
 			}
-			var glowModule = NekotineCore.MODULES.get(EntityGlowModule.class);
+			var glowModule = Ioc.resolve(EntityGlowModule.class);
 			if (sneaking) {
 				glowModule.glowEntityFor(placed, getOwner());
 			}else {
@@ -103,7 +103,7 @@ public class OmniCaptor extends Tool{
 		var ploc = player.getLocation();
 		if (placed == null) {
 			if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
-				enemyTeam = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
+				enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
 				placed = (ArmorStand) ploc.getWorld().spawnEntity(ploc, EntityType.ARMOR_STAND);
 				placed.setArms(false);
 				placed.setMarker(true);
@@ -126,7 +126,7 @@ public class OmniCaptor extends Tool{
 				placed = null;
 				Vi6Sound.OMNICAPTEUR_PICKUP.play(ploc.getWorld(),ploc);
 				itemUpdate();
-				var flagModule = NekotineCore.MODULES.get(StatusFlagModule.class);
+				var flagModule = Ioc.resolve(StatusFlagModule.class);
 				for (var p : ennemiesInRange) {
 					flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
 				}

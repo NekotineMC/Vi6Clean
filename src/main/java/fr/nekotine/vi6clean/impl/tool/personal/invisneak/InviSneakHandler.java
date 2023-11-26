@@ -9,7 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
@@ -28,7 +29,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 
 	public InviSneakHandler() {
 		super(ToolType.INVISNEAK, InviSneak::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	public static final int DETECTION_BLOCK_RANGE = 3;
@@ -76,7 +77,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var wrappingModule = NekotineCore.MODULES.get(WrappingModule.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		for (var tool : getTools()) {
 			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
 			if (wrap.isEmpty()) {

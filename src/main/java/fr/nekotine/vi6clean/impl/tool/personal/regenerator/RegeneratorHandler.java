@@ -9,8 +9,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
@@ -49,7 +50,7 @@ public class RegeneratorHandler extends ToolHandler<Regenerator>{
 	
 	public RegeneratorHandler() {
 		super(ToolType.REGENERATOR, Regenerator::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	@Override
 	protected void onAttachedToPlayer(Regenerator tool, Player player) {

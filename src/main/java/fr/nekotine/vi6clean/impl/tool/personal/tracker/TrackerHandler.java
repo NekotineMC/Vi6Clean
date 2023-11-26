@@ -10,8 +10,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-import fr.nekotine.core.NekotineCore;
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
@@ -41,7 +42,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	}
 	protected static final ItemStack COMPASS_ITEM(Location ownerLoc, Location hitLoc) {
 		var distance = ownerLoc.distance(hitLoc);
-		Component name = NekotineCore.MODULES.get(TextModule.class).message(Leaf.builder()
+		Component name = Ioc.resolve(TextModule.class).message(Leaf.builder()
 				.addLine("<gold>Traceur</gold> - <red>Distance: <aqua><distance><red>m")
 				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
 				.addStyle(NekotineStyles.STANDART)).buildFirst();	
@@ -63,7 +64,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	private int n = 0;
 	public TrackerHandler() {
 		super(ToolType.TRACKER, Tracker::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	@Override
 	protected void onAttachedToPlayer(Tracker tool, Player player) {

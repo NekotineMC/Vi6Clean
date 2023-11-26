@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
@@ -50,7 +50,7 @@ public class LanternHandler extends ToolHandler<Lantern>{
 			return;
 		}
 		var evtP = evt.getPlayer();
-		var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(evtP, PlayerWrapper.class);
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(evtP, PlayerWrapper.class);
 		if (optWrap.isEmpty()) {
 			return;
 		}

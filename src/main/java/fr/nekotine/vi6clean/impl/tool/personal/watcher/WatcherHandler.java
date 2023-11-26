@@ -13,7 +13,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
@@ -35,7 +36,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 
 	public WatcherHandler() {
 		super(ToolType.WATCHER, Watcher::new);
-		NekotineCore.MODULES.tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	private static final StatusEffect glowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
@@ -90,13 +91,13 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var statusEffectModule = NekotineCore.MODULES.get(StatusEffectModule.class);
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		for (var tool : getTools()) {
 			if (tool.getOwner() == null) {
 				continue;
 			}
 			Supplier<Stream<Player>> enemiTeam =
-					NekotineCore.MODULES.get(WrappingModule.class).getWrapper(tool.getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
+					Ioc.resolve(WrappingModule.class).getWrapper(tool.getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
 			var watchers = tool.getWatcherList();
 			var toRemove = watchers.stream().filter(sf ->enemiTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
 			.collect(Collectors.toCollection(LinkedList::new));

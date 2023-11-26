@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
@@ -33,7 +33,7 @@ public class Tracker extends Tool{
 	protected boolean shoot(TrackerHandler handler) {
 		if(hit)
 			return false;
-		var ownWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class);
+		var ownWrap = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class);
 		var eyeLoc = getOwner().getEyeLocation();
 		RayTraceResult res = getOwner().getWorld().rayTrace(
 				eyeLoc, 

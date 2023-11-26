@@ -6,7 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.NekotineCore;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.EntityUtil;
@@ -44,7 +44,7 @@ public class Tazer extends Tool{
 		if (cooldown > 0) {
 			return false;
 		}
-		var optWrap = NekotineCore.MODULES.get(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
 		if (optWrap.isEmpty()) {
 			return false;
 		}
@@ -58,7 +58,7 @@ public class Tazer extends Tool{
 		if (trace != null && hite != null && hite instanceof LivingEntity hit) {
 			EntityUtil.fakeDamage(hit);
 			if (optWrap.get().ennemiTeamInMap().anyMatch(e -> e.equals(hit))) {
-				NekotineCore.MODULES.get(StatusEffectModule.class).addEffect(hit, tazedEffect);
+				Ioc.resolve(StatusEffectModule.class).addEffect(hit, tazedEffect);
 			}
 		}
 		if (hitp != null) {
