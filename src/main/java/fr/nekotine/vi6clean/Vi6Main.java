@@ -4,6 +4,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.NekotinePlugin;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.setup.PluginBuilder;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
@@ -18,7 +19,6 @@ public class Vi6Main extends JavaPlugin{
 	public void onLoad() {
 		super.onLoad();
 		var builder = new PluginBuilder(this);
-		builder.preloadModules(TickingModule.class);
 		builder.mapCommandsFor(Vi6Map.class);
 		nekotinePlugin = builder.build();
 	}
@@ -29,6 +29,7 @@ public class Vi6Main extends JavaPlugin{
 		Vi6Styles.load();
 		var game = new Vi6Game();
 		Ioc.getProvider().registerSingleton(game);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		game.start();
 	}
 	
