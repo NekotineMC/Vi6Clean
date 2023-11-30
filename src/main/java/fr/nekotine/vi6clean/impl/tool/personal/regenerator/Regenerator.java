@@ -29,6 +29,7 @@ public class Regenerator extends Tool{
 			return;
 		double maxHealth = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		double newHealth = Math.min(maxHealth, getOwner().getHealth() + RegeneratorHandler.REGENERATION_AMOUNT);
+		getOwner().setHealth(newHealth);
 		if(newHealth!=maxHealth) {
 			getOwner().setCooldown(Material.CAMPFIRE, RegeneratorHandler.DELAY_BETWEEN_HEALING_TICKS);
 		}

@@ -63,12 +63,13 @@ public class RegeneratorHandler extends ToolHandler<Regenerator>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		var heal = ++healingTick >= DELAY_BETWEEN_HEALING_TICKS ? true : false;
 		for (var tool : getTools()) {
-			if(++healingTick >= DELAY_BETWEEN_HEALING_TICKS) {
-				healingTick = 0;
-				tool.heal();
-			}
 			tool.tick();
+			if(heal) {
+				tool.heal();
+				healingTick = 0;
+			}		
 		}
 	}
 	@EventHandler
