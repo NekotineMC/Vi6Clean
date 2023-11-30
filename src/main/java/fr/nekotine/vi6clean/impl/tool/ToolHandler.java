@@ -2,9 +2,11 @@ package fr.nekotine.vi6clean.impl.tool;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,9 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.EquipmentSlot;
+
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
@@ -38,6 +43,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private final Supplier<T> toolSupplier;
 
 	private final Collection<T> tools = new LinkedList<>();
+	
+	private final Random random = new Random();
 
 	public ToolHandler(ToolType type, Supplier<T> toolSupplier) {
 		this.type = type;
@@ -184,5 +191,26 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		var wrap = optWrap.get();
 		remove(match.get());
 		wrap.setMoney(wrap.getMoney() + type.getPrice());
+	}
+	
+	@EventHandler
+	public void onPlayerArmorChange(PlayerArmorChangeEvent evt) {
+		var match = tools.stream().filter(t -> t.getItemStack().equals(evt.getNewItem())).findFirst();
+		if (match.isEmpty()) {
+			return;
+		}
+		var player = evt.getPlayer();
+		var storage = player.getInventory().getStorageContents();
+		var emptySlots = IntStream
+			.range(0, storage.length)
+			.filter(i -> storage[i] == null)
+			.mapToObj(i -> i)
+			.toArray();
+		if(emptySlots.length == 0) {
+			return;
+		}
+		var slot = (int)emptySlots[random.nextInt(0, emptySlots.length)];
+		player.getEquipment().setItem(EquipmentSlot.valueOf(evt.getSlotType().name()), evt.getOldItem(), true);
+		player.getInventory().setItem(slot, evt.getNewItem());
 	}
 }
