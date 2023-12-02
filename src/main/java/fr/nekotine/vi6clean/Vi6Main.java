@@ -9,6 +9,7 @@ import fr.nekotine.core.setup.PluginBuilder;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 
 public class Vi6Main extends JavaPlugin{
@@ -29,6 +30,7 @@ public class Vi6Main extends JavaPlugin{
 		Vi6Styles.load();
 		var game = new Vi6Game();
 		Ioc.getProvider().registerSingleton(game);
+		Ioc.getProvider().registerSingleton(new Majordom());
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		game.start();
 	}

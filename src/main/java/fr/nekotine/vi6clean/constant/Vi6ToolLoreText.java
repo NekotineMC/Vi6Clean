@@ -58,7 +58,9 @@ public enum Vi6ToolLoreText {
 	TRACKER ("<lore>Tire un projectile à grande vitesse",
 			 "<lore>Obtenez une boussole qui pointe vers l'ennemi touché"),
 	SCANNER ("<lore>Vous permet de détecter les enemis",
-			 "<lore>toutes les <variable><delay></variable>");
+			 "<lore>toutes les <variable><delay></variable>"),
+	PARABOLIC_MIC ("<lore>Vous permet d'entendre les enemis qui bouge",
+			 "<lore>jusqu'a <variable><range></variable>.");
 
 	//
 	

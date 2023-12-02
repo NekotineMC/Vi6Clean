@@ -53,7 +53,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	@Override
 	public void itemSetup(Player item) {
 		Ioc.resolve(WrappingModule.class).makeWrapper(item, InfiltrationPhasePlayerWrapper::new);
-		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,20*15,0,false,false,true));
+		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,30,20,false,false,true));
 	}
 
 	@Override

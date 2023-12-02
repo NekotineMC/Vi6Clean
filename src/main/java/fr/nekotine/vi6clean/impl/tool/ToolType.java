@@ -17,6 +17,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.doublejump.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic.ParabolicMicHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.radar.RadarHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.regenerator.RegeneratorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.scanner.ScannerHandler;
@@ -107,7 +108,13 @@ public enum ToolType {
 	SCANNER (
 			ItemStackUtil.make(Material.CLOCK, Component.text("Scanner", NamedTextColor.GOLD), ScannerHandler.LORE),
 			ScannerHandler::new,
-			500,		// PRICE
+			600,		// PRICE
+			1			// LIMIT
+			),
+	PARABOLIC_MIC (
+			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Micro parabolique", NamedTextColor.GOLD), ParabolicMicHandler.LORE),
+			ParabolicMicHandler::new,
+			600,		// PRICE
 			1			// LIMIT
 			)
 	;
