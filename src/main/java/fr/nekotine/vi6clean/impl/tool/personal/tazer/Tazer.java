@@ -52,7 +52,7 @@ public class Tazer extends Tool{
 		var eyeDir = eyeLoc.getDirection();
 		var world = player.getWorld();
 		var range = 100d;
-		var trace = world.rayTrace(eyeLoc, eyeDir, range, FluidCollisionMode.NEVER, true,1.1, e -> !e.equals(player) && e instanceof LivingEntity);
+		var trace = world.rayTrace(eyeLoc, eyeDir, range, FluidCollisionMode.NEVER, true,1.0, e -> !e.equals(player) && e instanceof LivingEntity);
 		var hite = trace.getHitEntity();
 		var hitp = trace.getHitPosition();
 		if (trace != null && hite != null && hite instanceof LivingEntity hit) {

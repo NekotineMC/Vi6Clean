@@ -19,7 +19,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class TazerHandler extends ToolHandler<Tazer>{
 
-	public static final int COOLDOWN_TICK = 200 / 4;
+	public static final int COOLDOWN_TICK = 200;
 	
 	public static final List<Component> LORE = Vi6ToolLoreText.TAZER.make(
 		Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes"),
