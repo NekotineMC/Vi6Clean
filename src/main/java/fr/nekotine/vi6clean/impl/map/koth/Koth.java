@@ -1,9 +1,10 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.BoundingBox;
@@ -12,95 +13,72 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
-import fr.nekotine.core.text.TextModule;
-import fr.nekotine.core.text.TextModule.Builder;
-import fr.nekotine.core.text.placeholder.TextPlaceholder;
-import fr.nekotine.core.text.style.NekotineStyles;
-import fr.nekotine.core.text.tree.Leaf;
-import fr.nekotine.core.tuple.Pair;
+import fr.nekotine.core.map.element.MapLocationElement;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 
-public abstract class Koth implements TextPlaceholder{
-	private static final int CAPTURE_AMOUNT_NEEDED = 200;
-	private int capture_advancement;
+public abstract class Koth{
 	@MapDictKey
 	@ComposingMap
 	private String name = "";
-	private Set<Player> inside = new HashSet<>(8);
-	private Vi6Team owningTeam = Vi6Team.GUARD;
 	@ComposingMap
 	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
+	@ComposingMap
+	private MapLocationElement displayLocation = new MapLocationElement();
+	private Set<Player> inside = new HashSet<>(8);
+	
+	private static final int CAPTURE_AMOUNT_NEEDED = 200;
+	private int capture_advancement;
+	private Vi6Team owningTeam = Vi6Team.GUARD;
 	private TextDisplay display;
-	//Summon le display à la création de la game
-	
-	//
-	
-	private boolean isInOwningTeam(Player player) {
-		var game = Ioc.resolve(Vi6Game.class);
-		return owningTeam == Vi6Team.GUARD ? 
-				game.getGuards().contains(player) :
-				game.getThiefs().contains(player);
-	}
-	private boolean isInEnemyTeam(Player player) {
-		var game = Ioc.resolve(Vi6Game.class);
-		return owningTeam == Vi6Team.GUARD ? 
-				game.getThiefs().contains(player) :
-				game.getGuards().contains(player);
-	}
-	private Vi6Team getEnemyTeam(Vi6Team team) {
-		switch(team) {
-		case GUARD: return Vi6Team.THIEF;
-		case THIEF: return Vi6Team.GUARD;
-		default: return team;
-		}
-	}
-	private final Builder activeDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
-			.addStyle(NekotineStyles.STANDART)
-			.addLine("<yellow><u>Générateur</u></yellow>\n"
-					+"<green>Actif</green>\n"
-					+"<yellow><i>Puissance</i>: <aqua><inv_power></aqua>")
-			.addPlaceholder(this));
-	private final Builder inactiveDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
-			.addStyle(NekotineStyles.STANDART)
-			.addLine("<yellow><u>Générateur</u></yellow>\n"
-					+"<red>Désactivé</red>\n"
-					+"<yellow><i>Puissance</i>: <aqua><power></aqua>")
-			.addPlaceholder(this));
-	
+
 	//
 	
 	public BoundingBox getBoundingBox() {
 		return boundingBox.get();
 	}
+	public Vi6Team getOwningTeam() {
+		return owningTeam;
+	}
+	public int getCaptureAdvancement() {
+		return capture_advancement;
+	}
+	public int getCaptureAmountNeeded() {
+		return CAPTURE_AMOUNT_NEEDED;
+	}
+	public Set<Player> getInsideCaptureZone(){
+		return inside;
+	}
 	public String getName() {
 		return name;
 	}
+	
+	//
+	
 	public void clean() {
 		capture_advancement = 0;
 		display.remove();
 	}
-	public Vi6Team getOwningTeam() {
-		return owningTeam;
-	}
-	public Set<Player> getInsideCaptureZone(){
-		return inside;
+	public void setup(World world) {
+		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
 	}
 	public void tick() {
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		int tickAdvancement = 0;
 		boolean owningTeamCancelling = false;
+		Player firstEnemy = null;
 		for (var player : inside) {
-			if (isInOwningTeam(player)) {
+			var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+			if (optWrapper.isEmpty())
+				continue;
+	
+			if (optWrapper.get().getParentWrapper().getTeam() == owningTeam) {
 				owningTeamCancelling = true;
-			}else if(isInEnemyTeam(player)) {
-				var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
-				if (optWrapper.isEmpty())
-					continue;
+			}else {
+				firstEnemy = player;
 				tickAdvancement++;
 			}
 		}
@@ -109,30 +87,22 @@ public abstract class Koth implements TextPlaceholder{
 		if (tickAdvancement == 0)
 			tickAdvancement--;
 		capture_advancement += tickAdvancement;
-		if (capture_advancement < 0) 
+		if (capture_advancement < 0) {
 			capture_advancement = 0;
-		if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
-			owningTeam = getEnemyTeam(owningTeam);
-			capture_advancement = 0;
-			//do smth
+			return;
 		}
-		var text = owningTeam==Vi6Team.GUARD ? activeDisplay.buildFirst() : inactiveDisplay.buildFirst();
-		display.text(text);
+		if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
+			var newOwning = Ioc.resolve(WrappingModule.class).
+					getWrapperOptional(firstEnemy, PlayerWrapper.class).get().getTeam();
+			capture(newOwning, owningTeam);
+			owningTeam = newOwning;
+			capture_advancement = 0;
+		}
+		display.text(display());
 	}
 	
 	//
 	
-	public abstract void capture(Vi6Team owningTeam);
-	
-	//
-	
-	@Override
-	public ArrayList<Pair<String, ComponentLike>> resolve() {
-		var list = new ArrayList<Pair<String,ComponentLike>>();
-		var percentage = (int)((capture_advancement / CAPTURE_AMOUNT_NEEDED) * 100);
-		var inv_percentage = 100 - percentage;
-		list.add(Pair.from("power", Component.text(percentage+"%")));
-		list.add(Pair.from("inv_power", Component.text(inv_percentage+"%")));
-		return list;
-	}
+	public abstract void capture(Vi6Team winningTeam, Vi6Team losingTeam);
+	public abstract Component display();
 }

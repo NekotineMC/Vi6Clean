@@ -101,6 +101,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				e.setCancelled(true);
 			}
 		}.register();
+		map.getLightKoths().backingMap().values().stream().forEach(koth -> koth.setup(world));
 	}
 
 	@Override

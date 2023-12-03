@@ -118,6 +118,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			tool.getHandler().stopHandling();
 			tool.getHandler().removeAll();
 		}
+		for(var koth : map.getLightKoths().backingMap().values()) {
+			koth.clean();
+		}
 		map = null;
 	}
 	
@@ -187,6 +190,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			map.getArtefacts().backingMap().values().stream().filter(a -> !a.isCaptured()).forEach(artefact -> {
 				var zone = artefact.getInsideCaptureZone();
 				if (artefact.getBoundingBox().contains(destVect)) {
+					zone.add(player);
+				}else {
+					zone.remove(player);
+				}
+			});
+			map.getLightKoths().backingMap().values().stream().forEach(koth -> {
+				var zone = koth.getInsideCaptureZone();
+				if (koth.getBoundingBox().contains(destVect)) {
 					zone.add(player);
 				}else {
 					zone.remove(player);
