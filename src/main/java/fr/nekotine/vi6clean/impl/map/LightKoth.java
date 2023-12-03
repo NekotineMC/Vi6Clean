@@ -1,5 +1,6 @@
-package fr.nekotine.vi6clean.impl.map.koth;
+package fr.nekotine.vi6clean.impl.map;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,13 +15,20 @@ import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.map.element.MapLocationElement;
+import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.TextModule.Builder;
+import fr.nekotine.core.text.placeholder.TextPlaceholder;
+import fr.nekotine.core.text.style.NekotineStyles;
+import fr.nekotine.core.text.tree.Leaf;
+import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 
-public abstract class Koth{
+public class LightKoth implements TextPlaceholder{
 	@MapDictKey
 	@ComposingMap
 	private String name = "";
@@ -51,9 +59,6 @@ public abstract class Koth{
 	}
 	public Set<Player> getInsideCaptureZone(){
 		return inside;
-	}
-	public String getName() {
-		return name;
 	}
 	
 	//
@@ -103,6 +108,34 @@ public abstract class Koth{
 	
 	//
 	
-	public abstract void capture(Vi6Team winningTeam, Vi6Team losingTeam);
-	public abstract Component display();
+	private final Builder activeDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
+			.addStyle(NekotineStyles.STANDART)
+			.addLine("<yellow><u>Générateur</u></yellow>\n"
+					+"<green>Actif</green>\n"
+					+"<yellow><i>Puissance</i>: <aqua><inv_power></aqua>")
+			.addPlaceholder(this));
+	private final Builder inactiveDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
+			.addStyle(NekotineStyles.STANDART)
+			.addLine("<yellow><u>Générateur</u></yellow>\n"
+					+"<red>Désactivé</red>\n"
+					+"<yellow><i>Puissance</i>: <aqua><power></aqua>")
+			.addPlaceholder(this));
+	public void capture(Vi6Team winningTeam, Vi6Team losingTeam) {
+		System.out.println("CAPTURE");
+	}
+	public Component display() {
+		return getOwningTeam()==Vi6Team.GUARD ? activeDisplay.buildFirst() : inactiveDisplay.buildFirst();
+	}
+	
+	//
+	
+	@Override
+	public ArrayList<Pair<String, ComponentLike>> resolve() {
+		var list = new ArrayList<Pair<String,ComponentLike>>();
+		var percentage = (int)((getCaptureAdvancement() / getCaptureAmountNeeded()) * 100);
+		var inv_percentage = 100 - percentage;
+		list.add(Pair.from("power", Component.text(percentage+"%")));
+		list.add(Pair.from("inv_power", Component.text(inv_percentage+"%")));
+		return list;
+	}
 }

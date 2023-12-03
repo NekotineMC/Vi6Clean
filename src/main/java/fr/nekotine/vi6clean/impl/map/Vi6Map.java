@@ -8,7 +8,6 @@ import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
 import fr.nekotine.core.map.element.MapDictionaryElement;
 import fr.nekotine.core.map.element.MapPositionElement;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
-import fr.nekotine.vi6clean.impl.map.koth.LightKoth;
 
 public class Vi6Map{
 	
