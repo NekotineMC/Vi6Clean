@@ -47,20 +47,19 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
 				.addStyle(NekotineStyles.STANDART)).buildFirst();	
 				
-		var item = new ItemStackBuilder(Material.RECOVERY_COMPASS)
+		var item = new ItemStackBuilder(Material.COMPASS)
 		.name(name)
 		.lore(Vi6ToolLoreText.TRACKER.make())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
+
+		var meta = (CompassMeta)item.getItemMeta();
+		meta.setLodestoneTracked(false);
+		meta.setLodestone(hitLoc);
+		item.setItemMeta(meta);
 		
-		owner.setLastDeathLocation(hitLoc);
-		owner.spigot().respawn();
-		
-		//var meta = (CompassMeta)item.getItemMeta();
-		//meta.setLodestone(hitLoc);
-		//meta.setLodestoneTracked(true);
-		//item.setItemMeta(meta);
+		//Ca devrait marcher, mais peut etre pas se refresh normalement
 		
 		return item;
 	}
