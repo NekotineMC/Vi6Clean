@@ -47,7 +47,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
 				.addStyle(NekotineStyles.STANDART)).buildFirst();	
 				
-		var item = new ItemStackBuilder(Material.RECOVERY_COMPASS)
+		var item = new ItemStackBuilder(Material.COMPASS)
 		.name(name)
 		.lore(Vi6ToolLoreText.TRACKER.make())
 		.unstackable()
@@ -56,7 +56,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 		
 		var meta = (CompassMeta)item.getItemMeta();
 		meta.setLodestone(hitLoc);
-		meta.setLodestoneTracked(true);
+		//meta.setLodestoneTracked(true);
 		item.setItemMeta(meta);
 		
 		return item;
