@@ -53,14 +53,17 @@ public class Tazer extends Tool{
 		var world = player.getWorld();
 		var range = 100d;
 		var trace = world.rayTrace(eyeLoc, eyeDir, range, FluidCollisionMode.NEVER, true,1.0, e -> !e.equals(player) && e instanceof LivingEntity);
+		if (trace == null) {
+			return true; // No hit, le joueur à tiré en l'air
+		}
 		var hite = trace.getHitEntity();
-		var hitp = trace.getHitPosition();
-		if (trace != null && hite != null && hite instanceof LivingEntity hit) {
+		if (hite != null && hite instanceof LivingEntity hit) {
 			EntityUtil.fakeDamage(hit);
 			if (optWrap.get().ennemiTeamInMap().anyMatch(e -> e.equals(hit))) {
 				Ioc.resolve(StatusEffectModule.class).addEffect(hit, tazedEffect);
 			}
 		}
+		var hitp = trace.getHitPosition();
 		if (hitp != null) {
 			range = hitp.distance(eyeLoc.toVector());
 		}
