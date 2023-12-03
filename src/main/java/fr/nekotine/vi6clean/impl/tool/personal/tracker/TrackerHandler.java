@@ -40,24 +40,27 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 		.flags(ItemFlag.values())
 		.build();
 	}
-	protected static final ItemStack COMPASS_ITEM(Location ownerLoc, Location hitLoc) {
-		var distance = ownerLoc.distance(hitLoc);
+	protected static final ItemStack COMPASS_ITEM(Player owner, Location hitLoc) {
+		var distance = owner.getLocation().distance(hitLoc);
 		Component name = Ioc.resolve(TextModule.class).message(Leaf.builder()
-				.addLine("<gold>Traceur</gold> - <red>Distance: <aqua><distance><red>m")
+				.addLine("<gold>Traceur</gold> - <red>Distance: <aqua><distance>m")
 				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
 				.addStyle(NekotineStyles.STANDART)).buildFirst();	
 				
-		var item = new ItemStackBuilder(Material.COMPASS)
+		var item = new ItemStackBuilder(Material.RECOVERY_COMPASS)
 		.name(name)
 		.lore(Vi6ToolLoreText.TRACKER.make())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
 		
-		var meta = (CompassMeta)item.getItemMeta();
-		meta.setLodestone(hitLoc);
+		owner.setLastDeathLocation(hitLoc);
+		owner.spigot().respawn();
+		
+		//var meta = (CompassMeta)item.getItemMeta();
+		//meta.setLodestone(hitLoc);
 		//meta.setLodestoneTracked(true);
-		item.setItemMeta(meta);
+		//item.setItemMeta(meta);
 		
 		return item;
 	}

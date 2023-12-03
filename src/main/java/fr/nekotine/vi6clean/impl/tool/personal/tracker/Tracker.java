@@ -18,7 +18,7 @@ public class Tracker extends Tool{
 	private boolean hit = false;
 	private Player playerHit;
 	private void setCompassItem() {
-		setItemStack(TrackerHandler.COMPASS_ITEM(getOwner().getLocation(), playerHit.getLocation()));
+		setItemStack(TrackerHandler.COMPASS_ITEM(getOwner(), playerHit.getLocation()));
 	}
 	@Override
 	protected ItemStack makeInitialItemStack() {
