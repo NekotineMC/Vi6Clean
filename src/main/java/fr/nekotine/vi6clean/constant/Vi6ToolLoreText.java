@@ -60,7 +60,8 @@ public enum Vi6ToolLoreText {
 	SCANNER ("<lore>Vous permet de détecter les enemis",
 			 "<lore>toutes les <variable><delay></variable>"),
 	PARABOLIC_MIC ("<lore>Vous permet d'entendre les enemis qui bouge",
-			 "<lore>jusqu'a <variable><range></variable>.");
+			 "<lore>jusqu'a <variable><range></variable>."),
+	DEPHASER("<lore>Toutes les <variable><delay></variable>, gagnez <variable><duration></variable> d'invisibilité");
 
 	//
 	
