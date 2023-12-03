@@ -29,7 +29,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class TrackerHandler extends ToolHandler<Tracker>{
-	private static final int REFRESH_DELAY_SECOND = 2;
+	//private static final int REFRESH_DELAY_SECOND = 2;
 	protected static final double RAY_DISTANCE = 100;
 	protected static final int RAY_SIZE = 0;
 	protected static final ItemStack GUN_ITEM() {
@@ -58,12 +58,10 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 		meta.setLodestoneTracked(false);
 		meta.setLodestone(hitLoc);
 		item.setItemMeta(meta);
-		
-		//Ca devrait marcher, mais peut etre pas se refresh normalement
-		
+
 		return item;
 	}
-	private int n = 0;
+	//private int n = 0;
 	public TrackerHandler() {
 		super(ToolType.TRACKER, Tracker::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
@@ -79,8 +77,8 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		if(evt.timeStampReached(TickTimeStamp.Second) && ++n>=REFRESH_DELAY_SECOND) {
-			n = 0;
+		if(evt.timeStampReached(TickTimeStamp.Second)/* && ++n>=REFRESH_DELAY_SECOND*/) {
+			//n = 0;
 			for (var tool : getTools()) {
 				tool.tickRefresh();
 			}

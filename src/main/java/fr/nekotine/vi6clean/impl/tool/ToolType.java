@@ -100,7 +100,7 @@ public enum ToolType {
 			-1 			// LIMIT
 			),
 	TRACKER (
-			ItemStackUtil.make(Material.RECOVERY_COMPASS, Component.text("Traceur", NamedTextColor.GOLD), Vi6ToolLoreText.TRACKER.make()),
+			ItemStackUtil.make(Material.CROSSBOW, Component.text("Traceur", NamedTextColor.GOLD), Vi6ToolLoreText.TRACKER.make()),
 			TrackerHandler::new,
 			100,		// PRICE
 			-1			// LIMIT
