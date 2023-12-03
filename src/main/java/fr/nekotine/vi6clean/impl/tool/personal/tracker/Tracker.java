@@ -31,8 +31,9 @@ public class Tracker extends Tool{
 	//
 	
 	protected boolean shoot(TrackerHandler handler) {
-		if(hit)
+		if (hit) {
 			return false;
+		}
 		var ownWrap = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class);
 		var eyeLoc = getOwner().getEyeLocation();
 		RayTraceResult res = getOwner().getWorld().rayTrace(
