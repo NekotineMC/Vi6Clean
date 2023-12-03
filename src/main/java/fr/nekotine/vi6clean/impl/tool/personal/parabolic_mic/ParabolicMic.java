@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -14,6 +15,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 public class ParabolicMic extends Tool{
 	
+	private Entity vibrationTargetEntity;
+	
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR,
@@ -25,5 +28,13 @@ public class ParabolicMic extends Tool{
 
 	@Override
 	protected void cleanup() {
+	}
+
+	public Entity getVibrationTargetEntity() {
+		return vibrationTargetEntity;
+	}
+
+	public void setVibrationTargetEntity(Entity vibrationTargetEntity) {
+		this.vibrationTargetEntity = vibrationTargetEntity;
 	}
 }
