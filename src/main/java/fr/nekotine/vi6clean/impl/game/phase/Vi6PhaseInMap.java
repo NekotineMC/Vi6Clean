@@ -35,6 +35,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
+import fr.nekotine.vi6clean.impl.map.LightKoth;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
@@ -216,6 +217,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		map.getArtefacts().backingMap().values().stream().forEach(Artefact::tick);
+		map.getLightKoths().backingMap().values().stream().forEach(LightKoth::tick);
 	}
 
 	@EventHandler

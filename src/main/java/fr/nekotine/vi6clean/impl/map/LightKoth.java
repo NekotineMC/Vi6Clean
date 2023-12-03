@@ -26,9 +26,9 @@ import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 
 public class LightKoth implements TextPlaceholder{
+	//FAIRE QUE LES GARDES PRENNENT PLUS DE TEMPS A RECUPERER LE POINT
 	@MapDictKey
 	@ComposingMap
 	private String name = "";
@@ -42,6 +42,7 @@ public class LightKoth implements TextPlaceholder{
 	private int capture_advancement;
 	private Vi6Team owningTeam = Vi6Team.GUARD;
 	private TextDisplay display;
+	private int tickAdvancement = 0;
 
 	//
 	
@@ -69,10 +70,11 @@ public class LightKoth implements TextPlaceholder{
 	}
 	public void setup(World world) {
 		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
+		display.text(display());
 	}
 	public void tick() {
 		var wrapping = Ioc.resolve(WrappingModule.class);
-		int tickAdvancement = 0;
+		tickAdvancement = 0;
 		boolean owningTeamCancelling = false;
 		Player firstEnemy = null;
 		for (var player : inside) {
@@ -94,7 +96,7 @@ public class LightKoth implements TextPlaceholder{
 		capture_advancement += tickAdvancement;
 		if (capture_advancement < 0) {
 			capture_advancement = 0;
-			return;
+			tickAdvancement = 0;
 		}
 		if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
 			var newOwning = Ioc.resolve(WrappingModule.class).
@@ -108,34 +110,36 @@ public class LightKoth implements TextPlaceholder{
 	
 	//
 	
-	private final Builder activeDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
+	private final Builder textDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
 			.addStyle(NekotineStyles.STANDART)
 			.addLine("<yellow><u>Générateur</u></yellow>\n"
-					+"<green>Actif</green>\n"
-					+"<yellow><i>Puissance</i>: <aqua><inv_power></aqua>")
-			.addPlaceholder(this));
-	private final Builder inactiveDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
-			.addStyle(NekotineStyles.STANDART)
-			.addLine("<yellow><u>Générateur</u></yellow>\n"
-					+"<red>Désactivé</red>\n"
-					+"<yellow><i>Puissance</i>: <aqua><power></aqua>")
+					+"<aqua><power></aqua> <evolution>\n"
+					+"<status>")
 			.addPlaceholder(this));
 	public void capture(Vi6Team winningTeam, Vi6Team losingTeam) {
 		System.out.println("CAPTURE");
 	}
 	public Component display() {
-		return getOwningTeam()==Vi6Team.GUARD ? activeDisplay.buildFirst() : inactiveDisplay.buildFirst();
+		return textDisplay.buildFirst();
 	}
 	
 	//
 	
 	@Override
-	public ArrayList<Pair<String, ComponentLike>> resolve() {
-		var list = new ArrayList<Pair<String,ComponentLike>>();
-		var percentage = (int)((getCaptureAdvancement() / getCaptureAmountNeeded()) * 100);
+	public ArrayList<Pair<String, String>> resolve() {
+		var list = new ArrayList<Pair<String,String>>();
+		var percentage = (int)(((float)getCaptureAdvancement() / getCaptureAmountNeeded()) * 100);
 		var inv_percentage = 100 - percentage;
-		list.add(Pair.from("power", Component.text(percentage+"%")));
-		list.add(Pair.from("inv_power", Component.text(inv_percentage+"%")));
+		
+		var status = owningTeam == Vi6Team.GUARD ? "<green>Actif</green>" : "<red>Désactivé</red>";
+		var power = owningTeam == Vi6Team.GUARD ? inv_percentage+"%" : percentage+"%";
+		if(owningTeam == Vi6Team.GUARD)
+			tickAdvancement = -tickAdvancement;
+		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<green>↑</green>" : "<red>↓</red>");
+		list.add(Pair.from("status", status));
+		list.add(Pair.from("power", power));
+		list.add(Pair.from("evolution", evolution));
+
 		return list;
 	}
 }
