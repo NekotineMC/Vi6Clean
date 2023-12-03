@@ -184,7 +184,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
 			return;
 		}
-		var match = tools.stream().filter(t -> t.getItemStack().equals(evt.getCurrentItem())).findFirst();
+		var match = tools.stream().filter(t -> t.getItemStack().isSimilar(evt.getCurrentItem()) && t.getOwner() == evt.getWhoClicked()).findFirst();
 		if (match.isEmpty()) {
 			return;
 		}
