@@ -13,6 +13,7 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.personal.bush.BushHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.doublejump.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
@@ -115,6 +116,12 @@ public enum ToolType {
 			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Micro parabolique", NamedTextColor.GOLD), ParabolicMicHandler.LORE),
 			ParabolicMicHandler::new,
 			600,		// PRICE
+			1			// LIMIT
+			),
+	BUSH (
+			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Buisson furtif", NamedTextColor.GOLD), Vi6ToolLoreText.BUSH.make()),
+			BushHandler::new,
+			350,		// PRICE
 			1			// LIMIT
 			)
 	;
