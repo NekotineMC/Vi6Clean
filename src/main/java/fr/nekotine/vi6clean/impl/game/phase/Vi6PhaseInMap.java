@@ -134,6 +134,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@Override
 	public void itemTearDown(Player item) {
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
+		if (!wrap.getParentWrapper().isThief()) {
+			wrap.setCanLeaveMap(true);
+			wrap.updateMapLeaveBlocker();
+		}
 	}
 	
 	@Override
