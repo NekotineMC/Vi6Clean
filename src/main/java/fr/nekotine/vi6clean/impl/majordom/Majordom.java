@@ -1,23 +1,28 @@
 package fr.nekotine.vi6clean.impl.majordom;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.Map;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.EventUtil;
 
 public final class Majordom implements Listener {
 
-	private final Set<Block> toClose = new HashSet<>();
+	private final Map<Block, BukkitTask> toClose = new HashMap<>();
 	
 	public final void enable() {
 		EventUtil.register(this);
@@ -28,7 +33,7 @@ public final class Majordom implements Listener {
 	}
 	
 	public final void revertThenDisable() {
-		for (var block : new LinkedList<>(toClose)) {
+		for (var block : new LinkedList<>(toClose.keySet())) {
 			tryToggle(block);
 		}
 	}
@@ -42,10 +47,17 @@ public final class Majordom implements Listener {
 			return true;
 		}
 		// TOGGLE STATUS
-		if (toClose.contains(block)) {
+		if (toClose.containsKey(block)) {
+			toClose.computeIfPresent(block, (b,t) -> {t.cancel();return null;});
 			toClose.remove(block);
 		}else {
-			toClose.add(block);
+			var task = new BukkitRunnable() {
+				@Override
+				public void run() {
+					tryToggle(block);
+				}
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Ioc.resolve(Configuration.class).getInt("majordom.delay", 40));
+			toClose.put(block,task);
 		}
 		openable.setOpen(!openable.isOpen());
 		block.setBlockData(openable);

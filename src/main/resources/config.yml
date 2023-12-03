@@ -1,4 +1,8 @@
 update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clean.jar'
+
+majordom:
+   delay: 40 # Delai en tick
+
 tool:
    double_jump:
       power: 0.5
