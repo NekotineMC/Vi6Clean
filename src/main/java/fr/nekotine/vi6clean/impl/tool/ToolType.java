@@ -71,7 +71,7 @@ public enum ToolType {
 			1 			// LIMIT
 			),
 	RADAR (
-			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
+			ItemStackUtil.make(Material.DAYLIGHT_DETECTOR, Component.text("Radar", NamedTextColor.GOLD), RadarHandler.LORE),
 			RadarHandler::new,
 			200,		// PRICE
 			1 			// LIMIT
@@ -119,7 +119,7 @@ public enum ToolType {
 			1			// LIMIT
 			),
 	BUSH (
-			ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, Component.text("Buisson furtif", NamedTextColor.GOLD), Vi6ToolLoreText.BUSH.make()),
+			ItemStackUtil.make(Material.OAK_LEAVES, Component.text("Buisson furtif", NamedTextColor.GOLD), Vi6ToolLoreText.BUSH.make()),
 			BushHandler::new,
 			350,		// PRICE
 			1			// LIMIT
