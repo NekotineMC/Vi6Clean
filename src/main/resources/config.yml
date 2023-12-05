@@ -8,3 +8,5 @@ tool:
       power: 0.5
    parabolic_mic:
       range: 20
+   bush:
+      fadeoff: 40
