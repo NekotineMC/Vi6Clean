@@ -14,6 +14,7 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.personal.bush.BushHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.dephaser.DephaserHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.doublejump.DoubleJumpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
@@ -122,6 +123,12 @@ public enum ToolType {
 			ItemStackUtil.make(Material.OAK_LEAVES, Component.text("Buisson furtif", NamedTextColor.GOLD), Vi6ToolLoreText.BUSH.make()),
 			BushHandler::new,
 			350,		// PRICE
+			1			// LIMIT
+			),
+	DEPHASER (
+			ItemStackUtil.make(Material.IRON_NUGGET, Component.text("Déphasage", NamedTextColor.GOLD), DephaserHandler.LORE),
+			DephaserHandler::new,
+			200,		// PRICE
 			1			// LIMIT
 			)
 	;

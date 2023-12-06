@@ -37,6 +37,7 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
@@ -118,6 +119,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			tool.getHandler().stopHandling();
 			tool.getHandler().removeAll();
 		}
+		for(var koth : map.getKoths().backingMap().values()) {
+			koth.clean();
+		}
 		map = null;
 	}
 	
@@ -198,6 +202,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					zone.remove(player);
 				}
 			});
+			map.getKoths().backingMap().values().stream().forEach(koth -> {
+				var zone = koth.getInsideCaptureZone();
+				if (koth.getBoundingBox().contains(destVect)) {
+					zone.add(player);
+				}else {
+					zone.remove(player);
+				}
+			});
 		}else if (wrapper.getState() == InMapState.ENTERING){
 			var entrance = map.getEntrances().backingMap().values().stream()
 					.filter(e -> e.getEntranceTriggerBox().get().contains(destVect))
@@ -211,6 +223,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		map.getArtefacts().backingMap().values().stream().forEach(Artefact::tick);
+		map.getKoths().backingMap().values().stream().forEach(Koth::tick);
 	}
 
 	@EventHandler

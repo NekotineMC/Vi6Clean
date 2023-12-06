@@ -106,6 +106,24 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 1),
 	Sound.sound(Key.key("block.note_block.iron_xylophone"), Sound.Source.VOICE, 1, 0)
 	}),
+	DEPHASER_ACTIVATE(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 2),
+	Sound.sound(Key.key("block.beacon.activate"), Sound.Source.VOICE, 1, 1.5f),
+	Sound.sound(Key.key("entity.illusioner.prepare_blindness"), Sound.Source.VOICE, 1, 1)		
+	}),
+	DEPHASER_WARNING_LOW(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 1)	
+	}),
+	DEPHASER_WARNING_MID(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 1.5f)	
+	}),
+	DEPHASER_WARNING_HIGH(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 2)	
+	}),
+	DEPHASER_DEACTIVATE(new Sound[]{
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 1),
+	Sound.sound(Key.key("block.beacon.deactivate"), Sound.Source.VOICE, 1, 1.5f)
+	})
 	;
 	
 	private Sound[] sounds;

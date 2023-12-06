@@ -62,7 +62,9 @@ public enum Vi6ToolLoreText {
 	PARABOLIC_MIC ("<lore>Vous permet d'entendre les enemis qui bouge",
 			 "<lore>jusqu'a <variable><range></variable>."),
 	BUSH ("<lore>Vous rend invisible dans les buissons",
-			 "<lore>et peut de temps après leurs sortie.");
+			 "<lore>et peut de temps après leurs sortie."),
+	DEPHASER("<lore>Toutes les <variable><delay></variable>",
+			"gagnez <variable><duration></variable> d'invisibilité");
 	//
 	
 	private String[] minimessageFormatted;
