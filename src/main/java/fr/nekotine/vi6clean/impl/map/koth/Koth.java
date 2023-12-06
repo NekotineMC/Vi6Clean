@@ -124,6 +124,7 @@ public class Koth{
 			effect.capture(newOwning, owningTeam);
 			owningTeam = newOwning;
 			captureAdvancement = 0;
+			tickAdvancement = 0;
 		}
 		effect.tick();
 		display.text(text);
