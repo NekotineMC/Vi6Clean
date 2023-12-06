@@ -8,6 +8,7 @@ import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
 import fr.nekotine.core.map.element.MapDictionaryElement;
 import fr.nekotine.core.map.element.MapPositionElement;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.map.koth.Koth;
 
 public class Vi6Map{
 	
@@ -35,9 +36,9 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<MapPositionElement> thiefMinimapSpawns = new MapDictionaryElement<>();
 	
-	@MapElementTyped(LightKoth.class)
+	@MapElementTyped(Koth.class)
 	@ComposingMap
-	private MapDictionaryElement<LightKoth> lightKoths = new MapDictionaryElement<>();
+	private MapDictionaryElement<Koth> koths = new MapDictionaryElement<>();
 	
 	
 	public Collection<MapPositionElement> getGuardSpawns(){
@@ -64,7 +65,7 @@ public class Vi6Map{
 		return exits;
 	}
 	
-	public MapDictionaryElement<LightKoth> getLightKoths() {
-		return lightKoths;
+	public MapDictionaryElement<Koth> getKoths() {
+		return koths;
 	}
 }

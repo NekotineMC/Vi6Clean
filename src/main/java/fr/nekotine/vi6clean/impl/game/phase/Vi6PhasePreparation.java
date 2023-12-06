@@ -34,6 +34,7 @@ import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
+import fr.nekotine.vi6clean.impl.map.koth.LightKothEffect;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -101,7 +102,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				e.setCancelled(true);
 			}
 		}.register();
-		map.getLightKoths().backingMap().values().stream().forEach(koth -> koth.setup(world));
+		map.getKoths().backingMap().values().stream().forEach(koth -> koth.setup(new LightKothEffect(),world));
 	}
 
 	@Override
