@@ -55,8 +55,13 @@ public class Bush extends Tool{
 		}
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		if (inBush) {
+			owner.setCooldown(getItemStack().getType(), 0);
 			setItemStack(INVISIBLE_ITEM);
 			statusEffectModule.addEffect(owner, unlimitedInvisibility);
+			if (fadeOffTask != null) {
+				fadeOffTask.cancel();
+			}
+			fadeOffTask = null;
 		}else {
 			statusEffectModule.addEffect(owner, fadeoffInvisibility);
 			statusEffectModule.removeEffect(owner, unlimitedInvisibility);
@@ -91,6 +96,7 @@ public class Bush extends Tool{
 			statusEffectModule.removeEffect(owner, unlimitedInvisibility);
 			statusEffectModule.removeEffect(owner, fadeoffInvisibility);
 			setItemStack(REVEALED_ITEM);
+			owner.setCooldown(getItemStack().getType(), 0);
 			if (fadeOffTask != null) {
 				fadeOffTask.cancel();
 				fadeOffTask = null;
