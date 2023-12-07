@@ -13,8 +13,10 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class BushHandler extends ToolHandler<Bush>{
 
@@ -49,7 +51,11 @@ public class BushHandler extends ToolHandler<Bush>{
 				continue;
 			}
 			tool.setInBush(bushMaterials.isTagged(owner.getLocation().getBlock()));
-			tool.setRevealed(false);// TODO HERE
+			var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
+			if (wrap.isPresent()) {
+				var ploc = owner.getLocation();
+				tool.setRevealed(wrap.get().ennemiTeamInMap().anyMatch(e -> e.getLocation().distanceSquared(ploc) <= DETECTION_RANGE_SQUARED));
+			}
 		}
 	}
 	
