@@ -27,7 +27,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
-	private final double DETECTION_BLOCK_RANGE = Ioc.resolve(Configuration.class).getDouble("tool.parabolic_mic.range", 20);
+	private final double DETECTION_BLOCK_RANGE = Ioc.resolve(Configuration.class).getDouble("tool.parabolic_mic.range", 20d);
 	
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
