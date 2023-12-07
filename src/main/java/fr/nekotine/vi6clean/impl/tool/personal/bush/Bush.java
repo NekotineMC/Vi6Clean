@@ -25,21 +25,21 @@ public class Bush extends Tool{
 	
 	private BukkitTask fadeOffTask;
 	
-	private final int fadeOffDelay = Ioc.resolve(Configuration.class).getInt("tool.bush.fadeoff", 40);
+	private final int fadeOffDelay = Ioc.resolve(Configuration.class).getInt("tool.bush.fadeoff", 30);
 	
 	private final StatusEffect unlimitedInvisibility = new StatusEffect( InvisibleStatusEffectType.get(), -1);
 	
 	private final StatusEffect fadeoffInvisibility = new StatusEffect(InvisibleStatusEffectType.get(),fadeOffDelay);
 	
-	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(Material.WHITE_STAINED_GLASS_PANE,
+	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(Material.FLOWERING_AZALEA_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Visible", NamedTextColor.WHITE)),
 			Vi6ToolLoreText.BUSH.make());
 	
-	private final ItemStack INVISIBLE_ITEM = ItemStackUtil.make(Material.GLASS_PANE,
+	private final ItemStack INVISIBLE_ITEM = ItemStackUtil.make(Material.AZALEA_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Invisible", NamedTextColor.GRAY)),
 			Vi6ToolLoreText.BUSH.make());
 	
-	private final ItemStack REVEALED_ITEM = ItemStackUtil.make(Material.RED_STAINED_GLASS_PANE,
+	private final ItemStack REVEALED_ITEM = ItemStackUtil.make(Material.CHERRY_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Découvert", NamedTextColor.RED)),
 			Vi6ToolLoreText.BUSH.make());
 	
