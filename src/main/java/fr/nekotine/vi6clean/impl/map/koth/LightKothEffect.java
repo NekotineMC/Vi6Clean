@@ -4,6 +4,8 @@ import java.util.List;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.TextModule.Builder;
@@ -13,9 +15,10 @@ import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.status.flag.DarkenedStatusFlag;
+import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
 
 public class LightKothEffect implements KothEffect, TextPlaceholder{
+	private static final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
 	private static final int AMOUNT_FOR_OTHER_CAPTURE = 200;
 	private static final int AMOUNT_FOR_GUARD_CAPTURE = 400;
 	private Koth koth;
@@ -28,13 +31,15 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 	}
 	@Override
 	public void capture(Vi6Team owning, Vi6Team losing) {
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		var game = Ioc.resolve(Vi6Game.class);
 		if(losing==Vi6Team.GUARD) {
-			var flagModule = Ioc.resolve(StatusFlagModule.class);
-			Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> flagModule.addFlag(p, DarkenedStatusFlag.get()));
+			game.getGuards().forEach(
+					p -> statusEffectModule.addEffect(p, unlimitedDarkened));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 		}else if(owning==Vi6Team.GUARD) {
-			var flagModule = Ioc.resolve(StatusFlagModule.class);
-			Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> flagModule.removeFlag(p, DarkenedStatusFlag.get()));
+			game.getGuards().forEach(
+					p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 		}
 	}
@@ -48,8 +53,9 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 	public void clean() {
 		if(koth.getOwningTeam() == Vi6Team.GUARD) 
 			return;
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> flagModule.removeFlag(p, DarkenedStatusFlag.get()));
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		Ioc.resolve(Vi6Game.class).getGuards().forEach(
+				p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
 	}
 
 	//

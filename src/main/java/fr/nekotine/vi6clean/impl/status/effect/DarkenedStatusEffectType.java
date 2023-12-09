@@ -10,9 +10,6 @@ import fr.nekotine.vi6clean.impl.status.flag.DarkenedStatusFlag;
 
 public class DarkenedStatusEffectType implements StatusEffectType{
 	private static DarkenedStatusEffectType instance;
-	
-	//
-	
 	public static final DarkenedStatusEffectType get() {
 		if (instance == null) {
 			instance = new DarkenedStatusEffectType();

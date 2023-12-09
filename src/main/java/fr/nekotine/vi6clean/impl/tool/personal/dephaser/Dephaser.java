@@ -4,15 +4,20 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
+import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Dephaser extends Tool{
+	private static final StatusEffect effect = new StatusEffect(DarkenedStatusEffectType.get(), DephaserHandler.INVISIBILITY_DURATION_TICKS);
+	
+	//
+	
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return ItemStackUtil.make(
@@ -22,8 +27,6 @@ public class Dephaser extends Tool{
 	}
 	@Override
 	protected void cleanup() {
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 	}
 
 	//
@@ -38,13 +41,11 @@ public class Dephaser extends Tool{
 		Vi6Sound.DEPHASER_WARNING_HIGH.play(getOwner());
 	}
 	protected void activate() {
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		flagModule.addFlag(getOwner(), InvisibleStatusFlag.get());
+		Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
 		Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.INVISIBILITY_DURATION_TICKS);
 	}
 	protected void deactivate() {
-		cleanup();
 		Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.DELAY_BETWEEN_INVISIBILITY_TICKS - DephaserHandler.INVISIBILITY_DURATION_TICKS);
 	}
