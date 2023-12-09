@@ -40,4 +40,13 @@ public class Regenerator extends Tool{
 		healing = false;
 		setItemStack(RegeneratorHandler.IDLE_ITEM());
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

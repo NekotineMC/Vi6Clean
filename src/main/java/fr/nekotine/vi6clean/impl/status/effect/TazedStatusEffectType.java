@@ -32,5 +32,4 @@ public class TazedStatusEffectType implements StatusEffectType{
 	public void removeEffect(LivingEntity target) {
 		Ioc.resolve(StatusFlagModule.class).removeFlag(target, TazedStatusFlag.get());
 	}
-
 }

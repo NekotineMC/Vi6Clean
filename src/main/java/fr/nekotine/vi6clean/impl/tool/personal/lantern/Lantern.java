@@ -142,4 +142,12 @@ public class Lantern extends Tool{
 		}
 	}
 
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

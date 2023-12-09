@@ -114,4 +114,13 @@ public class Shadow extends Tool{
 	public ArmorStand getPlaced() {
 		return shadow;
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

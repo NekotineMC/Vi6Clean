@@ -80,4 +80,13 @@ public class Tazer extends Tool{
 			cooldown--;
 		}
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

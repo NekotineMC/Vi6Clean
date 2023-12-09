@@ -37,4 +37,13 @@ public class ParabolicMic extends Tool{
 	public void setVibrationTargetEntity(Entity vibrationTargetEntity) {
 		this.vibrationTargetEntity = vibrationTargetEntity;
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

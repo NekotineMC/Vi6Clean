@@ -123,4 +123,13 @@ public class Bush extends Tool{
 		statusEffectModule.removeEffect(owner, unlimitedInvisibility);
 		statusEffectModule.removeEffect(owner, fadeoffInvisibility);
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

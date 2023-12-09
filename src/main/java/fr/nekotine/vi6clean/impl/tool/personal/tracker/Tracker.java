@@ -79,4 +79,13 @@ public class Tracker extends Tool{
 		if(hit) 
 			setCompassItem();
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

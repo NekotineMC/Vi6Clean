@@ -49,4 +49,13 @@ public class DoubleJump extends Tool{
 		return (!player.isFlying()
 				&& player.getLocation().subtract(0.0D, 0.1D, 0.0D).getBlock().getType().isSolid());
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

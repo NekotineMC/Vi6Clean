@@ -94,4 +94,13 @@ public class InviSneak extends Tool{
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

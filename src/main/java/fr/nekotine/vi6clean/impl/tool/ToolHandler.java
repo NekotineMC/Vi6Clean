@@ -23,6 +23,8 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 
 /**
@@ -212,5 +214,25 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		var slot = (int)emptySlots[random.nextInt(0, emptySlots.length)];
 		player.getEquipment().setItem(EquipmentSlot.valueOf(evt.getSlotType().name()), evt.getOldItem(), true);
 		player.getInventory().setItem(slot, evt.getNewItem());
+	}
+	
+	@EventHandler
+	public void onEntityEmpStart(EntityEmpStartEvent evt) {
+		if(!(evt.getEntity() instanceof Player player)) 
+			return;
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty()) 
+			return;
+		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpStart());
+	}
+	
+	@EventHandler
+	public void onEntityEmpEnd(EntityEmpEndEvent evt) {
+		if(!(evt.getEntity() instanceof Player player)) 
+			return;
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty()) 
+			return;
+		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpEnd());
 	}
 }

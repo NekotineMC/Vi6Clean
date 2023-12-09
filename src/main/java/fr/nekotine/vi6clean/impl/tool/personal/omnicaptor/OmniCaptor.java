@@ -167,4 +167,13 @@ public class OmniCaptor extends Tool{
 	public Stream<Player> getEnemyTeam() {
 		return enemyTeam.get();
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

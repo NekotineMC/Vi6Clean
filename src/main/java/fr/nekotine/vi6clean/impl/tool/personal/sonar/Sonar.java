@@ -54,4 +54,12 @@ public class Sonar extends Tool{
 	protected void cleanup() {
 	}
 
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

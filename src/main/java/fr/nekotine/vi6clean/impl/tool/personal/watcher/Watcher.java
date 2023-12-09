@@ -127,4 +127,13 @@ public class Watcher extends Tool{
 		}
 		
 	}
+	
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

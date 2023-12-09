@@ -167,4 +167,13 @@ public class Radar extends Tool{
 	protected void setInHand(boolean inHand) {
 		this.inHand = inHand;
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

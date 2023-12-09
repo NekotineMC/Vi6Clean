@@ -27,6 +27,8 @@ public class Dephaser extends Tool{
 	}
 	@Override
 	protected void cleanup() {
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		statusEffectModule.removeEffect(getOwner(), effect);
 	}
 
 	//
@@ -48,5 +50,14 @@ public class Dephaser extends Tool{
 	protected void deactivate() {
 		Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.DELAY_BETWEEN_INVISIBILITY_TICKS - DephaserHandler.INVISIBILITY_DURATION_TICKS);
+	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
 	}
 }
