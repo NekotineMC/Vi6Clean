@@ -16,6 +16,7 @@ import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.personal.bush.BushHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.dephaser.DephaserHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.doublejump.DoubleJumpHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.emp.EmpHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.invisneak.InviSneakHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
@@ -130,6 +131,12 @@ public enum ToolType {
 			DephaserHandler::new,
 			200,		// PRICE
 			1			// LIMIT
+			),
+	EMP(
+			ItemStackUtil.make(Material.BEACON, Component.text("IEM", NamedTextColor.GOLD), EmpHandler.LORE),
+			EmpHandler::new,
+			150,		// PRICE
+			-1
 			)
 	;
 	

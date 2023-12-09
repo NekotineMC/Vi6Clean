@@ -64,7 +64,8 @@ public enum Vi6ToolLoreText {
 	BUSH ("<lore>Vous rend invisible dans les buissons",
 			 "<lore>et peut de temps après leurs sortie."),
 	DEPHASER("<lore>Toutes les <variable><delay></variable>",
-			"gagnez <variable><duration></variable> d'invisibilité");
+			"gagnez <variable><duration></variable> d'invisibilité"),
+	EMP("<lore>Désactive pendant <variable><duration></variable> les objets ennemis");
 	//
 	
 	private String[] minimessageFormatted;
