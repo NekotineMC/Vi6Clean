@@ -4,10 +4,30 @@ majordom:
    delay: 40 # Delai en tick
 
 tool:
+   invisneak:
+      display_name: InviSneak
+      price: 400
+      amount_limit: 1
+      shop_icon: GLASS_PANE
+      statusname: Invisible
+      range: 3
+      lore:
+         - <lore>Vous rend <variable><statusname></variable>
+         - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak>).</important>
+         - <lore>Vous êtes visible si un ennemi est
+         - <lore>à moins de <variable><range> blocs</variable> de vous.
    double_jump:
+      display_name: Double saut
+      price: 300
+      amount_limit: 1
+      shop_icon: GOLDEN_BOOTS
       power: 0.5 # vitesse en block/s
+      lore:
+         - <lore>permet de sauter une fois
+         - <lore> en l'air, en appuyant
+         - <lore>deux fois sur <important><key:key.jump></important>
    parabolic_mic:
       range: 20.0 # distance en block
    bush:
       fadeoff: 30 # delai en tick
-      reveal_range: 2.0 # distance en block
+      reveal_range: 2.0 # distance en block               

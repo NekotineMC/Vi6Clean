@@ -2,6 +2,9 @@ package fr.nekotine.vi6clean.impl.game.phase;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -19,8 +22,10 @@ import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.reflexion.ReflexionUtil;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.PotionEffectState;
@@ -38,14 +43,20 @@ import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
+import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
+import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
+	private Logger logger = new NekotineLogger(getClass());
+	
 	private Vi6Map map;
 	
 	private List<BlockDisplay> debugDisplays = new LinkedList<>();
+	
+	private List<ToolHandler<?>> toolHandlers = new LinkedList<>();
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
@@ -97,8 +108,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));
 			}
 		}
-		for (var tool : ToolType.values()) {
-			tool.getHandler().startHandling();
+		discoverToolHandlers();
+		for (var tool : toolHandlers) {
+			tool.startHandling();
 		}
 		Ioc.resolve(Majordom.class).enable();
 	}
@@ -115,9 +127,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			artefact.clean();
 		}
-		for (var tool : ToolType.values()) {
-			tool.getHandler().stopHandling();
-			tool.getHandler().removeAll();
+		for (var tool : toolHandlers) {
+			tool.stopHandling();
+			tool.removeAll();
 		}
 		for(var koth : map.getKoths().backingMap().values()) {
 			koth.clean();
@@ -161,6 +173,25 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		return list;
 	}
 	
+	public void discoverToolHandlers() {
+		for (var tool : toolHandlers) {
+			tool.stopHandling();
+			tool.removeAll();
+		}
+		toolHandlers.clear();
+		logger.info("Découverte et ajout des tools: ");
+		try {
+			for (var tool : ReflexionUtil.streamClassesFromPackage("fr.nekotine.vi6clean.impl.tool")
+					.filter(c -> Tool.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class)).collect(Collectors.toSet())) {
+				var ctor = tool.getConstructor();
+				var handler = (ToolHandler<?>)ctor.newInstance();
+				toolHandlers.add(handler);
+				logger.info(String.format("Type: %s",tool.getSimpleName()));
+			}
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Une erreur est survenue lors de l'ajout des class Tool au registre", e);
+		}
+	}
 	
 	public Vi6Map getMap() {
 		return map;

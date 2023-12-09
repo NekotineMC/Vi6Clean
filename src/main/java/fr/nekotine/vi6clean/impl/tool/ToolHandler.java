@@ -2,12 +2,15 @@ package fr.nekotine.vi6clean.impl.tool;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
+import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,11 +22,21 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 
+import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
+import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 /**
  * Gestionnaire d'outil pour une partie de Vi6. Une instance par partie.
@@ -37,28 +50,79 @@ import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	protected final Logger logger = new NekotineLogger(getClass());
-	
-	private final ToolType type;
 
 	private final Supplier<T> toolSupplier;
 
 	private final Collection<T> tools = new LinkedList<>();
 	
 	private final Random random = new Random();
+	
+	private String code;
+	
+	private final MenuElement shopItem;
+	
+	private Material iconMaterial;
+	
+	private final Component displayName;
+	
+	private final int price;
+	
+	private final int limite;
+	
+	private final List<Component> lore;
+	
+	private boolean active;
 
-	public ToolHandler(ToolType type, Supplier<T> toolSupplier) {
-		this.type = type;
+	public ToolHandler(Supplier<T> toolSupplier) {
 		this.toolSupplier = toolSupplier;
+		var an = getClass().getDeclaredAnnotation(ToolCode.class);
+		code = an.value();
+		var config = Ioc.resolve(Configuration.class).getConfigurationSection("tool."+code);
+		// Lore construction
+		var loreTagResolvers = new LinkedList<TagResolver>();
+		for (var key : config.getKeys(false)) {
+			var value = config.get(key,key);
+			loreTagResolvers.add(Placeholder.unparsed(key, value.toString()));
+		}
+		var serializedLore = config.getStringList("lore");
+		lore = Ioc.resolve(TextModule.class).message(
+			Leaf.builder()
+				.addLine(serializedLore.toArray(String[]::new))
+				.addStyle(Vi6Styles.TOOL_LORE)
+				.addStyle(loreTagResolvers.toArray(TagResolver[]::new))
+			).build();
+		// Values
+		limite = config.getInt("amount_limit", -1);
+		price = config.getInt("price", 9999);
+		displayName = Ioc.resolve(TextModule.class).message(
+			Leaf.builder()
+				.addLine(config.getString("display_name", "Unnamed"))
+			).buildFirst();
+		// Shop item
+		iconMaterial = Material.getMaterial(config.getString("shop_icon", Material.BARRIER.name()));
+		var shopLore = new LinkedList<Component>(lore);
+		shopLore.add(Component.empty());
+		shopLore.add(Component.text("Prix: "+price,NamedTextColor.GOLD));
+		var menuItem = ItemStackUtil.make(iconMaterial, displayName, shopLore.toArray(Component[]::new));
+		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 	}
 
 	public final void startHandling() {
+		if (active) {
+			return;
+		}
 		onStartHandling();
 		EventUtil.register(this);
+		active = true;
 	}
 
 	public final void stopHandling() {
+		if (!active) {
+			return;
+		}
 		EventUtil.unregister(this);
 		onStopHandling();
+		active = false;
 	}
 
 	public final void removeAll() {
@@ -66,12 +130,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			try {
 				detachFromOwner(tool);
 			}catch(Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+type, e);
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+code, e);
 			}
 			try {
 				tool.cleanup();
 			}catch(Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+type, e);
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+code, e);
 			}
 		}
 		tools.clear();
@@ -103,8 +167,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	 * @return If tool could be attached.
 	 */
 	public final boolean attachToPlayer(T tool, Player player) {
-		var lim = type.getLimite();
-		if (lim >=0 && lim <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
+		if (limite >=0 && limite <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
 			return false;
 		}
 		tool.setOwner(player);
@@ -141,9 +204,30 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public Collection<T> getTools() {
 		return tools;
 	}
-
-	public ToolType getType() {
-		return type;
+	
+	public MenuElement getShopMenuItem() {
+		return shopItem;
+	}
+	
+	/**
+	 * 
+	 * @param player
+	 * @return buy succesfull
+	 */
+	public boolean tryBuy(InventoryClickEvent evt) {
+		if (!(evt.getWhoClicked() instanceof Player player)) {
+			return false;
+		}
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optionalWrap.isEmpty()) {
+			return false;
+		}
+		var wrap = optionalWrap.get();
+		if (wrap.getMoney() >= price && attachNewToPlayer(player)) {
+			wrap.setMoney(wrap.getMoney() - price);
+			return true;
+		}
+		return false;
 	}
 
 	@EventHandler
@@ -190,7 +274,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		}
 		var wrap = optWrap.get();
 		remove(match.get());
-		wrap.setMoney(wrap.getMoney() + type.getPrice());
+		wrap.setMoney(wrap.getMoney() + price);
 	}
 	
 	@EventHandler
@@ -212,5 +296,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		var slot = (int)emptySlots[random.nextInt(0, emptySlots.length)];
 		player.getEquipment().setItem(EquipmentSlot.valueOf(evt.getSlotType().name()), evt.getOldItem(), true);
 		player.getInventory().setItem(slot, evt.getNewItem());
+	}
+
+	public boolean isActive() {
+		return active;
 	}
 }
