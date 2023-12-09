@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.dephaser;
 
 import java.util.List;
 
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -10,14 +11,18 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("dephaser")
 public class DephaserHandler extends ToolHandler<Dephaser>{
-	protected static final int DELAY_BETWEEN_INVISIBILITY_TICKS=400;
-	protected static final int INVISIBILITY_DURATION_TICKS=40;
+	protected static final int DELAY_BETWEEN_INVISIBILITY_TICKS=
+			20 * Ioc.resolve(Configuration.class).getInt("tool.dephaser.inv_delay", 20);
+	protected static final int INVISIBILITY_DURATION_TICKS= 
+			20 * Ioc.resolve(Configuration.class).getInt("tool.dephaser.inv_duration", 2);
+	
 	private static final int DELAY_BETWEEN_WARNING_SOUND=10;
 	public static final List<Component> LORE = Vi6ToolLoreText.DEPHASER.make(
 			Placeholder.unparsed("delay", (int)(DELAY_BETWEEN_INVISIBILITY_TICKS/20)+"s"),
@@ -25,7 +30,7 @@ public class DephaserHandler extends ToolHandler<Dephaser>{
 	);
 	private int count = DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS + 1;
 	public DephaserHandler() {
-		super(ToolType.DEPHASER, Dephaser::new);
+		super(Dephaser::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 

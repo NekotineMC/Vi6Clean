@@ -14,14 +14,15 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
+@ToolCode("bush")
 public class BushHandler extends ToolHandler<Bush>{
 
 	public BushHandler() {
-		super(ToolType.BUSH, Bush::new);
+		super(Bush::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	

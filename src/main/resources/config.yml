@@ -21,11 +21,24 @@ tool:
       price: 250
       amount_limit: 2
       shop_icon: GLASS_PANE
+      statusname: invisible
+      range: 3
       lore:
          - <lore>Vous rend <variable><statusname></variable>
          - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak>).</important>
          - <lore>Vous êtes visible si un ennemi est
          - <lore>à moins de <variable><range> blocs</variable> de vous.
+   sonar:
+      display_name: Sonar
+      price: 400
+      amount_limit: 1
+      shop_icon: TARGET
+      range: 5
+      delay: 3
+      lore:
+         - <lore>Détecte un ennemi à
+         - <lore>moins de <variable><range> blocs</variable>
+         - <lore>toutes les <variable><delay>s</variable>.
    double_jump:
       display_name: Double saut
       price: 300
@@ -36,8 +49,117 @@ tool:
          - <lore>permet de sauter une fois
          - <lore> en l'air, en appuyant
          - <lore>deux fois sur <important><key:key.jump></important>
+   tazer:
+      display_name: Tazer
+      price: 300
+      amount_limit: 1
+      shop_icon: SHEARS
+      cooldown: 10
+      lore:
+         - <lore>Taze les ennemis en ligne de mire.
+         - <lore>Utilisez <important><key:key.attack></important> pour tirer.
+         - <lore>Temps de recharge: <variable><cooldown>s</variable>
+   lantern:
+      display_name: Lanterne
+      price: 200
+      amount_limit: 1
+      shop_icon: LANTERN
+      maxlantern: 2
+      lore:
+         - <lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes
+         - <lore>que vos alliés peuvent prendre pour se téléporter à vous.
+   radar:
+      display_name: Radar
+      price: 200
+      amount_limit: 1
+      shop_icon: DAYLIGHT_DETECTOR
+      delay: 5
+      range: 20
+      cooldown: 20
+      lore:
+         - <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
+         - <lore>indique le nombre de voleurs dans un rayon de <variable><range> blocs</variable>.
+         - <lore>Temps de recharge: <variable><cooldown>s</variable
+   shadow:
+      display_name: Ombre
+      price: 250
+      amount_limit: 2
+      shop_icon: WITHER_SKELETON_SKULL
+      lore:
+         - <lore>Placer une ombre pour revenir plus tard,
+         - <lore>ou mourrez si un garde la trouve!
+   watcher:
+      display_name: Observateur
+      price: 200
+      amount_limit: 1
+      shop_icon: SILVERFISH_SPAWN_EGG
+      nbmax: 3
+      range: 3
+      lore:
+         - <lore>Pose une balise qui affiche en surbrillance les gardes à proximité.
+         - <lore>Les gardes peuvent détruire les balises en marchant dessus.
+         - <lore>Vous pouvez en poser <variable><nbmax></variable> simultanément.
+         - <lore>La portée est de <variable><range> blocs</variable>.
+   warner:
+      display_name: Avertisseur
+      price: 150
+      amount_limit: -1
+      shop_icon: ENDER_EYE
+      delay: 2
+      place_range: 8
+      lore:
+         - <lore>S'attache à un artéfact et avertit lorsqu'il est volé.
+         - <lore>Délai du message: <variable><delay>s</variable>"
+   regenerator:
+      display_name: Régénérateur
+      price: 150
+      amount_limit: -1
+      shop_icon: CAMPFIRE
+      delay_before_regen: 5
+      delay_between_heal: 1
+      heal_amount: 1
+      lore:
+         - <lore>Régénerez-vous après <variable><delay_before_regen>s</variable> sans prendre de dégâts
+   tracker:
+      display_name: Traceur
+      price: 100
+      amount_limit: -1
+      shop_icon: CROSSBOW
+      ray_distance: 100
+      lore:
+         - <lore>Tire un projectile à grande vitesse.
+         - <lore>Obtenez une boussole qui pointe vers l'ennemi touché.
+   bush:
+      display_name: Buisson furtif
+      price: 350
+      amount_limit: 1
+      shop_icon: OAK_LEAVES
+      fadeoff: 30 # delai en tick
+      reveal_range: 2.0 # distance en block
+      lore:
+         - <lore>Vous rend invisible dans les buissons
+         - <lore>et un court instant après en être sorti.
+   dephaser:
+      display_name: Déphasage
+      price: 200
+      amount_limit: 1
+      shop_icon: IRON_NUGGET
+      inv_delay: 20
+      inv_duration: 2
+      lore:
+         - <lore>Toutes les <variable><inv_delay>s</variable>,
+         - <lore>gagnez <variable><inv_duration>s</variable> d'invisibilité.
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    parabolic_mic:
       range: 20.0 # distance en block
-   bush:
-      fadeoff: 30 # delai en tick
-      reveal_range: 2.0 # distance en block               
+   
