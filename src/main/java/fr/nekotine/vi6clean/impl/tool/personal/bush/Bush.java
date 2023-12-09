@@ -23,6 +23,8 @@ public class Bush extends Tool{
 	
 	private boolean revealed;
 	
+	private boolean emp;
+	
 	private BukkitTask fadeOffTask;
 	
 	private final int fadeOffDelay = Ioc.resolve(Configuration.class).getInt("tool.bush.fadeoff", 30);
@@ -88,7 +90,7 @@ public class Bush extends Tool{
 	
 	public void setRevealed(boolean revealed) {
 		var owner = getOwner();
-		if (this.revealed == revealed || owner == null) {
+		if (this.revealed == revealed || owner == null || emp) {
 			return;
 		}
 		if (revealed) {
@@ -128,8 +130,11 @@ public class Bush extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		setRevealed(true);
+		emp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
+		emp = false;
 	}
 }
