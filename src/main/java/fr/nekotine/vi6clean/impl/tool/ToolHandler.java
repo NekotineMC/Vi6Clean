@@ -69,7 +69,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	
 	private final int limite;
 	
-	private final List<Component> lore;
+	protected final List<Component> lore;
 	
 	private boolean active;
 
