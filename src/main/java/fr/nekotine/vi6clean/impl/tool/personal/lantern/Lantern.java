@@ -16,9 +16,12 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -91,6 +94,10 @@ public class Lantern extends Tool{
 	public void allyTryPickup(Player picking) {
 		var owner = getOwner();
 		if (owner == null) {
+			return;
+		}
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
+		if(flagModule.hasAny(owner, EmpStatusFlag.get())) {
 			return;
 		}
 		var ite = displayedLanterns.iterator();
