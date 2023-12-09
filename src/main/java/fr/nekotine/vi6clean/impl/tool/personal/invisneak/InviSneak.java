@@ -6,10 +6,13 @@ import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.status.effect.InvisibleStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
@@ -18,6 +21,8 @@ public class InviSneak extends Tool{
 	private boolean sneaking;
 	
 	private boolean revealed;
+	
+	private final StatusEffect invisibleEffect = new StatusEffect(InvisibleStatusEffectType.get(), -1);
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -74,18 +79,18 @@ public class InviSneak extends Tool{
 	}
 	
 	private void statusUpdate() {
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		if (sneaking) {
 			if (revealed) {
 				setItemStack(InviSneakHandler.REVEALED_ITEM);
-				flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
+				statusEffectModule.removeEffect(getOwner(), invisibleEffect);
 			}else {
 				setItemStack(InviSneakHandler.INVISIBLE_ITEM);
-				flagModule.addFlag(getOwner(), InvisibleStatusFlag.get());
+				statusEffectModule.addEffect(getOwner(), invisibleEffect);
 			}
 		}else {
 			setItemStack(InviSneakHandler.VISIBLE_ITEM);
-			flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
+			statusEffectModule.removeEffect(getOwner(), invisibleEffect);
 		}
 	}
 

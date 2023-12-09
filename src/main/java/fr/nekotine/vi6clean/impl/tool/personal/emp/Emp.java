@@ -35,8 +35,9 @@ public class Emp extends Tool{
 	
 	protected boolean trigger() {
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		if(flagModule.hasAny(getOwner(), EmpStatusFlag.get()))
+		if(flagModule.hasAny(getOwner(), EmpStatusFlag.get())) {
 			return false;
+		}
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
 		opt.get().ennemiTeamInMap().forEach(p -> statusEffectModule.addEffect(p, effect));
