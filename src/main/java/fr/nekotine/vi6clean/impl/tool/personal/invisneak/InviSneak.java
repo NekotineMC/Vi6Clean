@@ -22,6 +22,8 @@ public class InviSneak extends Tool{
 	
 	private boolean revealed;
 	
+	private boolean emp;
+	
 	private final StatusEffect invisibleEffect = new StatusEffect(InvisibleStatusEffectType.get(), -1);
 	
 	@Override
@@ -34,7 +36,7 @@ public class InviSneak extends Tool{
 	}
 
 	public void setSneaking(boolean sneaking) {
-		if (this.sneaking != sneaking) {
+		if (this.sneaking != sneaking && !emp) {
 			this.sneaking = sneaking;
 			statusUpdate();
 		}
@@ -45,7 +47,7 @@ public class InviSneak extends Tool{
 	}
 
 	public void setRevealed(boolean revealed) {
-		if (this.revealed != revealed) {
+		if (this.revealed != revealed && !emp) {
 			this.revealed = revealed;
 			statusUpdate();
 		}
@@ -104,8 +106,11 @@ public class InviSneak extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		setRevealed(true);
+		emp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
+		emp = false;
 	}
 }
