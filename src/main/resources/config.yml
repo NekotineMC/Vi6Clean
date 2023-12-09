@@ -16,6 +16,16 @@ tool:
          - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak>).</important>
          - <lore>Vous êtes visible si un ennemi est
          - <lore>à moins de <variable><range> blocs</variable> de vous.
+   omnicaptor:
+      display_name: Omnicapteur
+      price: 250
+      amount_limit: 2
+      shop_icon: GLASS_PANE
+      lore:
+         - <lore>Vous rend <variable><statusname></variable>
+         - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak>).</important>
+         - <lore>Vous êtes visible si un ennemi est
+         - <lore>à moins de <variable><range> blocs</variable> de vous.
    double_jump:
       display_name: Double saut
       price: 300
