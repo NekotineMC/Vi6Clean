@@ -5,6 +5,14 @@ majordom:
 
 tool:
    double_jump:
+      display_name: Double saut
+      price: 300
+      amount_limit: 1
+      shop_icon: GOLDEN_BOOTS
+      lore:
+         - <lore>permet de sauter une fois
+         - <lore> en l'air, en appuyant
+         - <lore>deux fois sur <important><key:key.jump></important>
       power: 0.5 # vitesse en block/s
    parabolic_mic:
       range: 20.0 # distance en block

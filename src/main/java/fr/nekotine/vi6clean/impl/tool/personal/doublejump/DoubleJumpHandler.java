@@ -6,13 +6,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 
+@ToolCode("double_jump")
 public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 
 	public DoubleJumpHandler() {
-		super(ToolType.DOUBLEJUMP, DoubleJump::new);
+		super(DoubleJump::new);
 	}
 	
 	@Override
