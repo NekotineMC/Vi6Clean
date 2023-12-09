@@ -14,16 +14,16 @@ import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.EmpStatusEffectType;
 
-public class LightKothEffect implements KothEffect, TextPlaceholder{
-	private static final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
+public class EmpKothEffect implements KothEffect,TextPlaceholder{
 	private static final int AMOUNT_FOR_OTHER_CAPTURE = 200;
 	private static final int AMOUNT_FOR_GUARD_CAPTURE = 400;
-	private Koth koth;
+	private static final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
 	
 	//
 	
+	private Koth koth;
 	@Override
 	public void tick() {
 		koth.setText(textDisplay.buildFirst());
@@ -34,11 +34,11 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 		var game = Ioc.resolve(Vi6Game.class);
 		if(losing==Vi6Team.GUARD) {
 			game.getGuards().forEach(
-					p -> statusEffectModule.addEffect(p, unlimitedDarkened));
+					p -> statusEffectModule.addEffect(p, effect));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 		}else if(owning==Vi6Team.GUARD) {
 			game.getGuards().forEach(
-					p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
+					p -> statusEffectModule.removeEffect(p, effect));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 		}
 	}
@@ -54,14 +54,14 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 			return;
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		Ioc.resolve(Vi6Game.class).getGuards().forEach(
-				p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
+				p -> statusEffectModule.removeEffect(p, effect));
 	}
-
+	
 	//
 	
 	private final Builder textDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
 			.addStyle(NekotineStyles.STANDART)
-			.addLine("<yellow><u>Générateur</u></yellow>\n"
+			.addLine("<dark_purple><u>Brouilleur</u></dark_purple>\n"
 					+"<aqua><power></aqua> <evolution>\n"
 					+"<status>")
 			.addPlaceholder(this));
@@ -70,11 +70,11 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 		var owningTeam = koth.getOwningTeam();
 		var tickAdvancement = koth.getTickAdvancement();
 		var percentage = (int)(((float)koth.getCaptureAdvancement() / koth.getCaptureAmountNeeded()) * 100);
-		var status = owningTeam == Vi6Team.GUARD ? "<green>Actif</green>" : "<red>Désactivé</red>";
-		var power = owningTeam == Vi6Team.GUARD ? (100 - percentage)+"%" : percentage+"%";
+		var status = (owningTeam == Vi6Team.GUARD) ? "<red>Désactivé</red>" : "<green>Actif</green>";
+		var power = (owningTeam == Vi6Team.GUARD) ? percentage+"%" : (100-percentage)+"%";
 		if(owningTeam == Vi6Team.GUARD)
 			tickAdvancement = -tickAdvancement;
-		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<green>↑</green>" : "<red>↓</red>");
+		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<red>↓</red>" : "<green>↑</green>");
 
 		return List.of(
 				Pair.from("status", status),
