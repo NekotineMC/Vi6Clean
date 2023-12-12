@@ -10,10 +10,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -32,6 +35,14 @@ public class Shadow extends Tool{
 			.lore(Vi6ToolLoreText.SHADOW.make())
 			.unstackable()
 			.flags(ItemFlag.values())
+			.build();
+	
+	private ItemStack EMP_ITEM = new ItemStackBuilder(Material.PLAYER_HEAD)
+			.name(Component.text("Ombre - ",NamedTextColor.GOLD).append(Component.text("Brouillée", NamedTextColor.RED)))
+			.lore(Vi6ToolLoreText.SHADOW.make())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWM3NzcyYzdjZGNkZGI2Yjc5ZDU1MjVmOWRjZWJjNzQ4YWFiZGFlMzhkOWUzOGVlYTdmZTc4YTUwMWRlNmVkZSJ9fX0=")
 			.build();
 	
 	private ArmorStand shadow;
@@ -93,15 +104,19 @@ public class Shadow extends Tool{
 	
 	public boolean tryUse() {
 		var player = getOwner();
-		if (shadow != null) {
-			Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), player.getLocation());
-			Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), shadow.getLocation());
-			player.teleport(shadow);
-			shadow.remove();
-			shadow = null;
-			return true;
+		if(shadow == null) {
+			return false;
 		}
-		return false;
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		if(statusFlagModule.hasAny(getOwner(), EmpStatusFlag.get())) {
+			return false;
+		}
+		Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), player.getLocation());
+		Vi6Sound.SHADOW_TELEPORT.play(player.getWorld(), shadow.getLocation());
+		player.teleport(shadow);
+		shadow.remove();
+		shadow = null;
+		return true;
 	}
 
 	@Override
@@ -119,8 +134,14 @@ public class Shadow extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		if(shadow != null) {
+			setItemStack(EMP_ITEM);
+		}
 	}
 	@Override
 	protected void onEmpEnd() {
+		if(shadow != null) {
+			setItemStack(PLACED_ITEM);
+		}
 	}
 }
