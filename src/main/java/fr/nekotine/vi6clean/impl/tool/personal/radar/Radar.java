@@ -10,8 +10,10 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
@@ -47,7 +49,8 @@ public class Radar extends Tool{
 			return false;
 
 		Location ploc = getOwner().getLocation();
-		if (placed || !ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid())
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
+		if (placed || !ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid() || flagModule.hasAny(getOwner(), EmpStatusFlag.get()))
 			return false;
 			
 		bottom = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.add(0, 0.6, 0), EntityType.ITEM_DISPLAY);
@@ -172,6 +175,14 @@ public class Radar extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		if (placed) {
+			cooldown = RadarHandler.COOLDOWN_TICK;
+			getOwner().setCooldown(getItemStack().getType(), cooldown);
+			
+			cleanup();
+			placed = false;
+			updateItem();
+		}
 	}
 	@Override
 	protected void onEmpEnd() {
