@@ -16,6 +16,7 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Tracker extends Tool{
 	private boolean hit = false;
+	private boolean emp = false;
 	private Player playerHit;
 	private void setCompassItem() {
 		setItemStack(TrackerHandler.COMPASS_ITEM(getOwner(), playerHit.getLocation()));
@@ -76,7 +77,7 @@ public class Tracker extends Tool{
 		
 	}
 	protected void tickRefresh() {
-		if(hit) 
+		if(hit && !emp) 
 			setCompassItem();
 	}
 
@@ -84,8 +85,10 @@ public class Tracker extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		emp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
+		emp = false;
 	}
 }

@@ -9,11 +9,13 @@ import org.bukkit.inventory.ItemStack;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -42,6 +44,10 @@ public class Tazer extends Tool{
 			return false;
 		}
 		if (cooldown > 0) {
+			return false;
+		}
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		if(statusFlagModule.hasAny(getOwner(), EmpStatusFlag.get())) {
 			return false;
 		}
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
