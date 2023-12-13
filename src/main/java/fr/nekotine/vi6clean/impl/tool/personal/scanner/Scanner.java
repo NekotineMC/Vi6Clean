@@ -24,4 +24,13 @@ public class Scanner extends Tool{
 	@Override
 	protected void cleanup() {
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

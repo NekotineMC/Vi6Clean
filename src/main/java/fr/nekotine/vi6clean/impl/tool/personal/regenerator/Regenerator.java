@@ -4,6 +4,9 @@ import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
 public class Regenerator extends Tool{
@@ -17,7 +20,8 @@ public class Regenerator extends Tool{
 	protected void cleanup() {
 	}
 	public void tick() {
-		if(healing)
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
+		if(healing || flagModule.hasAny(getOwner(), EmpStatusFlag.get()))
 			return;
 		if(++tickCount >= RegeneratorHandler.DELAY_BEFORE_REGENERATING_TICKS) {
 			healing = true;
@@ -25,8 +29,9 @@ public class Regenerator extends Tool{
 		}
 	}
 	public void heal() {
-		if(!healing)
+		if(!healing) {
 			return;
+		}
 		double maxHealth = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 		double newHealth = Math.min(maxHealth, getOwner().getHealth() + RegeneratorHandler.REGENERATION_AMOUNT);
 		getOwner().setHealth(newHealth);
@@ -39,5 +44,16 @@ public class Regenerator extends Tool{
 		tickCount = 0;
 		healing = false;
 		setItemStack(RegeneratorHandler.IDLE_ITEM());
+	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+		healing = false;
+		tickCount = 0;
+	}
+	@Override
+	protected void onEmpEnd() {
 	}
 }

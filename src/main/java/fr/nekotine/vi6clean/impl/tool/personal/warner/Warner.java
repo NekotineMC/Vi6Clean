@@ -125,4 +125,13 @@ public class Warner extends Tool{
 			eye_item2.remove();
 		}
 	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+	}
+	@Override
+	protected void onEmpEnd() {
+	}
 }

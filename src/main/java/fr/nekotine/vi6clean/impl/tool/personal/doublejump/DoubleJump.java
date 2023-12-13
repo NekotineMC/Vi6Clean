@@ -16,6 +16,8 @@ public class DoubleJump extends Tool{
 	
 	private boolean canDoubleJump;
 	
+	private boolean emp;
+	
 	private double power = Ioc.resolve(Configuration.class).getDouble("tool.double_jump.power", 0.5d);
 	
 	@Override
@@ -37,6 +39,9 @@ public class DoubleJump extends Tool{
 	}
 	
 	public void doubleJump() {
+		if (emp) {
+			return;
+		}
 		var player = getOwner();
 		var loc = player.getLocation();
 		player.setVelocity(player.getVelocity().setY(power));
@@ -48,5 +53,16 @@ public class DoubleJump extends Tool{
 		var player = getOwner();
 		return (!player.isFlying()
 				&& player.getLocation().subtract(0.0D, 0.1D, 0.0D).getBlock().getType().isSolid());
+	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+		emp = true;
+	}
+	@Override
+	protected void onEmpEnd() {
+		emp = false;
 	}
 }

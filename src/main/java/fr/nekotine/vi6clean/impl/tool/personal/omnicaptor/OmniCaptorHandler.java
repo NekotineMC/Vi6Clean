@@ -87,7 +87,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			var as = tool.getPlaced();
 			if (as == null) {
@@ -107,12 +106,12 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 				if (inRange.contains(p)) {
 					inRange.remove(p);
 				}else {
-					flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
+					tool.removeEffect(p);
 					ite.remove();
 				}
 			}
 			for (var p : inRange) {
-				flagModule.addFlag(p, OmniCaptedStatusFlag.get());
+				tool.applyEffect(p);
 				oldInRange.add(p);
 				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				var own = tool.getOwner();

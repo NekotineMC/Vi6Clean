@@ -27,12 +27,14 @@ import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
@@ -92,12 +94,20 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 				.filter(t -> t.getOwner() != null)
 				.map(Tool::getOwner)
 				.filter(p -> {
+					var flagModule = Ioc.resolve(StatusFlagModule.class);
+					return !flagModule.hasAny(p, EmpStatusFlag.get());
+				})
+				.filter(p -> {
 					var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
 					return w.isPresent() && w.get().getTeam() == Vi6Team.GUARD;
 				}).collect(Collectors.toCollection(LinkedList::new));
 		var thiefOwners = getTools().stream()
 				.filter(t -> t.getOwner() != null)
 				.map(Tool::getOwner)
+				.filter(p -> {
+					var flagModule = Ioc.resolve(StatusFlagModule.class);
+					return !flagModule.hasAny(p, EmpStatusFlag.get());
+				})
 				.filter(p -> {
 					var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
 					return w.isPresent() && w.get().getTeam() == Vi6Team.THIEF;

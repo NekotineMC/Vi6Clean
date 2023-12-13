@@ -17,6 +17,7 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
@@ -26,6 +27,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -39,7 +41,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
-	private static final StatusEffect glowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
+	protected static final StatusEffect glowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
 	
 	public static final int DETECTION_BLOCK_RANGE = 3;
 	
@@ -92,6 +94,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			if (tool.getOwner() == null) {
 				continue;
@@ -127,13 +130,15 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 				}
 			}
 			for (var p : inRange) {
-				statusEffectModule.addEffect(p, glowEffect);
-				oldInRange.add(p);
-				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				var own = tool.getOwner();
-				if (own != null) {
-					Vi6Sound.OMNICAPTEUR_DETECT.play(own);
+				if(own == null || !statusFlagModule.hasAny(own, EmpStatusFlag.get())) {
+					statusEffectModule.addEffect(p, glowEffect);
+					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
+					if (own != null) {
+						Vi6Sound.OMNICAPTEUR_DETECT.play(own);
+					}
 				}
+				oldInRange.add(p);
 			}
 		}
 		if (evt.timeStampReached(TickTimeStamp.QuartSecond)){

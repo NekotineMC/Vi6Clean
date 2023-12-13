@@ -16,6 +16,10 @@ public abstract class Tool {
 	
 	protected abstract void cleanup();
 	
+	protected abstract void onEmpStart();
+	
+	protected abstract void onEmpEnd();
+	
 	public final ItemStack getItemStack() {
 		if (itemStack == null) {
 			itemStack = makeInitialItemStack();

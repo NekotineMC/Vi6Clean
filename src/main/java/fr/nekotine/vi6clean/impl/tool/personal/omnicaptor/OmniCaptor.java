@@ -16,10 +16,13 @@ import org.bukkit.inventory.ItemStack;
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.OmniCaptedStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -28,6 +31,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class OmniCaptor extends Tool{
 
+	private boolean emp;
+	
+	private StatusEffect omniCaptedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
+	
 	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.REPEATER)
 			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
 			.lore(OmniCaptorHandler.LORE)
@@ -148,6 +155,19 @@ public class OmniCaptor extends Tool{
 			setItemStack(DISPONIBLE_ITEM);
 		}
 	}
+	
+	public void applyEffect(Player player) {
+		if (emp) {
+			return;
+		}
+		var effectModule = Ioc.resolve(StatusEffectModule.class);
+		effectModule.addEffect(player, omniCaptedEffect);
+	}
+	
+	public void removeEffect(Player player) {
+		var effectModule = Ioc.resolve(StatusEffectModule.class);
+		effectModule.removeEffect(player, omniCaptedEffect);
+	}
 
 	@Override
 	protected void cleanup() {
@@ -166,5 +186,19 @@ public class OmniCaptor extends Tool{
 
 	public Stream<Player> getEnemyTeam() {
 		return enemyTeam.get();
+	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+		for (var i : ennemiesInRange) {
+			removeEffect(i);
+		}
+		emp = true;
+	}
+	@Override
+	protected void onEmpEnd() {
+		emp = true;
 	}
 }

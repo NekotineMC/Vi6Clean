@@ -13,8 +13,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
@@ -54,6 +56,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 		if (!evt.hasChangedBlock()) {
 			return;
 		}
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
 			var vibrationTarget = tool.getVibrationTargetEntity();
@@ -65,7 +68,10 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 			if (evt.getPlayer().equals(owner)) {
 				vibrationTarget.teleport(owner);
 			}
-			if (!ownerloc.getWorld().equals(destloc.getWorld()) || evt.getPlayer().equals(owner) || evt.getTo().distanceSquared(owner.getLocation()) > DETECTION_RANGE_SQUARED) {
+			if (!ownerloc.getWorld().equals(destloc.getWorld()) ||
+					evt.getPlayer().equals(owner) ||
+					evt.getTo().distanceSquared(owner.getLocation()) > DETECTION_RANGE_SQUARED ||
+					flagModule.hasAny(owner, EmpStatusFlag.get())) {
 				continue;
 			}
 			var vibration = new Vibration(new Vibration.Destination.EntityDestination(vibrationTarget), 20);

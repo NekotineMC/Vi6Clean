@@ -32,6 +32,8 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -300,5 +302,25 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	public boolean isActive() {
 		return active;
+	}
+	
+	@EventHandler
+	public void onEntityEmpStart(EntityEmpStartEvent evt) {
+		if(!(evt.getEntity() instanceof Player player)) 
+			return;
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty()) 
+			return;
+		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpStart());
+	}
+	
+	@EventHandler
+	public void onEntityEmpEnd(EntityEmpEndEvent evt) {
+		if(!(evt.getEntity() instanceof Player player)) 
+			return;
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty()) 
+			return;
+		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpEnd());
 	}
 }

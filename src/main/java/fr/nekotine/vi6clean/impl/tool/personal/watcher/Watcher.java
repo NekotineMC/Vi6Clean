@@ -12,9 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -126,5 +129,26 @@ public class Watcher extends Tool{
 				Vi6ToolLoreText.WATCHER.make()));
 		}
 		
+	}
+	
+	//
+
+	@Override
+	protected void onEmpStart() {
+		var statusModule = Ioc.resolve(StatusEffectModule.class);
+		for(Player p : ennemiesInRange) {
+			statusModule.removeEffect(p, WatcherHandler.glowEffect);
+		}
+	}
+	@Override
+	protected void onEmpEnd() {
+		var statusModule = Ioc.resolve(StatusEffectModule.class);
+		for(Player p : ennemiesInRange) {
+			statusModule.addEffect(p, WatcherHandler.glowEffect);
+			Vi6Sound.OMNICAPTEUR_DETECT.play(p);
+		}
+		if(ennemiesInRange.size() > 0) {
+			Vi6Sound.OMNICAPTEUR_DETECT.play(getOwner());
+		}
 	}
 }

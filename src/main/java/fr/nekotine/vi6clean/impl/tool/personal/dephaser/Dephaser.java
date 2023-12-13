@@ -14,6 +14,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Dephaser extends Tool{
+	
+	private boolean emp;
+	
+	private boolean inv;
+	
 	private static final StatusEffect effect = new StatusEffect(DarkenedStatusEffectType.get(), DephaserHandler.INVISIBILITY_DURATION_TICKS);
 	
 	//
@@ -27,6 +32,8 @@ public class Dephaser extends Tool{
 	}
 	@Override
 	protected void cleanup() {
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		statusEffectModule.removeEffect(getOwner(), effect);
 	}
 
 	//
@@ -41,12 +48,32 @@ public class Dephaser extends Tool{
 		Vi6Sound.DEPHASER_WARNING_HIGH.play(getOwner());
 	}
 	protected void activate() {
+		if (emp) {
+			return;
+		}
 		Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
 		Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.INVISIBILITY_DURATION_TICKS);
+		inv = true;
 	}
 	protected void deactivate() {
 		Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.DELAY_BETWEEN_INVISIBILITY_TICKS - DephaserHandler.INVISIBILITY_DURATION_TICKS);
+		inv = false;
+	}
+
+	//
+
+	@Override
+	protected void onEmpStart() {
+		deactivate();
+		if (inv) {
+			deactivate();
+		}
+		emp = true;
+	}
+	@Override
+	protected void onEmpEnd() {
+		emp = false;
 	}
 }
