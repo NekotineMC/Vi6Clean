@@ -46,14 +46,6 @@ public class WarnerHandler extends ToolHandler<Warner>{
 		.flags(ItemFlag.values())
 		.build();
 	}
-	protected static final ItemStack PLACED(String artefactName) {
-		return new ItemStackBuilder(Material.ENDER_PEARL)
-		.name(Component.text("Avertisseur",NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text(artefactName, NamedTextColor.AQUA)))
-		.lore(WarnerHandler.LORE)
-		.unstackable()
-		.flags(ItemFlag.values())
-		.build();
-	}
 	protected static Component BUILD_WARN_MESSAGE(String artefactName) {
 		return Ioc.resolve(TextModule.class).message(Leaf.builder()
 				.addStyle(Placeholder.unparsed("name", artefactName))

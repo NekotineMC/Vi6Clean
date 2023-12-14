@@ -50,9 +50,8 @@ public class Warner extends Tool{
 		eye_item2.setTransformation(getTransform(n + 4));
 		
 		Vi6Sound.WARNER_POSE.play(watchedLocation.getWorld(), watchedLocation);
-		
-		setItemStack(WarnerHandler.PLACED(watched.getName()));
-		
+				
+		handler.detachFromOwner(this);
 		placed = true;
 		return true;
 	}

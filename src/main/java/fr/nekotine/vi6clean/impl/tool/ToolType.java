@@ -22,6 +22,7 @@ import fr.nekotine.vi6clean.impl.tool.personal.lantern.LanternHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.omnicaptor.OmniCaptorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic.ParabolicMicHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.radar.RadarHandler;
+import fr.nekotine.vi6clean.impl.tool.personal.recall.RecallHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.regenerator.RegeneratorHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.scanner.ScannerHandler;
 import fr.nekotine.vi6clean.impl.tool.personal.shadow.ShadowHandler;
@@ -94,7 +95,7 @@ public enum ToolType {
 			ItemStackUtil.make(Material.ENDER_EYE, Component.text("Avertisseur", NamedTextColor.GOLD), WarnerHandler.LORE),
 			WarnerHandler::new,
 			150,		// PRICE
-			-1
+			-1			// LIMIT
 			),
 	REGENERATOR (
 			ItemStackUtil.make(Material.CAMPFIRE, Component.text("Régénérateur", NamedTextColor.GOLD), RegeneratorHandler.LORE),
@@ -136,7 +137,13 @@ public enum ToolType {
 			ItemStackUtil.make(Material.BEACON, Component.text("IEM", NamedTextColor.GOLD), EmpHandler.LORE),
 			EmpHandler::new,
 			150,		// PRICE
-			-1
+			-1			// LIMIT
+			),
+	RECALL(
+			ItemStackUtil.make(Material.CHORUS_FRUIT, Component.text("Retour", NamedTextColor.GOLD), RecallHandler.LORE),
+			RecallHandler::new,
+			150,		// PRICE
+			1			// LIMIT
 			)
 	;
 	
