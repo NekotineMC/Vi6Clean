@@ -53,6 +53,11 @@ public class RadarHandler extends ToolHandler<Radar>{
 			.lore(RadarHandler.LORE)
 			.build();
 	protected static final ItemStack PLACED = ItemStackUtil.addEnchant(UNPLACED.clone(), Enchantment.QUICK_CHARGE, 1);
+	protected static final ItemStack EMPED = new ItemStackBuilder(Material.SCULK_SENSOR)
+			.unstackable()
+			.name(Component.text("Radar", NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé", NamedTextColor.RED))))
+			.lore(RadarHandler.LORE)
+			.build();
 	protected static final LinkedList<Triplet<Double, Double, Double>> BALL = new LinkedList<Triplet<Double, Double, Double>>();
 	protected static final LinkedList<Triplet<Double, Double, Double>> SPHERE = new LinkedList<Triplet<Double, Double, Double>>();
 	protected static final Transformation TOP_TRANSFORMATION = new Transformation(

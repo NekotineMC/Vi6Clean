@@ -1,16 +1,11 @@
 package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class DoubleJump extends Tool{
 	
@@ -22,7 +17,7 @@ public class DoubleJump extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make());
+		return DoubleJumpHandler.ITEM;
 	}
 	
 	@Override
@@ -59,10 +54,12 @@ public class DoubleJump extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		setItemStack(DoubleJumpHandler.EMP_ITEM);
 		emp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
+		setItemStack(DoubleJumpHandler.ITEM);
 		emp = false;
 	}
 }

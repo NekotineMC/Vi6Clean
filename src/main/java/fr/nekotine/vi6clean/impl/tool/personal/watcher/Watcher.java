@@ -31,6 +31,8 @@ public class Watcher extends Tool{
 	
 	private Collection<Player> ennemiesInRange = new LinkedList<>();
 	
+	private boolean isEmp = false;
+	
 	private static final ItemStack NOWATCHER_ITEMSTACK = ItemStackUtil.make(Material.ENDERMITE_SPAWN_EGG, 1,
 			Component.text("Observateur", NamedTextColor.GOLD), Vi6ToolLoreText.WATCHER.make());
 	
@@ -124,7 +126,8 @@ public class Watcher extends Tool{
 		if (nbAvailable <= 0) {
 			setItemStack(NOWATCHER_ITEMSTACK);
 		}else {
-			setItemStack(ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG,nbAvailable,
+			var mat = isEmp ? Material.EVOKER_SPAWN_EGG : Material.SILVERFISH_SPAWN_EGG;
+			setItemStack(ItemStackUtil.make(mat,nbAvailable,
 				Component.text("Observateur",NamedTextColor.GOLD),
 				Vi6ToolLoreText.WATCHER.make()));
 		}
@@ -135,13 +138,16 @@ public class Watcher extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		isEmp = true;
 		var statusModule = Ioc.resolve(StatusEffectModule.class);
 		for(Player p : ennemiesInRange) {
 			statusModule.removeEffect(p, WatcherHandler.glowEffect);
 		}
+		itemUpdate();
 	}
 	@Override
 	protected void onEmpEnd() {
+		isEmp = false;
 		var statusModule = Ioc.resolve(StatusEffectModule.class);
 		for(Player p : ennemiesInRange) {
 			statusModule.addEffect(p, WatcherHandler.glowEffect);
@@ -150,5 +156,6 @@ public class Watcher extends Tool{
 		if(ennemiesInRange.size() > 0) {
 			Vi6Sound.OMNICAPTEUR_DETECT.play(getOwner());
 		}
+		itemUpdate();
 	}
 }

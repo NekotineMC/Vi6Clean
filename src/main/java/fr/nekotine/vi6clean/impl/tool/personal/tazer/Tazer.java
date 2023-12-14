@@ -1,7 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.tazer;
 
 import org.bukkit.FluidCollisionMode;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -11,15 +10,12 @@ import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.EntityUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Tazer extends Tool{
 	
@@ -31,7 +27,7 @@ public class Tazer extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.SHEARS, Component.text("Tazer", NamedTextColor.GOLD), TazerHandler.LORE);
+		return TazerHandler.ITEM;
 	}
 	
 	@Override
@@ -91,8 +87,10 @@ public class Tazer extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		setItemStack(TazerHandler.EMP_ITEM);
 	}
 	@Override
 	protected void onEmpEnd() {
+		setItemStack(TazerHandler.EMP_ITEM);
 	}
 }
