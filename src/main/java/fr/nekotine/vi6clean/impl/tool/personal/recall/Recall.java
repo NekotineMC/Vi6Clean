@@ -5,19 +5,16 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
 public class Recall extends Tool{
 	private boolean isPlaced = false;
+	private boolean isEmp = false;
 	private Location placedLocation;
 	private Location particleLocation;
 	private int n = 0;
 	public boolean use() {
-		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
-		if(statusFlagModule.hasAny(getOwner(), EmpStatusFlag.get())) {
+		if(isEmp) {
 			return false;
 		}
 		if(isPlaced) {
@@ -72,8 +69,10 @@ public class Recall extends Tool{
 			recall();
 			updateItem();
 		}
+		isEmp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
+		isEmp = false;
 	}
 }
