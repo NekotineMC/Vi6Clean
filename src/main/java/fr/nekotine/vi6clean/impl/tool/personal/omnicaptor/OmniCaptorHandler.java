@@ -14,7 +14,6 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
-import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
