@@ -1,0 +1,8 @@
+display_name: Lanterne
+price: 200
+amount_limit: 1
+shop_icon: LANTERN
+maxlantern: 2
+lore:
+   - <lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes
+   - <lore>que vos alliés peuvent prendre pour se téléporter à vous.

@@ -1,0 +1,10 @@
+display_name: Omnicapteur
+price: 250
+amount_limit: 2
+shop_icon: REDSTONE_TORCH
+range: 3
+lore:
+   - <lore>Pose un capteur qui affiche
+   - <lore>en <variable><statusname></variable> les ennemis
+   - <lore>à moins de <variable><range></variable>.
+   - <lore>Peut être récupéré et déplacé.

@@ -1,0 +1,9 @@
+display_name: Double saut
+price: 300
+amount_limit: 1
+shop_icon: GOLDEN_BOOTS
+power: 0.5 # vitesse en block/s
+lore:
+   - <lore>permet de sauter une fois
+   - <lore> en l'air, en appuyant
+   - <lore>deux fois sur <important><key:key.jump></important>

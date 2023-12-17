@@ -1,0 +1,11 @@
+display_name: Radar
+price: 200
+amount_limit: 1
+shop_icon: DAYLIGHT_DETECTOR
+delay: 5
+range: 20
+cooldown: 20
+lore:
+   - <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
+   - <lore>indique le nombre de voleurs dans un rayon de <variable><range> blocs</variable>.
+   - <lore>Temps de recharge: <variable><cooldown>s</variable

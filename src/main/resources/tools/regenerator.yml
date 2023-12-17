@@ -1,0 +1,9 @@
+display_name: Régénérateur
+price: 150
+amount_limit: -1
+shop_icon: CAMPFIRE
+delay_before_regen: 5
+delay_between_heal: 1
+heal_amount: 1
+lore:
+   - <lore>Régénerez-vous après <variable><delay_before_regen>s</variable> sans prendre de dégâts

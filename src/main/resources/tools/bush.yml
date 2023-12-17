@@ -1,0 +1,9 @@
+display_name: Buisson furtif
+price: 350
+amount_limit: 1
+shop_icon: OAK_LEAVES
+fadeoff: 30 # delai en tick
+reveal_range: 2.0 # distance en block
+lore:
+   - <lore>Vous rend invisible dans les buissons
+   - <lore>et un court instant après en être sorti.

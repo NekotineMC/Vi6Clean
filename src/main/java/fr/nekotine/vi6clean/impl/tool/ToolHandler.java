@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.IntStream;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +24,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 
+import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
 import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.ioc.Ioc;
@@ -74,19 +77,28 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	protected final List<Component> lore;
 	
 	private boolean active;
+	
+	private Configuration configuration;
 
 	public ToolHandler(Supplier<T> toolSupplier) {
 		this.toolSupplier = toolSupplier;
 		var an = getClass().getDeclaredAnnotation(ToolCode.class);
 		code = an.value();
-		var config = Ioc.resolve(Configuration.class).getConfigurationSection("tool."+code);
+		// load configuration
+		try {
+			configuration = ConfigurationUtil.updateAndLoadYaml("tools/"+code+".yml", "tools/"+code+".yml");
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration de l'outil "+code, e);
+			configuration = new YamlConfiguration();
+		}
+		Ioc.resolve(Configuration.class).getConfigurationSection("tool."+code);
 		// Lore construction
 		var loreTagResolvers = new LinkedList<TagResolver>();
-		for (var key : config.getKeys(false)) {
-			var value = config.get(key,key);
+		for (var key : configuration.getKeys(false)) {
+			var value = configuration.get(key,key);
 			loreTagResolvers.add(Placeholder.unparsed(key, value.toString()));
 		}
-		var serializedLore = config.getStringList("lore");
+		var serializedLore = configuration.getStringList("lore");
 		lore = Ioc.resolve(TextModule.class).message(
 			Leaf.builder()
 				.addLine(serializedLore.toArray(String[]::new))
@@ -94,14 +106,14 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 				.addStyle(loreTagResolvers.toArray(TagResolver[]::new))
 			).build();
 		// Values
-		limite = config.getInt("amount_limit", -1);
-		price = config.getInt("price", 9999);
+		limite = configuration.getInt("amount_limit", -1);
+		price = configuration.getInt("price", 9999);
 		displayName = Ioc.resolve(TextModule.class).message(
 			Leaf.builder()
-				.addLine(config.getString("display_name", "Unnamed"))
+				.addLine(configuration.getString("display_name", "Unnamed"))
 			).buildFirst();
 		// Shop item
-		iconMaterial = Material.getMaterial(config.getString("shop_icon", Material.BARRIER.name()));
+		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
 		var shopLore = new LinkedList<Component>(lore);
 		shopLore.add(Component.empty());
 		shopLore.add(Component.text("Prix: "+price,NamedTextColor.GOLD));
@@ -127,6 +139,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		active = false;
 	}
 
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+	
 	public final void removeAll() {
 		for (var tool : tools) {
 			try {
