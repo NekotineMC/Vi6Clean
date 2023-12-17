@@ -1,8 +1,8 @@
-display_name: Buisson furtif
-price: 350
+display_name: Micro parabolique
+price: 600
 amount_limit: 1
-shop_icon: OAK_LEAVES
+shop_icon: CALIBRATED_SCULK_SENSOR
 range: 20.0 # distance en block
 lore:
-   - <lore>Vous rend invisible dans les buissons
-   - <lore>et un court instant après en être sorti.
+   - <lore>Vous permet d'entendre les enemis qui bouge
+   - <lore>jusqu'a <variable><range></variable>.

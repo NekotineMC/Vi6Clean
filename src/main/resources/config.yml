@@ -2,8 +2,3 @@ update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clea
 
 majordom:
    delay: 40 # Delai en tick
-
-tool:
-   parabolic_mic:
-      range: 20.0 # distance en block
-   
