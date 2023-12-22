@@ -69,7 +69,7 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	protected static final float DISPLAY_DISTANCE = 0.8f;
 	protected static final float DISPLAY_SCALE = 1.4f;
 	protected static final String WARN_MESSAGE = "<gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été volé !</red>";
-	protected final Vi6Map map;
+	protected Vi6Map map;
 	
 	//
 	
@@ -82,7 +82,6 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	public WarnerHandler() {
 		super(Warner::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		map = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
 	}
 	
 	//
@@ -94,6 +93,11 @@ public class WarnerHandler extends ToolHandler<Warner>{
 			 (art.getBlockPosition().toLocation(pLoc.getWorld()).distanceSquared(pLoc) <= PLACE_RANGE_SQUARED) && 
 			 (watchedArticats.noneMatch(watched -> watched!=null && watched.equals(art)))
 		).findFirst();
+	}
+	
+	@Override
+	protected void onStartHandling() {
+		map = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
 	}
 	
 	//

@@ -1,6 +1,7 @@
 package fr.nekotine.vi6clean.impl.tool;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -13,7 +14,7 @@ public class ToolHandlerContainer {
 
 	private Logger logger = new NekotineLogger(getClass());
 	
-	private Collection<ToolHandler<?>> toolHandlers;
+	private Collection<ToolHandler<?>> toolHandlers = new LinkedList<>();
 	
 	public void discoverHandlers() {
 		for (var tool : toolHandlers) {
@@ -25,15 +26,15 @@ public class ToolHandlerContainer {
 		logger.info("Découverte et ajout des tools: ");
 		try {
 			for (var tool : ReflexionUtil.streamClassesFromPackage("fr.nekotine.vi6clean.impl.tool")
-					.filter(c -> Tool.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class)).collect(Collectors.toSet())) {
+					.filter(c -> ToolHandler.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class)).collect(Collectors.toSet())) {
 				var ctor = tool.getConstructor();
 				var handler = (ToolHandler<?>)ctor.newInstance();
 				toolHandlers.add(handler);
-				Ioc.resolve(tool);
+				Ioc.getProvider().registerSingleton(handler);
 				logger.info(String.format("Type: %s",tool.getSimpleName()));
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Une erreur est survenue lors de l'ajout des class Tool au registre", e);
+			logger.log(Level.SEVERE, "Une erreur est survenue lors de l'ajout des class ToolHandler au registre", e);
 		}
 	}
 	

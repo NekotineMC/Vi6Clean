@@ -59,25 +59,25 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private final Supplier<T> toolSupplier;
 
 	private final Collection<T> tools = new LinkedList<>();
-	
+
 	private final Random random = new Random();
-	
+
 	private String code;
-	
+
 	private final MenuElement shopItem;
-	
+
 	private Material iconMaterial;
-	
+
 	private final Component displayName;
-	
+
 	private final int price;
-	
+
 	private final int limite;
-	
+
 	protected final List<Component> lore;
-	
+
 	private boolean active;
-	
+
 	private Configuration configuration;
 
 	public ToolHandler(Supplier<T> toolSupplier) {
@@ -86,37 +86,33 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		code = an.value();
 		// load configuration
 		try {
-			configuration = ConfigurationUtil.updateAndLoadYaml("tools/"+code+".yml", "tools/"+code+".yml");
+			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + code + ".yml", "/tools/" + code + ".yml");
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration de l'outil "+code, e);
+			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration de l'outil " + code, e);
 			configuration = new YamlConfiguration();
 		}
-		Ioc.resolve(Configuration.class).getConfigurationSection("tool."+code);
 		// Lore construction
 		var loreTagResolvers = new LinkedList<TagResolver>();
 		for (var key : configuration.getKeys(false)) {
-			var value = configuration.get(key,key);
+			if (key.equalsIgnoreCase("lore")) {
+				continue;
+			}
+			var value = configuration.get(key, key);
 			loreTagResolvers.add(Placeholder.unparsed(key, value.toString()));
 		}
 		var serializedLore = configuration.getStringList("lore");
-		lore = Ioc.resolve(TextModule.class).message(
-			Leaf.builder()
-				.addLine(serializedLore.toArray(String[]::new))
-				.addStyle(Vi6Styles.TOOL_LORE)
-				.addStyle(loreTagResolvers.toArray(TagResolver[]::new))
-			).build();
+		lore = Ioc.resolve(TextModule.class).message(Leaf.builder().addLine(serializedLore.toArray(String[]::new))
+				.addStyle(Vi6Styles.TOOL_LORE).addStyle(loreTagResolvers.toArray(TagResolver[]::new))).build();
 		// Values
 		limite = configuration.getInt("amount_limit", -1);
 		price = configuration.getInt("price", 9999);
-		displayName = Ioc.resolve(TextModule.class).message(
-			Leaf.builder()
-				.addLine(configuration.getString("display_name", "Unnamed"))
-			).buildFirst();
+		displayName = Ioc.resolve(TextModule.class)
+				.message(Leaf.builder().addLine(configuration.getString("display_name", "Unnamed"))).buildFirst();
 		// Shop item
 		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
 		var shopLore = new LinkedList<Component>(lore);
 		shopLore.add(Component.empty());
-		shopLore.add(Component.text("Prix: "+price,NamedTextColor.GOLD));
+		shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
 		var menuItem = ItemStackUtil.make(iconMaterial, displayName, shopLore.toArray(Component[]::new));
 		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 	}
@@ -142,18 +138,18 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
+
 	public final void removeAll() {
 		for (var tool : tools) {
 			try {
 				detachFromOwner(tool);
-			}catch(Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil "+code, e);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil " + code, e);
 			}
 			try {
 				tool.cleanup();
-			}catch(Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil "+code, e);
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil " + code, e);
 			}
 		}
 		tools.clear();
@@ -185,7 +181,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	 * @return If tool could be attached.
 	 */
 	public final boolean attachToPlayer(T tool, Player player) {
-		if (limite >=0 && limite <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
+		if (limite >= 0 && limite <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
 			return false;
 		}
 		tool.setOwner(player);
@@ -208,10 +204,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		tool.cleanup();
 		tools.remove(tool);
 	}
-	
+
 	protected void onStartHandling() {
 	}
-	
+
 	protected void onStopHandling() {
 	}
 
@@ -222,15 +218,15 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public Collection<T> getTools() {
 		return tools;
 	}
-	
+
 	public MenuElement getShopMenuItem() {
 		return shopItem;
 	}
-	
-	public List<Component> getLore(){
+
+	public List<Component> getLore() {
 		return lore;
 	}
-	
+
 	/**
 	 * 
 	 * @param player
@@ -240,7 +236,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getWhoClicked() instanceof Player player)) {
 			return false;
 		}
-		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player,
+				PreparationPhasePlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return false;
 		}
@@ -254,8 +251,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent evt) {
-		var optionalTool = tools.stream()
-				.filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
+		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
 				.findFirst();
 		if (optionalTool.isEmpty()) {
 			return;
@@ -280,7 +276,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent evt) {
 		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction.PICKUP_HALF) {
@@ -290,7 +286,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
 			return;
 		}
-		var match = tools.stream().filter(t -> t.getItemStack().isSimilar(evt.getCurrentItem()) && t.getOwner() == evt.getWhoClicked()).findFirst();
+		var match = tools.stream()
+				.filter(t -> t.getItemStack().isSimilar(evt.getCurrentItem()) && t.getOwner() == evt.getWhoClicked())
+				.findFirst();
 		if (match.isEmpty()) {
 			return;
 		}
@@ -298,7 +296,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		remove(match.get());
 		wrap.setMoney(wrap.getMoney() + price);
 	}
-	
+
 	@EventHandler
 	public void onPlayerArmorChange(PlayerArmorChangeEvent evt) {
 		var match = tools.stream().filter(t -> t.getItemStack().equals(evt.getNewItem())).findFirst();
@@ -307,15 +305,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		}
 		var player = evt.getPlayer();
 		var storage = player.getInventory().getStorageContents();
-		var emptySlots = IntStream
-			.range(0, storage.length)
-			.filter(i -> storage[i] == null)
-			.mapToObj(i -> i)
-			.toArray();
-		if(emptySlots.length == 0) {
+		var emptySlots = IntStream.range(0, storage.length).filter(i -> storage[i] == null).mapToObj(i -> i).toArray();
+		if (emptySlots.length == 0) {
 			return;
 		}
-		var slot = (int)emptySlots[random.nextInt(0, emptySlots.length)];
+		var slot = (int) emptySlots[random.nextInt(0, emptySlots.length)];
 		player.getEquipment().setItem(EquipmentSlot.valueOf(evt.getSlotType().name()), evt.getOldItem(), true);
 		player.getInventory().setItem(slot, evt.getNewItem());
 	}
@@ -323,23 +317,23 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public boolean isActive() {
 		return active;
 	}
-	
+
 	@EventHandler
 	public void onEntityEmpStart(EntityEmpStartEvent evt) {
-		if(!(evt.getEntity() instanceof Player player)) 
+		if (!(evt.getEntity() instanceof Player player))
 			return;
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty()) 
+		if (optWrap.isEmpty())
 			return;
 		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpStart());
 	}
-	
+
 	@EventHandler
 	public void onEntityEmpEnd(EntityEmpEndEvent evt) {
-		if(!(evt.getEntity() instanceof Player player)) 
+		if (!(evt.getEntity() instanceof Player player))
 			return;
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty()) 
+		if (optWrap.isEmpty())
 			return;
 		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpEnd());
 	}
