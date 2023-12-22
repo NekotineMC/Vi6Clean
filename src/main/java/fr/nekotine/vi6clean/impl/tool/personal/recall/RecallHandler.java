@@ -11,7 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.track.EntityTrackModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
@@ -46,6 +49,7 @@ public class RecallHandler extends ToolHandler<Recall>{
 	);
 	public RecallHandler() {
 		super(ToolType.RECALL, Recall::new);
+		Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
 	}
 
 	@Override
