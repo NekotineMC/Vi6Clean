@@ -6,3 +6,5 @@ maxlantern: 2
 lore:
    - <lore>Permet de poser jusqu'à <variable><maxlantern></variable> lanternes
    - <lore>que vos alliés peuvent prendre pour se téléporter à vous.
+team:
+   - guard

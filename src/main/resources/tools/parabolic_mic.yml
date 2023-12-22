@@ -6,3 +6,5 @@ range: 20.0 # distance en block
 lore:
    - <lore>Vous permet d'entendre les enemis qui bouge
    - <lore>jusqu'a <variable><range></variable>.
+team:
+   - thief

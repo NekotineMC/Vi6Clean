@@ -7,3 +7,5 @@ lore:
    - <lore>Taze les ennemis en ligne de mire.
    - <lore>Utilisez <important><key:key.attack></important> pour tirer.
    - <lore>Temps de recharge: <variable><cooldown>s</variable>
+team:
+   - guard

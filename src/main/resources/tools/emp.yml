@@ -4,3 +4,5 @@ amount_limit: -1
 shop_icon: BEACON
 lore:
    - <lore>Désactive pendant <variable><duration></variable> les objets ennemis
+team:
+   - thief

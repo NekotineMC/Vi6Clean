@@ -7,3 +7,5 @@ lore:
    - <lore>permet de sauter une fois
    - <lore> en l'air, en appuyant
    - <lore>deux fois sur <important><key:key.jump></important>
+team:
+   - thief

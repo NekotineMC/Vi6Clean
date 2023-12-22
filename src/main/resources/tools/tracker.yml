@@ -6,3 +6,5 @@ ray_distance: 100
 lore:
    - <lore>Tire un projectile à grande vitesse.
    - <lore>Obtenez une boussole qui pointe vers l'ennemi touché.
+team:
+   - thief

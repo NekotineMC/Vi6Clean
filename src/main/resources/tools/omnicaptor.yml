@@ -8,3 +8,5 @@ lore:
    - <lore>en <variable><statusname></variable> les ennemis
    - <lore>à moins de <variable><range></variable>.
    - <lore>Peut être récupéré et déplacé.
+team:
+   - guard

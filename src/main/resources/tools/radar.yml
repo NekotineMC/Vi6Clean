@@ -7,5 +7,7 @@ range: 20
 cooldown: 20
 lore:
    - <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
-   - <lore>indique le nombre de voleurs dans un rayon de <variable><range> blocs</variable>.
+   - <lore>indique le nombre d'enemis dans un rayon de <variable><range> blocs</variable>.
    - <lore>Temps de recharge: <variable><cooldown>s</variable
+team:
+   - guard

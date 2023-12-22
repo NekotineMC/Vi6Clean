@@ -7,3 +7,5 @@ delay_between_heal: 1
 heal_amount: 1
 lore:
    - <lore>Régénerez-vous après <variable><delay_before_regen>s</variable> sans prendre de dégâts
+team:
+   - thief

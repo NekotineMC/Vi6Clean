@@ -8,3 +8,5 @@ lore:
    - <lore>Détecte un ennemi à
    - <lore>moins de <variable><range> blocs</variable>
    - <lore>toutes les <variable><delay>s</variable>.
+team:
+   - guard

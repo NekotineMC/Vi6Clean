@@ -5,3 +5,5 @@ shop_icon: WITHER_SKELETON_SKULL
 lore:
    - <lore>Placer une ombre pour revenir plus tard,
    - <lore>ou mourrez si un garde la trouve!
+team:
+   - thief

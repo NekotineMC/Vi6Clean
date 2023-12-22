@@ -7,3 +7,5 @@ inv_duration: 2
 lore:
    - <lore>Toutes les <variable><inv_delay>s</variable>,
    - <lore>gagnez <variable><inv_duration>s</variable> d'invisibilité.
+team:
+   - thief

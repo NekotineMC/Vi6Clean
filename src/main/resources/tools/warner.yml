@@ -7,3 +7,5 @@ place_range: 8
 lore:
    - <lore>S'attache à un artéfact et avertit lorsqu'il est volé.
    - <lore>Délai du message: <variable><delay>s</variable>
+team:
+   - guard
