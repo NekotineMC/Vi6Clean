@@ -1,0 +1,10 @@
+display_name: Retour
+price: 150
+amount_limit: 1
+shop_icon: CHORUS_FRUIT
+teleport_delay: 120
+lore:
+   - <lore>Vous téléporte au même endroit après <variable><delay></variable>
+   
+team:
+   - thief

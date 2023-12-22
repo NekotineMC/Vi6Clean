@@ -18,12 +18,13 @@ import fr.nekotine.core.track.EntityTrackModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("recall")
 public class RecallHandler extends ToolHandler<Recall>{
 	protected static final int TELEPORT_DELAY_TICKS = 20*6;
 	protected static final int PARTICLE_NUMBER = 2;
@@ -48,7 +49,7 @@ public class RecallHandler extends ToolHandler<Recall>{
 			Placeholder.parsed("duration", (TELEPORT_DELAY_TICKS/20)+"s")
 	);
 	public RecallHandler() {
-		super(ToolType.RECALL, Recall::new);
+		super(Recall::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
 	}
 

@@ -56,13 +56,12 @@ public class Recall extends Tool{
 		}
 	}
 	private void recall() {
-		var trackModule = Ioc.resolve(EntityTrackModule.class);
-		var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-		opt.get().ennemiTeam().forEach(p -> trackModule.trackEntityFor(getOwner(), p));
-		
 		n = 0;
 		isPlaced = false;
 		getOwner().teleport(placedLocation);
+		var trackModule = Ioc.resolve(EntityTrackModule.class);
+		var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
+		opt.get().ennemiTeam().forEach(p -> trackModule.trackEntityFor(getOwner(), p));
 		updateItem();
 	}
 	
