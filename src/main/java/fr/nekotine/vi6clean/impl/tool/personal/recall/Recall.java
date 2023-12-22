@@ -5,7 +5,11 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.track.EntityTrackModule;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Recall extends Tool{
 	private boolean isPlaced = false;
@@ -20,6 +24,10 @@ public class Recall extends Tool{
 		if(isPlaced) {
 			recall();
 		}else {
+			var trackModule = Ioc.resolve(EntityTrackModule.class);
+			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
+			opt.get().ennemiTeam().forEach(p -> trackModule.untrackEntityFor(getOwner(), p));
+			
 			isPlaced = true;
 			placedLocation = getOwner().getLocation();
 			particleLocation = placedLocation.clone().subtract(0, 0.1, 0);
@@ -48,6 +56,10 @@ public class Recall extends Tool{
 		}
 	}
 	private void recall() {
+		var trackModule = Ioc.resolve(EntityTrackModule.class);
+		var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
+		opt.get().ennemiTeam().forEach(p -> trackModule.trackEntityFor(getOwner(), p));
+		
 		n = 0;
 		isPlaced = false;
 		getOwner().teleport(placedLocation);
