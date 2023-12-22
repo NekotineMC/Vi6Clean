@@ -181,10 +181,11 @@ public class Radar extends Tool{
 			
 			cleanup();
 			placed = false;
-			updateItem();
 		}
+		setItemStack(RadarHandler.EMPED);
 	}
 	@Override
 	protected void onEmpEnd() {
+		updateItem();
 	}
 }

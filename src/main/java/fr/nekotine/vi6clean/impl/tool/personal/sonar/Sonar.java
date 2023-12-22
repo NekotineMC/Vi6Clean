@@ -1,26 +1,22 @@
 package fr.nekotine.vi6clean.impl.tool.personal.sonar;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Sonar extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.TARGET, Component.text("Sonar", NamedTextColor.GOLD), SonarHandler.LORE);
+		return SonarHandler.ITEM;
 	}
 
 	public void pulse() {
@@ -64,8 +60,10 @@ public class Sonar extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		setItemStack(SonarHandler.EMP_ITEM);
 	}
 	@Override
 	protected void onEmpEnd() {
+		setItemStack(SonarHandler.ITEM);
 	}
 }

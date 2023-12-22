@@ -41,6 +41,14 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 		.flags(ItemFlag.values())
 		.build();
 	}
+	protected static final ItemStack EMP_ITEM() {
+		return new ItemStackBuilder(Material.RECOVERY_COMPASS)
+				.name(Component.text("Traceur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé",NamedTextColor.RED))))
+				.lore(Vi6ToolLoreText.TRACKER.make())
+				.unstackable()
+				.flags(ItemFlag.values())
+				.build();
+	}
 	protected static final ItemStack COMPASS_ITEM(Player owner, Location hitLoc) {
 		var distance = owner.getLocation().distance(hitLoc);
 		Component name = Ioc.resolve(TextModule.class).message(Leaf.builder()

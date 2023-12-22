@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +37,8 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.map.koth.EmpKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.Koth;
+import fr.nekotine.vi6clean.impl.map.koth.KothEffect;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -102,7 +106,20 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				e.setCancelled(true);
 			}
 		}.register();
-		map.getKoths().backingMap().values().stream().forEach(koth -> koth.setup(new EmpKothEffect(),world));
+		
+		var random = new Random();
+		
+		List<KothEffect> kothEffects = new ArrayList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
+		List<Koth> koths = new ArrayList<>(map.getKoths().backingMap().values());
+		while(kothEffects.size() > 0 && koths.size() > 0) {
+			var indexEffect = random.nextInt(0, kothEffects.size());
+			var indexKoth = random.nextInt(0, koths.size());
+			var effect = kothEffects.get(indexEffect);
+			var koth = koths.get(indexKoth);
+			koth.setup(effect, world);
+			kothEffects.remove(indexEffect);
+			koths.remove(indexKoth);
+		}
 	}
 
 	@Override

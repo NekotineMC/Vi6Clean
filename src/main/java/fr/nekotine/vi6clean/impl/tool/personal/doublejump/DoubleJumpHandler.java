@@ -1,16 +1,22 @@
 package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
+import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 
 @ToolCode("double_jump")
 public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
+	protected static final ItemStack ITEM = ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make());
+	protected static final ItemStack EMP_ITEM = ItemStackUtil.make(Material.CHAINMAIL_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), Vi6ToolLoreText.DOUBLEJUMP.make());
 
 	public DoubleJumpHandler() {
 		super(DoubleJump::new);
