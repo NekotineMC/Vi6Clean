@@ -1,5 +1,8 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -34,13 +37,24 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
+		if (wrapped==null) {
+			return;
+		}
+		try {
+			throw new Exception("PrepWrapper="+wrapped);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
 		var readyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
 		var wrapLayout = new WrapMenuLayout();
-		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()){
+		var team =  Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class).getTeam();
+		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
+				.filter(t -> t.getTeamsAvailableFor().contains(team))
+				.collect(Collectors.toCollection(ArrayList::new))){
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
 		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);

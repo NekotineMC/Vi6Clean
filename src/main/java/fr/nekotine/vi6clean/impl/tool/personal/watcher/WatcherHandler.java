@@ -75,7 +75,6 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		System.out.println("ACTION = "+evt.getAction());
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryDropWatcher()) {
 			evt.setCancelled(true);
 		}

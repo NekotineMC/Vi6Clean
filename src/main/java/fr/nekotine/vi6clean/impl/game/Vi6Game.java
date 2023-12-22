@@ -114,6 +114,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	}
 	
 	public ObservableCollection<Player> getPlayerList(){
+		try {
+			throw new Exception("PLAYERLIST="+players.size());
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 		return players;
 	}
 	

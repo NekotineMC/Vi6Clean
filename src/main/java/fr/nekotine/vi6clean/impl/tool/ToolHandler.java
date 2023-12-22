@@ -2,9 +2,11 @@ package fr.nekotine.vi6clean.impl.tool;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +37,7 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
@@ -79,6 +82,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private boolean active;
 
 	private Configuration configuration;
+	
+	private final Set<Vi6Team> forTeams = new HashSet<>(2);
 
 	public ToolHandler(Supplier<T> toolSupplier) {
 		this.toolSupplier = toolSupplier;
@@ -115,6 +120,13 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
 		var menuItem = ItemStackUtil.make(iconMaterial, displayName, shopLore.toArray(Component[]::new));
 		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
+		var teams = configuration.getStringList("team");
+		if (teams.stream().anyMatch(s -> s.equalsIgnoreCase("guard"))) {
+			forTeams.add(Vi6Team.GUARD);
+		}
+		if (teams.stream().anyMatch(s -> s.equalsIgnoreCase("thief"))) {
+			forTeams.add(Vi6Team.THIEF);
+		}
 	}
 
 	public final void startHandling() {
@@ -227,6 +239,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		return lore;
 	}
 
+	public Set<Vi6Team> getTeamsAvailableFor(){
+		return forTeams;
+	}
+	
 	/**
 	 * 
 	 * @param player
