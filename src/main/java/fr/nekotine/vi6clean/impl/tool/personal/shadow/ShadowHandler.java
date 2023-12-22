@@ -15,16 +15,17 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
+@ToolCode("shadow")
 public class ShadowHandler extends ToolHandler<Shadow>{
 
 	public static final double SHADOW_KILL_RANGE_BLOCK = 1;
 	
 	public ShadowHandler() {
-		super(ToolType.OMNICAPTOR, Shadow::new);
+		super(Shadow::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	

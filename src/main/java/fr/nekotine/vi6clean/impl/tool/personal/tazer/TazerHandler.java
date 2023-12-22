@@ -12,11 +12,12 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.flag.TazedStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("tazer")
 public class TazerHandler extends ToolHandler<Tazer>{
 
 	public static final int COOLDOWN_TICK = 200;
@@ -27,7 +28,7 @@ public class TazerHandler extends ToolHandler<Tazer>{
 	);
 	
 	public TazerHandler() {
-		super(ToolType.TAZER, Tazer::new);
+		super(Tazer::new);
 	}
 	
 	@Override

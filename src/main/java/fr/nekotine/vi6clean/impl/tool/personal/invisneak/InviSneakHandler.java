@@ -18,17 +18,18 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("invisneak")
 public class InviSneakHandler extends ToolHandler<InviSneak>{
 
 	public InviSneakHandler() {
-		super(ToolType.INVISNEAK, InviSneak::new);
+		super(InviSneak::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	

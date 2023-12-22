@@ -11,15 +11,16 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("sonar")
 public class SonarHandler extends ToolHandler<Sonar>{
 
 	public SonarHandler() {
-		super(ToolType.SONAR, Sonar::new);
+		super(Sonar::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	

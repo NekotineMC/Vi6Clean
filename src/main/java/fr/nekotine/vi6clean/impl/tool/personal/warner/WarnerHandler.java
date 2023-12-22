@@ -31,12 +31,13 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("warner")
 public class WarnerHandler extends ToolHandler<Warner>{
 	protected static final ItemStack UNPLACED() {
 		return new ItemStackBuilder(Material.ENDER_EYE)
@@ -79,7 +80,7 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	//
 	
 	public WarnerHandler() {
-		super(ToolType.WARNER, Warner::new);
+		super(Warner::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		map = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
 	}

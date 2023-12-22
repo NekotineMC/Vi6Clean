@@ -10,11 +10,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("emp")
 public class EmpHandler extends ToolHandler<Emp>{
 	protected static final int EMP_DURATION_TICKS = 100;
 	public static final List<Component> LORE = Vi6ToolLoreText.EMP.make(
@@ -23,7 +24,7 @@ public class EmpHandler extends ToolHandler<Emp>{
 	//
 	
 	public EmpHandler() {
-		super(ToolType.EMP, Emp::new);
+		super(Emp::new);
 	}
 	@Override
 	protected void onAttachedToPlayer(Emp tool, Player player) {

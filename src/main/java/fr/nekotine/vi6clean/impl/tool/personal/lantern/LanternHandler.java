@@ -15,12 +15,13 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("lantern")
 public class LanternHandler extends ToolHandler<Lantern>{
 
 	public static final int MAX_LANTERN = 2;
@@ -32,7 +33,7 @@ public class LanternHandler extends ToolHandler<Lantern>{
 			);
 	
 	public LanternHandler() {
-		super(ToolType.LANTERN, Lantern::new);
+		super(Lantern::new);
 	}
 	
 	@Override

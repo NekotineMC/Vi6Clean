@@ -227,6 +227,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		return shopItem;
 	}
 	
+	public List<Component> getLore(){
+		return lore;
+	}
+	
 	/**
 	 * 
 	 * @param player

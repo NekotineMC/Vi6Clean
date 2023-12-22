@@ -16,7 +16,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
+import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -40,7 +40,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
 		var wrapLayout = new WrapMenuLayout();
-		for (var tool : ToolType.values()){
+		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()){
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
 		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);

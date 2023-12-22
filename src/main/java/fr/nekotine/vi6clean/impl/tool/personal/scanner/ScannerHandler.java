@@ -36,13 +36,14 @@ import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.util.Tick;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("scanner")
 public class ScannerHandler extends ToolHandler<Scanner>{
 	
 	private static final Duration scanDelay = Duration.ofSeconds(30); // normal = 30s reduced = 10s
@@ -55,7 +56,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 	private @NotNull BukkitTask task;
 	
 	public ScannerHandler() {
-		super(ToolType.SCANNER, Scanner::new);
+		super(Scanner::new);
 	}
 	@Override
 	protected void onAttachedToPlayer(Scanner tool, Player player) {

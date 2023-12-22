@@ -15,12 +15,13 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("regenerator")
 public class RegeneratorHandler extends ToolHandler<Regenerator>{
 	protected final static int DELAY_BEFORE_REGENERATING_TICKS = 100;
 	protected final static int DELAY_BETWEEN_HEALING_TICKS = 20;
@@ -49,7 +50,7 @@ public class RegeneratorHandler extends ToolHandler<Regenerator>{
 	//
 	
 	public RegeneratorHandler() {
-		super(ToolType.REGENERATOR, Regenerator::new);
+		super(Regenerator::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	@Override

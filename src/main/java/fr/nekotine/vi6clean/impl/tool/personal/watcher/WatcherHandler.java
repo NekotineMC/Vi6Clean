@@ -28,16 +28,17 @@ import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("watcher")
 public class WatcherHandler extends ToolHandler<Watcher>{
 
 	public WatcherHandler() {
-		super(ToolType.WATCHER, Watcher::new);
+		super(Watcher::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	

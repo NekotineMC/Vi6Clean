@@ -19,7 +19,7 @@ public class Dephaser extends Tool{
 	
 	private boolean inv;
 	
-	private static final StatusEffect effect = new StatusEffect(DarkenedStatusEffectType.get(), DephaserHandler.INVISIBILITY_DURATION_TICKS);
+	private final StatusEffect effect = new StatusEffect(DarkenedStatusEffectType.get(), Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
 	
 	//
 	
@@ -28,7 +28,7 @@ public class Dephaser extends Tool{
 		return ItemStackUtil.make(
 				Material.IRON_NUGGET,
 				Component.text("Déphasage",NamedTextColor.GOLD),
-				DephaserHandler.LORE);
+				Ioc.resolve(DephaserHandler.class).getLore());
 	}
 	@Override
 	protected void cleanup() {
@@ -51,14 +51,16 @@ public class Dephaser extends Tool{
 		if (emp) {
 			return;
 		}
+		
 		Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
 		Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
-		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.INVISIBILITY_DURATION_TICKS);
+		getOwner().setCooldown(Material.IRON_NUGGET,Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
 		inv = true;
 	}
 	protected void deactivate() {
+		var handler = Ioc.resolve(DephaserHandler.class);
 		Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
-		getOwner().setCooldown(Material.IRON_NUGGET, DephaserHandler.DELAY_BETWEEN_INVISIBILITY_TICKS - DephaserHandler.INVISIBILITY_DURATION_TICKS);
+		getOwner().setCooldown(Material.IRON_NUGGET, handler.getDelayBetweenInvisibilityTick() - handler.getInvisibilityDurationTick());
 		inv = false;
 	}
 

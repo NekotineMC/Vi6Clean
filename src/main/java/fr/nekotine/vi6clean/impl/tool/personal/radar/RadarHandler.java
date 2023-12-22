@@ -32,12 +32,13 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("radar")
 public class RadarHandler extends ToolHandler<Radar>{
 	protected static final String DETECTION_SUCCESS = "<gold>Radar>></gold> <aqua><number></aqua> <green>ennemis détéctés à proximité !</green>";
 	protected static final String DETECTION_FAIL = "<gold>Radar>></gold> <aqua>0</aqua> <red>ennemis détéctés à proximité !</red>";
@@ -73,7 +74,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	//
 	
 	public RadarHandler() {
-		super(ToolType.RADAR, Radar::new);
+		super(Radar::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {

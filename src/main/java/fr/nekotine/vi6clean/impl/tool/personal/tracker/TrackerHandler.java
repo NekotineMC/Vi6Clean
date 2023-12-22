@@ -22,12 +22,13 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.ToolType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
+@ToolCode("tracker")
 public class TrackerHandler extends ToolHandler<Tracker>{
 	//private static final int REFRESH_DELAY_SECOND = 2;
 	protected static final double RAY_DISTANCE = 100;
@@ -63,7 +64,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	}
 	//private int n = 0;
 	public TrackerHandler() {
-		super(ToolType.TRACKER, Tracker::new);
+		super(Tracker::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	@Override
