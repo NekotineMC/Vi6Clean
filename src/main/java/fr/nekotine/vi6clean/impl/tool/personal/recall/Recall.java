@@ -6,7 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.track.EntityTrackModule;
+import fr.nekotine.core.track.ClientTrackModule;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
 public class Recall extends Tool{
@@ -22,7 +22,7 @@ public class Recall extends Tool{
 		if(isPlaced) {
 			recall();
 		}else {
-			var trackModule = Ioc.resolve(EntityTrackModule.class);
+			var trackModule = Ioc.resolve(ClientTrackModule.class);
 			trackModule.untrack(getOwner());
 			
 			isPlaced = true;
@@ -55,7 +55,7 @@ public class Recall extends Tool{
 	private void recall() {
 		n = 0;
 		isPlaced = false;
-		var trackModule = Ioc.resolve(EntityTrackModule.class);
+		var trackModule = Ioc.resolve(ClientTrackModule.class);
 		trackModule.track(getOwner());
 		getOwner().teleport(placedLocation);
 		updateItem();
