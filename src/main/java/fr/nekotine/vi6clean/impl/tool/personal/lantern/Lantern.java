@@ -32,12 +32,14 @@ public class Lantern extends Tool{
 	
 	private List<BlockDisplay> displayedLanterns = new LinkedList<>();
 	
-	private static final ItemStack NOLANTERN_ITEMSTACK = ItemStackUtil.make(Material.CHAIN, 1,
-			Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make());
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.LANTERN, LanternHandler.MAX_LANTERN-displayedLanterns.size(), Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make());
+		return ItemStackUtil.make(
+				Material.LANTERN, 
+				Ioc.resolve(LanternHandler.class).getMaxLantern()-displayedLanterns.size(), 
+				Component.text("Lantern", NamedTextColor.GOLD), 
+				Vi6ToolLoreText.LANTERN.make());
 	}
 	
 	@Override
@@ -51,19 +53,20 @@ public class Lantern extends Tool{
 	}
 	
 	public void updateItemStack() {
-		var amount = LanternHandler.MAX_LANTERN-displayedLanterns.size();
+		var handler = Ioc.resolve(LanternHandler.class);
+		var amount = handler.getMaxLantern()-displayedLanterns.size();
 		if (amount <= 0) {
-			setItemStack(NOLANTERN_ITEMSTACK);
+			setItemStack(handler.getNoLanternItemstack());
 		}else {
 			setItemStack(
-					ItemStackUtil.make(Material.LANTERN, LanternHandler.MAX_LANTERN-displayedLanterns.size(),
+					ItemStackUtil.make(Material.LANTERN, handler.getMaxLantern()-displayedLanterns.size(),
 							Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make()));
 		}
 	}
 	
 	public boolean tryPlace() {
 		var owner = getOwner();
-		if (displayedLanterns.size() >= LanternHandler.MAX_LANTERN || fallingArmorStand != null || owner == null) {
+		if (displayedLanterns.size() >= Ioc.resolve(LanternHandler.class).getMaxLantern() || fallingArmorStand != null || owner == null) {
 			return false;
 		}
 		if (fallingArmorStand != null) {
@@ -101,10 +104,11 @@ public class Lantern extends Tool{
 			return;
 		}
 		var ite = displayedLanterns.iterator();
+		var range = Ioc.resolve(LanternHandler.class).getSquaredPickupBlockRange();
 		while (ite.hasNext()) {
 			var lantern = ite.next();
 			var lanternLoc = lantern.getLocation();
-			if (picking.getLocation().distanceSquared(lanternLoc) <= LanternHandler.SQUARED_PICKUP_BLOCK_RANGE) {
+			if (picking.getLocation().distanceSquared(lanternLoc) <= range) {
 				var w = lanternLoc.getWorld();
 				Vi6Sound.LANTERNE_PRE_TELEPORT.play(w, lanternLoc);
 				if (!owner.equals(picking)) {

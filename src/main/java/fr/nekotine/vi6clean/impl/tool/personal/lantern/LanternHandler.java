@@ -1,37 +1,35 @@
 package fr.nekotine.vi6clean.impl.tool.personal.lantern;
 
-import java.util.List;
-
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("lantern")
 public class LanternHandler extends ToolHandler<Lantern>{
+	private final ItemStack NO_LANTERN_ITEMSTACK = ItemStackUtil.make(
+			Material.CHAIN, 1,
+			Component.text("Lantern", NamedTextColor.GOLD), 
+			getLore());
+	private final int MAX_LANTERN = getConfiguration().getInt("max_lantern",2);	
+	private final double SQUARED_PICKUP_BLOCK_RANGE = getConfiguration().getDouble("squared_pickup_range", 2.25);
 
-	public static final int MAX_LANTERN = 2;
-	
-	public static final double SQUARED_PICKUP_BLOCK_RANGE = 2.25;
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.LANTERN.make(
-			Placeholder.unparsed("maxlantern", Integer.toString(MAX_LANTERN))
-			);
-	
 	public LanternHandler() {
 		super(Lantern::new);
 	}
@@ -80,4 +78,13 @@ public class LanternHandler extends ToolHandler<Lantern>{
 		}
 	}
 	
+	public ItemStack getNoLanternItemstack() {
+		return NO_LANTERN_ITEMSTACK;
+	}
+	public int getMaxLantern() {
+		return MAX_LANTERN;
+	}
+	public double getSquaredPickupBlockRange() {
+		return SQUARED_PICKUP_BLOCK_RANGE;
+	}
 }
