@@ -1,11 +1,15 @@
 package fr.nekotine.vi6clean.impl.tool.personal.shadow;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickTimeStamp;
@@ -18,11 +22,31 @@ import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("shadow")
 public class ShadowHandler extends ToolHandler<Shadow>{
-
-	public static final double SHADOW_KILL_RANGE_BLOCK = 1;
+	private final double SHADOW_KILL_RANGE_BLOCK = getConfiguration().getDouble("kill_range",1);
+	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.WITHER_SKELETON_SKULL)
+			.name(Component.text("Ombre - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
+	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.SKELETON_SKULL)
+			.name(Component.text("Ombre - ",NamedTextColor.GOLD).append(Component.text("Placée", NamedTextColor.GRAY)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
+	private ItemStack EMP_ITEM = new ItemStackBuilder(Material.PLAYER_HEAD)
+			.name(Component.text("Ombre - ",NamedTextColor.GOLD).append(Component.text("Brouillée", NamedTextColor.RED)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWM3NzcyYzdjZGNkZGI2Yjc5ZDU1MjVmOWRjZWJjNzQ4YWFiZGFlMzhkOWUzOGVlYTdmZTc4YTUwMWRlNmVkZSJ9fX0=")
+			.build();
 	
 	public ShadowHandler() {
 		super(Shadow::new);
@@ -87,4 +111,16 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 		}
 	}
 	
+	public double getShadowKillRangeBlock() {
+		return SHADOW_KILL_RANGE_BLOCK;
+	}
+	public ItemStack getDisponibleItem() {
+		return DISPONIBLE_ITEM;
+	}
+	public ItemStack getPlacedItem() {
+		return PLACED_ITEM;
+	}
+	public ItemStack getEmpItem() {
+		return EMP_ITEM;
+	}
 }
