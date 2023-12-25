@@ -14,9 +14,10 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 public class DephaserHandler extends ToolHandler<Dephaser>{
 	
 	private final int DELAY_BETWEEN_INVISIBILITY_TICKS=
-			20 * getConfiguration().getInt("inv_delay", 20);
+			(int)(20 * getConfiguration().getDouble("inv_delay", 20));
 	
-	private final int INVISIBILITY_DURATION_TICKS = 20*getConfiguration().getInt("inv_duration", 2);
+	private final int INVISIBILITY_DURATION_TICKS = 
+			(int)(20*getConfiguration().getDouble("inv_duration", 2));
 	
 	private final int DELAY_BETWEEN_WARNING_SOUND=10;
 
