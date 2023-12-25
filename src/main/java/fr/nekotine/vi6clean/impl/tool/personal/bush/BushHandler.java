@@ -2,7 +2,6 @@ package fr.nekotine.vi6clean.impl.tool.personal.bush;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,7 +29,9 @@ public class BushHandler extends ToolHandler<Bush>{
 			Material.PEONY, Material.TALL_GRASS, Material.LARGE_FERN,Material.LILAC, Material.ROSE_BUSH, Material.SMALL_DRIPLEAF, Material.KELP
 			);
 	
-	private final double DETECTION_BLOCK_RANGE = Ioc.resolve(Configuration.class).getDouble("tool.bush.reveal_range", 2);
+	private final int FADE_OFF_DELAY = getConfiguration().getInt("fadeoff", 30);
+	
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("reveal_range", 2);
 	
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	
@@ -58,6 +59,10 @@ public class BushHandler extends ToolHandler<Bush>{
 				tool.setRevealed(wrap.get().ennemiTeamInMap().anyMatch(e -> e.getLocation().distanceSquared(ploc) <= DETECTION_RANGE_SQUARED));
 			}
 		}
+	}
+	
+	public int getFadeOffDelay() {
+		return FADE_OFF_DELAY;
 	}
 	
 }

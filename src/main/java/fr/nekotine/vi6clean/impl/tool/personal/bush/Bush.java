@@ -1,7 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.bush;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -27,7 +26,7 @@ public class Bush extends Tool{
 	
 	private BukkitTask fadeOffTask;
 	
-	private final int fadeOffDelay = Ioc.resolve(Configuration.class).getInt("tool.bush.fadeoff", 30);
+	private final int fadeOffDelay = Ioc.resolve(BushHandler.class).getFadeOffDelay();
 	
 	private final StatusEffect unlimitedInvisibility = new StatusEffect( InvisibleStatusEffectType.get(), -1);
 	
