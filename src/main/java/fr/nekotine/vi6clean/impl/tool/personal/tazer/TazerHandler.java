@@ -1,7 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.tazer;
 
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,29 +12,24 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
-import fr.nekotine.vi6clean.impl.status.flag.TazedStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("tazer")
 public class TazerHandler extends ToolHandler<Tazer>{
-	protected static final ItemStack EMP_ITEM = new ItemStackBuilder(Material.IRON_INGOT)
+	private final ItemStack EMP_ITEM = new ItemStackBuilder(
+			Material.IRON_INGOT)
 			.name(Component.text("Tazer", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)))
-			.lore(TazerHandler.LORE)
+			.lore(getLore())
 			.build();
-	
-	protected static final ItemStack ITEM = ItemStackUtil.make(Material.SHEARS, Component.text("Tazer", NamedTextColor.GOLD), TazerHandler.LORE);
-	
-	public static final int COOLDOWN_TICK = 200;
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.TAZER.make(
-		Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes"),
-		Placeholder.parsed("statusname", TazedStatusFlag.getStatusName())
-	);
+	private final ItemStack ITEM = ItemStackUtil.make(
+			Material.SHEARS, 
+			Component.text("Tazer", NamedTextColor.GOLD), 
+			getLore());
+	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown", 10));
+
 	
 	public TazerHandler() {
 		super(Tazer::new);
@@ -70,6 +63,16 @@ public class TazerHandler extends ToolHandler<Tazer>{
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().shot()) {
 			evt.setCancelled(true);
 		}
+	}
+	
+	public ItemStack getItem() {
+		return ITEM;
+	}
+	public ItemStack getEmpItem() {
+		return EMP_ITEM;
+	}
+	public int getCooldownTick() {
+		return COOLDOWN_TICK;
 	}
 	
 }

@@ -2,7 +2,7 @@ display_name: Tazer
 price: 300
 amount_limit: 1
 shop_icon: SHEARS
-cooldown: 10
+cooldown: 10.0 #délai de réécupération en secondes
 lore:
    - <lore>Taze les ennemis en ligne de mire.
    - <lore>Utilisez <important><key:key.attack></important> pour tirer.

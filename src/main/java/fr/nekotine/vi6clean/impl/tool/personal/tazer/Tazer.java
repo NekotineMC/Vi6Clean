@@ -27,7 +27,7 @@ public class Tazer extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return TazerHandler.ITEM;
+		return Ioc.resolve(TazerHandler.class).getItem();
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ public class Tazer extends Tool{
 		SpatialUtil.line3DFromDir(eyeLoc.toVector(), eyeLoc.getDirection(), range, 4,
 				(vec) -> world.spawnParticle(Particle.FIREWORKS_SPARK, vec.getX(), vec.getY(), vec.getZ(), 0,
 						0, 0, 0, 0f));
-		cooldown = TazerHandler.COOLDOWN_TICK;
+		cooldown = Ioc.resolve(TazerHandler.class).getCooldownTick();
 		player.setCooldown(getItemStack().getType(), cooldown);
 		return true;
 	}
@@ -87,10 +87,10 @@ public class Tazer extends Tool{
 
 	@Override
 	protected void onEmpStart() {
-		setItemStack(TazerHandler.EMP_ITEM);
+		setItemStack(Ioc.resolve(TazerHandler.class).getEmpItem());
 	}
 	@Override
 	protected void onEmpEnd() {
-		setItemStack(TazerHandler.EMP_ITEM);
+		setItemStack(Ioc.resolve(TazerHandler.class).getItem());
 	}
 }
