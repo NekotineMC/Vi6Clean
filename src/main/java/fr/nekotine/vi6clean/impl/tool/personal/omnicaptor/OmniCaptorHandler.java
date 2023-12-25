@@ -2,16 +2,19 @@ package fr.nekotine.vi6clean.impl.tool.personal.omnicaptor;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Collectors;
 
+import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickTimeStamp;
@@ -20,30 +23,39 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
-import fr.nekotine.vi6clean.impl.status.flag.OmniCaptedStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("omnicaptor")
 public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
-
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",3);
+	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
+	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.REPEATER)
+			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
+	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.LEVER)
+			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Placé", NamedTextColor.GRAY)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
+	private final ItemStack TRIGGERED_ITEM = new ItemStackBuilder(Material.REDSTONE_TORCH)
+			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Activé", NamedTextColor.RED)))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
+	
 	public OmniCaptorHandler() {
 		super(OmniCaptor::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
-	
-	public static final int DETECTION_BLOCK_RANGE = 3;
-	
-	public static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.OMNICAPTOR.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
-			Placeholder.parsed("statusname", OmniCaptedStatusFlag.getStatusName())
-			);
-	
+
 	@Override
 	protected void onAttachedToPlayer(OmniCaptor tool, Player player) {
 		tool.setSneaking(false);
@@ -123,4 +135,16 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 		}
 	}
 	
+	public double getDetectionBlockRange() {
+		return DETECTION_BLOCK_RANGE;
+	}
+	public ItemStack getDisponibleItem() {
+		return DISPONIBLE_ITEM;
+	}
+	public ItemStack getPlacedItem() {
+		return PLACED_ITEM;
+	}
+	public ItemStack getTriggeredItem() {
+		return TRIGGERED_ITEM;
+	}
 }

@@ -2,7 +2,7 @@ display_name: Omnicapteur
 price: 250
 amount_limit: 2
 shop_icon: REDSTONE_TORCH
-range: 3
+range: 3.0 #portée de détection en blocs
 lore:
    - <lore>Pose un capteur qui affiche
    - <lore>en <variable><statusname></variable> les ennemis

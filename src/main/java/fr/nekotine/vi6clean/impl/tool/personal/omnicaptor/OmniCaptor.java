@@ -10,11 +10,9 @@ import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.glow.EntityGlowModule;
-import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
@@ -26,8 +24,6 @@ import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.OmniCaptedStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class OmniCaptor extends Tool{
 
@@ -35,26 +31,7 @@ public class OmniCaptor extends Tool{
 	
 	private StatusEffect omniCaptedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
 	
-	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.REPEATER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
-			.lore(OmniCaptorHandler.LORE)
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
 	
-	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.LEVER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Placé", NamedTextColor.GRAY)))
-			.lore(OmniCaptorHandler.LORE)
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
-	
-	private final ItemStack TRIGGERED_ITEM = new ItemStackBuilder(Material.REDSTONE_TORCH)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Activé", NamedTextColor.RED)))
-			.lore(OmniCaptorHandler.LORE)
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
 	
 	private boolean sneaking;
 	
@@ -66,7 +43,7 @@ public class OmniCaptor extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return DISPONIBLE_ITEM;
+		return Ioc.resolve(OmniCaptorHandler.class).getDisponibleItem();
 	}
 
 	public boolean isSneaking() {
@@ -98,7 +75,7 @@ public class OmniCaptor extends Tool{
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(OmniCaptorHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			SpatialUtil.circle2DDensity(Ioc.resolve(OmniCaptorHandler.class).getDetectionBlockRange(), 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
@@ -128,7 +105,7 @@ public class OmniCaptor extends Tool{
 		var player = getOwner();
 		var ploc = player.getLocation();
 		if (placed != null) {
-			if (ploc.distanceSquared(placed.getLocation()) <= OmniCaptorHandler.DETECTION_RANGE_SQUARED) {
+			if (ploc.distanceSquared(placed.getLocation()) <= Ioc.resolve(OmniCaptorHandler.class).getDetectionBlockRange()) {
 				placed.remove();
 				placed = null;
 				Vi6Sound.OMNICAPTEUR_PICKUP.play(ploc.getWorld(),ploc);
@@ -145,14 +122,15 @@ public class OmniCaptor extends Tool{
 	}
 	
 	public void itemUpdate() {
+		var handler = Ioc.resolve(OmniCaptorHandler.class);
 		if (placed != null) {
 			if (ennemiesInRange.size() > 0) {
-				setItemStack(TRIGGERED_ITEM);
+				setItemStack(handler.getTriggeredItem());
 			}else {
-				setItemStack(PLACED_ITEM);
+				setItemStack(handler.getPlacedItem());
 			}
 		}else {
-			setItemStack(DISPONIBLE_ITEM);
+			setItemStack(handler.getDisponibleItem());
 		}
 	}
 	
