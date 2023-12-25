@@ -1,7 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.radar;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
@@ -31,7 +30,6 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
@@ -40,25 +38,25 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("radar")
 public class RadarHandler extends ToolHandler<Radar>{
-	protected static final String DETECTION_SUCCESS = "<gold>Radar>></gold> <aqua><number></aqua> <green>ennemis détéctés à proximité !</green>";
-	protected static final String DETECTION_FAIL = "<gold>Radar>></gold> <aqua>0</aqua> <red>ennemis détéctés à proximité !</red>";
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",20);
+	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
+	private final int DELAY_TICK = (int)(20*getConfiguration().getDouble("delay",5));
+	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown",20));
+	private final String DETECTION_SUCCESS = getConfiguration().getString("detection_success");
+	private final String DETECTION_FAIL = getConfiguration().getString("detection_fail");
 
-	protected static final int DETECTION_BLOCK_RANGE = 20;
-	protected static final int DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	protected static final int DELAY_SECOND = 5;
-	protected static final int COOLDOWN_TICK = 20 * 20;
-	
-	protected static final ItemStack UNPLACED = new ItemStackBuilder(Material.CALIBRATED_SCULK_SENSOR)
+	private final ItemStack UNPLACED = new ItemStackBuilder(Material.CALIBRATED_SCULK_SENSOR)
 			.unstackable()
 			.name(Component.text("Radar", NamedTextColor.GOLD))
-			.lore(RadarHandler.LORE)
+			.lore(getLore())
 			.build();
-	protected static final ItemStack PLACED = ItemStackUtil.addEnchant(UNPLACED.clone(), Enchantment.QUICK_CHARGE, 1);
-	protected static final ItemStack EMPED = new ItemStackBuilder(Material.SCULK_SENSOR)
+	private final ItemStack PLACED = ItemStackUtil.addEnchant(UNPLACED.clone(), Enchantment.QUICK_CHARGE, 1);
+	private final ItemStack EMPED = new ItemStackBuilder(Material.SCULK_SENSOR)
 			.unstackable()
 			.name(Component.text("Radar", NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé", NamedTextColor.RED))))
-			.lore(RadarHandler.LORE)
+			.lore(getLore())
 			.build();
+	
 	protected static final LinkedList<Triplet<Double, Double, Double>> BALL = new LinkedList<Triplet<Double, Double, Double>>();
 	protected static final LinkedList<Triplet<Double, Double, Double>> SPHERE = new LinkedList<Triplet<Double, Double, Double>>();
 	protected static final Transformation TOP_TRANSFORMATION = new Transformation(
@@ -70,22 +68,14 @@ public class RadarHandler extends ToolHandler<Radar>{
 	
 	//
 	
-	public static final List<Component> LORE = Vi6ToolLoreText.RADAR.make(
-			Placeholder.unparsed("range", DETECTION_BLOCK_RANGE+" blocs"),
-			Placeholder.parsed("delay", DELAY_SECOND+" secondes"),
-			Placeholder.unparsed("cooldown", ((int)COOLDOWN_TICK/20)+" secondes")
-	);
-	
-	//
-	
 	public RadarHandler() {
 		super(Radar::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		SpatialUtil.ball3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
+		SpatialUtil.ball3DDensity(DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI, 
 				(offsetX, offsetY, offsetZ) -> {
 					BALL.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
-		SpatialUtil.sphere3DDensity(RadarHandler.DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
+		SpatialUtil.sphere3DDensity(DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 				(offsetX, offsetY, offsetZ) -> {
 					SPHERE.add(Triplet.from(offsetX, offsetY, offsetZ));
 		});
@@ -146,12 +136,30 @@ public class RadarHandler extends ToolHandler<Radar>{
 	
 	//
 	
-	protected static Component DETECTION_MESSAGE(int nbDetected) {
+	public Component getDetectionMessage(int nbDetected) {
 		String message = nbDetected>0 ? DETECTION_SUCCESS : DETECTION_FAIL;
 		return Ioc.resolve(TextModule.class).message(Leaf.builder()
 				.addStyle(Placeholder.unparsed("number", String.valueOf(nbDetected)))
 				.addStyle(NekotineStyles.STANDART)
 				.addLine(message)
 				).buildFirst();
+	}
+	public double getDetectionRangeSquared() {
+		return DETECTION_RANGE_SQUARED;
+	}
+	public int getDelayTick() {
+		return DELAY_TICK;
+	}
+	public int getCooldownTick() {
+		return COOLDOWN_TICK;
+	}
+	public ItemStack getUnplaced() {
+		return UNPLACED;
+	}
+	public ItemStack getPlaced() {
+		return PLACED;
+	}
+	public ItemStack getEmped() {
+		return EMPED;
 	}
 }

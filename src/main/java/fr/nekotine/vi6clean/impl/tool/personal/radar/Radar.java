@@ -31,7 +31,7 @@ public class Radar extends Tool{
 
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return RadarHandler.UNPLACED;
+		return Ioc.resolve(RadarHandler.class).getUnplaced();
 	}
 	@Override
 	protected void cleanup() {
@@ -73,17 +73,18 @@ public class Radar extends Tool{
 		return true;
 	}
 	protected void updateItem() {
+		var handler = Ioc.resolve(RadarHandler.class);
 		if(placed) {
-			setItemStack(RadarHandler.PLACED);
+			setItemStack(handler.getPlaced());
 		}else {
-			setItemStack(RadarHandler.UNPLACED);
+			setItemStack(handler.getUnplaced());
 		}
 	}
 	protected void detect() {
 		if(placed) {
-			
+			var handler = Ioc.resolve(RadarHandler.class);
 			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= RadarHandler.DETECTION_RANGE_SQUARED).count();
+			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared()).count();
 			
 			//Son
 			if(ennemiNear > 0) {
@@ -93,7 +94,7 @@ public class Radar extends Tool{
 			}
 			
 			//Message
-			getOwner().sendMessage(RadarHandler.DETECTION_MESSAGE(ennemiNear));
+			getOwner().sendMessage(handler.getDetectionMessage(ennemiNear));
 			
 			//Particules
 			Location loc = bottom.getLocation();
@@ -108,7 +109,7 @@ public class Radar extends Tool{
 						(ennemiNear>0 ? null:new DustOptions(Color.RED, 2)));
 			});
 			
-			cooldown = RadarHandler.COOLDOWN_TICK;
+			cooldown = handler.getCooldownTick();
 			getOwner().setCooldown(getItemStack().getType(), cooldown);
 			
 			cleanup();
@@ -118,12 +119,13 @@ public class Radar extends Tool{
 	}
 	protected void tickCharge() {
 		if(placed) {
+			var handler = Ioc.resolve(RadarHandler.class);
 			if(chargeTime == 1) {
 				top.setInterpolationDelay(0);
-				top.setInterpolationDuration(RadarHandler.DELAY_SECOND * 20 - 10);
+				top.setInterpolationDuration(handler.getDelayTick() - 10);
 			    top.setTransformation(RadarHandler.TOP_TRANSFORMATION);
 			}
-			if(++chargeTime>=RadarHandler.DELAY_SECOND * 20) {
+			if(++chargeTime>=handler.getDelayTick()) {
 				detect();
 			}
 		}
@@ -175,14 +177,15 @@ public class Radar extends Tool{
 
 	@Override
 	protected void onEmpStart() {
+		var handler = Ioc.resolve(RadarHandler.class);
 		if (placed) {
-			cooldown = RadarHandler.COOLDOWN_TICK;
+			cooldown = handler.getCooldownTick();
 			getOwner().setCooldown(getItemStack().getType(), cooldown);
 			
 			cleanup();
 			placed = false;
 		}
-		setItemStack(RadarHandler.EMPED);
+		setItemStack(handler.getEmped());
 	}
 	@Override
 	protected void onEmpEnd() {
