@@ -1,7 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.recall;
 
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,37 +15,31 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.track.EntityTrackModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("recall")
 public class RecallHandler extends ToolHandler<Recall>{
-	protected static final int TELEPORT_DELAY_TICKS = 20*6;
-	protected static final int PARTICLE_NUMBER = 2;
-	protected static final ItemStack UNPLACED() {
-		return new ItemStackBuilder(Material.CHORUS_FRUIT)
+	private final int TELEPORT_DELAY_TICKS = (int)(20*getConfiguration().getDouble("teleport_delay",6));
+	private final int PARTICLE_NUMBER = getConfiguration().getInt("particle_number",2);
+	private final int COOLDOWN_TICKS = (int)(20*getConfiguration().getDouble("cooldown",1));
+	private final ItemStack UNPLACED = new ItemStackBuilder(
+		Material.CHORUS_FRUIT)
 		.name(Component.text("Retour",NamedTextColor.GOLD))
-		.lore(RecallHandler.LORE)
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
-	}
-	protected static final ItemStack PLACED() {
-		return new ItemStackBuilder(Material.POPPED_CHORUS_FRUIT)
+	private final ItemStack PLACED = new ItemStackBuilder(
+		Material.POPPED_CHORUS_FRUIT)
 		.name(Component.text("Retour",NamedTextColor.GOLD))
-		.lore(RecallHandler.LORE)
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
-	}
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.RECALL.make(
-			Placeholder.parsed("duration", (TELEPORT_DELAY_TICKS/20)+"s")
-	);
+
 	public RecallHandler() {
 		super(Recall::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
@@ -84,5 +76,20 @@ public class RecallHandler extends ToolHandler<Recall>{
 			tool.tickCooldown();
 			tool.tickParticle();
 		}
+	}
+	
+	//
+	
+	public ItemStack getPlaced() {
+		return PLACED;
+	}
+	public ItemStack getUnplaced() {
+		return UNPLACED;
+	}
+	public int getTeleportDelayTicks() {
+		return TELEPORT_DELAY_TICKS;
+	}
+	public int getParticleNumber() {
+		return PARTICLE_NUMBER;
 	}
 }

@@ -28,7 +28,7 @@ public class Recall extends Tool{
 			isPlaced = true;
 			placedLocation = getOwner().getLocation();
 			particleLocation = placedLocation.clone().subtract(0, 0.1, 0);
-			getOwner().setCooldown(Material.POPPED_CHORUS_FRUIT, RecallHandler.TELEPORT_DELAY_TICKS);
+			getOwner().setCooldown(Material.POPPED_CHORUS_FRUIT, Ioc.resolve(RecallHandler.class).getTeleportDelayTicks());
 		}
 		updateItem();
 		return true;
@@ -36,20 +36,21 @@ public class Recall extends Tool{
 	public void tickCooldown() {
 		if(!isPlaced)
 			return;
-		if(++n >= RecallHandler.TELEPORT_DELAY_TICKS) {
+		if(++n >= Ioc.resolve(RecallHandler.class).getTeleportDelayTicks()) {
 			recall();
 		}
 	}
 	public void tickParticle() {
 		if(!isPlaced)
 			return;
-		getOwner().getWorld().spawnParticle(Particle.GLOW, particleLocation, RecallHandler.PARTICLE_NUMBER, 0.1, 0, 0.1, 0);
+		getOwner().getWorld().spawnParticle(Particle.GLOW, particleLocation, Ioc.resolve(RecallHandler.class).getParticleNumber(), 0.1, 0, 0.1, 0);
 	}
 	private void updateItem() {
+		var handler = Ioc.resolve(RecallHandler.class);
 		if(isPlaced) {
-			setItemStack(RecallHandler.PLACED());
+			setItemStack(handler.getPlaced());
 		}else {
-			setItemStack(RecallHandler.UNPLACED());
+			setItemStack(handler.getUnplaced());
 		}
 	}
 	private void recall() {
@@ -65,7 +66,7 @@ public class Recall extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return RecallHandler.UNPLACED();
+		return Ioc.resolve(RecallHandler.class).getUnplaced();
 	}
 	@Override
 	protected void cleanup() {
