@@ -18,7 +18,6 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,18 +32,20 @@ public class Watcher extends Tool{
 	
 	private boolean isEmp = false;
 	
-	private static final ItemStack NOWATCHER_ITEMSTACK = ItemStackUtil.make(Material.ENDERMITE_SPAWN_EGG, 1,
-			Component.text("Observateur", NamedTextColor.GOLD), Vi6ToolLoreText.WATCHER.make());
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.SILVERFISH_SPAWN_EGG,WatcherHandler.NB_MAX_WATCHER,
+		var handler = Ioc.resolve(WatcherHandler.class);
+		return ItemStackUtil.make(
+				Material.SILVERFISH_SPAWN_EGG,
+				handler.getNbMaxWatcher(),
 				Component.text("Observateur",NamedTextColor.GOLD),
-				Vi6ToolLoreText.WATCHER.make());
+				handler.getLore());
 	}
 	
 	public void lowTick() {
-		if (watchers.size() < WatcherHandler.NB_MAX_WATCHER) {
+		var handler = Ioc.resolve(WatcherHandler.class);
+		if (watchers.size() < handler.getNbMaxWatcher()) {
 			var player = getOwner();
 			if (player == null || !isSneaking || !player.getInventory().getItemInMainHand().isSimilar(getItemStack())) {
 				return;
@@ -53,7 +54,7 @@ public class Watcher extends Tool{
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(WatcherHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
@@ -61,7 +62,7 @@ public class Watcher extends Tool{
 	}
 	
 	public boolean tryDropWatcher() {
-		if (watchers.size() >= WatcherHandler.NB_MAX_WATCHER) {
+		if (watchers.size() >= Ioc.resolve(WatcherHandler.class).getNbMaxWatcher()) {
 			return false;
 		}
 		var owner = getOwner();
@@ -85,7 +86,7 @@ public class Watcher extends Tool{
 		}
 		var ownerLoc = owner.getLocation();
 		var worked = false;
-		for (var sf : watchers.stream().filter(sf -> sf.getLocation().distanceSquared(ownerLoc) <= WatcherHandler.DETECTION_RANGE_SQUARED)
+		for (var sf : watchers.stream().filter(sf -> sf.getLocation().distanceSquared(ownerLoc) <= Ioc.resolve(WatcherHandler.class).getDetectionBlockRangeSquared())
 				.collect(Collectors.toCollection(LinkedList::new))) {
 			watchers.remove(sf);
 			sf.remove();
@@ -122,16 +123,18 @@ public class Watcher extends Tool{
 	}
 	
 	public void itemUpdate() {
-		var nbAvailable = WatcherHandler.NB_MAX_WATCHER-watchers.size();
+		var handler = Ioc.resolve(WatcherHandler.class);
+		var nbAvailable = handler.getNbMaxWatcher()-watchers.size();
 		if (nbAvailable <= 0) {
-			setItemStack(NOWATCHER_ITEMSTACK);
+			setItemStack(handler.getNoWatcherItemStack());
 		}else {
 			var mat = isEmp ? Material.EVOKER_SPAWN_EGG : Material.SILVERFISH_SPAWN_EGG;
-			setItemStack(ItemStackUtil.make(mat,nbAvailable,
-				Component.text("Observateur",NamedTextColor.GOLD),
-				Vi6ToolLoreText.WATCHER.make()));
+			setItemStack(ItemStackUtil.make(
+					mat,
+					nbAvailable,
+					Component.text("Observateur",NamedTextColor.GOLD),
+					handler.getLore()));
 		}
-		
 	}
 	
 	//
