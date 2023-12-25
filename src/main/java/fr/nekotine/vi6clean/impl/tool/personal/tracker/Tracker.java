@@ -19,15 +19,16 @@ public class Tracker extends Tool{
 	private boolean isEmp = false;
 	private Player playerHit;
 	private void setCompassItem() {
+		var handler = Ioc.resolve(TrackerHandler.class);
 		if(isEmp) {
-			setItemStack(TrackerHandler.EMP_ITEM());
+			setItemStack(handler.getEmpItem());
 		}else {
-			setItemStack(TrackerHandler.COMPASS_ITEM(getOwner(), playerHit.getLocation()));
+			setItemStack(handler.getCompassItem(getOwner(), playerHit.getLocation()));
 		}
 	}
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return TrackerHandler.GUN_ITEM();
+		return Ioc.resolve(TrackerHandler.class).getGunItem();
 	}
 	@Override
 	protected void cleanup() {

@@ -21,7 +21,6 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
@@ -33,43 +32,25 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	//private static final int REFRESH_DELAY_SECOND = 2;
 	protected static final double RAY_DISTANCE = 100;
 	protected static final int RAY_SIZE = 0;
-	protected static final ItemStack GUN_ITEM() {
-		return new ItemStackBuilder(Material.CROSSBOW)
+	private final ItemStack GUN_ITEM() {
+		return new ItemStackBuilder(
+		Material.CROSSBOW)
 		.name(Component.text("Traceur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Armé",NamedTextColor.AQUA))))
-		.lore(Vi6ToolLoreText.TRACKER.make())
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
 	}
-	protected static final ItemStack EMP_ITEM() {
-		return new ItemStackBuilder(Material.RECOVERY_COMPASS)
+	private final ItemStack EMP_ITEM() {
+		return new ItemStackBuilder(
+				Material.RECOVERY_COMPASS)
 				.name(Component.text("Traceur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé",NamedTextColor.RED))))
-				.lore(Vi6ToolLoreText.TRACKER.make())
+				.lore(getLore())
 				.unstackable()
 				.flags(ItemFlag.values())
 				.build();
 	}
-	protected static final ItemStack COMPASS_ITEM(Player owner, Location hitLoc) {
-		var distance = owner.getLocation().distance(hitLoc);
-		Component name = Ioc.resolve(TextModule.class).message(Leaf.builder()
-				.addLine("<gold>Traceur</gold> - <red>Distance: <aqua><distance>m")
-				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
-				.addStyle(NekotineStyles.STANDART)).buildFirst();	
-				
-		var item = new ItemStackBuilder(Material.COMPASS)
-		.name(name)
-		.lore(Vi6ToolLoreText.TRACKER.make())
-		.unstackable()
-		.flags(ItemFlag.values())
-		.build();
-
-		var meta = (CompassMeta)item.getItemMeta();
-		meta.setLodestoneTracked(false);
-		meta.setLodestone(hitLoc);
-		item.setItemMeta(meta);
-
-		return item;
-	}
+	
 	//private int n = 0;
 	public TrackerHandler() {
 		super(Tracker::new);
@@ -110,5 +91,33 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().shoot(this)) {
 			evt.setCancelled(true);
 		}
+	}
+	
+	public ItemStack getGunItem() {
+		return GUN_ITEM();
+	}
+	public ItemStack getEmpItem() {
+		return EMP_ITEM();
+	}
+	public final ItemStack getCompassItem(Player owner, Location hitLoc) {
+		var distance = owner.getLocation().distance(hitLoc);
+		Component name = Ioc.resolve(TextModule.class).message(Leaf.builder()
+				.addLine("<gold>Traceur</gold> - <red>Distance: <aqua><distance>m")
+				.addStyle(Placeholder.unparsed("distance", String.valueOf((int)distance)))
+				.addStyle(NekotineStyles.STANDART)).buildFirst();	
+				
+		var item = new ItemStackBuilder(Material.COMPASS)
+		.name(name)
+		.lore(getLore())
+		.unstackable()
+		.flags(ItemFlag.values())
+		.build();
+
+		var meta = (CompassMeta)item.getItemMeta();
+		meta.setLodestoneTracked(false);
+		meta.setLodestone(hitLoc);
+		item.setItemMeta(meta);
+
+		return item;
 	}
 }
