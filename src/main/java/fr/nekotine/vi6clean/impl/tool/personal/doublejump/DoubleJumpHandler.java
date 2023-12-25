@@ -19,7 +19,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	protected static final ItemStack ITEM = ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make());
 	protected static final ItemStack EMP_ITEM = ItemStackUtil.make(Material.CHAINMAIL_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), Vi6ToolLoreText.DOUBLEJUMP.make());
-
+	private final double POWER = getConfiguration().getDouble("power", 0.5);
+	
 	public DoubleJumpHandler() {
 		super(DoubleJump::new);
 	}
@@ -61,6 +62,10 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 				return;
 			}
 		}
+	}
+	
+	protected double getPower() {
+		return POWER;
 	}
 	
 }

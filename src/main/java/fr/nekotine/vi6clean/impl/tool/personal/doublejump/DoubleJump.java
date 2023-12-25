@@ -1,6 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
-import org.bukkit.configuration.Configuration;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -13,7 +12,7 @@ public class DoubleJump extends Tool{
 	
 	private boolean emp;
 	
-	private double power = Ioc.resolve(Configuration.class).getDouble("tool.double_jump.power", 0.5d);
+	private double power = Ioc.resolve(DoubleJumpHandler.class).getPower();
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
