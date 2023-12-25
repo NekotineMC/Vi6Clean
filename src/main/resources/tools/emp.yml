@@ -2,7 +2,8 @@ display_name: EMP
 price: 150
 amount_limit: -1
 shop_icon: BEACON
+duration: 5.0 #durée en secondes
 lore:
-   - <lore>Désactive pendant <variable><duration></variable> les objets ennemis
+   - <lore>Désactive pendant <variable><duration>s</variable> les objets ennemis
 team:
    - thief

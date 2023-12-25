@@ -17,13 +17,16 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Emp extends Tool{
-	private static final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), EmpHandler.EMP_DURATION_TICKS);
+	private static final StatusEffect effect = new StatusEffect(
+			EmpStatusEffectType.get(), Ioc.resolve(EmpHandler.class).getEmpDuration());
 	
 	//
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(Material.BEACON,Component.text("IEM",NamedTextColor.GOLD), EmpHandler.LORE);
+		return ItemStackUtil.make(
+				Material.BEACON,Component.text("IEM",NamedTextColor.GOLD), 
+				Ioc.resolve(EmpHandler.class).getLore());
 	}
 	@Override
 	protected void cleanup() {
