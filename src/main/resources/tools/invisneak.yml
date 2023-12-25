@@ -3,7 +3,7 @@ price: 400
 amount_limit: 1
 shop_icon: GLASS_PANE
 statusname: Invisible
-range: 3
+range: 3.0
 lore:
    - <lore>Vous rend <variable><statusname></variable>
    - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak/>).</important>

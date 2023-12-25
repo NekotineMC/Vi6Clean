@@ -28,7 +28,7 @@ public class InviSneak extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return InviSneakHandler.VISIBLE_ITEM;
+		return Ioc.resolve(InviSneakHandler.class).getVisibleItem();
 	}
 
 	public boolean isSneaking() {
@@ -65,15 +65,16 @@ public class InviSneak extends Tool{
 		var y = loc.getZ();
 		var x = loc.getX();
 		var z = loc.getZ();
+		var range = Ioc.resolve(InviSneakHandler.class).getDetectionBlockRange();
 		if (revealed) {
 			var world = Ioc.resolve(Vi6Game.class).getWorld();
 			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
-			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			SpatialUtil.circle2DDensity(range, 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.FALLING_DUST, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
 					});
 		}else {
-			SpatialUtil.circle2DDensity(InviSneakHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			SpatialUtil.circle2DDensity(range, 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
@@ -84,14 +85,14 @@ public class InviSneak extends Tool{
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		if (sneaking) {
 			if (revealed) {
-				setItemStack(InviSneakHandler.REVEALED_ITEM);
+				setItemStack(Ioc.resolve(InviSneakHandler.class).getRevealedItem());
 				statusEffectModule.removeEffect(getOwner(), invisibleEffect);
 			}else {
-				setItemStack(InviSneakHandler.INVISIBLE_ITEM);
+				setItemStack(Ioc.resolve(InviSneakHandler.class).getInvisibleItem());
 				statusEffectModule.addEffect(getOwner(), invisibleEffect);
 			}
 		}else {
-			setItemStack(InviSneakHandler.VISIBLE_ITEM);
+			setItemStack(Ioc.resolve(InviSneakHandler.class).getVisibleItem());
 			statusEffectModule.removeEffect(getOwner(), invisibleEffect);
 		}
 	}
