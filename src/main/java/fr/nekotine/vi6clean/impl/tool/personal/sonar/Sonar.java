@@ -16,7 +16,7 @@ public class Sonar extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return SonarHandler.ITEM;
+		return Ioc.resolve(SonarHandler.class).getItem();
 	}
 
 	public void pulse() {
@@ -36,20 +36,21 @@ public class Sonar extends Tool{
 		var x = loc.getX();
 		var y = loc.getY() + 0.1;
 		var z = loc.getZ();
-		if (opt.get().ennemiTeamInMap().anyMatch(e -> player.getLocation().distanceSquared(e.getLocation()) <= SonarHandler.DETECTION_RANGE_SQUARED)) {
+		var handler = Ioc.resolve(SonarHandler.class);
+		if (opt.get().ennemiTeamInMap().anyMatch(e -> player.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionBlockRangeSquared())) {
 			Vi6Sound.SONAR_POSITIVE.play(player.getLocation().getWorld(), player.getLocation());
-			SpatialUtil.circle2DDensity(SonarHandler.DETECTION_BLOCK_RANGE, 5, 0,
+			SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.CRIT, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 			return;
 		}
 		Vi6Sound.SONAR_NEGATIVE.play(player);
-		SpatialUtil.circle2DDensity(SonarHandler.DETECTION_BLOCK_RANGE, 5, 0,
+		SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 5, 0,
 				(offsetX, offsetZ) -> {
 					player.spawnParticle(Particle.CRIT_MAGIC, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 				});
-		player.setCooldown(getItemStack().getType(), SonarHandler.DELAY_SECOND*20);
+		player.setCooldown(getItemStack().getType(), handler.getDelayTick());
 	}
 	
 	@Override
@@ -60,10 +61,10 @@ public class Sonar extends Tool{
 
 	@Override
 	protected void onEmpStart() {
-		setItemStack(SonarHandler.EMP_ITEM);
+		setItemStack(Ioc.resolve(SonarHandler.class).getEmpItem());
 	}
 	@Override
 	protected void onEmpEnd() {
-		setItemStack(SonarHandler.ITEM);
+		setItemStack(Ioc.resolve(SonarHandler.class).getItem());
 	}
 }

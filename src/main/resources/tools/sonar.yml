@@ -2,8 +2,8 @@ display_name: Sonar
 price: 400
 amount_limit: 1
 shop_icon: TARGET
-range: 5
-delay: 3
+range: 5.0 #portée en blocs
+delay: 3.0 #délai en secondes
 lore:
    - <lore>Détecte un ennemi à
    - <lore>moins de <variable><range> blocs</variable>
