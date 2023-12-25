@@ -19,7 +19,6 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 
 public class Warner extends Tool{
-	private WarnerHandler handler;
 	private boolean placed = false;
 	private Artefact watched;
 	private int warn_delay = 0;
@@ -32,7 +31,6 @@ public class Warner extends Tool{
 	//
 	
 	protected boolean place(WarnerHandler handler) {
-		this.handler = handler;
 		if(placed)
 			return false;
 		
@@ -56,8 +54,9 @@ public class Warner extends Tool{
 		return true;
 	}
 	protected void tickWarning() {
-		if(placed && watched.isCaptured() && ++warn_delay >= WarnerHandler.WARN_DELAY_SECOND * 20) {
-			Component message = WarnerHandler.BUILD_WARN_MESSAGE(watched.getName());
+		var handler = Ioc.resolve(WarnerHandler.class);
+		if(placed && watched.isCaptured() && ++warn_delay >= handler.getWarnDelayTick()) {
+			Component message = handler.getWarnMessage(watched.getName());
 			Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
 				p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
 			);
@@ -83,7 +82,7 @@ public class Warner extends Tool{
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			SpatialUtil.circle2DDensity(WarnerHandler.PLACE_RANGE, 5, 0,(offsetX, offsetZ) -> {
+			SpatialUtil.circle2DDensity(Ioc.resolve(WarnerHandler.class).getPlaceRange(), 5, 0,(offsetX, offsetZ) -> {
 			getOwner().spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);});
 		}
 	}
@@ -101,10 +100,11 @@ public class Warner extends Tool{
 	
 	private Transformation getTransform(int n) {
 		float angle = (float)(n * Math.PI / 4);
+		var handler = Ioc.resolve(WarnerHandler.class);
 		return new Transformation(
-			new Vector3f((float)Math.sin(angle) * WarnerHandler.DISPLAY_DISTANCE, 0, (float)Math.cos(angle) * WarnerHandler.DISPLAY_DISTANCE), 
+			new Vector3f((float)Math.sin(angle) * handler.getDisplayDistance(), 0, (float)Math.cos(angle) * handler.getDisplayDistance()), 
 			new AxisAngle4f(angle, new Vector3f(0,1,0)), 
-			new Vector3f(WarnerHandler.DISPLAY_SCALE, WarnerHandler.DISPLAY_SCALE, WarnerHandler.DISPLAY_SCALE),
+			new Vector3f(handler.getDisplayScale(), handler.getDisplayScale(), handler.getDisplayScale()),
 			new AxisAngle4f());
 	}
 	
@@ -112,7 +112,7 @@ public class Warner extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return WarnerHandler.UNPLACED();
+		return Ioc.resolve(WarnerHandler.class).getUnplaced();
 	}
 	
 	//

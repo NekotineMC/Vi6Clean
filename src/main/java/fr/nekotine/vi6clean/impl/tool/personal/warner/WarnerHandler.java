@@ -1,6 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.warner;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,6 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
@@ -39,35 +37,21 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("warner")
 public class WarnerHandler extends ToolHandler<Warner>{
-	protected static final ItemStack UNPLACED() {
+	private final ItemStack UNPLACED() {
 		return new ItemStackBuilder(Material.ENDER_EYE)
 		.name(Component.text("Avertisseur",NamedTextColor.GOLD))
-		.lore(WarnerHandler.LORE)
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
 	}
-	protected static Component BUILD_WARN_MESSAGE(String artefactName) {
-		return Ioc.resolve(TextModule.class).message(Leaf.builder()
-				.addStyle(Placeholder.unparsed("name", artefactName))
-				.addStyle(NekotineStyles.STANDART)
-				.addLine(WARN_MESSAGE)
-		).buildFirst();
-	}
-	protected static final int WARN_DELAY_SECOND = 2;
-	protected static final int PLACE_RANGE = 8;
-	protected static final int PLACE_RANGE_SQUARED = PLACE_RANGE * PLACE_RANGE;
-	protected static final int DISPLAY_TURN_DURATION_TICKS = 10;
-	protected static final float DISPLAY_DISTANCE = 0.8f;
-	protected static final float DISPLAY_SCALE = 1.4f;
-	protected static final String WARN_MESSAGE = "<gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été volé !</red>";
-	protected Vi6Map map;
-	
-	//
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.WARNER.make(
-			Placeholder.parsed("delay", WARN_DELAY_SECOND+" secondes")
-	);
+	private final int WARN_DELAY_TICK = (int)(20*getConfiguration().getDouble("delay", 2));
+	private final double PLACE_RANGE = getConfiguration().getDouble("place_range", 8);
+	private final double PLACE_RANGE_SQUARED = PLACE_RANGE * PLACE_RANGE;
+	private final float DISPLAY_DISTANCE = 0.8f;
+	private final float DISPLAY_SCALE = 1.4f;
+	private final String WARN_MESSAGE = "<gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été volé !</red>";
+	private Vi6Map map;
 	
 	//
 	
@@ -146,5 +130,29 @@ public class WarnerHandler extends ToolHandler<Warner>{
 			tool.setSneaking(evt.isSneaking());
 		}
 	}
-
+	
+	//
+	
+	public Component getWarnMessage(String artefactName) {
+		return Ioc.resolve(TextModule.class).message(Leaf.builder()
+				.addStyle(Placeholder.unparsed("name", artefactName))
+				.addStyle(NekotineStyles.STANDART)
+				.addLine(WARN_MESSAGE)
+		).buildFirst();
+	}
+	public int getWarnDelayTick() {
+		return WARN_DELAY_TICK;
+	}
+	public double getPlaceRange() {
+		return PLACE_RANGE;
+	}
+	public float getDisplayDistance() {
+		return DISPLAY_DISTANCE;
+	}
+	public float getDisplayScale() {
+		return DISPLAY_SCALE;
+	}
+	public ItemStack getUnplaced() {
+		return UNPLACED();
+	}
 }
