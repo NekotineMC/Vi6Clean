@@ -123,6 +123,9 @@ public enum Vi6Sound {
 	DEPHASER_DEACTIVATE(new Sound[]{
 	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 1),
 	Sound.sound(Key.key("block.beacon.deactivate"), Sound.Source.VOICE, 1, 1.5f)
+	}),
+	SMOKEPOOL(new Sound[] {
+	Sound.sound(Key.key("minecraft:block.fire.extinguish"), Sound.Source.AMBIENT, 1.0F, 0.0F)		
 	})
 	;
 	
