@@ -19,8 +19,6 @@ import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.Tool;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Watcher extends Tool{
 
@@ -39,7 +37,7 @@ public class Watcher extends Tool{
 		return ItemStackUtil.make(
 				Material.SILVERFISH_SPAWN_EGG,
 				handler.getNbMaxWatcher(),
-				Component.text("Observateur",NamedTextColor.GOLD),
+				handler.getDisplayName(),
 				handler.getLore());
 	}
 	
@@ -132,7 +130,7 @@ public class Watcher extends Tool{
 			setItemStack(ItemStackUtil.make(
 					mat,
 					nbAvailable,
-					Component.text("Observateur",NamedTextColor.GOLD),
+					handler.getDisplayName(),
 					handler.getLore()));
 		}
 	}

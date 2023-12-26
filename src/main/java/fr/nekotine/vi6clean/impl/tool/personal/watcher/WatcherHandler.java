@@ -32,8 +32,6 @@ import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("watcher")
 public class WatcherHandler extends ToolHandler<Watcher>{
@@ -49,7 +47,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	private final ItemStack NOWATCHER_ITEMSTACK = ItemStackUtil.make(
 			Material.ENDERMITE_SPAWN_EGG, 
 			1,
-			Component.text("Observateur", NamedTextColor.GOLD), 
+			getDisplayName(), 
 			getLore());
 	
 	

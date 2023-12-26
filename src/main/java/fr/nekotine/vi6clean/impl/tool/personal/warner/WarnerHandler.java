@@ -32,14 +32,13 @@ import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("warner")
 public class WarnerHandler extends ToolHandler<Warner>{
 	private final ItemStack UNPLACED() {
 		return new ItemStackBuilder(Material.ENDER_EYE)
-		.name(Component.text("Avertisseur",NamedTextColor.GOLD))
+		.name(getDisplayName())
 		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())

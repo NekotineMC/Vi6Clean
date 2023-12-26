@@ -32,24 +32,27 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",3);
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	private final ItemStack DISPONIBLE_ITEM = new ItemStackBuilder(Material.REPEATER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Disponible", NamedTextColor.BLUE)))
+	private final ItemStack DISPONIBLE_ITEM () {return new ItemStackBuilder(Material.REPEATER)
+			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE)))
 			.lore(getLore())
 			.unstackable()
 			.flags(ItemFlag.values())
 			.build();
-	private final ItemStack PLACED_ITEM = new ItemStackBuilder(Material.LEVER)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Placé", NamedTextColor.GRAY)))
+	}
+	private final ItemStack PLACED_ITEM () {return new ItemStackBuilder(Material.LEVER)
+			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY)))
 			.lore(getLore())
 			.unstackable()
 			.flags(ItemFlag.values())
 			.build();
-	private final ItemStack TRIGGERED_ITEM = new ItemStackBuilder(Material.REDSTONE_TORCH)
-			.name(Component.text("OmniCapteur - ",NamedTextColor.GOLD).append(Component.text("Activé", NamedTextColor.RED)))
+	}
+	private final ItemStack TRIGGERED_ITEM () {return new ItemStackBuilder(Material.REDSTONE_TORCH)
+			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Activé", NamedTextColor.RED)))
 			.lore(getLore())
 			.unstackable()
 			.flags(ItemFlag.values())
 			.build();
+	}
 	
 	public OmniCaptorHandler() {
 		super(OmniCaptor::new);
@@ -139,12 +142,12 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 		return DETECTION_BLOCK_RANGE;
 	}
 	public ItemStack getDisponibleItem() {
-		return DISPONIBLE_ITEM;
+		return DISPONIBLE_ITEM();
 	}
 	public ItemStack getPlacedItem() {
-		return PLACED_ITEM;
+		return PLACED_ITEM();
 	}
 	public ItemStack getTriggeredItem() {
-		return TRIGGERED_ITEM;
+		return TRIGGERED_ITEM();
 	}
 }

@@ -18,11 +18,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	private final ItemStack ITEM = ItemStackUtil.make(
 			Material.GOLDEN_BOOTS, 
-			Component.text("Double Saut", NamedTextColor.GOLD), 
+			getDisplayName(), 
 			getLore());
 	private final ItemStack EMP_ITEM = ItemStackUtil.make(
 			Material.CHAINMAIL_BOOTS, 
-			Component.text("Double Saut", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), 
+			getDisplayName().append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), 
 			getLore());
 	private final double POWER = getConfiguration().getDouble("power", 0.5);
 	

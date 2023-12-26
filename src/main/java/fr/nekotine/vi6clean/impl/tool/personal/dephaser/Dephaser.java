@@ -9,8 +9,6 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.Tool;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Dephaser extends Tool{
 	
@@ -32,7 +30,7 @@ public class Dephaser extends Tool{
 	protected ItemStack makeInitialItemStack() {
 		return ItemStackUtil.make(
 				Material.IRON_NUGGET,
-				Component.text("Déphasage",NamedTextColor.GOLD),
+				Ioc.resolve(DephaserHandler.class).getDisplayName(),
 				Ioc.resolve(DephaserHandler.class).getLore());
 	}
 	@Override

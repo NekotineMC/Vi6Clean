@@ -1,4 +1,4 @@
-display_name: Retour
+display_name: <light_purple>Retour
 price: 150
 amount_limit: 1
 shop_icon: CHORUS_FRUIT
@@ -7,7 +7,7 @@ particle_number: 2 #nombre de particules dans le visuel
 cooldown: 1.0 #délai de récupération en secondes
 lore:
    - <lore>Vous téléporte au même endroit après <variable><teleport_delay>s</variable>.
-   - <lore>Délai: <variable><cooldown>s</variable>.
+   - "<lore>Délai: <variable><cooldown>s</variable>."
    
 team:
    - thief

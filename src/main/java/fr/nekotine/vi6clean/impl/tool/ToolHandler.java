@@ -32,6 +32,7 @@ import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
@@ -111,8 +112,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		// Values
 		limite = configuration.getInt("amount_limit", -1);
 		price = configuration.getInt("price", 9999);
-		displayName = Ioc.resolve(TextModule.class)
-				.message(Leaf.builder().addLine(configuration.getString("display_name", "Unnamed"))).buildFirst();
+		displayName = Ioc.resolve(TextModule.class).message(Leaf.builder()
+				.addLine(configuration.getString("display_name", "Unnamed"))
+				.addStyle(NekotineStyles.NEKOTINE))
+				.buildFirst();
 		// Shop item
 		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
 		var shopLore = new LinkedList<Component>(lore);
@@ -237,6 +240,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	public List<Component> getLore() {
 		return lore;
+	}
+	
+	public Component getDisplayName() {
+		return displayName;
 	}
 
 	public Set<Vi6Team> getTeamsAvailableFor(){
