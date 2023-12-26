@@ -16,7 +16,7 @@ public class DoubleJump extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return DoubleJumpHandler.ITEM;
+		return Ioc.resolve(DoubleJumpHandler.class).getItem();
 	}
 	
 	@Override
@@ -53,12 +53,12 @@ public class DoubleJump extends Tool{
 
 	@Override
 	protected void onEmpStart() {
-		setItemStack(DoubleJumpHandler.EMP_ITEM);
+		setItemStack(Ioc.resolve(DoubleJumpHandler.class).getEmpItem());
 		emp = true;
 	}
 	@Override
 	protected void onEmpEnd() {
-		setItemStack(DoubleJumpHandler.ITEM);
+		setItemStack(Ioc.resolve(DoubleJumpHandler.class).getItem());
 		emp = false;
 	}
 }

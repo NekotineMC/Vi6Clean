@@ -20,7 +20,6 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -39,7 +38,7 @@ public class Lantern extends Tool{
 				Material.LANTERN, 
 				Ioc.resolve(LanternHandler.class).getMaxLantern()-displayedLanterns.size(), 
 				Component.text("Lantern", NamedTextColor.GOLD), 
-				Vi6ToolLoreText.LANTERN.make());
+				Ioc.resolve(LanternHandler.class).getLore());
 	}
 	
 	@Override
@@ -59,8 +58,11 @@ public class Lantern extends Tool{
 			setItemStack(handler.getNoLanternItemstack());
 		}else {
 			setItemStack(
-					ItemStackUtil.make(Material.LANTERN, handler.getMaxLantern()-displayedLanterns.size(),
-							Component.text("Lantern", NamedTextColor.GOLD), Vi6ToolLoreText.LANTERN.make()));
+					ItemStackUtil.make(
+							Material.LANTERN, 
+							handler.getMaxLantern()-displayedLanterns.size(),
+							Component.text("Lantern", NamedTextColor.GOLD), 
+							handler.getLore()));
 		}
 	}
 	

@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
@@ -17,8 +16,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("double_jump")
 public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
-	protected static final ItemStack ITEM = ItemStackUtil.make(Material.GOLDEN_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD), Vi6ToolLoreText.DOUBLEJUMP.make());
-	protected static final ItemStack EMP_ITEM = ItemStackUtil.make(Material.CHAINMAIL_BOOTS, Component.text("Double Saut", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), Vi6ToolLoreText.DOUBLEJUMP.make());
+	private final ItemStack ITEM = ItemStackUtil.make(
+			Material.GOLDEN_BOOTS, 
+			Component.text("Double Saut", NamedTextColor.GOLD), 
+			getLore());
+	private final ItemStack EMP_ITEM = ItemStackUtil.make(
+			Material.CHAINMAIL_BOOTS, 
+			Component.text("Double Saut", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)), 
+			getLore());
 	private final double POWER = getConfiguration().getDouble("power", 0.5);
 	
 	public DoubleJumpHandler() {
@@ -66,6 +71,12 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	
 	protected double getPower() {
 		return POWER;
+	}
+	protected ItemStack getItem() {
+		return ITEM;
+	}
+	protected ItemStack getEmpItem() {
+		return EMP_ITEM;
 	}
 	
 }

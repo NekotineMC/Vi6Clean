@@ -10,7 +10,6 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.effect.InvisibleStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -32,17 +31,20 @@ public class Bush extends Tool{
 	
 	private final StatusEffect fadeoffInvisibility = new StatusEffect(InvisibleStatusEffectType.get(),fadeOffDelay);
 	
-	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(Material.FLOWERING_AZALEA_LEAVES,
+	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(
+			Material.FLOWERING_AZALEA_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Visible", NamedTextColor.WHITE)),
-			Vi6ToolLoreText.BUSH.make());
+			Ioc.resolve(BushHandler.class).getLore());
 	
-	private final ItemStack INVISIBLE_ITEM = ItemStackUtil.make(Material.AZALEA_LEAVES,
+	private final ItemStack INVISIBLE_ITEM = ItemStackUtil.make(
+			Material.AZALEA_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Invisible", NamedTextColor.GRAY)),
-			Vi6ToolLoreText.BUSH.make());
+			Ioc.resolve(BushHandler.class).getLore());
 	
-	private final ItemStack REVEALED_ITEM = ItemStackUtil.make(Material.CHERRY_LEAVES,
+	private final ItemStack REVEALED_ITEM = ItemStackUtil.make(
+			Material.CHERRY_LEAVES,
 			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Découvert", NamedTextColor.RED)),
-			Vi6ToolLoreText.BUSH.make());
+			Ioc.resolve(BushHandler.class).getLore());
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
