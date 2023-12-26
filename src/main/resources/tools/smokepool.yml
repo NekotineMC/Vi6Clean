@@ -1,0 +1,13 @@
+display_name: Bain de fumée
+price: 400
+amount_limit: 1
+shop_icon: FIREWORK_STAR
+duration: 8.0 #durée en secondes
+cooldown: 20.0 #délai de récupération en secondes
+lore:
+   - <lore>Posez un bain de fumée.
+   - <lore>Vous êtes invisible et invincible dedans !
+   - <lore>Durée: <variable><duration>s</variable>,
+   - <lore>Récupération: <variable><cooldown>s</variable>.
+team:
+   - thief
