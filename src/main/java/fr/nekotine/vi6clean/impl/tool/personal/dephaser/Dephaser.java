@@ -2,13 +2,12 @@ package fr.nekotine.vi6clean.impl.tool.personal.dephaser;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.effect.StatusEffect;
-import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,7 +18,13 @@ public class Dephaser extends Tool{
 	
 	private boolean inv;
 	
-	private final StatusEffect effect = new StatusEffect(DarkenedStatusEffectType.get(), Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
+	private final PotionEffect effect = new PotionEffect(
+			PotionEffectType.INVISIBILITY, 
+			Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick(), 
+			0, 
+			false, 
+			false, 
+			true);
 	
 	//
 	
@@ -32,8 +37,6 @@ public class Dephaser extends Tool{
 	}
 	@Override
 	protected void cleanup() {
-		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-		statusEffectModule.removeEffect(getOwner(), effect);
 	}
 
 	//
@@ -51,8 +54,7 @@ public class Dephaser extends Tool{
 		if (emp) {
 			return;
 		}
-		
-		Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
+		getOwner().addPotionEffect(effect);
 		Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
 		getOwner().setCooldown(Material.IRON_NUGGET,Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
 		inv = true;
