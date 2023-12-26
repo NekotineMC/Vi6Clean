@@ -35,7 +35,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	private final ItemStack GUN_ITEM() {
 		return new ItemStackBuilder(
 		Material.CROSSBOW)
-		.name(Component.text("Traceur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Armé",NamedTextColor.AQUA))))
+		.name(getDisplayName().append(Component.text(" - ").append(Component.text("Armé",NamedTextColor.AQUA))))
 		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
@@ -44,7 +44,7 @@ public class TrackerHandler extends ToolHandler<Tracker>{
 	private final ItemStack EMP_ITEM() {
 		return new ItemStackBuilder(
 				Material.RECOVERY_COMPASS)
-				.name(Component.text("Traceur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé",NamedTextColor.RED))))
+				.name(getDisplayName().append(Component.text(" - ").append(Component.text("Brouillé",NamedTextColor.RED))))
 				.lore(getLore())
 				.unstackable()
 				.flags(ItemFlag.values())

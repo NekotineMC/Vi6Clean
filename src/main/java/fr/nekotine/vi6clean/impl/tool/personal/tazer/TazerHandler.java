@@ -21,12 +21,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class TazerHandler extends ToolHandler<Tazer>{
 	private final ItemStack EMP_ITEM = new ItemStackBuilder(
 			Material.IRON_INGOT)
-			.name(Component.text("Tazer", NamedTextColor.GOLD).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)))
+			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED)))
 			.lore(getLore())
 			.build();
 	private final ItemStack ITEM = ItemStackUtil.make(
 			Material.SHEARS, 
-			Component.text("Tazer", NamedTextColor.GOLD), 
+			getDisplayName(), 
 			getLore());
 	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown", 10));
 

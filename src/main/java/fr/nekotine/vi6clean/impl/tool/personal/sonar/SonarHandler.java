@@ -12,18 +12,16 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("sonar")
 public class SonarHandler extends ToolHandler<Sonar>{
 	private final ItemStack ITEM = ItemStackUtil.make(
 			Material.TARGET, 
-			Component.text("Sonar", NamedTextColor.GOLD), 
+			getDisplayName(), 
 			getLore());
 	private final ItemStack EMP_ITEM = ItemStackUtil.make(
 			Material.QUARTZ_PILLAR, 
-			Component.text("Sonar", NamedTextColor.GOLD), 
+			getDisplayName(), 
 			getLore());
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 5);
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;

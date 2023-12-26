@@ -33,17 +33,17 @@ public class Bush extends Tool{
 	
 	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(
 			Material.FLOWERING_AZALEA_LEAVES,
-			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Visible", NamedTextColor.WHITE)),
+			Ioc.resolve(BushHandler.class).getDisplayName().append(Component.text(" - ")).append(Component.text("Visible", NamedTextColor.WHITE)),
 			Ioc.resolve(BushHandler.class).getLore());
 	
 	private final ItemStack INVISIBLE_ITEM = ItemStackUtil.make(
 			Material.AZALEA_LEAVES,
-			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Invisible", NamedTextColor.GRAY)),
+			Ioc.resolve(BushHandler.class).getDisplayName().append(Component.text(" - ")).append(Component.text("Invisible", NamedTextColor.GRAY)),
 			Ioc.resolve(BushHandler.class).getLore());
 	
 	private final ItemStack REVEALED_ITEM = ItemStackUtil.make(
 			Material.CHERRY_LEAVES,
-			Component.text("Buisson furtif - ",NamedTextColor.GOLD).append(Component.text("Découvert", NamedTextColor.RED)),
+			Ioc.resolve(BushHandler.class).getDisplayName().append(Component.text(" - ")).append(Component.text("Découvert", NamedTextColor.RED)),
 			Ioc.resolve(BushHandler.class).getLore());
 	
 	@Override

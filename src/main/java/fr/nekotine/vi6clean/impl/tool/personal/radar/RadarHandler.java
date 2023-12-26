@@ -45,15 +45,17 @@ public class RadarHandler extends ToolHandler<Radar>{
 	private final String DETECTION_SUCCESS = getConfiguration().getString("detection_success");
 	private final String DETECTION_FAIL = getConfiguration().getString("detection_fail");
 
-	private final ItemStack UNPLACED = new ItemStackBuilder(Material.CALIBRATED_SCULK_SENSOR)
+	private final ItemStack UNPLACED = new ItemStackBuilder(
+			Material.CALIBRATED_SCULK_SENSOR)
 			.unstackable()
-			.name(Component.text("Radar", NamedTextColor.GOLD))
+			.name(getDisplayName())
 			.lore(getLore())
 			.build();
 	private final ItemStack PLACED = ItemStackUtil.addEnchant(UNPLACED.clone(), Enchantment.QUICK_CHARGE, 1);
-	private final ItemStack EMPED = new ItemStackBuilder(Material.SCULK_SENSOR)
+	private final ItemStack EMPED = new ItemStackBuilder(
+			Material.SCULK_SENSOR)
 			.unstackable()
-			.name(Component.text("Radar", NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Brouillé", NamedTextColor.RED))))
+			.name(getDisplayName().append(Component.text(" - ").append(Component.text("Brouillé", NamedTextColor.RED))))
 			.lore(getLore())
 			.build();
 	

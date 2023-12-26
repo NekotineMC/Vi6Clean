@@ -22,8 +22,6 @@ import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Lantern extends Tool{
 	
@@ -37,7 +35,7 @@ public class Lantern extends Tool{
 		return ItemStackUtil.make(
 				Material.LANTERN, 
 				Ioc.resolve(LanternHandler.class).getMaxLantern()-displayedLanterns.size(), 
-				Component.text("Lantern", NamedTextColor.GOLD), 
+				Ioc.resolve(LanternHandler.class).getDisplayName(), 
 				Ioc.resolve(LanternHandler.class).getLore());
 	}
 	
@@ -61,7 +59,7 @@ public class Lantern extends Tool{
 					ItemStackUtil.make(
 							Material.LANTERN, 
 							handler.getMaxLantern()-displayedLanterns.size(),
-							Component.text("Lantern", NamedTextColor.GOLD), 
+							Ioc.resolve(LanternHandler.class).getDisplayName(), 
 							handler.getLore()));
 		}
 	}

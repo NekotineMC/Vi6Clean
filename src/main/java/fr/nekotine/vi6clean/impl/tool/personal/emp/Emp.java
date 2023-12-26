@@ -3,18 +3,16 @@ package fr.nekotine.vi6clean.impl.tool.personal.emp;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.EmpStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Emp extends Tool{
 	private static final StatusEffect effect = new StatusEffect(
@@ -24,9 +22,12 @@ public class Emp extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(
-				Material.BEACON,Component.text("IEM",NamedTextColor.GOLD), 
-				Ioc.resolve(EmpHandler.class).getLore());
+		var handler = Ioc.resolve(EmpHandler.class);
+		return new ItemStackBuilder(
+				Material.BEACON)
+				.name(handler.getDisplayName())
+				.lore(handler.getLore())
+				.unstackable().build();
 	}
 	@Override
 	protected void cleanup() {
