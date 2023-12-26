@@ -9,16 +9,12 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.track.EntityTrackModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("recall")
 public class RecallHandler extends ToolHandler<Recall>{
@@ -27,22 +23,29 @@ public class RecallHandler extends ToolHandler<Recall>{
 	private final int COOLDOWN_TICKS = (int)(20*getConfiguration().getDouble("cooldown",1));
 	private final ItemStack UNPLACED = new ItemStackBuilder(
 		Material.CHORUS_FRUIT)
-		.name(Component.text("Retour",NamedTextColor.GOLD))
+		.name(getDisplayName())
 		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
 	private final ItemStack PLACED = new ItemStackBuilder(
 		Material.POPPED_CHORUS_FRUIT)
-		.name(Component.text("Retour",NamedTextColor.GOLD))
+		.name(getDisplayName())
 		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
+	private final ItemStack COOLDOWN = new ItemStackBuilder(
+			Material.PURPLE_DYE)
+			.name(getDisplayName().decorate(TextDecoration.STRIKETHROUGH))
+			.lore(getLore())
+			.unstackable()
+			.flags(ItemFlag.values())
+			.build();
 
 	public RecallHandler() {
 		super(Recall::new);
-		Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
+		//Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
 	}
 
 	@Override
@@ -86,10 +89,16 @@ public class RecallHandler extends ToolHandler<Recall>{
 	public ItemStack getUnplaced() {
 		return UNPLACED;
 	}
+	public ItemStack getCooldown() {
+		return COOLDOWN;
+	}
 	public int getTeleportDelayTicks() {
 		return TELEPORT_DELAY_TICKS;
 	}
 	public int getParticleNumber() {
 		return PARTICLE_NUMBER;
+	}
+	public int getCooldownTick() {
+		return COOLDOWN_TICKS;
 	}
 }

@@ -42,5 +42,4 @@ public abstract class Tool {
 	public void setOwner(Player owner) {
 		this.owner = owner;
 	}
-	
 }
