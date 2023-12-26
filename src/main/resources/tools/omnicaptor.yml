@@ -5,7 +5,7 @@ shop_icon: REDSTONE_TORCH
 range: 3.0 #portée de détection en blocs
 lore:
    - <lore>Pose un capteur qui affiche
-   - <lore>en <variable><statusname></variable> les ennemis
+   - <lore>en surbrillance les ennemis
    - <lore>à moins de <variable><range></variable>.
    - <lore>Peut être récupéré et déplacé.
 team:

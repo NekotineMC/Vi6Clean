@@ -4,6 +4,6 @@ amount_limit: 1
 shop_icon: CLOCK
 lore:
    - <lore>Vous permet de détecter les enemis
-   - <lore>toutes les <variable><delay></variable>
+   - <lore>toutes les <variable><delay>s</variable>.
 team:
    - thief

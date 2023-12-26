@@ -7,6 +7,6 @@ place_range: 8.0 #portée pour placer l'objet en blocs
 warn_message: "<gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été volé !</red>"
 lore:
    - <lore>S'attache à un artéfact et avertit lorsqu'il est volé.
-   - <lore>Délai du message: <variable><delay>s</variable>
+   - "<lore>Délai du message: <variable><delay>s</variable>"
 team:
    - guard
