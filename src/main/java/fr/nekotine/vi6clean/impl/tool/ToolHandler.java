@@ -315,8 +315,16 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (match.isEmpty()) {
 			return;
 		}
+		
+		var sellEvent = new PlayerSellToolEvent(match.get(), price);
+		EventUtil.call(sellEvent);
+		if(sellEvent.isAllCancelled()) {
+			return;
+		}
+		if(!sellEvent.isRemoveCancelled()) {
+			remove(match.get());
+		}
 		var wrap = optWrap.get();
-		remove(match.get());
 		wrap.setMoney(wrap.getMoney() + price);
 	}
 

@@ -50,7 +50,7 @@ public class ShadowHandler extends ToolHandler<Shadow>{
 			.lore(getLore())
 			.unstackable()
 			.flags(ItemFlag.values())
-			.skull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWM3NzcyYzdjZGNkZGI2Yjc5ZDU1MjVmOWRjZWJjNzQ4YWFiZGFlMzhkOWUzOGVlYTdmZTc4YTUwMWRlNmVkZSJ9fX0=")
+			.skull("5c7772c7cdcddb6b79d5525f9dcebc748aabdae38d9e38eea7fe78a501de6ede")
 			.build();
 	}
 	

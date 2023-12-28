@@ -11,6 +11,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 public enum Vi6Styles {
 	TOOL_LORE(TextStyle.build(
+		TagResolver.standard(),
 		TagResolver.resolver("lore",Tag.styling(b -> b.color(NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.ITALIC, State.NOT_SET))),
 		TagResolver.resolver("variable", Tag.styling(NamedTextColor.GREEN)),
 		TagResolver.resolver("important", Tag.styling(NamedTextColor.AQUA))));
