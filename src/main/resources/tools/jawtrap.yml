@@ -8,6 +8,6 @@ pickup_range: 0.85 #distance pour récupérer un piège en blocs
 spacing_distance: 0.85 #distance minimal entre 2 pièges mâchoires
 lore:
    - <lore>Permet de poser et déplacer un piège à mâchoires.
-   - "<lore>Dégats: <variable><damage></variable><red>♡</red>."
+   - "<lore>Dégats: <variable><damage></variable><red>❤</red>."
 team:
    - guard
