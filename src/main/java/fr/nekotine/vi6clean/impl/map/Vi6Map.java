@@ -40,6 +40,9 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<Koth> koths = new MapDictionaryElement<>();
 	
+	@MapElementTyped(Camera.class)
+	@ComposingMap
+	private MapDictionaryElement<Camera> cameras = new MapDictionaryElement<>();
 	
 	public Collection<MapPositionElement> getGuardSpawns(){
 		return guardSpawns.backingMap().values();
@@ -67,5 +70,9 @@ public class Vi6Map{
 	
 	public MapDictionaryElement<Koth> getKoths() {
 		return koths;
+	}
+	
+	public MapDictionaryElement<Camera> getCameras(){
+		return cameras;
 	}
 }
