@@ -2,6 +2,10 @@ package fr.nekotine.vi6clean.impl.map.koth;
 
 import java.util.List;
 
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -55,6 +59,13 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		Ioc.resolve(Vi6Game.class).getGuards().forEach(
 				p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
+	}
+	@Override
+	public Pair<Particle, DustOptions> getParticle(Vi6Team owning) {
+		return Pair.from(Particle.REDSTONE,new DustOptions(Color.YELLOW, 0.5f));
+		/*return (owning==Vi6Team.GUARD? 
+				Pair.from(Particle.REDSTONE,new DustOptions(Color.YELLOW, 1)):
+				Pair.from(Particle.REDSTONE,new DustOptions(Color.RED, 1)));*/
 	}
 
 	//

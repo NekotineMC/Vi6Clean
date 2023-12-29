@@ -1,8 +1,10 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
@@ -15,6 +17,7 @@ import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.map.element.MapLocationElement;
+import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
@@ -33,12 +36,15 @@ public class Koth{
 	
 	private boolean isEnabled = true;
 	private int captureAmountNeeded = 200;
+	private static final int PARTICLE_DENSITY = 1;
 	private Vi6Team owningTeam = Vi6Team.GUARD;
 	private Component text = Component.text("");
 	private int tickAdvancement;
 	private TextDisplay display;
 	private int captureAdvancement;
 	private KothEffect effect;
+	private LinkedList<Location> rectangle = new LinkedList<Location>();
+	
 	
 	//
 	
@@ -80,9 +86,14 @@ public class Koth{
 	
 	public void setup(KothEffect effect, World world) {
 		this.effect = effect;
+	
 		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
 		display.setBillboard(Billboard.CENTER);
 		display.setShadowed(true);
+		SpatialUtil.rectangle3DFromPoints(
+				boundingBox.get(),
+				PARTICLE_DENSITY, 
+				v -> rectangle.add(new Location(world, v.getX(), v.getY(), v.getZ())));
 		effect.setup(this);
 	}
 	public void clean() {
@@ -93,6 +104,13 @@ public class Koth{
 	public void tick() {
 		if(!isEnabled)
 			return;
+		
+		//particle
+		var particleData = effect.getParticle(owningTeam);
+		rectangle.forEach(l -> l.getWorld().spawnParticle(
+				particleData.a(), l, 1, particleData.b()));
+		
+		//capture
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		tickAdvancement = 0;
 		boolean owningTeamCancelling = false;
@@ -126,6 +144,8 @@ public class Koth{
 			captureAdvancement = 0;
 			tickAdvancement = 0;
 		}
+		
+		//effect & display
 		effect.tick();
 		display.text(text);
 	}
