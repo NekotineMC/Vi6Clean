@@ -12,14 +12,13 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
-import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 
-@ToolCode("jawtrap")
-public class JawTrapHandler extends ToolHandler<JawTrap>{
+@ToolCode("beartrap")
+public class BearTrapHandler extends ToolHandler<BearTrap>{
 	private final double DAMAGE = 2*getConfiguration().getDouble("damage", 5);
 	private final double SQUARED_TRIGGER_RANGE = Math.pow(getConfiguration().getDouble("trigger_range", 0.85), 2);
 	private final double SQUARED_PICKUP_RANGE = Math.pow(getConfiguration().getDouble("pickup_range", 0.85), 2);
@@ -36,21 +35,21 @@ public class JawTrapHandler extends ToolHandler<JawTrap>{
 			.unstackable()
 			.skull("85a8be4b3666eef20199c84d59efc7c771f4e3f290f9688fb12a97f65cdd64c7").build();
 
-	public JawTrapHandler() {
-		super(JawTrap::new);
+	public BearTrapHandler() {
+		super(BearTrap::new);
 	}
 	@Override
-	protected void onAttachedToPlayer(JawTrap tool, Player player) {
+	protected void onAttachedToPlayer(BearTrap tool, Player player) {
 	}
 	@Override
-	protected void onDetachFromPlayer(JawTrap tool, Player player) {
+	protected void onDetachFromPlayer(BearTrap tool, Player player) {
 	}
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		var evtP = evt.getPlayer();
 		//Pickup
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)){
-			for(JawTrap tool : getTools()) {
+			for(BearTrap tool : getTools()) {
 				if(tool.tryPickup(evtP)) {
 					evt.setCancelled(true);
 					return;
@@ -78,7 +77,7 @@ public class JawTrapHandler extends ToolHandler<JawTrap>{
 	}
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
-		for(JawTrap tool : getTools()) {
+		for(BearTrap tool : getTools()) {
 			if(!tool.isPlaced()) {
 				continue;
 			}
@@ -106,7 +105,7 @@ public class JawTrapHandler extends ToolHandler<JawTrap>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		hitEntity.damage(Ioc.resolve(JawTrapHandler.class).getDamage(), optionalTool.get().getOwner());
+		hitEntity.damage(DAMAGE, optionalTool.get().getOwner());
 		evt.setCancelled(true);
 	}
 	

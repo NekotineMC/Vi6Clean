@@ -1,13 +1,13 @@
-display_name: <dark_gray>Piège mâchoires
+display_name: <dark_gray>Piège à ours
 price: 100
 amount_limit: -1
 shop_icon: DRAGON_HEAD
 damage: 5.0 #dégats en nombre de coeurs
 trigger_range: 0.85 #distance d'activation du piège en blocs
 pickup_range: 0.85 #distance pour récupérer un piège en blocs
-spacing_distance: 0.85 #distance minimal entre 2 pièges mâchoires
+spacing_distance: 0.85 #distance minimal entre 2 pièges à ours
 lore:
-   - <lore>Permet de poser et déplacer un piège à mâchoires.
+   - <lore>Permet de poser et déplacer un piège à ours.
    - "<lore>Dégats: <variable><damage></variable><red>❤</red>."
 team:
    - guard

@@ -21,7 +21,7 @@ import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
-public class JawTrap extends Tool{
+public class BearTrap extends Tool{
 	private static final int FANG_ANIMATION_DURATION_TICK = 20;
 	private static final StatusEffect EFFECT = new StatusEffect(
 			TazedStatusEffectType.get(), FANG_ANIMATION_DURATION_TICK);
@@ -48,7 +48,7 @@ public class JawTrap extends Tool{
 		triggered = true;
 		fang = location.getWorld().spawnEntity(
 				location, EntityType.EVOKER_FANGS, SpawnReason.TRAP);
-		trap.getEquipment().setHelmet(Ioc.resolve(JawTrapHandler.class).getTriggeredItem());
+		trap.getEquipment().setHelmet(Ioc.resolve(BearTrapHandler.class).getTriggeredItem());
 		Ioc.resolve(StatusEffectModule.class).addEffect(hit, EFFECT);
 	}
 	public void tickAnimation() {
@@ -61,7 +61,7 @@ public class JawTrap extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return Ioc.resolve(JawTrapHandler.class).getItem();
+		return Ioc.resolve(BearTrapHandler.class).getItem();
 	}
 	@Override
 	protected void cleanup() {
@@ -97,10 +97,10 @@ public class JawTrap extends Tool{
 		trap.setInvisible(true);
 		trap.setMarker(true);
 		trap.setGravity(false);
-		trap.getEquipment().setHelmet(Ioc.resolve(JawTrapHandler.class).getItem());
+		trap.getEquipment().setHelmet(Ioc.resolve(BearTrapHandler.class).getItem());
 		enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ennemiTeamInMap;
 		ourTeam = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ourTeam;
-		Ioc.resolve(JawTrapHandler.class).detachFromOwner(this);
+		Ioc.resolve(BearTrapHandler.class).detachFromOwner(this);
 		return true;
 	}
 	public boolean tryPickup(Player trying) {
@@ -110,7 +110,7 @@ public class JawTrap extends Tool{
 		if(!ourTeam.get().contains(trying)) {
 			return false;
 		}
-		var handler = Ioc.resolve(JawTrapHandler.class);
+		var handler = Ioc.resolve(BearTrapHandler.class);
 		if(location.distanceSquared(trying.getLocation()) > handler.getSquaredPickupRange()) {
 			return false;
 		}
