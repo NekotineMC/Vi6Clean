@@ -9,6 +9,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +40,9 @@ public class Camera {
 	@ComposingMap
 	private int slot;
 	
+	private static final ItemStack LEFT_CAM_ITEM = new ItemStackBuilder(Material.PLAYER_HEAD)
+			.skull(null)
+			.build();
 	private boolean idle = true;
 	private Collection<Player> spectators = new ArrayList<Player>();
 	private String idleURL = "cc36ec5323f765ff59f916d2d1a1ec7496854cf7bd26dd2f2cbadc3dd49279c8";
@@ -91,15 +95,37 @@ public class Camera {
 	public int getSlot() {
 		return slot;
 	}
-	public void spectate(Player player) {
+	public boolean spectate(Player player) {
+		if(spectators.contains(player)) {
+			return false;
+		}
 		if(idle) {
 			idle = false;
 			updateArmorStand();
 		}
-		Ioc.resolve(ClientTrackModule.class).untrack(player);
 		spectators.add(player);
+		player.setAllowFlight(true);
+		
+		//PACKETS?
+		Ioc.resolve(ClientTrackModule.class).untrack(player);
 		player.teleport(location.toLocation(player.getWorld()));
-		//freeze le joueur
+		player.setFlySpeed(0);
+		player.setFlying(true);
+		return true;
+	}
+	public boolean unspectate(Player player) {
+		if(!spectators.contains(player)) {
+			return false;
+		}
+		spectators.remove(player);
+		player.setAllowFlight(false);
+		player.setFlying(false);
+		
+		//PACKETS?
+		Ioc.resolve(ClientTrackModule.class).track(player);
+		
+		
+		return true;
 	}
 	public void setup(World world) {
 		as = (ArmorStand)world.spawnEntity(location.toLocation(world), EntityType.ARMOR_STAND, SpawnReason.CUSTOM);
@@ -117,5 +143,8 @@ public class Camera {
 		as.remove();
 		ProtocolLibrary.getProtocolManager().removePacketListener(packetAdapter);
 		spectators.clear();
+	}
+	public void onToggleFlight(PlayerToggleFlightEvent evt) {
+		
 	}
 }
