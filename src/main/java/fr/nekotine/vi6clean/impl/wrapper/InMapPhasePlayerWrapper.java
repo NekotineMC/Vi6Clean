@@ -116,6 +116,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void thiefLeaveMap() {
+		thiefLeaveMap(false);
+	}
+	
+	public void thiefLeaveMap(boolean dead) {
 		var game = Ioc.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
 		wrapped.setGameMode(GameMode.SPECTATOR);
@@ -123,10 +127,18 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		// Send message
 		var infiltrationWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, InfiltrationPhasePlayerWrapper.class);
 		if (infiltrationWrapper.isPresent()) {
-			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
-					.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
-					.append(Component.text(infiltrationWrapper.get().getStolenArtefacts().size(), NamedTextColor.AQUA))
-					.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+			infiltrationWrapper.get().setDead(dead);
+			if (dead) {
+				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+						.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
+						.append(Component.text(infiltrationWrapper.get().getStolenArtefacts().size(), NamedTextColor.AQUA))
+						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+			}else {
+				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+						.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
+						.append(Component.text(infiltrationWrapper.get().getStolenArtefacts().size(), NamedTextColor.AQUA))
+						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+			}
 		}else {
 			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
 					.append(Component.text(" s'est échappé!", NamedTextColor.GOLD)));

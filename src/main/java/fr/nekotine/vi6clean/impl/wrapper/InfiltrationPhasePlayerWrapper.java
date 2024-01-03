@@ -17,6 +17,8 @@ import net.kyori.adventure.util.Ticks;
 
 public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 
+	private boolean dead;
+	
 	private List<Artefact> stolen = new LinkedList<>();
 	
 	public InfiltrationPhasePlayerWrapper(Player wrapped) {
@@ -53,6 +55,14 @@ public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 		game.getGuards().showTitle(guardTitle);
 		game.getThiefs().sendMessage(thiefMsg);
 		game.getThiefs().showTitle(thiefTitle);
+	}
+
+	public boolean isDead() {
+		return dead;
+	}
+
+	public void setDead(boolean dead) {
+		this.dead = dead;
 	}
 	
 }

@@ -232,7 +232,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		if (game.getThiefs().contains(evt.getPlayer())){
 			var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrap.isPresent()) {
-				optWrap.get().thiefLeaveMap();
+				optWrap.get().thiefLeaveMap(true);
 			}
 		}
 	}
