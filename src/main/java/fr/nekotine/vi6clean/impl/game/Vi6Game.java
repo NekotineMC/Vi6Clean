@@ -28,7 +28,6 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.game.team.GuardTeam;
 import fr.nekotine.vi6clean.impl.game.team.ThiefTeam;
-import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
@@ -89,8 +88,6 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		phaseMachine.registerPhase(Vi6PhasePreparation.class, Vi6PhasePreparation::new);
 		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
 		phaseMachine.setLooping(true);
-		
-		Ioc.getProvider().registerSingleton(new Majordom());
 	}
 	
 	public final void start() {
