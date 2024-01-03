@@ -49,7 +49,9 @@ public class SmokePoolHandler extends ToolHandler<SmokePool>{
 	private final ItemStack COOLDOWN_ITEM = new ItemStackBuilder(
 			Material.GRAY_DYE)
 			.name(getDisplayName().decorate(TextDecoration.STRIKETHROUGH))
-			.lore(getLore()).build();
+			.lore(getLore())
+			.flags(ItemFlag.values())
+			.build();
 		
 	//
 	

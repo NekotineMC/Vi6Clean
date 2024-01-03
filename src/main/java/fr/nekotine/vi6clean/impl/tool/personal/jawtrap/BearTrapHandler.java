@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
@@ -27,12 +28,14 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 			.name(getDisplayName())
 			.lore(getLore())
 			.unstackable()
+			.flags(ItemFlag.values())
 			.skull("d23dd5fc15b2d337347a94146ff20003b2d62f668b4517e1145d3acfcc25587c").build();
 	}
 	private final ItemStack TRIGGERED_ITEM = new ItemStackBuilder(Material.PLAYER_HEAD)
 			.name(getDisplayName())
 			.lore(getLore())
 			.unstackable()
+			.flags(ItemFlag.values())
 			.skull("85a8be4b3666eef20199c84d59efc7c771f4e3f290f9688fb12a97f65cdd64c7").build();
 
 	public BearTrapHandler() {
