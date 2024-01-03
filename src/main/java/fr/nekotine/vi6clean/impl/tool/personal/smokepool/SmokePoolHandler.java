@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
@@ -42,7 +43,9 @@ public class SmokePoolHandler extends ToolHandler<SmokePool>{
 	private final ItemStack ITEM = new ItemStackBuilder(
 			Material.FIREWORK_STAR)
 			.name(getDisplayName())
-			.lore(getLore()).build();
+			.lore(getLore())
+			.flags(ItemFlag.values())
+			.build();
 	private final ItemStack COOLDOWN_ITEM = new ItemStackBuilder(
 			Material.GRAY_DYE)
 			.name(getDisplayName().decorate(TextDecoration.STRIKETHROUGH))
