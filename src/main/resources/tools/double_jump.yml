@@ -3,6 +3,7 @@ price: 300
 amount_limit: 1
 shop_icon: GOLDEN_BOOTS
 power: 0.5 # vitesse en block/s
+is_rune: false
 lore:
    - <lore>permet de sauter une fois
    - <lore> en l'air, en appuyant

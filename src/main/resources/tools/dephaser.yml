@@ -4,6 +4,7 @@ amount_limit: 1
 shop_icon: IRON_NUGGET
 inv_delay: 20.0 #delai en secondes
 inv_duration: 2.0 #durée en secondes
+is_rune: false
 lore:
    - <lore>Toutes les <variable><inv_delay>s</variable>,
    - <lore>gagnez <variable><inv_duration>s</variable> d'invisibilité.

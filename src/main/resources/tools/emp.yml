@@ -3,6 +3,7 @@ price: 150
 amount_limit: -1
 shop_icon: BEACON
 duration: 5.0 #durée en secondes
+is_rune: false
 lore:
    - <lore>Désactive pendant <variable><duration>s</variable> les objets ennemis
 team:
