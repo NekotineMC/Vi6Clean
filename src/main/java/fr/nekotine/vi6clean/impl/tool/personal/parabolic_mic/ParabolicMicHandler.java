@@ -15,10 +15,12 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
@@ -61,16 +63,20 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
 			var vibrationTarget = tool.getVibrationTargetEntity();
-			if (owner == null || vibrationTarget == null || evt.getPlayer().equals(vibrationTarget)) {
+			var evtPlayer = evt.getPlayer();
+			if (owner == null || vibrationTarget == null || evtPlayer.equals(vibrationTarget)) {
 				continue;
 			}
 			var ownerloc = owner.getLocation();
 			var destloc = evt.getTo();
-			if (evt.getPlayer().equals(owner)) {
+			var enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).ennemiTeamInMap();
+			if (evtPlayer.equals(owner)) {
 				vibrationTarget.teleport(owner);
+				continue;
 			}
 			if (!ownerloc.getWorld().equals(destloc.getWorld()) ||
-					evt.getPlayer().equals(owner) ||
+					enemyTeam.anyMatch(e -> e.equals(evtPlayer)) ||
+					evtPlayer.equals(owner) ||
 					evt.getTo().distanceSquared(owner.getLocation()) > DETECTION_RANGE_SQUARED ||
 					flagModule.hasAny(owner, EmpStatusFlag.get())) {
 				continue;
