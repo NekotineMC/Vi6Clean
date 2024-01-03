@@ -12,17 +12,23 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.fakeblock.AppliedFakeBlockPatch;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.status.effect.InvisibleStatusEffectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
+	
+	private final StatusEffect invisibleEffect = new StatusEffect(InvisibleStatusEffectType.get(), -1);
 	
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
 	
@@ -36,6 +42,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public InMapPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
+		var pw = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, PlayerWrapper.class);
+		if (pw.isPresent() && pw.get().getTeam()==Vi6Team.THIEF) {
+			var effectModule = Ioc.resolve(StatusEffectModule.class);
+			effectModule.addEffect(wrapped, invisibleEffect);
+		}
 	}
 
 	public boolean canLeaveMap() {
@@ -107,6 +118,8 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		for (var guard : game.getGuards()) {
 			guard.showEntity(Ioc.resolve(JavaPlugin.class), wrapped);
 		}
+		var effectModule = Ioc.resolve(StatusEffectModule.class);
+		effectModule.removeEffect(wrapped, invisibleEffect);
 		thiefScheduleCanLeaveMap();
 		thiefScheduleCanCaptureArtefact();
 		var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
