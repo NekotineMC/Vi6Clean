@@ -10,6 +10,9 @@ import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -44,6 +47,7 @@ public class Koth{
 	private int captureAdvancement;
 	private KothEffect effect;
 	private LinkedList<Location> rectangle = new LinkedList<Location>();
+	private BukkitTask particleTask;
 	
 	
 	//
@@ -92,9 +96,24 @@ public class Koth{
 				PARTICLE_DENSITY, 
 				v -> rectangle.add(new Location(world, v.getX(), v.getY(), v.getZ())));
 		effect.setup(this);
+		particleTask = new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				//particle
+				var particleData = effect.getParticle(owningTeam);
+				rectangle.forEach(l -> l.getWorld().spawnParticle(
+						particleData.a(), l, 1, particleData.b()));
+			}
+			
+		}.runTaskTimer(Ioc.resolve(JavaPlugin.class), 0, 10/*10tick = 0.5sec*/);
 		isEnabled = true;
 	}
 	public void clean() {
+		if (particleTask != null && !particleTask.isCancelled()) {
+			particleTask.cancel();
+			particleTask = null;
+		}
 		if(!isEnabled) {
 			return;
 		}
@@ -105,11 +124,6 @@ public class Koth{
 	public void tick() {
 		if(!isEnabled)
 			return;
-		
-		//particle
-		var particleData = effect.getParticle(owningTeam);
-		rectangle.forEach(l -> l.getWorld().spawnParticle(
-				particleData.a(), l, 1, particleData.b()));
 		
 		//capture
 		var wrapping = Ioc.resolve(WrappingModule.class);
