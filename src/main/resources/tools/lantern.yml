@@ -9,4 +9,4 @@ lore:
    - <lore>Permet de poser jusqu'à <variable><max_lantern></variable> lanternes
    - <lore>que vos alliés peuvent prendre pour se téléporter à vous.
 team:
-   - guard
+   - thief

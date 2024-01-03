@@ -77,6 +77,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private final int price;
 
 	private final int limite;
+	
+	private final boolean isRune;
 
 	protected final List<Component> lore;
 
@@ -97,6 +99,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration de l'outil " + code, e);
 			configuration = new YamlConfiguration();
 		}
+		//
+		isRune = configuration.getBoolean("is_rune", false);
 		// Lore construction
 		var loreTagResolvers = new LinkedList<TagResolver>();
 		for (var key : configuration.getKeys(false)) {
@@ -367,5 +371,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (optWrap.isEmpty())
 			return;
 		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpEnd());
+	}
+
+	public boolean isRune() {
+		return isRune;
 	}
 }

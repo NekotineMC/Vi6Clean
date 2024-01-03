@@ -53,7 +53,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		var wrapLayout = new WrapMenuLayout();
 		var team =  Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class).getTeam();
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
-				.filter(t -> t.getTeamsAvailableFor().contains(team))
+				.filter(t -> t.getTeamsAvailableFor().contains(team) /*&& !t.isRune()*/)
 				.collect(Collectors.toCollection(ArrayList::new))){
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
