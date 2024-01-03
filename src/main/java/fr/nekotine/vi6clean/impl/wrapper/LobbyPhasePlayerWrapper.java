@@ -74,8 +74,10 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
 		this.readyForNextPhase = readyForNextPhase;
+		var lobby = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class);
+		lobby.getSidebarObjective().getScore(wrapped).setScore(readyForNextPhase?1:0);
 		if (readyForNextPhase) {
-			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class).checkForCompletion();
+			lobby.checkForCompletion();
 		}
 	}
 	

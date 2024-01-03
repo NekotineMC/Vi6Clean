@@ -99,6 +99,10 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		item.getInventory().clear();
 	}
 	
+	public Objective getSidebarObjective() {
+		return scoreboardPlayerListingObjective;
+	}
+	
 	@Override
 	protected List<ItemState<Player>> makeAppliedItemStates() {
 		var list = new LinkedList<ItemState<Player>>();
