@@ -5,6 +5,7 @@ shop_icon: CHORUS_FRUIT
 teleport_delay: 6.0 #délai de téléportation en secondes
 particle_number: 2 #nombre de particules dans le visuel
 cooldown: 1.0 #délai de récupération en secondes
+is_rune: false
 lore:
    - <lore>Vous téléporte au même endroit après <variable><teleport_delay>s</variable>.
    - "<lore>Délai: <variable><cooldown>s</variable>."

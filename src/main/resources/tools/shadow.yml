@@ -3,6 +3,7 @@ price: 250
 amount_limit: 2
 shop_icon: WITHER_SKELETON_SKULL
 kill_range: 1.0 #distance pour marcher sur l'ombre en blocs
+is_rune: false
 lore:
    - <lore>Placer une ombre pour revenir plus tard,
    - <lore>ou mourrez si un garde la trouve!

@@ -4,6 +4,7 @@ amount_limit: 1
 shop_icon: LANTERN
 max_lantern: 2 #nombre maximal de lanternes simultanées
 squared_pickup_range: 2.25 #distance en blocs au carré pour utiliser une lanterne
+is_rune: false
 lore:
    - <lore>Permet de poser jusqu'à <variable><max_lantern></variable> lanternes
    - <lore>que vos alliés peuvent prendre pour se téléporter à vous.

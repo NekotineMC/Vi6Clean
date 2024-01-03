@@ -3,6 +3,7 @@ price: 250
 amount_limit: 2
 shop_icon: REDSTONE_TORCH
 range: 3.0 #portée de détection en blocs
+is_rune: false
 lore:
    - <lore>Pose un capteur qui affiche
    - <lore>en surbrillance les ennemis

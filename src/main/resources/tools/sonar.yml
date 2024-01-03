@@ -4,6 +4,7 @@ amount_limit: 1
 shop_icon: TARGET
 range: 5.0 #portée en blocs
 delay: 3.0 #délai en secondes
+is_rune: false
 lore:
    - <lore>Détecte un ennemi à
    - <lore>moins de <variable><range> blocs</variable>

@@ -3,6 +3,7 @@ price: 600
 amount_limit: 1
 shop_icon: CALIBRATED_SCULK_SENSOR
 range: 20.0 # distance en block
+is_rune: true
 lore:
    - <lore>Vous permet d'entendre les enemis qui bouge
    - <lore>jusqu'a <variable><range></variable>.
