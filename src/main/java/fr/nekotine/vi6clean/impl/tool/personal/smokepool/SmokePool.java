@@ -31,6 +31,9 @@ public class SmokePool extends Tool{
 	}
 	
 	protected boolean cast() {
+		if(getOwner() == null) {
+			return false;
+		}
 		if(placed || cooldownLeft > 0) {
 			return false;
 		}
@@ -52,7 +55,7 @@ public class SmokePool extends Tool{
 			}
 		}else if(cooldownLeft > 0){
 			cooldownLeft--;
-			if(cooldownLeft == 0 && !Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get())) {
+			if(cooldownLeft == 0 && (getOwner() == null || !Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get()))) {
 				setItemStack(Ioc.resolve(SmokePoolHandler.class).getItem());
 			}
 		}
@@ -103,9 +106,10 @@ public class SmokePool extends Tool{
 		inside.clear();
 		placed = false;
 		cooldownLeft = handler.getCooldownTick();
-		setItemStack(handler.getCooldownItem());
-		getOwner().setCooldown(handler.getCooldownItem().getType(), handler.getCooldownTick());
-	
+		setItemStack(handler.getCooldownItem());	
+		if(getOwner() != null) {
+			getOwner().setCooldown(handler.getCooldownItem().getType(), handler.getCooldownTick());	
+		}
 	}
 
 	@Override
