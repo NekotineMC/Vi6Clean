@@ -19,6 +19,9 @@ import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.TitlePart;
 
 public class LightKothEffect implements KothEffect, TextPlaceholder{
 	private static final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
@@ -40,10 +43,18 @@ public class LightKothEffect implements KothEffect, TextPlaceholder{
 			game.getGuards().forEach(
 					p -> statusEffectModule.addEffect(p, unlimitedDarkened));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
+			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont désactivé le générateur", NamedTextColor.YELLOW));
+			game.getGuards().sendMessage(Component.text("Les voleurs ont désactivé le générateur", NamedTextColor.YELLOW));
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
+			game.getThiefs().sendMessage(Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
 		}else if(owning==Vi6Team.GUARD) {
 			game.getGuards().forEach(
 					p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont redémarré le générateur", NamedTextColor.RED));
+			game.getThiefs().sendMessage(Component.text("Les gardes ont redémarré le générateur", NamedTextColor.RED));
+			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a redémarré le générateur", NamedTextColor.GREEN));
+			game.getGuards().sendMessage(Component.text("Votre équipe a redémarré le générateur", NamedTextColor.GREEN));
 		}
 	}
 	@Override

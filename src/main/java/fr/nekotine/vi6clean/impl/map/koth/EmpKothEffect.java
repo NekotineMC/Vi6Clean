@@ -19,6 +19,9 @@ import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.effect.EmpStatusEffectType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.TitlePart;
 
 public class EmpKothEffect implements KothEffect,TextPlaceholder{
 	private static final int AMOUNT_FOR_OTHER_CAPTURE = 200;
@@ -40,10 +43,18 @@ public class EmpKothEffect implements KothEffect,TextPlaceholder{
 			game.getGuards().forEach(
 					p -> statusEffectModule.addEffect(p, effect));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
+			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
+			game.getGuards().sendMessage(Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
+			game.getThiefs().sendMessage(Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
 		}else if(owning==Vi6Team.GUARD) {
 			game.getGuards().forEach(
 					p -> statusEffectModule.removeEffect(p, effect));
 			koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
+			game.getThiefs().sendMessage(Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
+			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
+			game.getGuards().sendMessage(Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
 		}
 	}
 	@Override
