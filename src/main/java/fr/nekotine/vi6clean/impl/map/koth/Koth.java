@@ -75,9 +75,6 @@ public class Koth{
 	public int getTickAdvancement() {
 		return tickAdvancement;
 	}
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
-	}
 	public void setText(Component text) {
 		this.text = text;
 	}
@@ -98,6 +95,9 @@ public class Koth{
 		isEnabled = true;
 	}
 	public void clean() {
+		if(!isEnabled) {
+			return;
+		}
 		effect.clean();
 		captureAdvancement = 0;
 		display.remove();
