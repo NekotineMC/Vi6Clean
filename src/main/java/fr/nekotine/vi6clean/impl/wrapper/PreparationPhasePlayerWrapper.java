@@ -40,11 +40,6 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		if (wrapped==null) {
 			return;
 		}
-		try {
-			throw new Exception("PrepWrapper="+wrapped);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
 		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
 		var readyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
