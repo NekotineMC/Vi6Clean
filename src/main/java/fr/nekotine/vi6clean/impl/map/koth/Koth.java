@@ -34,7 +34,7 @@ public class Koth{
 	private MapLocationElement displayLocation = new MapLocationElement();
 	private Set<Player> inside = new HashSet<>(8);
 	
-	private boolean isEnabled = true;
+	private boolean isEnabled = false;
 	private int captureAmountNeeded = 200;
 	private static final int PARTICLE_DENSITY = 1;
 	private Vi6Team owningTeam = Vi6Team.GUARD;
@@ -95,6 +95,7 @@ public class Koth{
 				PARTICLE_DENSITY, 
 				v -> rectangle.add(new Location(world, v.getX(), v.getY(), v.getZ())));
 		effect.setup(this);
+		isEnabled = true;
 	}
 	public void clean() {
 		effect.clean();
