@@ -75,7 +75,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 				continue;
 			}
 			if (!ownerloc.getWorld().equals(destloc.getWorld()) ||
-					enemyTeam.anyMatch(e -> e.equals(evtPlayer)) ||
+					!enemyTeam.anyMatch(e -> e.equals(evtPlayer)) ||
 					evtPlayer.equals(owner) ||
 					evt.getTo().distanceSquared(owner.getLocation()) > DETECTION_RANGE_SQUARED ||
 					flagModule.hasAny(owner, EmpStatusFlag.get())) {
