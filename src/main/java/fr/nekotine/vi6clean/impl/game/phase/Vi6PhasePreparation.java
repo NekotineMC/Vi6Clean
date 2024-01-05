@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -37,9 +38,9 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.EmpKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
-import fr.nekotine.vi6clean.impl.map.koth.LightKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
@@ -112,13 +113,20 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		
 		List<AbstractKothEffect> kothEffects = new ArrayList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
 		List<Koth> koths = new ArrayList<>(map.getKoths().backingMap().values());
-		while(kothEffects.size() > 0 && koths.size() > 0) {
+		var limit = Ioc.resolve(Configuration.class).getInt("koth.limit", 0);
+		var count = 0;
+		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
+			count++;
 			var indexEffect = random.nextInt(0, kothEffects.size());
-			var indexKoth = random.nextInt(0, koths.size());
 			var effect = kothEffects.get(indexEffect);
+			var probability = effect.getProbability();
+			kothEffects.remove(indexEffect);
+			if(random.nextDouble() > probability) {
+				continue;
+			}
+			var indexKoth = random.nextInt(0, koths.size());
 			var koth = koths.get(indexKoth);
 			koth.setup(effect, world);
-			kothEffects.remove(indexEffect);
 			koths.remove(indexKoth);
 		}
 	}
