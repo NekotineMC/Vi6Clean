@@ -31,7 +31,7 @@ public class Recall extends Tool{
 		}else {
 			var trackModule = Ioc.resolve(ClientTrackModule.class);
 			trackModule.untrack(getOwner());
-			
+			n=0;
 			isPlaced = true;
 			placedLocation = getOwner().getLocation();
 			particleLocation = placedLocation.clone().subtract(0, 0.1, 0);
