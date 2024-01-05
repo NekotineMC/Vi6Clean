@@ -12,6 +12,7 @@ import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
 import fr.nekotine.core.inventory.menu.element.ComponentDisplayMenuItem;
 import fr.nekotine.core.inventory.menu.layout.ToolbarMenuLayout;
 import fr.nekotine.core.inventory.menu.layout.WrapMenuLayout;
+import fr.nekotine.core.inventory.menu.layout.ToolbarMenuLayout.Direction;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
@@ -48,13 +49,16 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		var wrapLayout = new WrapMenuLayout();
 		var team =  Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class).getTeam();
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
-				.filter(t -> t.getTeamsAvailableFor().contains(team) /*&& !t.isRune()*/)
+				.filter(t -> t.getTeamsAvailableFor().contains(team) && !t.isRune())
 				.collect(Collectors.toCollection(ArrayList::new))){
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
-		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
+		var toolbarRunes = new ToolbarMenuLayout(ItemStackUtil.make(Material.BLUE_STAINED_GLASS_PANE,Component.empty()), wrapLayout, Direction.DOWN);
+		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), toolbarRunes);
 		toolbar.addTool(readyItem);
 		toolbar.addTool(moneyIndicator);
+		toolbarRunes.addTool(readyItem);
+		toolbarRunes.addTool(moneyIndicator);
 		menu = new MenuInventory(toolbar,6);
 	}
 
