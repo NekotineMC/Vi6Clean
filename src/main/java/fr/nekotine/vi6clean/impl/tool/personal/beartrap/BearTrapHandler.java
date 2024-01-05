@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal.jawtrap;
+package fr.nekotine.vi6clean.impl.tool.personal.beartrap;
 
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
