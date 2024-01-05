@@ -23,20 +23,20 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
 
-public class EmpKothEffect implements KothEffect,TextPlaceholder{
-	private static final int AMOUNT_FOR_OTHER_CAPTURE = 200;
-	private static final int AMOUNT_FOR_GUARD_CAPTURE = 400;
-	private static final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
+public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder{
+	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_other", 200);
+	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_guard", 400);
+	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
+	private final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
 	
 	//
 	
-	private Koth koth;
 	@Override
-	public void tick() {
-		koth.setText(textDisplay.buildFirst());
+	public void tick(Koth koth) {
+		koth.setText(textDisplay.buildFirst(koth));
 	}
 	@Override
-	public void capture(Vi6Team owning, Vi6Team losing) {
+	public void capture(Koth koth, Vi6Team owning, Vi6Team losing) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
 		if(losing==Vi6Team.GUARD) {
@@ -60,13 +60,10 @@ public class EmpKothEffect implements KothEffect,TextPlaceholder{
 	@Override
 	public void setup(Koth koth) {
 		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
-		this.koth = koth;
 		koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 	}
 	@Override
 	public void clean() {
-		if(koth.getOwningTeam() == Vi6Team.GUARD) 
-			return;
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		Ioc.resolve(Vi6Game.class).getGuards().forEach(
 				p -> statusEffectModule.removeEffect(p, effect));
@@ -83,12 +80,11 @@ public class EmpKothEffect implements KothEffect,TextPlaceholder{
 	
 	private final Builder textDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
 			.addStyle(NekotineStyles.STANDART)
-			.addLine("<dark_purple><u>Brouilleur</u></dark_purple>\n"
-					+"<aqua><power></aqua> <evolution>\n"
-					+"<status>")
+			.addLine(DISPLAY_TEXT)
 			.addPlaceholder(this));
 	@Override
-	public List<Pair<String, String>> resolve() {
+	public <T> List<Pair<String, String>> resolve(T resolveData) {
+		var koth = (Koth)resolveData;
 		var owningTeam = koth.getOwningTeam();
 		var tickAdvancement = koth.getTickAdvancement();
 		var percentage = (int)(((float)koth.getCaptureAdvancement() / koth.getCaptureAmountNeeded()) * 100);
@@ -103,4 +99,5 @@ public class EmpKothEffect implements KothEffect,TextPlaceholder{
 				Pair.from("power", power),
 				Pair.from("evolution", evolution));
 	}
+	
 }

@@ -1,0 +1,4 @@
+probability: 0.8
+capture_amount_guard: 400
+capture_amount_other: 200
+display_text: "<dark_purple><u>Brouilleur</u></dark_purple>\n <aqua><power></aqua> <evolution>\n <status>"

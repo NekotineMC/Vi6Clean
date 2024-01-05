@@ -2,3 +2,6 @@ update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clea
 
 majordom:
    delay: 40 # Delai en tick
+   
+koth:
+   limit: 2

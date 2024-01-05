@@ -45,7 +45,7 @@ public class Koth{
 	private int tickAdvancement;
 	private TextDisplay display;
 	private int captureAdvancement;
-	private KothEffect effect;
+	private AbstractKothEffect effect;
 	private LinkedList<Location> rectangle = new LinkedList<Location>();
 	private BukkitTask particleTask;
 	
@@ -85,7 +85,7 @@ public class Koth{
 	
 	//
 	
-	public void setup(KothEffect effect, World world) {
+	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
 	
 		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
@@ -154,14 +154,14 @@ public class Koth{
 		if (captureAdvancement >= captureAmountNeeded) {
 			var newOwning = Ioc.resolve(WrappingModule.class).
 					getWrapperOptional(firstEnemy, PlayerWrapper.class).get().getTeam();
-			effect.capture(newOwning, owningTeam);
+			effect.capture(this, newOwning, owningTeam);
 			owningTeam = newOwning;
 			captureAdvancement = 0;
 			tickAdvancement = 0;
 		}
 		
 		//effect & display
-		effect.tick();
+		effect.tick(this);
 		display.text(text);
 	}
 }
