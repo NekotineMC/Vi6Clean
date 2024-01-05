@@ -113,14 +113,15 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		
 		List<AbstractKothEffect> kothEffects = new ArrayList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
 		List<Koth> koths = new ArrayList<>(map.getKoths().backingMap().values());
-		var limit = Ioc.resolve(Configuration.class).getInt("koth.limit", 0);
+		var limit = Ioc.resolve(Configuration.class).getInt("koth.limit", 2);
 		var count = 0;
 		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
 			count++;
 			var indexEffect = random.nextInt(0, kothEffects.size());
 			var effect = kothEffects.get(indexEffect);
-			var probability = effect.getProbability();
 			kothEffects.remove(indexEffect);
+			var probability = effect.getProbability();
+			
 			if(random.nextDouble() > probability) {
 				continue;
 			}
