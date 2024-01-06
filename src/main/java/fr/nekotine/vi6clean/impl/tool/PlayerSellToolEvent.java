@@ -1,9 +1,11 @@
 package fr.nekotine.vi6clean.impl.tool;
 
-import org.bukkit.event.Event;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.player.PlayerEvent;
 
-public class PlayerSellToolEvent extends Event{
+public class PlayerSellToolEvent extends PlayerEvent implements Cancellable{
 	private static final HandlerList handlers = new HandlerList();
 	public static HandlerList getHandlerList() {
 	    return handlers;
@@ -17,9 +19,10 @@ public class PlayerSellToolEvent extends Event{
 	
 	private Tool tool;
 	private int price;
-	private boolean removeCancelled = false; //Only cancel the removal of the tool, not the money given
-	private boolean allCancelled = false; //Also cancel the money being given
-	public PlayerSellToolEvent(Tool tool, int price) {
+	private boolean cancelled = false;
+	
+	public PlayerSellToolEvent(Player player, Tool tool, int price) {
+		super(player);
 		this.tool = tool;
 		this.price = price;
 	}
@@ -36,16 +39,12 @@ public class PlayerSellToolEvent extends Event{
 	public void setPrice(int price) {
 		this.price = price;
 	}
-	public boolean isRemoveCancelled() {
-		return removeCancelled;
+	@Override
+	public boolean isCancelled() {
+		return cancelled;
 	}
-	public void setRemoveCancelled(boolean removeCancelled) {
-		this.removeCancelled = removeCancelled;
-	}
-	public boolean isAllCancelled() {
-		return allCancelled;
-	}
-	public void setAllCancelled(boolean allCancelled) {
-		this.allCancelled = allCancelled;
+	@Override
+	public void setCancelled(boolean cancel) {
+		cancelled = cancel;
 	}
 }

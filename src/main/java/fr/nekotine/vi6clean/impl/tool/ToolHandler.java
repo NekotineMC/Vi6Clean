@@ -77,7 +77,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private final int price;
 
 	private final int limite;
-	
+
 	private final boolean isRune;
 
 	protected final List<Component> lore;
@@ -85,7 +85,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	private boolean active;
 
 	private Configuration configuration;
-	
+
 	private final Set<Vi6Team> forTeams = new HashSet<>(2);
 
 	public ToolHandler(Supplier<T> toolSupplier) {
@@ -116,9 +116,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		// Values
 		limite = configuration.getInt("amount_limit", -1);
 		price = configuration.getInt("price", 9999);
-		displayName = Ioc.resolve(TextModule.class).message(Leaf.builder()
-				.addLine(configuration.getString("display_name", "Unnamed"))
-				.addStyle(NekotineStyles.NEKOTINE))
+		displayName = Ioc
+				.resolve(TextModule.class).message(Leaf.builder()
+						.addLine(configuration.getString("display_name", "Unnamed")).addStyle(NekotineStyles.NEKOTINE))
 				.buildFirst();
 		// Shop item
 		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
@@ -182,14 +182,15 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	 * @param player
 	 * @return If tool could be attached.
 	 */
-	public final boolean attachNewToPlayer(Player player) {
+	public final T attachNewToPlayer(Player player) {
 		var tool = toolSupplier.get();
+		tool.setHandler(this);
 		if (attachToPlayer(tool, player)) {
 			player.getInventory().addItem(tool.getItemStack());
 			tools.add(tool);
-			return true;
+			return tool;
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -245,15 +246,15 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public List<Component> getLore() {
 		return lore;
 	}
-	
+
 	public Component getDisplayName() {
 		return displayName;
 	}
 
-	public Set<Vi6Team> getTeamsAvailableFor(){
+	public Set<Vi6Team> getTeamsAvailableFor() {
 		return forTeams;
 	}
-	
+
 	/**
 	 * 
 	 * @param player
@@ -269,11 +270,52 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return false;
 		}
 		var wrap = optionalWrap.get();
-		if (wrap.getMoney() >= price && attachNewToPlayer(player)) {
-			wrap.setMoney(wrap.getMoney() - price);
-			return true;
+		if (!isRune) {
+			if (wrap.getMoney() >= price && attachNewToPlayer(player) != null) {
+				wrap.setMoney(wrap.getMoney() - price);
+				return true;
+			}
+		}else {
+			var r = wrap.getRune();
+			if (r != null) {
+				r.getHandler().trySell(player, r);
+			}
+			var t = attachNewToPlayer(player);
+			if (t != null) {
+				wrap.setRune(t);
+				return true;
+			}
 		}
 		return false;
+	}
+
+	/**
+	 * 
+	 * @param player
+	 * @param tool
+	 * @return La vente n'as pas eu lieu
+	 */
+	public boolean trySell(Player player, Tool tool) {
+		if (tool.getHandler() != this) {
+			return false;
+		}
+		@SuppressWarnings("unchecked")
+		T t = (T)tool;
+		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
+		if (optWrap.isEmpty()) {
+			return false;
+		}
+		var sellEvent = new PlayerSellToolEvent(player, tool, price);
+		EventUtil.call(sellEvent);
+		if (sellEvent.isCancelled()) {
+			return false;
+		}
+		remove(t);
+		if (!isRune) {
+			var wrap = optWrap.get();
+			wrap.setMoney(wrap.getMoney() + sellEvent.getPrice());
+		}
+		return true;
 	}
 
 	@EventHandler
@@ -310,7 +352,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return;
 		}
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
+		if (optWrap.isEmpty() || player.getOpenInventory() != evt.getInventory()) {
 			return;
 		}
 		var match = tools.stream()
@@ -319,17 +361,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (match.isEmpty()) {
 			return;
 		}
-		
-		var sellEvent = new PlayerSellToolEvent(match.get(), price);
-		EventUtil.call(sellEvent);
-		if(sellEvent.isAllCancelled()) {
-			return;
-		}
-		if(!sellEvent.isRemoveCancelled()) {
-			remove(match.get());
-		}
-		var wrap = optWrap.get();
-		wrap.setMoney(wrap.getMoney() + price);
+		trySell(player, match.get());
 	}
 
 	@EventHandler

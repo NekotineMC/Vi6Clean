@@ -8,6 +8,8 @@ import fr.nekotine.core.util.InventoryUtil;
 
 public abstract class Tool {
 	
+	private ToolHandler<?> handler;
+	
 	private ItemStack itemStack;
 	
 	private Player owner;
@@ -41,5 +43,13 @@ public abstract class Tool {
 
 	public void setOwner(Player owner) {
 		this.owner = owner;
+	}
+
+	public ToolHandler<?> getHandler() {
+		return handler;
+	}
+	
+	public void setHandler(ToolHandler<?> handler) {
+		this.handler = handler;
 	}
 }
