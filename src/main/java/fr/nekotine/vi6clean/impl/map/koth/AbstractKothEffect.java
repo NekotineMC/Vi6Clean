@@ -23,7 +23,7 @@ public abstract class AbstractKothEffect {
 		var an = getClass().getDeclaredAnnotation(KothCode.class);
 		code = an.value();
 		try {
-			configuration = ConfigurationUtil.updateAndLoadYaml("koths/" + code + ".yml", "/tools/" + code + ".yml");
+			configuration = ConfigurationUtil.updateAndLoadYaml("koths/" + code + ".yml", "/koths/" + code + ".yml");
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration du koth " + code, e);
 			configuration = new YamlConfiguration();
