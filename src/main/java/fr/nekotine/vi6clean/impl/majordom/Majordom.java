@@ -36,6 +36,7 @@ public final class Majordom implements Listener {
 		for (var block : new LinkedList<>(toClose.keySet())) {
 			tryToggle(block);
 		}
+		disable();
 	}
 	
 	private boolean tryToggle(Block block) {

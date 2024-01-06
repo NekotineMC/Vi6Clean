@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal.jawtrap;
+package fr.nekotine.vi6clean.impl.tool.personal.beartrap;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -47,7 +47,7 @@ public class BearTrap extends Tool{
 		armed = false;
 		triggered = true;
 		fang = location.getWorld().spawnEntity(
-				location, EntityType.EVOKER_FANGS, SpawnReason.TRAP);
+				hit.getLocation(), EntityType.EVOKER_FANGS, SpawnReason.TRAP);
 		trap.getEquipment().setHelmet(Ioc.resolve(BearTrapHandler.class).getTriggeredItem());
 		Ioc.resolve(StatusEffectModule.class).addEffect(hit, EFFECT);
 	}

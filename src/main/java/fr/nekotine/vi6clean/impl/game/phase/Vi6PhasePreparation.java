@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
@@ -27,6 +29,7 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
@@ -47,6 +50,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> implements Listener{
+	
+	private Logger logger = new NekotineLogger(getClass());
 	
 	private final ItemStack guardSword = new ItemStackBuilder(Material.DIAMOND_SWORD)
 			.name(Component.text("Épée de garde", NamedTextColor.GOLD))
@@ -113,21 +118,24 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		
 		List<AbstractKothEffect> kothEffects = new ArrayList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
 		List<Koth> koths = new ArrayList<>(map.getKoths().backingMap().values());
-		var limit = Ioc.resolve(Configuration.class).getInt("koth.limit", 0);
+		var limit = Ioc.resolve(Configuration.class).getInt("koth.limit", 2);
+		logger.log(Level.INFO, "Limite de koth: "+limit);
 		var count = 0;
 		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
 			count++;
 			var indexEffect = random.nextInt(0, kothEffects.size());
 			var effect = kothEffects.get(indexEffect);
-			var probability = effect.getProbability();
 			kothEffects.remove(indexEffect);
+			var probability = effect.getProbability();
 			if(random.nextDouble() > probability) {
 				continue;
 			}
+			
 			var indexKoth = random.nextInt(0, koths.size());
 			var koth = koths.get(indexKoth);
 			koth.setup(effect, world);
 			koths.remove(indexKoth);
+			logger.log(Level.INFO, "Spawning koth at "+koth.getBoundingBox().getCenter());
 		}
 	}
 

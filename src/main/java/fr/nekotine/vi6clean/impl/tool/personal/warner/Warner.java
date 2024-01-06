@@ -1,13 +1,18 @@
 package fr.nekotine.vi6clean.impl.tool.personal.warner;
 
+import java.util.Collection;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+
+import com.google.common.base.Supplier;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.SpatialUtil;
@@ -25,6 +30,7 @@ public class Warner extends Tool{
 	private boolean inHand = false;
 	private boolean sneaking = false;
 	private int n = 0;
+	private Supplier<Collection<Player>> ourTeam;
 	private ItemDisplay eye_item1;
 	private ItemDisplay eye_item2;
 	
@@ -48,7 +54,8 @@ public class Warner extends Tool{
 		eye_item2.setTransformation(getTransform(n + 4));
 		
 		Vi6Sound.WARNER_POSE.play(watchedLocation.getWorld(), watchedLocation);
-				
+		
+		ourTeam = Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class)::ourTeam;
 		handler.detachFromOwner(this);
 		placed = true;
 		return true;
@@ -57,7 +64,7 @@ public class Warner extends Tool{
 		var handler = Ioc.resolve(WarnerHandler.class);
 		if(placed && watched.isCaptured() && ++warn_delay >= handler.getWarnDelayTick()) {
 			Component message = handler.getWarnMessage(watched.getName());
-			Ioc.resolve(WrappingModule.class).getWrapper(getOwner(), PlayerWrapper.class).ourTeam().forEach(
+			ourTeam.get().forEach(
 				p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
 			);
 			cleanup();

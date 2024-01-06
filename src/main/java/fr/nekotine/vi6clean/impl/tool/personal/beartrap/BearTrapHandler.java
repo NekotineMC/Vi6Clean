@@ -1,4 +1,4 @@
-package fr.nekotine.vi6clean.impl.tool.personal.jawtrap;
+package fr.nekotine.vi6clean.impl.tool.personal.beartrap;
 
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
@@ -81,7 +81,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		for(BearTrap tool : getTools()) {
-			if(!tool.isPlaced()) {
+			if(!tool.isArmed()) {
 				continue;
 			}
 			if(tool.getEnemyTeam().noneMatch(p -> p.equals(evt.getPlayer()))) {

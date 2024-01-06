@@ -84,6 +84,15 @@ public class Artefact{
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
+			var guardMsg = Component.text("Artefact: ", NamedTextColor.AQUA)
+					.append(Component.text(name, NamedTextColor.AQUA))
+					.append(Component.text(" Status: ", NamedTextColor.WHITE))
+					.append(Component.text("Volé", NamedTextColor.RED));
+			for (var player : inside) {
+				if (game.getGuards().contains(player)) {
+					player.sendActionBar(guardMsg);
+				}
+			}
 		}else {
 			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 2, 0.5, 0.5, 0.5);
 			int tickAdvancement = 0;
@@ -92,9 +101,7 @@ public class Artefact{
 			var guardMsg = Component.text("Artefact: ", NamedTextColor.AQUA)
 					.append(Component.text(name, NamedTextColor.AQUA))
 					.append(Component.text(" Status: ", NamedTextColor.WHITE))
-					.append(isCaptured ?
-							Component.text("Volé", NamedTextColor.RED):
-								Component.text("Sécurisé", NamedTextColor.GREEN));
+					.append(Component.text("Sécurisé", NamedTextColor.GREEN));
 			var thiefMsg = Component.text("Vole ", NamedTextColor.GOLD)
 					.append(Component.text(name, NamedTextColor.AQUA))
 					.append(Component.text(" - ", NamedTextColor.GOLD))
