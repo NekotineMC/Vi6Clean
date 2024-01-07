@@ -5,17 +5,17 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.vi6clean.impl.tool.Tool;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Scanner extends Tool{
 
 	@Override
 	protected ItemStack makeInitialItemStack() {
+		var handler = Ioc.resolve(ScannerHandler.class);
 		return new ItemStackBuilder(Material.CLOCK)
-		.name(Component.text("Scanner",NamedTextColor.GOLD))
-		.lore(ScannerHandler.LORE)
+		.name(handler.getDisplayName())
+		.lore(handler.getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();

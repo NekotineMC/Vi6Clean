@@ -1,10 +1,7 @@
 package fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic;
 
-import java.util.List;
-
 import org.bukkit.Particle;
 import org.bukkit.Vibration;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
@@ -16,13 +13,10 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("parabolic_mic")
 public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
@@ -32,13 +26,9 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMic>{
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
-	private final double DETECTION_BLOCK_RANGE = Ioc.resolve(Configuration.class).getDouble("tool.parabolic_mic.range", 20d);
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 20d);
 	
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	
-	public static final List<Component> LORE = Vi6ToolLoreText.PARABOLIC_MIC.make(
-			Placeholder.unparsed("range", Ioc.resolve(Configuration.class).getDouble("tool.parabolic_mic.range", 20)+" blocs")
-			);
 	
 	@Override
 	protected void onAttachedToPlayer(ParabolicMic tool, Player player) {

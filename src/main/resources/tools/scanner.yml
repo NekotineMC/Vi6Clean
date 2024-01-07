@@ -2,6 +2,8 @@ display_name: Scanner
 price: 600
 amount_limit: 1
 shop_icon: CLOCK
+delay: 30.0 #délai du scan en secondes
+duration: 7.0 #durée du scan en secondes 
 is_rune: true
 lore:
    - <lore>Vous permet de détecter les enemis

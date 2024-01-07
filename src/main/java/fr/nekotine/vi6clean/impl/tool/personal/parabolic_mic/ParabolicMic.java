@@ -14,10 +14,11 @@ public class ParabolicMic extends Tool{
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
+		var handler = Ioc.resolve(ParabolicMicHandler.class);
 		return ItemStackUtil.make(
 				Material.CALIBRATED_SCULK_SENSOR,
-				Ioc.resolve(ParabolicMicHandler.class).getDisplayName(),
-				Ioc.resolve(ParabolicMicHandler.class).getLore());
+				handler.getDisplayName(),
+				handler.getLore());
 	}
 
 	@Override
