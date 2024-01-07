@@ -40,6 +40,8 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private InMapState state;
 	
+	private String room;
+	
 	public InMapPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
 		var pw = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, PlayerWrapper.class);
@@ -182,5 +184,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setState(InMapState state) {
 		this.state = state;
+	}
+
+	public String getRoom() {
+		return room;
+	}
+
+	public void setRoom(String room) {
+		this.room = room;
 	}
 }

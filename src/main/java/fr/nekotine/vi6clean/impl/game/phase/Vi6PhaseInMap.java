@@ -209,6 +209,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					zone.remove(player);
 				}
 			});
+			map.getRoomCaptors().backingMap().values().stream().forEach(room -> {
+				if (room.getTriggerBox().get().contains(destVect)) {
+					wrapper.setRoom(room.getName());
+				}
+			});
 		}else if (wrapper.getState() == InMapState.ENTERING){
 			var entrance = map.getEntrances().backingMap().values().stream()
 					.filter(e -> e.getEntranceTriggerBox().get().contains(destVect))

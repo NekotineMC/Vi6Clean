@@ -40,6 +40,10 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<Koth> koths = new MapDictionaryElement<>();
 	
+	@MapElementTyped(RoomCaptor.class)
+	@ComposingMap
+	private MapDictionaryElement<RoomCaptor> roomCaptors = new MapDictionaryElement<>();
+	
 	
 	public Collection<MapPositionElement> getGuardSpawns(){
 		return guardSpawns.backingMap().values();
@@ -55,6 +59,10 @@ public class Vi6Map{
 
 	public MapDictionaryElement<Entrance> getEntrances() {
 		return entrances;
+	}
+	
+	public MapDictionaryElement<RoomCaptor> getRoomCaptors() {
+		return roomCaptors;
 	}
 	
 	public MapDictionaryElement<ThiefSpawn> getThiefSpawns() {
