@@ -3,9 +3,9 @@ price: 100
 amount_limit: -1
 shop_icon: DRAGON_HEAD
 damage: 5.0 #dégats en nombre de coeurs
-trigger_range: 1 #distance d'activation du piège en blocs
-pickup_range: 1 #distance pour récupérer un piège en blocs
-spacing_distance: 1 #distance minimale entre 2 pièges à ours
+trigger_range: 0.9 #distance d'activation du piège en blocs
+pickup_range: 0.9 #distance pour récupérer un piège en blocs
+spacing_distance: 0.9 #distance minimale entre 2 pièges à ours
 is_rune: false
 lore:
    - <lore>Permet de poser et déplacer un piège à ours.
