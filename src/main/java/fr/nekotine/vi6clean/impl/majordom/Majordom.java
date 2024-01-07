@@ -7,7 +7,6 @@ import java.util.Map;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Door;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -52,12 +51,13 @@ public final class Majordom implements Listener {
 			toClose.computeIfPresent(block, (b,t) -> {t.cancel();return null;});
 			toClose.remove(block);
 		}else {
+			var plugin = Ioc.resolve(JavaPlugin.class);
 			var task = new BukkitRunnable() {
 				@Override
 				public void run() {
 					tryToggle(block);
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Ioc.resolve(Configuration.class).getInt("majordom.delay", 40));
+			}.runTaskLater(plugin, plugin.getConfig().getInt("majordom.delay", 40));
 			toClose.put(block,task);
 		}
 		openable.setOpen(!openable.isOpen());

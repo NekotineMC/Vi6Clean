@@ -5,3 +5,6 @@ majordom:
    
 koth:
    limit: 2
+   
+preparation:
+   duration: 4800 #durée de la phase de préparation en ticks
