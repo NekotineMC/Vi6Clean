@@ -71,10 +71,10 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryDropWatcher()) {
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryDropWatcher()) {
 			evt.setCancelled(true);
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPickupWatcher()) {
+		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPickupWatcher()) {
 			evt.setCancelled(true);
 		}
 	}
