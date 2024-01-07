@@ -288,6 +288,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		}
 		return false;
 	}
+	
+	public int getPrice() {
+		return price;
+	}
 
 	/**
 	 * 

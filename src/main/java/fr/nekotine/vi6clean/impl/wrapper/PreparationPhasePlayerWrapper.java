@@ -65,6 +65,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		var container = Ioc.resolve(ToolHandlerContainer.class);
 		for (var tool : container.getHandlers().stream()
 				.filter(t -> t.getTeamsAvailableFor().contains(team) && !t.isRune())
+				.sorted((a,b)->{return a.getPrice()-b.getPrice();})
 				.collect(Collectors.toCollection(ArrayList::new))){
 			wrapLayout.addElement(tool.getShopMenuItem());
 		}
@@ -85,6 +86,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		var runesWrapLayout = new WrapMenuLayout();
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
 				.filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune())
+				.sorted((a,b)->{return a.getPrice()-b.getPrice();})
 				.collect(Collectors.toCollection(ArrayList::new))){
 			runesWrapLayout.addElement(tool.getShopMenuItem());
 		}
