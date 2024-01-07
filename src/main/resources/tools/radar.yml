@@ -1,5 +1,5 @@
 display_name: <light_purple>Radar
-price: 200
+price: 400
 amount_limit: 1
 shop_icon: CALIBRATED_SCULK_SENSOR
 delay: 5.0 #durée du scan en secondes
