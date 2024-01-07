@@ -40,6 +40,8 @@ import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
@@ -211,7 +213,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			});
 			map.getRoomCaptors().backingMap().values().stream().forEach(room -> {
 				if (room.getTriggerBox().get().contains(destVect)) {
-					wrapper.setRoom(room.getName());
+					var r = room.getName();
+					if (r.contentEquals(wrapper.getRoom())) {
+						wrapper.setRoom(room.getName());
+						player.sendActionBar(Component.text("Salle: "+r,NamedTextColor.WHITE));
+					}
+					
 				}
 			});
 		}else if (wrapper.getState() == InMapState.ENTERING){
