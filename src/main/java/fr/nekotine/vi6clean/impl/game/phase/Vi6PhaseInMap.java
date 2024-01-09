@@ -195,7 +195,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					return;
 				}
 			}
-			map.getArtefacts().backingMap().values().stream().filter(a -> !a.isCaptured()).forEach(artefact -> {
+			map.getArtefacts().backingMap().values().forEach(artefact -> {
 				var zone = artefact.getInsideCaptureZone();
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
