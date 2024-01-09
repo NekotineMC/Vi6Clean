@@ -58,6 +58,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			.unbreakable()
 			.oldPvp()
 			.flags(ItemFlag.values())
+			.attackDamage(5)
 			.build();
 	
 	private Map<ArmorStand, ThiefSpawn> minimapSpawnIndicators = new HashMap<>();

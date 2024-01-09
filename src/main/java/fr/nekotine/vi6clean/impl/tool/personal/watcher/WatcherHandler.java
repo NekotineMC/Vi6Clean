@@ -40,7 +40,6 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		super(Watcher::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
-
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",3);
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	private final int NB_MAX_WATCHER = getConfiguration().getInt("nbmax",3);
@@ -60,7 +59,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 	protected void onDetachFromPlayer(Watcher tool, Player player) {
 		tool.cleanup();
 	}
-	
+
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		if (evt.getHand() != EquipmentSlot.HAND) {
@@ -71,6 +70,7 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
+	
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryDropWatcher()) {
 			evt.setCancelled(true);
 		}

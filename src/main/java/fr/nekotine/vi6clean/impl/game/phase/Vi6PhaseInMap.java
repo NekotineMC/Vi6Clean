@@ -6,14 +6,23 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 
 import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
@@ -40,6 +49,7 @@ import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -195,7 +205,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					return;
 				}
 			}
-			map.getArtefacts().backingMap().values().stream().filter(a -> !a.isCaptured()).forEach(artefact -> {
+			map.getArtefacts().backingMap().values().forEach(artefact -> {
 				var zone = artefact.getInsideCaptureZone();
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
@@ -249,4 +259,35 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 	}
 	
+	//Map protection
+	@EventHandler
+	public void itemFrameBreak(HangingBreakEvent e) {
+		e.setCancelled(true);
+	}
+	@EventHandler
+	public void itemFrameChange(PlayerItemFrameChangeEvent e) {
+		e.setCancelled(true);
+	}
+	@EventHandler
+	public void entityDamageEvent(EntityDamageEvent e) {
+		if(e.getEntity() instanceof ArmorStand || e.getEntity() instanceof Minecart) 
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void interactEvent(PlayerInteractEvent e) {
+		if(e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType()==Material.RESPAWN_ANCHOR) 
+			e.setCancelled(true);
+		
+	}
+	@EventHandler
+	public void endGateway(EntityTeleportEndGatewayEvent e) {
+		if(!(e.getEntity() instanceof Player)) 
+			e.setCancelled(true);	
+	}
+	
+	@EventHandler
+	public void vehicleDestroyEvent(VehicleDestroyEvent e) {
+		e.setCancelled(true);
+	}
 }

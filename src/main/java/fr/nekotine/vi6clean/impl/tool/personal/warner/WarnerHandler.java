@@ -107,7 +107,9 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	}
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		for(var tool : getTools()) {
+		var iterator = getTools().iterator();
+		while(iterator.hasNext()) {
+			var tool = iterator.next();
 			tool.tickWarning();
 			if(evt.timeStampReached(TickTimeStamp.HalfSecond)) {
 				tool.tickDisplay();

@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.NekotinePlugin;
+import fr.nekotine.core.eventguard.PlayerDoubleEventGuard;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.setup.PluginBuilder;
@@ -33,6 +34,7 @@ public class Vi6Main extends JavaPlugin{
 		Ioc.getProvider().registerSingleton(game);
 		Ioc.getProvider().registerSingleton(new Majordom());
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(PlayerDoubleEventGuard.class);
 		var container = new ToolHandlerContainer();
 		container.discoverHandlers();
 		Ioc.getProvider().registerSingleton(container);
