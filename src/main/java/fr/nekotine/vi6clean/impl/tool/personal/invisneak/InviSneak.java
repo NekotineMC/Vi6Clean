@@ -12,8 +12,8 @@ import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.status.effect.InvisibleStatusEffectType;
-import fr.nekotine.vi6clean.impl.status.flag.InvisibleStatusFlag;
+import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.flag.InvisibilityStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
 public class InviSneak extends Tool{
@@ -24,7 +24,7 @@ public class InviSneak extends Tool{
 	
 	private boolean emp;
 	
-	private final StatusEffect invisibleEffect = new StatusEffect(InvisibleStatusEffectType.get(), -1);
+	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -100,7 +100,7 @@ public class InviSneak extends Tool{
 	@Override
 	protected void cleanup() {
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		flagModule.removeFlag(getOwner(), InvisibleStatusFlag.get());
+		flagModule.removeFlag(getOwner(), InvisibilityStatusFlag.get());
 	}
 
 	//

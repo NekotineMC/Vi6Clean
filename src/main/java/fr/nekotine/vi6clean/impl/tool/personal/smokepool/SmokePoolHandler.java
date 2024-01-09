@@ -22,7 +22,7 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.status.effect.InvisibleStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -39,7 +39,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePool>{
 	private final double DIAMETER = getConfiguration().getDouble("diameter", 31.4159);
 	private final int DURATION_TICK = (int)(20*getConfiguration().getDouble("duration", 8));
 	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown", 20));
-	private final StatusEffect INVISIBLE = new StatusEffect(InvisibleStatusEffectType.get(), DURATION_TICK);
+	private final StatusEffect INVISIBLE = new StatusEffect(TrueInvisibilityStatusEffectType.get(), DURATION_TICK);
 	private final ItemStack ITEM = new ItemStackBuilder(
 			Material.FIREWORK_STAR)
 			.name(getDisplayName())

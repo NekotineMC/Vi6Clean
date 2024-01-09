@@ -48,8 +48,8 @@ public class OmniCaptedStatusFlag implements StatusFlag{
 			glowModule.glowEntityFor(appliedTo, ennemi);
 		}
 		player.showTitle(title);
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibleStatusFlag.get())) {
-			InvisibleStatusFlag.get().removeStatus(appliedTo); // Remove status without removing flag
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {
+			InvisibilityStatusFlag.get().removeStatus(appliedTo); // Remove status without removing flag
 		}
 	}
 
@@ -67,8 +67,8 @@ public class OmniCaptedStatusFlag implements StatusFlag{
 			glowModule.unglowEntityFor(appliedTo, ennemi);
 		}
 		player.clearTitle();
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibleStatusFlag.get())) {
-			InvisibleStatusFlag.get().applyStatus(appliedTo); // Add status without reset flag
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {
+			InvisibilityStatusFlag.get().applyStatus(appliedTo); // Add status without reset flag
 		}
 	}
 
