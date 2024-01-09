@@ -40,7 +40,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private InMapState state;
 	
-	private String room;
+	private String room = "";
 	
 	public InMapPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);

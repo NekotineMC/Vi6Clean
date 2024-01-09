@@ -214,8 +214,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			map.getRoomCaptors().backingMap().values().stream().forEach(room -> {
 				if (room.getTriggerBox().get().contains(destVect)) {
 					var r = room.getName();
-					if (r.contentEquals(wrapper.getRoom())) {
-						wrapper.setRoom(room.getName());
+					if (!r.contentEquals(wrapper.getRoom())) {
+						wrapper.setRoom(r);
 						player.sendActionBar(Component.text("Salle: "+r,NamedTextColor.WHITE));
 					}
 					

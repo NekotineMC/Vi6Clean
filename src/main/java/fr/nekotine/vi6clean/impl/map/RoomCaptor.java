@@ -5,7 +5,7 @@ import fr.nekotine.core.map.element.MapBoundingBoxElement;
 
 public class RoomCaptor {
 
-	private String name;
+	private String name = "";
 	
 	@ComposingMap
 	private MapBoundingBoxElement triggerBox = new MapBoundingBoxElement();
