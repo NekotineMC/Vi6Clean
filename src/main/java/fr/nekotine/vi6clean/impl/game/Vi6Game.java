@@ -56,7 +56,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private String mapName;
 	
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	public Vi6Game() {
 		
