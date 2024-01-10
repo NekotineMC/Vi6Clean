@@ -356,7 +356,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return;
 		}
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty() || player.getOpenInventory() != evt.getInventory()) {
+		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
 			return;
 		}
 		var match = tools.stream()
