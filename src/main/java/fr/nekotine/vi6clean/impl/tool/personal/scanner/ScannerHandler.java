@@ -115,6 +115,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 					for (var p : scanInfo.getSecond()) {
 						pmanager.sendServerPacket(guard, p);
 					}
+					Vi6Sound.SCANNER_SCAN.play(guard);
 				}
 			}
 			new BukkitRunnable() {
@@ -140,6 +141,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 					for (var p : scanInfo.getSecond()) {
 						pmanager.sendServerPacket(thief, p);
 					}
+					Vi6Sound.SCANNER_SCAN.play(thief);
 				}
 			}
 			new BukkitRunnable() {
@@ -156,7 +158,6 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 				}
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), SCAN_LIFETIME_TICK);
 		}
-		Vi6Sound.SCANNER_SCAN.play(game);
 	}
 	
 	private Pair<Integer,PacketContainer[]> makeScanCreationPackets(ProtocolManager pmanager, Player player) {
