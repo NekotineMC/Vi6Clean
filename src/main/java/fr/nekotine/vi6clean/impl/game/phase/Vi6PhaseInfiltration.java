@@ -16,7 +16,6 @@ import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
@@ -83,22 +82,22 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		if (game.getThiefs().stream()
 				.allMatch(guard -> !wrappingModule.getWrapper(guard, InMapPhasePlayerWrapper.class).isInside())) {
+			try {
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
-			complete();
 			var spectatorTimeSeconds = Duration
 					.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
+			var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+			var map = inMapPhase.getMap();
+			var spawns = map.getGuardSpawns();
+			if (spawns.size() < 1) {
+				return;
+			}
 			new BukkitRunnable() {
 
 				@Override
 				public void run() {
-					var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-					var map = inMapPhase.getMap();
-					var spawns = map.getGuardSpawns();
-					if (spawns.size() < 1) {
-						throw new RuntimeException("Impossible de teleporter les joueurs dans la carte, aucun spawn n'est configure");
-					}
 					var spawnsIte = spawns.iterator();
 					for(var player : getItemCollection()){
 						var loc = spawnsIte.next();
@@ -111,6 +110,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				}
 
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
+			}finally {
+				complete();
+			}
 		}
 	}
 
