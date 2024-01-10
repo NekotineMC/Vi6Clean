@@ -58,7 +58,7 @@ public class TazedStatusFlag implements StatusFlag, Listener{
 				EntityUtil.fakeDamage(e,player);
 			}
 			e.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, e.getLocation().add(0, 0.2, 0), 10, 0, 0.6, 0);
-			Vi6Sound.TAZER_SHOCKING.play(e.getWorld());
+			Vi6Sound.TAZER_SHOCKING.play(e.getWorld(),e);
 		}
 	}
 	
