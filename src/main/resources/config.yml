@@ -8,3 +8,5 @@ koth:
    
 preparation:
    duration: 4800 #durée de la phase de préparation en ticks
+
+game_end_spectator_time: 5 # délais en secondes
