@@ -75,6 +75,10 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		toolbar.addTool(runesItem);
 		menu = new MenuInventory(toolbar,6);
 		// Runes page
+		var runesReadyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
+				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
+				this::isReadyForNextPhase,
+				this::setReadyForNextPhase);
 		var backItem = new ActionMenuItem(new ItemStackBuilder(Material.PLAYER_HEAD)
 				.skull("76ebaa41d1d405eb6b60845bb9ac724af70e85eac8a96a5544b9e23ad6c96c62")
 				.flags(ItemFlag.values()).name(Component.text("Retour",NamedTextColor.RED)).build(), (e)->{
@@ -91,7 +95,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 			runesWrapLayout.addElement(tool.getShopMenuItem());
 		}
 		var runesToolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.BLUE_STAINED_GLASS_PANE,Component.empty()), runesWrapLayout);
-		runesToolbar.addTool(readyItem);
+		runesToolbar.addTool(runesReadyItem);
 		runesToolbar.addTool(backItem);
 		runesMenu = new MenuInventory(runesToolbar,6);
 	}
