@@ -10,7 +10,7 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.impl.status.effect.invisibility.SilentInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.invisibility.InvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import net.kyori.adventure.text.Component;
@@ -30,7 +30,7 @@ public class Bush extends Tool{
 	
 	private final StatusEffect unlimitedInvisibility = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	
-	private final StatusEffect fadeoffInvisibility = new StatusEffect(SilentInvisibilityStatusEffectType.get(),-1);
+	private final StatusEffect fadeoffInvisibility = new StatusEffect(InvisibilityStatusEffectType.get(),fadeOffDelay);
 	
 	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(
 			Material.FLOWERING_AZALEA_LEAVES,
