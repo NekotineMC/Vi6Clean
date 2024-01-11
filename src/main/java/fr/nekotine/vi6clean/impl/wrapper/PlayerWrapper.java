@@ -16,6 +16,9 @@ public class PlayerWrapper extends WrapperBase<Player> {
 
 	private Vi6Team team;
 	
+	//Used for invisibility
+	private double squared_walked_distance = 0;
+	
 	public PlayerWrapper(Player wrapped) {
 		super(wrapped);
 	}
@@ -69,6 +72,13 @@ public class PlayerWrapper extends WrapperBase<Player> {
 		default:
 			return Collections.emptySet();
 		}
+	}
+	
+	public double getSquaredWalkedDistance() {
+		return squared_walked_distance;
+	}
+	public void setSquaredWalkedDistance(double distance) {
+		this.squared_walked_distance = distance;
 	}
 
 }

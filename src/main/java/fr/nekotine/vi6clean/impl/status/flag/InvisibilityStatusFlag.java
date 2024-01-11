@@ -1,8 +1,7 @@
 package fr.nekotine.vi6clean.impl.status.flag;
 
-import java.util.HashMap;
+import javax.annotation.Nullable;
 
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,23 +14,21 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.effect.StatusEffectType;
 import fr.nekotine.core.status.flag.StatusFlag;
 import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.status.InvisibilityType;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.InvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.SilentInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class InvisibilityStatusFlag implements StatusFlag, Listener{
-
 	private static final PotionEffect invisibleEffect = new PotionEffect(PotionEffectType.INVISIBILITY, -1, 0, false, false, true);
 	private static InvisibilityStatusFlag instance;
-	private HashMap<LivingEntity, Pair<InvisibilityType,Double>> invType = new HashMap<LivingEntity, Pair<InvisibilityType,Double>>();
-	
+
 	public static final String getStatusName() {
 		return "invisible";
 	}
@@ -44,6 +41,9 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 	
 	//
 	
+	private final double STEP_DISTANCE = Ioc.resolve(JavaPlugin.class).getConfig().getDouble("invisibility.step_distance",0.75);
+	private final double SQUARED_STEP_DISTANCE = STEP_DISTANCE * STEP_DISTANCE;
+	private final int PARTICLE_COUNT = Ioc.resolve(JavaPlugin.class).getConfig().getInt("invisibility.particle_count",2);
 	public InvisibilityStatusFlag() {
 		EventUtil.register(this);
 	}
@@ -70,7 +70,6 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 	@Override
 	public void removeStatus(LivingEntity appliedTo) {
 		appliedTo.removePotionEffect(PotionEffectType.INVISIBILITY);
-		invType.remove(appliedTo);
 		if (!(appliedTo instanceof Player player)) {
 			return;
 		}
@@ -85,30 +84,29 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 	
 	//
 	
-	public void updateType(LivingEntity appliedTo) {
-		var sModule = Ioc.resolve(StatusEffectModule.class);
+	public void addFlag(LivingEntity target) {
 		var fModule = Ioc.resolve(StatusFlagModule.class);
-		if(!fModule.hasAny(appliedTo, this)) {
-			System.out.println("NEW EFFECT");
-			fModule.addFlag(appliedTo, this);
+		if(!fModule.hasAny(target, this)) {
+			fModule.addFlag(target, this);
 		}
+	}
+	public void removeFlag(LivingEntity target) {
+		if(getType(target)==null) {
+			Ioc.resolve(StatusFlagModule.class).removeFlag(target, this);
+		}
+	}
+	public @Nullable StatusEffectType getType(LivingEntity appliedTo) {
+		var sModule = Ioc.resolve(StatusEffectModule.class);
 		if(sModule.hasEffect(appliedTo, TrueInvisibilityStatusEffectType.get())) {
-			invType.put(appliedTo, Pair.from(InvisibilityType.True,0d));
-			System.out.println("TRUE");
-			return;
+			return TrueInvisibilityStatusEffectType.get();
 		}
 		if(sModule.hasEffect(appliedTo, SilentInvisibilityStatusEffectType.get())) {
-			invType.put(appliedTo, Pair.from(InvisibilityType.Silent,0d));
-			System.out.println("SILENT");
-			return;
+			return SilentInvisibilityStatusEffectType.get();
 		}
 		if(sModule.hasEffect(appliedTo, InvisibilityStatusEffectType.get())) {
-			invType.put(appliedTo, Pair.from(InvisibilityType.Default,0d));
-			System.out.println("DEFAULT");
-			return;
+			return InvisibilityStatusEffectType.get();
 		}
-		System.out.println("REMOVE");
-		fModule.removeFlag(appliedTo, this);
+		return null;
 	}
 	
 	//
@@ -119,18 +117,33 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 			return;
 		}
 		var evtP = evt.getPlayer();
-		if(!invType.containsKey(evtP) || invType.get(evtP).a()==InvisibilityType.True) {
+		if(!Ioc.resolve(StatusFlagModule.class).hasAny(evtP, this)) {
 			return;
 		}
-		var val = invType.get(evtP);
-		var d = val.b();
-		var toAdd = evt.getFrom().distanceSquared(evt.getTo());
-		if(d+toAdd > 0.14) {
-			evt.getTo().getWorld().spawnParticle(Particle.BLOCK_CRACK, evt.getTo(), 5, 0, 0, 0, 1, Material.SANDSTONE.createBlockData());
-			invType.put(evtP, Pair.from(val.a(),0d));
-		}else {
-			invType.put(evtP, Pair.from(val.a(),d+toAdd));
+		var type = getType(evtP);
+		if(TrueInvisibilityStatusEffectType.get().equals(type)) {
+			return;
 		}
-		
+		var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(evtP, PlayerWrapper.class);
+		var distance = wrapper.getSquaredWalkedDistance() + evt.getFrom().distanceSquared(evt.getTo());
+		var block_under = evt.getTo().clone().subtract(0, 0.1, 0).getBlock();
+		if(block_under.isSolid() && distance >= SQUARED_STEP_DISTANCE) {
+			distance = 0;
+			var pLoc = evt.getTo().clone().add(0, 0.2, 0);
+			var sound = InvisibilityStatusEffectType.get().equals(type);
+			for(Player enemy : wrapper.ennemiTeam()) {
+				enemy.spawnParticle(
+						Particle.BLOCK_CRACK,
+						pLoc,
+						PARTICLE_COUNT, 
+						0, 0, 0, 
+						0, 
+						block_under.getBlockData());
+				if(sound) {
+					Vi6Sound.INVISIBILITY_WALK.play(enemy, pLoc);
+				}
+			}
+		}
+		wrapper.setSquaredWalkedDistance(distance);
 	}
 }

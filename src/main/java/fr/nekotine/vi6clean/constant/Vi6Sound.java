@@ -126,6 +126,9 @@ public enum Vi6Sound {
 	}),
 	SMOKEPOOL(new Sound[] {
 	Sound.sound(Key.key("minecraft:block.fire.extinguish"), Sound.Source.AMBIENT, 1.0F, 0.0F)		
+	}),
+	INVISIBILITY_WALK(new Sound[] {
+	Sound.sound(Key.key("minecraft:block.stone.step"), Sound.Source.MASTER, 0.25f, 1f)
 	})
 	;
 	

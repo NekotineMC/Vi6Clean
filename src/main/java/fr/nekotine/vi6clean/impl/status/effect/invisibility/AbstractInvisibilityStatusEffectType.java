@@ -8,11 +8,10 @@ import fr.nekotine.vi6clean.impl.status.flag.InvisibilityStatusFlag;
 public abstract class AbstractInvisibilityStatusEffectType implements StatusEffectType{
 	@Override
 	public void applyEffect(LivingEntity target) {
-		InvisibilityStatusFlag.get().updateType(target);
+		InvisibilityStatusFlag.get().addFlag(target);
 	}
-
 	@Override
 	public void removeEffect(LivingEntity target) {
-		InvisibilityStatusFlag.get().updateType(target);
+		InvisibilityStatusFlag.get().removeFlag(target);
 	}
 }

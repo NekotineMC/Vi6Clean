@@ -30,7 +30,7 @@ public class Bush extends Tool{
 	
 	private final StatusEffect unlimitedInvisibility = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	
-	private final StatusEffect fadeoffInvisibility = new StatusEffect(SilentInvisibilityStatusEffectType.get(),fadeOffDelay);
+	private final StatusEffect fadeoffInvisibility = new StatusEffect(SilentInvisibilityStatusEffectType.get(),-1);
 	
 	private final ItemStack VISIBLE_ITEM = ItemStackUtil.make(
 			Material.FLOWERING_AZALEA_LEAVES,
