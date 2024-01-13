@@ -54,7 +54,9 @@ public class LanternHandler extends ToolHandler<Lantern>{
 		
 		// Pickup check
 		var allies = optWrap.get().ourTeam();
-		getTools().stream().filter(t -> allies.contains(t.getOwner())).forEach(tool -> tool.allyTryPickup(evtP));
+		if (getTools().stream().filter(t -> allies.contains(t.getOwner())).anyMatch(tool -> tool.allyTryPickup(evtP))) {
+			return;
+		}
 		
 		// Drop check
 		var optionalTool = getTools().stream().filter(t -> evtP.equals(t.getOwner()) && t.getItemStack().isSimilar(evt.getItem())).findFirst();

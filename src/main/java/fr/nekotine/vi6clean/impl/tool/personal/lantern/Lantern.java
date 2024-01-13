@@ -16,12 +16,16 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.glow.TeamColor;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Lantern extends Tool{
 	
@@ -91,24 +95,32 @@ public class Lantern extends Tool{
 		fallingArmorStand.setSmall(true);
 		displayedLanterns.add(lantern);
 		updateItemStack();
+		var wrapOpt = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
+		if (wrapOpt.isPresent()) {
+			var glowModule = Ioc.resolve(EntityGlowModule.class);
+			wrapOpt.get().ourTeam().stream().filter(p -> !p.equals(owner)).forEach(p -> glowModule.glowEntityFor(lantern, p, TeamColor.DARK_BLUE));
+			glowModule.glowEntityFor(lantern, owner, TeamColor.YELLOW);
+		}
 		return true;
 	}
 	
-	public void allyTryPickup(Player picking) {
+	public boolean allyTryPickup(Player picking) {
 		var owner = getOwner();
 		if (owner == null) {
-			return;
+			return false;
 		}
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		if(flagModule.hasAny(owner, EmpStatusFlag.get())) {
-			return;
+			return false;
 		}
 		var ite = displayedLanterns.iterator();
 		var range = Ioc.resolve(LanternHandler.class).getSquaredPickupBlockRange();
+		var changed = false;
 		while (ite.hasNext()) {
 			var lantern = ite.next();
 			var lanternLoc = lantern.getLocation();
 			if (picking.getLocation().distanceSquared(lanternLoc) <= range) {
+				changed = true;
 				var w = lanternLoc.getWorld();
 				Vi6Sound.LANTERNE_PRE_TELEPORT.play(w, lanternLoc);
 				if (!owner.equals(picking)) {
@@ -122,7 +134,11 @@ public class Lantern extends Tool{
 				break;
 			}
 		}
-		updateItemStack();
+		if (changed) {
+			updateItemStack();
+			return true;
+		}
+		return false;
 	}
 	
 	public void tryRemoveFallingArmorStand() {
