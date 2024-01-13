@@ -210,6 +210,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
 				}else {
+					artefact.exitZone(player);
 					zone.remove(player);
 				}
 			});

@@ -19,6 +19,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -79,18 +80,22 @@ public class Artefact{
 		return inside;
 	}
 	
+	public void exitZone(Player player) {
+		if(!inside.contains(player)) return;
+		Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class).getArtefactComponent().clearText();
+	}
+
 	public void tick() {
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
-			var msg = Component.text("Artefact: ", NamedTextColor.AQUA)
+			var stolenMessage = Component.text(
+					"Artefact: ", NamedTextColor.AQUA)
 					.append(Component.text(name, NamedTextColor.AQUA))
 					.append(Component.text(" Status: ", NamedTextColor.WHITE))
 					.append(Component.text("Volé", NamedTextColor.RED));
-			for (var player : inside) {
-				player.sendActionBar(msg);
-			}
+			inside.forEach(p -> wrapping.getWrapper(p, PlayerWrapper.class).getArtefactComponent().setText(stolenMessage));
 		}else {
 			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 2, 0.5, 0.5, 0.5);
 			int tickAdvancement = 0;
@@ -108,7 +113,7 @@ public class Artefact{
 			for (var player : inside) {
 				if (game.getGuards().contains(player)) {
 					guardCanceling = true;
-					player.sendActionBar(guardMsg);
+					wrapping.getWrapper(player, PlayerWrapper.class).getArtefactComponent().setText(guardMsg);
 				}
 				if (game.getThiefs().contains(player)) {
 					var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
@@ -117,7 +122,7 @@ public class Artefact{
 					}
 					tickAdvancement++;
 					firstThief = player;
-					player.sendActionBar(thiefMsg);
+					wrapping.getWrapper(player, PlayerWrapper.class).getArtefactComponent().setText(thiefMsg);
 				}
 			}
 			if (guardCanceling) {
