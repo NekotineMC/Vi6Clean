@@ -39,7 +39,7 @@ public class Sonar extends Tool{
 		var handler = Ioc.resolve(SonarHandler.class);
 		if (opt.get().ennemiTeamInMap().anyMatch(e -> player.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionBlockRangeSquared())) {
 			Vi6Sound.SONAR_POSITIVE.play(player.getLocation().getWorld(), player.getLocation());
-			SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 5, 0,
+			SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 2, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.CRIT, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
