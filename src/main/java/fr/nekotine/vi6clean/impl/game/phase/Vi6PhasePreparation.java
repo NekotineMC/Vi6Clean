@@ -1,14 +1,10 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
@@ -23,13 +19,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
@@ -40,19 +34,12 @@ import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
-import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.Koth;
-import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> implements Listener{
-	
-	private Logger logger = new NekotineLogger(getClass());
-	
 	private final ItemStack guardSword = new ItemStackBuilder(Material.DIAMOND_SWORD)
 			.name(Component.text("Épée de garde", NamedTextColor.GOLD))
 			.unbreakable()
@@ -114,27 +101,6 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 				e.setCancelled(true);
 			}
 		}.register();
-		
-		var random = new Random();
-		List<AbstractKothEffect> kothEffects = new ArrayList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
-		List<Koth> koths = new ArrayList<>(map.getKoths().backingMap().values());
-		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
-		logger.log(Level.INFO, "Limite de koth: "+limit);
-		var count = 0;
-		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
-			count++;
-			var indexEffect = random.nextInt(0, kothEffects.size());
-			var effect = kothEffects.remove(indexEffect);
-			var probability = effect.getProbability();
-			if(random.nextDouble() > probability) {
-				continue;
-			}
-			
-			var indexKoth = random.nextInt(0, koths.size());
-			var koth = koths.remove(indexKoth);
-			koth.setup(effect, world);
-			logger.log(Level.INFO, "Spawning koth at "+koth.getBoundingBox().getCenter());
-		}
 	}
 
 	@Override
