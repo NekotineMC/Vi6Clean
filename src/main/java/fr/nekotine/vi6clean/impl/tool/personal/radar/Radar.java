@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
@@ -50,7 +51,7 @@ public class Radar extends Tool{
 
 		Location ploc = getOwner().getLocation();
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		if (placed || !ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid() || flagModule.hasAny(getOwner(), EmpStatusFlag.get()))
+		if (placed || !EntityUtil.IsOnGround(getOwner()) || flagModule.hasAny(getOwner(), EmpStatusFlag.get()))
 			return false;
 			
 		bottom = (ItemDisplay)getOwner().getWorld().spawnEntity(ploc.add(0, 0.6, 0), EntityType.ITEM_DISPLAY);

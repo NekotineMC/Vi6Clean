@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
@@ -44,9 +45,7 @@ public class DoubleJump extends Tool{
 	}
 	
 	public boolean isOnGround() {
-		var player = getOwner();
-		return (!player.isFlying()
-				&& player.getLocation().subtract(0.0D, 0.1D, 0.0D).getBlock().getType().isSolid());
+		return !getOwner().isFlying() && EntityUtil.IsOnGround(getOwner());
 	}
 
 	//
