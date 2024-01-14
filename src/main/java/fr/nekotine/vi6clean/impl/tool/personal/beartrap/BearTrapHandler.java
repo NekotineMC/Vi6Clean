@@ -51,7 +51,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		var evtP = evt.getPlayer();
 		//Pickup
-		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)){
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)){
 			for(BearTrap tool : getTools()) {
 				if(tool.tryPickup(evtP)) {
 					evt.setCancelled(true);
@@ -74,7 +74,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 		if (optionalTool.isEmpty()) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPlace()) {
+		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPlace()) {
 			evt.setCancelled(true);
 		}
 	}
