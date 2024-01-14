@@ -1,18 +1,16 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
-import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -39,15 +37,13 @@ public class Koth{
 	
 	private boolean isEnabled = false;
 	private int captureAmountNeeded = 200;
-	private static final int PARTICLE_DENSITY = 1;
 	private Vi6Team owningTeam = Vi6Team.GUARD;
 	private Component text = Component.text("");
 	private int tickAdvancement;
 	private TextDisplay display;
 	private int captureAdvancement;
 	private AbstractKothEffect effect;
-	private LinkedList<Location> rectangle = new LinkedList<Location>();
-	private BukkitTask particleTask;
+	private BlockDisplay rectangle;
 	
 	
 	//
@@ -82,37 +78,25 @@ public class Koth{
 	public void setText(Component text) {
 		this.text = text;
 	}
+	public void setBlockDisplayData(BlockData data) {
+		rectangle.setBlock(data);
+	}
 	
 	//
 	
 	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
-	
 		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
 		display.setBillboard(Billboard.CENTER);
 		display.setShadowed(true);
-		SpatialUtil.rectangle3DFromPoints(
-				boundingBox.get(),
-				PARTICLE_DENSITY, 
-				v -> rectangle.add(new Location(world, v.getX(), v.getY(), v.getZ())));
-		effect.setup(this);
-		particleTask = new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				//particle
-				var particleData = effect.getParticle(owningTeam);
-				rectangle.forEach(l -> l.getWorld().spawnParticle(
-						particleData.a(), l, 1, particleData.b()));
-			}
-			
-		}.runTaskTimer(Ioc.resolve(JavaPlugin.class), 0, 10/*10tick = 0.5sec*/);
+		rectangle = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.BARRIER.createBlockData());
 		isEnabled = true;
+		effect.setKoth(this);
+		effect.setup();
 	}
 	public void clean() {
-		if (particleTask != null && !particleTask.isCancelled()) {
-			particleTask.cancel();
-			particleTask = null;
+		if (rectangle != null) {
+			rectangle.remove();
 		}
 		if(!isEnabled) {
 			return;
@@ -154,14 +138,14 @@ public class Koth{
 		if (captureAdvancement >= captureAmountNeeded) {
 			var newOwning = Ioc.resolve(WrappingModule.class).
 					getWrapperOptional(firstEnemy, PlayerWrapper.class).get().getTeam();
-			effect.capture(this, newOwning, owningTeam);
+			effect.capture(newOwning, owningTeam);
 			owningTeam = newOwning;
 			captureAdvancement = 0;
 			tickAdvancement = 0;
 		}
 		
 		//effect & display
-		effect.tick(this);
+		effect.tick();
 		display.text(text);
 	}
 }

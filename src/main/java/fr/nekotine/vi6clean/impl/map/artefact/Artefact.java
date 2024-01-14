@@ -6,6 +6,8 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
@@ -15,6 +17,7 @@ import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
+import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
@@ -44,6 +47,8 @@ public class Artefact{
 	@ComposingMap
 	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
 
+	private BlockDisplay boxDisplay;
+	
 	public BoundingBox getBoundingBox() {
 		return boundingBox.get();
 	}
@@ -65,10 +70,15 @@ public class Artefact{
 		isCaptured = true;
 	}
 	
+	public void setup(World world) {
+		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.ORANGE_STAINED_GLASS.createBlockData());
+	}
+	
 	public void clean() {
 		blockPatch.unpatchAll();
 		isCaptured = false;
 		capture_advancement = 0;
+		boxDisplay.remove();
 	}
 	
 	public boolean isCaptured() {
@@ -84,9 +94,7 @@ public class Artefact{
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
-			var stolenMessage = 
-					Component.text("Artefact: ", NamedTextColor.GOLD)
-					.append(Component.text(name, NamedTextColor.AQUA))
+			var stolenMessage = Component.text(name, NamedTextColor.GOLD)
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Volé", NamedTextColor.RED));
 			inside.forEach(p -> wrapping.getWrapper(p, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(stolenMessage));
@@ -95,12 +103,10 @@ public class Artefact{
 			int tickAdvancement = 0;
 			boolean guardCanceling = false;
 			Player firstThief = null;
-			var guardMsg = Component.text("Artefact: ", NamedTextColor.GOLD)
-					.append(Component.text(name, NamedTextColor.AQUA))
+			var guardMsg = Component.text(name, NamedTextColor.GOLD)
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Sécurisé", NamedTextColor.GREEN));
-			var thiefMsg = Component.text("Artefact: ", NamedTextColor.GOLD)
-					.append(Component.text(name, NamedTextColor.AQUA))
+			var thiefMsg = Component.text(name, NamedTextColor.GOLD)
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Vole", NamedTextColor.GREEN))
 					.append(Component.text(" (", NamedTextColor.WHITE))

@@ -77,7 +77,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@Override
 	public void globalSetup(Object inputData) {
 		var game = Ioc.resolve(Vi6Game.class);
-		game.getWorld().setTime(DayTime.MIDNIGHT);
+		var world = game.getWorld();
+		world.setTime(DayTime.MIDNIGHT);
 		var mapName = game.getMapName();
 		if (mapName == null) {
 			var maps = Ioc.resolve(MapModule.class).getMapFinder().list();
@@ -89,11 +90,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
-		var world = game.getWorld();
 		for (var artefact : artefacts.values()) {
-			if (game.isDebug()) {
-				debugDisplays.add(DebugUtil.debugBoundingBox(world, artefact.getBoundingBox(), Bukkit.createBlockData(Material.GLASS)));
-			}
+			artefact.setup(world);
 		}
 		var entrances = map.getEntrances().backingMap();
 		for (var entranceName : entrances.keySet()) {
@@ -104,6 +102,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox().get(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS)));
 			}
 		}
+		
 		if (game.isDebug()) {
 			for (var exit : map.getExits().backingMap().values()) {
 				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));

@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.logging.NekotineLogger;
-import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 
 public abstract class AbstractKothEffect {
@@ -32,12 +30,11 @@ public abstract class AbstractKothEffect {
 	
 	//
 	
-	public abstract void tick(Koth koth);
-	public abstract void capture(Koth koth, Vi6Team owning, Vi6Team losing);
-	public abstract void setup(Koth koth);
+	public abstract void tick();
+	public abstract void capture(Vi6Team owning, Vi6Team losing);
+	public abstract void setup();
 	public abstract void clean();
-	public abstract Pair<Particle, DustOptions> getParticle(Vi6Team owning);
-	
+
 	//
 	
 	public Configuration getConfiguration() {
@@ -48,5 +45,11 @@ public abstract class AbstractKothEffect {
 	}
 	public Koth getKoth() {
 		return koth;
+	}
+	public void setKoth(Koth koth) {
+		this.koth = koth;
+	}
+	public void setBlockDisplayData(BlockData data) {
+		koth.setBlockDisplayData(data);
 	}
 }

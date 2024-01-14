@@ -2,9 +2,7 @@ package fr.nekotine.vi6clean.impl.map.koth.effect;
 
 import java.util.List;
 
-import org.bukkit.Color;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
+import org.bukkit.Material;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
@@ -36,17 +34,17 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 	//
 	
 	@Override
-	public void tick(Koth koth) {
-		koth.setText(textDisplay.buildFirst(koth));
+	public void tick() {
+		getKoth().setText(textDisplay.buildFirst(getKoth()));
 	}
 	@Override
-	public void capture(Koth koth, Vi6Team owning, Vi6Team losing) {
+	public void capture(Vi6Team owning, Vi6Team losing) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
 		if(losing==Vi6Team.GUARD) {
 			game.getGuards().forEach(
 					p -> statusEffectModule.addEffect(p, effect));
-			koth.setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
+			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
 			game.getGuards().sendMessage(Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
@@ -54,7 +52,7 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 		}else if(owning==Vi6Team.GUARD) {
 			game.getGuards().forEach(
 					p -> statusEffectModule.removeEffect(p, effect));
-			koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
+			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
 			game.getThiefs().sendMessage(Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
 			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
@@ -62,22 +60,16 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 		}
 	}
 	@Override
-	public void setup(Koth koth) {
+	public void setup() {
 		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
-		koth.setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
+		setBlockDisplayData(Material.PURPLE_STAINED_GLASS.createBlockData());
+		getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 	}
 	@Override
 	public void clean() {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		Ioc.resolve(Vi6Game.class).getGuards().forEach(
 				p -> statusEffectModule.removeEffect(p, effect));
-	}
-	@Override
-	public Pair<Particle, DustOptions> getParticle(Vi6Team owning) {
-		return Pair.from(Particle.REDSTONE,new DustOptions(Color.PURPLE, 0.5f));
-		/*return (owning==Vi6Team.GUARD? 
-				Pair.from(Particle.REDSTONE,new DustOptions(Color.RED, 1)):
-				Pair.from(Particle.COMPOSTER,null));*/
 	}
 	
 	//
@@ -103,5 +95,4 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 				Pair.from("power", power),
 				Pair.from("evolution", evolution));
 	}
-	
 }
