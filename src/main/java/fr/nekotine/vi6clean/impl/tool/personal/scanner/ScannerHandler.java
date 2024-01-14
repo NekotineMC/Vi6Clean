@@ -141,6 +141,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 					for (var p : scanInfo.getSecond()) {
 						pmanager.sendServerPacket(thief, p);
 					}
+					thief.setCooldown(Material.CLOCK, SCAN_DELAY_TICK);
 					Vi6Sound.SCANNER_SCAN.play(thief);
 				}
 			}
