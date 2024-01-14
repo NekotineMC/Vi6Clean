@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import fr.nekotine.core.bar.actionbar.ActionBarComponent;
+import fr.nekotine.core.bar.actionbar.SharedActionBar;
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.fakeblock.AppliedFakeBlockPatch;
 import fr.nekotine.core.ioc.Ioc;
@@ -42,12 +44,24 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private String room = "";
 	
+	private SharedActionBar artefactActionBar = new SharedActionBar();
+	private ActionBarComponent artefactComponent = new ActionBarComponent();
+	private SharedActionBar defaultActionBar = new SharedActionBar();
+	private ActionBarComponent captureComponent = new ActionBarComponent();
+	private ActionBarComponent leaveComponent = new ActionBarComponent();
+	private ActionBarComponent roomComponent = new ActionBarComponent();
+	{artefactActionBar.addComponent(artefactComponent);
+	defaultActionBar.addComponent(roomComponent);}
+	
 	public InMapPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
 		var pw = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, PlayerWrapper.class);
-		if (pw.isPresent() && pw.get().getTeam()==Vi6Team.THIEF) {
+		if(!pw.isPresent()) return;
+		if(pw.get().getTeam()==Vi6Team.THIEF) {
 			var effectModule = Ioc.resolve(StatusEffectModule.class);
 			effectModule.addEffect(wrapped, invisibleEffect);
+		}else {
+			defaultActionBar.addViewers(wrapped);
 		}
 	}
 
@@ -76,6 +90,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	public void setCanLeaveMap(boolean canLeaveMap) {
 		if (this.canLeaveMap != canLeaveMap) {
 			this.canLeaveMap = canLeaveMap;
+			var cannot = Component.text("Fuyable ✘", NamedTextColor.RED);
+			var can = Component.text("Fuyable ✓", NamedTextColor.GREEN);
+			var text = canLeaveMap ? can : cannot;
+			leaveComponent.setText(text);
 			updateMapLeaveBlocker();
 		}
 	}
@@ -99,13 +117,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void thiefScheduleCanCaptureArtefact() {
-		canCaptureArtefact = false;
+		setCanCaptureArtefact(false);
 		wrapped.sendMessage(Component.text("Vous pouvez pas voler d'artefacts avant 30s", NamedTextColor.RED));
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
-				canCaptureArtefact = true;
+				setCanCaptureArtefact(true);
 				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
 			}
 			
@@ -114,6 +132,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public void thiefEnterInside(Entrance entrance) {
 		state = InMapState.INSIDE;
+
+		var separator = Component.text(" | ");
+		defaultActionBar.addComponents(new ActionBarComponent(separator,1),new ActionBarComponent(separator,3));
+		defaultActionBar.addComponents(captureComponent,leaveComponent);
+		captureComponent.setPriority(4);leaveComponent.setPriority(2);
+		defaultActionBar.addViewers(GetWrapped());
+		
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().sendMessage(wrapped.displayName().color(NamedTextColor.AQUA).append(Component.text(" est entré dans la carte par l'entrée ", NamedTextColor.GOLD).append(Component.text(entrance.getName(), NamedTextColor.AQUA))));
 		game.getGuards().sendMessage(wrapped.displayName().color(NamedTextColor.AQUA).append(Component.text(" est rentré dans la carte", NamedTextColor.GOLD)));
@@ -176,6 +201,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setCanCaptureArtefact(boolean canCaptureArtefact) {
 		this.canCaptureArtefact = canCaptureArtefact;
+		var cannot = Component.text("Volable ✘", NamedTextColor.RED);
+		var can = Component.text("Volable ✓", NamedTextColor.GREEN);
+		var text = canCaptureArtefact ? can : cannot;
+		captureComponent.setText(text);
 	}
 
 	public InMapState getState() {
@@ -192,5 +221,23 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setRoom(String room) {
 		this.room = room;
+		var text = 
+				Component.text("Salle: ",NamedTextColor.GOLD).append(
+				Component.text(room,NamedTextColor.AQUA));
+		roomComponent.setText(text);
+	}
+	
+	public void showArtefactBar() {
+		artefactActionBar.addViewers(GetWrapped());
+		defaultActionBar.removeViewers(GetWrapped());
+	}
+	
+	public void showDefaultBar() {
+		defaultActionBar.addViewers(GetWrapped());
+		artefactActionBar.removeViewers(GetWrapped());
+	}
+	
+	public ActionBarComponent getArtefactComponent() {
+		return artefactComponent;
 	}
 }

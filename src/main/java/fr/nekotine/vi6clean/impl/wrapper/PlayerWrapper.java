@@ -6,8 +6,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
-import fr.nekotine.core.bar.actionbar.ActionBarComponent;
-import fr.nekotine.core.bar.actionbar.SharedActionBar;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -20,19 +18,11 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	
 	//Used for invisibility
 	private double squared_walked_distance = 0;
-	
-	private SharedActionBar actionBar;
-	private ActionBarComponent artefactComponent;
-	
+
 	//
 	
 	public PlayerWrapper(Player wrapped) {
 		super(wrapped);
-		if(wrapped!=null) {
-			actionBar = new SharedActionBar(wrapped);
-			artefactComponent = new ActionBarComponent();
-			actionBar.addComponent(artefactComponent);
-		}
 	}
 	
 	public boolean isThief() {
@@ -91,9 +81,5 @@ public class PlayerWrapper extends WrapperBase<Player> {
 	}
 	public void setSquaredWalkedDistance(double distance) {
 		this.squared_walked_distance = distance;
-	}
-	
-	public ActionBarComponent getArtefactComponent() {
-		return artefactComponent;
 	}
 }

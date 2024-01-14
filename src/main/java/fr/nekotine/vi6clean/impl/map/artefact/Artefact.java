@@ -19,7 +19,6 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -79,41 +78,39 @@ public class Artefact{
 	public Set<Player> getInsideCaptureZone(){
 		return inside;
 	}
-	
-	public void exitZone(Player player) {
-		if(!inside.contains(player)) return;
-		Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class).getArtefactComponent().clearText();
-	}
 
 	public void tick() {
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		if(isCaptured) {
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
-			var stolenMessage = Component.text(
-					"Artefact: ", NamedTextColor.AQUA)
+			var stolenMessage = 
+					Component.text("Artefact: ", NamedTextColor.GOLD)
 					.append(Component.text(name, NamedTextColor.AQUA))
-					.append(Component.text(" Status: ", NamedTextColor.WHITE))
+					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Volé", NamedTextColor.RED));
-			inside.forEach(p -> wrapping.getWrapper(p, PlayerWrapper.class).getArtefactComponent().setText(stolenMessage));
+			inside.forEach(p -> wrapping.getWrapper(p, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(stolenMessage));
 		}else {
 			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 2, 0.5, 0.5, 0.5);
 			int tickAdvancement = 0;
 			boolean guardCanceling = false;
 			Player firstThief = null;
-			var guardMsg = Component.text("Artefact: ", NamedTextColor.AQUA)
+			var guardMsg = Component.text("Artefact: ", NamedTextColor.GOLD)
 					.append(Component.text(name, NamedTextColor.AQUA))
-					.append(Component.text(" Status: ", NamedTextColor.WHITE))
+					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Sécurisé", NamedTextColor.GREEN));
-			var thiefMsg = Component.text("Vole ", NamedTextColor.GOLD)
+			var thiefMsg = Component.text("Artefact: ", NamedTextColor.GOLD)
 					.append(Component.text(name, NamedTextColor.AQUA))
-					.append(Component.text(" - ", NamedTextColor.GOLD))
+					.append(Component.text(" >> ", NamedTextColor.WHITE))
+					.append(Component.text("Vole", NamedTextColor.GREEN))
+					.append(Component.text(" (", NamedTextColor.WHITE))
 					.append(Component.text(capture_advancement*100/CAPTURE_AMOUNT_NEEDED, NamedTextColor.AQUA))
-					.append(Component.text('%', NamedTextColor.GOLD));
+					.append(Component.text("%", NamedTextColor.GOLD))
+					.append(Component.text(")", NamedTextColor.WHITE));
 			for (var player : inside) {
 				if (game.getGuards().contains(player)) {
 					guardCanceling = true;
-					wrapping.getWrapper(player, PlayerWrapper.class).getArtefactComponent().setText(guardMsg);
+					wrapping.getWrapper(player, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(guardMsg);
 				}
 				if (game.getThiefs().contains(player)) {
 					var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
@@ -122,7 +119,7 @@ public class Artefact{
 					}
 					tickAdvancement++;
 					firstThief = player;
-					wrapping.getWrapper(player, PlayerWrapper.class).getArtefactComponent().setText(thiefMsg);
+					wrapping.getWrapper(player, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(thiefMsg);
 				}
 			}
 			if (guardCanceling) {

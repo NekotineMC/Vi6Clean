@@ -209,9 +209,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				var zone = artefact.getInsideCaptureZone();
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
-				}else {
-					artefact.exitZone(player);
+					wrapper.showArtefactBar();
+				}else if(artefact.getInsideCaptureZone().contains(player)){
 					zone.remove(player);
+					wrapper.showDefaultBar();
 				}
 			});
 			map.getKoths().backingMap().values().stream().forEach(koth -> {
