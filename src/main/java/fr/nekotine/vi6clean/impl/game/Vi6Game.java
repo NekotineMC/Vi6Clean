@@ -40,6 +40,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	
 	private final World world = Bukkit.getWorlds().get(0);
 	
+	
 	private final Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	
 	private final Team scoreboardGuard = scoreboard.registerNewTeam("guard");
@@ -59,16 +60,13 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	private boolean debug = false;
 	
 	public Vi6Game() {
-		
 		// add/remove players from scoreboard team
-		
 		guards.addAdditionCallback(this::setupGuard);
 		guards.addSuppressionCallback(this::tearDownPotentialGuard);
 		thiefs.addAdditionCallback(this::setupThief);
 		thiefs.addSuppressionCallback(this::tearDownPotentialThief);
 		
 		// Setup scoreboard teams
-		
 		scoreboardGuard.color(NamedTextColor.BLUE);
 		scoreboardThief.color(NamedTextColor.RED);
 		scoreboardGuard.displayName(Component.text("Garde", NamedTextColor.BLUE));

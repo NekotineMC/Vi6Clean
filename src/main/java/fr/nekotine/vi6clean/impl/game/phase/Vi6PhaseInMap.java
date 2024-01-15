@@ -21,6 +21,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
+import org.bukkit.scoreboard.Team;
 
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 
@@ -52,6 +57,7 @@ import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
@@ -59,9 +65,27 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	private List<BlockDisplay> debugDisplays = new LinkedList<>();
 	
+	private Objective scoreboardArtefactListObjective;
+	private final Team stolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("stolen");
+	private final Team unknownTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("unknown");
+	private final Team safeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("safe");
+	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
+		
+		var scoreboard = Ioc.resolve(Vi6Game.class).getScoreboard();
+		scoreboardArtefactListObjective = scoreboard.getObjective("artefactListing");
+		if (scoreboardArtefactListObjective == null) {
+			scoreboardArtefactListObjective = scoreboard.registerNewObjective("artefactListing",
+					Criteria.DUMMY,
+					Component.text("Check-list", NamedTextColor.GOLD).decorate(TextDecoration.UNDERLINED),
+					RenderType.INTEGER);
+		}
+		scoreboardArtefactListObjective.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_BLUE);
+		stolenTeam.color(NamedTextColor.RED);
+		unknownTeam.color(NamedTextColor.YELLOW);
+		safeTeam.color(NamedTextColor.GREEN);
 	}
 
 	@Override
@@ -92,6 +116,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var artefacts = map.getArtefacts().backingMap();
 		for (var artefact : artefacts.values()) {
 			artefact.setup(world);
+			objectiveSafe(artefact);
 		}
 		var entrances = map.getEntrances().backingMap();
 		for (var entranceName : entrances.keySet()) {
@@ -134,6 +159,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			koth.clean();
 		}
 		map = null;
+		
+		scoreboardArtefactListObjective.unregister();
+		scoreboardArtefactListObjective = null;
 	}
 	
 	@Override
@@ -290,5 +318,36 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@EventHandler
 	public void vehicleDestroyEvent(VehicleDestroyEvent e) {
 		e.setCancelled(true);
+	}
+	
+	//
+	
+	public Objective getSidebarObjective() {
+		return scoreboardArtefactListObjective;
+	}
+	public void objectiveStolen(Artefact artefact) {
+		var name = artefact.getName();
+		if(stolenTeam.hasEntry(name)) return;
+		stolenTeam.addEntry(name);
+		scoreboardArtefactListObjective.getScore(name).setScore(2);
+	}
+	public void objectiveSafe(Artefact artefact) {
+		var name = artefact.getName();
+		if(safeTeam.hasEntry(name)) return;
+		safeTeam.addEntry(name);
+		scoreboardArtefactListObjective.getScore(name).setScore(0);
+	}
+	public void objectiveUnknown(Artefact artefact) {
+		var name = artefact.getName();
+		if(unknownTeam.hasEntry(name)) return;
+		unknownTeam.addEntry(name);
+		scoreboardArtefactListObjective.getScore(name).setScore(1);
+	}
+	public void safeToUnknown() {
+		for (var artefact : map.getArtefacts().backingMap().values()) {
+			if(safeTeam.hasEntry(artefact.getName())) {
+				objectiveUnknown(artefact);
+			}
+		}
 	}
 }

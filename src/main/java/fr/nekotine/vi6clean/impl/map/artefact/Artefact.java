@@ -19,9 +19,12 @@ import fr.nekotine.core.map.element.MapBlockLocationElement;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -48,6 +51,8 @@ public class Artefact{
 	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
 
 	private BlockDisplay boxDisplay;
+	
+	private boolean foundAfterCapture;
 	
 	public BoundingBox getBoundingBox() {
 		return boundingBox.get();
@@ -92,7 +97,16 @@ public class Artefact{
 	public void tick() {
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrapping = Ioc.resolve(WrappingModule.class);
+		var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
 		if(isCaptured) {
+			
+			if(!foundAfterCapture) {
+				foundAfterCapture = inside.stream().anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam()==Vi6Team.GUARD);
+				if(foundAfterCapture) {
+					phaseInMap.objectiveStolen(this);
+				}
+			}
+			
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
 			var stolenMessage = Component.text(name, NamedTextColor.GOLD)
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
@@ -117,6 +131,7 @@ public class Artefact{
 				if (game.getGuards().contains(player)) {
 					guardCanceling = true;
 					wrapping.getWrapper(player, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(guardMsg);
+					phaseInMap.objectiveSafe(this);
 				}
 				if (game.getThiefs().contains(player)) {
 					var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
@@ -140,6 +155,7 @@ public class Artefact{
 			}
 			if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
 				Ioc.resolve(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
+				phaseInMap.safeToUnknown();
 				Bukkit.getPluginManager().callEvent(new ArtefactStealEvent(this, firstThief));
 			}
 		}
