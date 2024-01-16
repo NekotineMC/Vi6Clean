@@ -69,6 +69,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	private final Team stolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("stolen");
 	private final Team unknownTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("unknown");
 	private final Team safeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("safe");
+	private int unfoundStolenArtefacts = 0;
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
@@ -330,6 +331,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		if(stolenTeam.hasEntry(name)) return;
 		stolenTeam.addEntry(name);
 		scoreboardArtefactListObjective.getScore(name).setScore(2);
+		if(--unfoundStolenArtefacts == 0) {
+			unknownToSafe();
+		}
 	}
 	public void objectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
@@ -344,9 +348,17 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		scoreboardArtefactListObjective.getScore(name).setScore(1);
 	}
 	public void safeToUnknown() {
+		unfoundStolenArtefacts++;
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			if(safeTeam.hasEntry(artefact.getName())) {
 				objectiveUnknown(artefact);
+			}
+		}
+	}
+	public void unknownToSafe() {
+		for (var artefact : map.getArtefacts().backingMap().values()) {
+			if(unknownTeam.hasEntry(artefact.getName())) {
+				objectiveSafe(artefact);
 			}
 		}
 	}
