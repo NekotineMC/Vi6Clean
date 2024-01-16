@@ -161,6 +161,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		map = null;
 		
+		stolenTeam.unregister();
+		unknownTeam.unregister();
+		safeTeam.unregister();
 		scoreboardArtefactListObjective.unregister();
 		scoreboardArtefactListObjective = null;
 	}
