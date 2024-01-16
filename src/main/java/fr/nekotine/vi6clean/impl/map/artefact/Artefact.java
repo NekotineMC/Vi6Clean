@@ -160,4 +160,8 @@ public class Artefact{
 			}
 		}
 	}
+	
+	public void setFoundAfterCapture(boolean foundAfterCapture) {
+		this.foundAfterCapture = foundAfterCapture;
+	}
 }
