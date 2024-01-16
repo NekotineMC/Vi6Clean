@@ -1,16 +1,17 @@
 update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clean.jar'
 
-majordom:
-   delay: 40 # Delai en tick
+majordom.delay: 40 # Delai en tick
    
-koth:
-   limit: 2
+koth.limit: 2
    
-preparation:
-   duration: 4800 #durée de la phase de préparation en ticks
+preparation.duration: 4800 #durée de la phase de préparation en ticks
 
 game_end_spectator_time: 5 # délais en secondes
 
 invisibility:
    step_distance: 0.75
    particle_count: 2
+   
+infiltration:
+   delay_between_capture: 30.0 #délai entre 2 captures d'artéfacts en secondes
+   delay_before_escape: 30.0 #délai avant de pouvoir s'enfuir en secondes

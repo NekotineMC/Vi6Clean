@@ -129,6 +129,12 @@ public enum Vi6Sound {
 	}),
 	INVISIBILITY_WALK(new Sound[] {
 	Sound.sound(Key.key("minecraft:block.stone.step"), Sound.Source.MASTER, 0.25f, 1f)
+	}),
+	THIEF_CAN_STEAL(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 1),	
+	}),
+	THIEF_CAN_ESCAPE(new Sound[] {
+	Sound.sound(Key.key("block.note_block.chime"), Sound.Source.VOICE, 1, 0),	
 	})
 	;
 	

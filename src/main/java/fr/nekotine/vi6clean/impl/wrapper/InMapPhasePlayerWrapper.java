@@ -19,6 +19,7 @@ import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
@@ -33,6 +34,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
+	
+	private final double DELAY_BETWEEN_CAPTURE = Ioc.resolve(JavaPlugin.class).getConfig().getDouble("infiltration.delay_between_capture", 30); 
+	private final int DELAY_BETWEEN_CAPTURE_TICKS = (int)(20 * DELAY_BETWEEN_CAPTURE);
+	private final double DELAY_BEFORE_ESCAPE = Ioc.resolve(JavaPlugin.class).getConfig().getDouble("infiltration.delay_before_escape", 30); 
+	private final int DELAY_BEFORE_ESCAPE_TICKS = (int)(20 * DELAY_BEFORE_ESCAPE);
 	
 	private List<AppliedFakeBlockPatch> mapLeaveBlockers = new LinkedList<>();
 	
@@ -90,10 +96,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	public void setCanLeaveMap(boolean canLeaveMap) {
 		if (this.canLeaveMap != canLeaveMap) {
 			this.canLeaveMap = canLeaveMap;
-			var cannot = Component.text("Fuyable ✘", NamedTextColor.RED);
-			var can = Component.text("Fuyable ✓", NamedTextColor.GREEN);
+			var cannot = Component.text("Fuite ✘", NamedTextColor.RED);
+			var can = Component.text("Fuite ✓", NamedTextColor.GREEN);
 			var text = canLeaveMap ? can : cannot;
 			leaveComponent.setText(text);
+			if(canLeaveMap) Vi6Sound.THIEF_CAN_ESCAPE.play(wrapped);
 			updateMapLeaveBlocker();
 		}
 	}
@@ -104,7 +111,9 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public void thiefScheduleCanLeaveMap() {
 		setCanLeaveMap(false);
-		wrapped.sendMessage(Component.text("Vous pouvez pas vous enfuir avant 30s", NamedTextColor.RED));
+		wrapped.sendMessage(
+				Component.text("Vous pouvez pas vous enfuir avant ", NamedTextColor.RED).append(
+				Component.text(DELAY_BEFORE_ESCAPE+"s", NamedTextColor.AQUA)));
 		new BukkitRunnable() {
 			
 			@Override
@@ -113,12 +122,14 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuir", NamedTextColor.GOLD));
 			}
 			
-		}.runTaskLater(Ioc.resolve(JavaPlugin.class), 30*20);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BEFORE_ESCAPE_TICKS);
 	}
 	
 	public void thiefScheduleCanCaptureArtefact() {
 		setCanCaptureArtefact(false);
-		wrapped.sendMessage(Component.text("Vous pouvez pas voler d'artefacts avant 30s", NamedTextColor.RED));
+		wrapped.sendMessage(
+				Component.text("Vous pouvez pas voler d'artefacts avant ", NamedTextColor.RED).append(
+				Component.text(DELAY_BETWEEN_CAPTURE+"s", NamedTextColor.AQUA)));
 		new BukkitRunnable() {
 			
 			@Override
@@ -127,7 +138,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
 			}
 			
-		}.runTaskLater(Ioc.resolve(JavaPlugin.class), 30*20);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BETWEEN_CAPTURE_TICKS);
 	}
 	
 	public void thiefEnterInside(Entrance entrance) {
@@ -201,10 +212,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setCanCaptureArtefact(boolean canCaptureArtefact) {
 		this.canCaptureArtefact = canCaptureArtefact;
-		var cannot = Component.text("Volable ✘", NamedTextColor.RED);
-		var can = Component.text("Volable ✓", NamedTextColor.GREEN);
+		var cannot = Component.text("Vole ✘", NamedTextColor.RED);
+		var can = Component.text("Vole ✓", NamedTextColor.GREEN);
 		var text = canCaptureArtefact ? can : cannot;
 		captureComponent.setText(text);
+		if(canCaptureArtefact) Vi6Sound.THIEF_CAN_STEAL.play(wrapped);
 	}
 
 	public InMapState getState() {
