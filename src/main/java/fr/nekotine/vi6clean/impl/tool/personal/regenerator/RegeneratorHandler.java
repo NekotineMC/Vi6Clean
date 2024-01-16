@@ -1,7 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.regenerator;
 
-import java.util.List;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,38 +12,34 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.vi6clean.constant.Vi6ToolLoreText;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("regenerator")
 public class RegeneratorHandler extends ToolHandler<Regenerator>{
-	protected final static int DELAY_BEFORE_REGENERATING_TICKS = 100;
-	protected final static int DELAY_BETWEEN_HEALING_TICKS = 20;
-	protected final static int REGENERATION_AMOUNT=1;
-	protected static final ItemStack IDLE_ITEM() {
+	protected final int DELAY_BEFORE_REGENERATING_TICKS = (int)(20 * getConfiguration().getDouble("delay_before_regen", 5));
+	protected final int DELAY_BETWEEN_HEALING_TICKS = (int)(20 * getConfiguration().getDouble("delay_between_heal", 1));
+	protected final int REGENERATION_AMOUNT=(int)(20 * getConfiguration().getDouble("heal_amount", 1));
+	protected final ItemStack IDLE_ITEM() {
 		return new ItemStackBuilder(Material.CAMPFIRE)
 		.name(Component.text("Régénérateur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Désactivé",NamedTextColor.RED))))
-		.lore(RegeneratorHandler.LORE)
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.build();
 	}
-	protected static final ItemStack HEALING_ITEM() {
+	protected final ItemStack HEALING_ITEM() {
 		return new ItemStackBuilder(Material.CAMPFIRE)
 		.name(Component.text("Régénérateur",NamedTextColor.GOLD).append(Component.text(" - ").append(Component.text("Activé",NamedTextColor.GREEN))))
-		.lore(RegeneratorHandler.LORE)
+		.lore(getLore())
 		.unstackable()
 		.flags(ItemFlag.values())
 		.enchant()
 		.build();
 	}
-	public static final List<Component> LORE = Vi6ToolLoreText.REGENERATOR.make(
-	Placeholder.unparsed("delay", (int)(DELAY_BEFORE_REGENERATING_TICKS/20)+" secondes"));
-	
+
 	private int healingTick = 0;
 	//
 	
