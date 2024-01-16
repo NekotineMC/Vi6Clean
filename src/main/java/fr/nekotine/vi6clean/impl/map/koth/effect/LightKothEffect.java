@@ -3,6 +3,9 @@ package fr.nekotine.vi6clean.impl.map.koth.effect;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
@@ -27,6 +30,8 @@ import net.kyori.adventure.title.TitlePart;
 @KothCode("light")
 public class LightKothEffect extends AbstractKothEffect implements TextPlaceholder{
 	private final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
+	private final PotionEffect unlimitedNightVision = new PotionEffect(
+			PotionEffectType.NIGHT_VISION, -1, 0, false, false, false);
 	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_other", 200);
 	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_guard", 400);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
@@ -42,16 +47,20 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
 		if(losing==Vi6Team.GUARD) {
-			game.getGuards().forEach(
-					p -> statusEffectModule.addEffect(p, unlimitedDarkened));
+			for(Player guard : game.getGuards()) {
+				statusEffectModule.addEffect(guard, unlimitedDarkened);
+				guard.addPotionEffect(unlimitedNightVision);
+			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont désactivé le générateur", NamedTextColor.YELLOW));
 			game.getGuards().sendMessage(Component.text("Les voleurs ont désactivé le générateur", NamedTextColor.YELLOW));
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
 			game.getThiefs().sendMessage(Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
 		}else if(owning==Vi6Team.GUARD) {
-			game.getGuards().forEach(
-					p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
+			for(Player guard : game.getGuards()) {
+				statusEffectModule.removeEffect(guard, unlimitedDarkened);
+				guard.removePotionEffect(PotionEffectType.NIGHT_VISION);
+			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont redémarré le générateur", NamedTextColor.RED));
 			game.getThiefs().sendMessage(Component.text("Les gardes ont redémarré le générateur", NamedTextColor.RED));

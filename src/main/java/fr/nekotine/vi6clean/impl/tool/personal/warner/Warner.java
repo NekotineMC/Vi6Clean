@@ -67,6 +67,7 @@ public class Warner extends Tool{
 			ourTeam.get().forEach(
 				p -> {Vi6Sound.WARNER_TRIGGER.play(p); p.sendMessage(message);}
 			);
+			watched.setFoundAfterCapture(true);
 			cleanup();
 			handler.detachFromOwner(this);
 			handler.remove(this);
