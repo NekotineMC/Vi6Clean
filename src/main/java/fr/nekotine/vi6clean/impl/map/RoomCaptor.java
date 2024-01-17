@@ -1,11 +1,17 @@
 package fr.nekotine.vi6clean.impl.map;
 
 import fr.nekotine.core.map.annotation.ComposingMap;
+import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.element.MapBoundingBoxElement;
 
 public class RoomCaptor {
 
+	@ComposingMap
+	@MapDictKey
 	private String name = "";
+	
+	@ComposingMap
+	private String room = "";
 	
 	@ComposingMap
 	private MapBoundingBoxElement triggerBox = new MapBoundingBoxElement();
@@ -21,9 +27,9 @@ public class RoomCaptor {
 	public String getName() {
 		return name;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	
+	public String getRoom() {
+		return room;
 	}
 	
 }

@@ -115,6 +115,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		var artefacts = map.getArtefacts().backingMap();
+		var world = game.getWorld();
 		for (var artefact : artefacts.values()) {
 			artefact.setup(world);
 			objectiveSafe(artefact);
@@ -131,7 +132,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		
 		if (game.isDebug()) {
 			for (var exit : map.getExits().backingMap().values()) {
-				debugDisplays.add(DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS)));
+				DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS));
+			}
+			for (var roomCaptor : map.getRoomCaptors().backingMap().values()) {
+				DebugUtil.debugBoundingBox(world, roomCaptor.getTriggerBox().get(), Bukkit.createBlockData(Material.YELLOW_STAINED_GLASS));
 			}
 		}
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()) {
@@ -145,10 +149,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		Ioc.resolve(Majordom.class).revertThenDisable();
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getWorld().setTime(DayTime.NOON);
-		for (var display : debugDisplays) {
-			display.remove();
-		}
-		debugDisplays.clear();
+		DebugUtil.clearDebugEntities();
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			artefact.clean();
 		}
@@ -254,9 +255,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					zone.remove(player);
 				}
 			});
-			map.getRoomCaptors().backingMap().values().stream().forEach(room -> {
-				if (room.getTriggerBox().get().contains(destVect)) {
-					var r = room.getName();
+			map.getRoomCaptors().backingMap().values().stream().forEach(roomcaptor -> {
+				if (roomcaptor.getTriggerBox().get().contains(destVect)) {
+					var r = roomcaptor.getRoom();
 					if (!r.contentEquals(wrapper.getRoom())) {
 						wrapper.setRoom(r);
 						player.sendActionBar(Component.text("Salle: "+r,NamedTextColor.WHITE));
