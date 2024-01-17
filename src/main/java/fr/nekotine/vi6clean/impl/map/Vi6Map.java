@@ -2,11 +2,14 @@ package fr.nekotine.vi6clean.impl.map;
 
 import java.util.Collection;
 
+import org.bukkit.Location;
+
+import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapElementTyped;
+import fr.nekotine.core.map.command.generator.PositionCommandGenerator;
 import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
 import fr.nekotine.core.map.element.MapDictionaryElement;
-import fr.nekotine.core.map.element.MapPositionElement;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 
@@ -28,13 +31,15 @@ public class Vi6Map{
 	@ComposingMap
 	private MapDictionaryElement<MapBlockBoundingBoxElement> exits = new MapDictionaryElement<>();
 	
-	@MapElementTyped(MapPositionElement.class)
+	@CommandGeneratorOverride(PositionCommandGenerator.class)
+	@MapElementTyped(Location.class)
 	@ComposingMap
-	private MapDictionaryElement<MapPositionElement> guardSpawns = new MapDictionaryElement<>();
+	private MapDictionaryElement<Location> guardSpawns = new MapDictionaryElement<>();
 	
-	@MapElementTyped(MapPositionElement.class)
+	@CommandGeneratorOverride(PositionCommandGenerator.class)
+	@MapElementTyped(Location.class)
 	@ComposingMap
-	private MapDictionaryElement<MapPositionElement> thiefMinimapSpawns = new MapDictionaryElement<>();
+	private MapDictionaryElement<Location> thiefMinimapSpawns = new MapDictionaryElement<>();
 	
 	@MapElementTyped(Koth.class)
 	@ComposingMap
@@ -45,11 +50,11 @@ public class Vi6Map{
 	private MapDictionaryElement<RoomCaptor> roomCaptors = new MapDictionaryElement<>();
 	
 	
-	public Collection<MapPositionElement> getGuardSpawns(){
+	public Collection<Location> getGuardSpawns(){
 		return guardSpawns.backingMap().values();
 	}
 	
-	public Collection<MapPositionElement> getThiefMinimapSpawns(){
+	public Collection<Location> getThiefMinimapSpawns(){
 		return thiefMinimapSpawns.backingMap().values();
 	}
 
