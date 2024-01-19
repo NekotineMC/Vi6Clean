@@ -40,7 +40,7 @@ public class DoubleJump extends Tool{
 		var player = getOwner();
 		var loc = player.getLocation();
 		player.setVelocity(player.getVelocity().setY(power));
-		Vi6Sound.DOUBLE_JUMP.play(loc.getWorld(), loc);
+		Vi6Sound.DOUBLE_JUMP.play(player, loc);
 		setCanDoubleJump(false);
 	}
 	

@@ -87,9 +87,8 @@ public class Radar extends Tool{
 		if(placed) {
 			var handler = Ioc.resolve(RadarHandler.class);
 			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-			var ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared());
-			var ennemiList = ennemiNear.collect(Collectors.toList());
-			var ennemiNearCount = ennemiList.size();
+			var ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared()).collect(Collectors.toList());
+			var ennemiNearCount = ennemiNear.size();
 			
 			//Son
 			if(ennemiNearCount > 0) {
@@ -100,7 +99,7 @@ public class Radar extends Tool{
 			
 			//Message
 			getOwner().sendMessage(handler.getDetectionMessage(ennemiNearCount));
-			ennemiList.forEach(p -> p.sendMessage(handler.getDetectedMessage()));
+			ennemiNear.forEach(p -> p.sendMessage(handler.getDetectedMessage()));
 			
 			//Particules
 			Location loc = bottom.getLocation();
