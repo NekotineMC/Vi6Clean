@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.impl.tool.personal.radar;
 
+import java.util.stream.Collectors;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -86,7 +88,8 @@ public class Radar extends Tool{
 			var handler = Ioc.resolve(RadarHandler.class);
 			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
 			var ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared());
-			var ennemiNearCount = (int)ennemiNear.count();
+			var ennemiList = ennemiNear.collect(Collectors.toList());
+			var ennemiNearCount = ennemiList.size();
 			
 			//Son
 			if(ennemiNearCount > 0) {
@@ -97,7 +100,7 @@ public class Radar extends Tool{
 			
 			//Message
 			getOwner().sendMessage(handler.getDetectionMessage(ennemiNearCount));
-			ennemiNear.forEach(p -> p.sendMessage(handler.getDetectedMessage()));
+			ennemiList.forEach(p -> p.sendMessage(handler.getDetectedMessage()));
 			
 			//Particules
 			Location loc = bottom.getLocation();
