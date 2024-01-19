@@ -125,7 +125,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS));
 			}
 		}
-		
 		if (game.isDebug()) {
 			for (var exit : map.getExits().values()) {
 				DebugUtil.debugBoundingBox(world, exit, Bukkit.createBlockData(Material.RED_STAINED_GLASS));
