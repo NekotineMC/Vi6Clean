@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -13,10 +14,11 @@ import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
-import fr.nekotine.core.map.element.MapBlockLocationElement;
-import fr.nekotine.core.map.element.MapBoundingBoxElement;
+import fr.nekotine.core.map.command.generator.BlockLocationCommandGenerator;
+import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -44,21 +46,22 @@ public class Artefact{
 	
 	private final BlockPatch blockPatch = new BlockPatch(s -> s.setType(Material.AIR)); // For now
 	
+	@CommandGeneratorOverride(BlockLocationCommandGenerator.class)
 	@ComposingMap
-	private MapBlockLocationElement blockPosition = new MapBlockLocationElement();
+	private Location blockPosition = BukkitUtil.defaultLocation();
 	
 	@ComposingMap
-	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
+	private BoundingBox boundingBox = new BoundingBox();
 
 	private BlockDisplay boxDisplay;
 	
 	private boolean foundAfterCapture;
 	
 	public BoundingBox getBoundingBox() {
-		return boundingBox.get();
+		return boundingBox;
 	}
 	
-	public MapBlockLocationElement getBlockPosition() {
+	public Location getBlockPosition() {
 		return blockPosition;
 	}
 
@@ -68,9 +71,9 @@ public class Artefact{
 	
 	public void capture() {
 		blockPatch.patch(Ioc.resolve(Vi6Game.class).getWorld().getBlockAt(
-						blockPosition.getX(),
-						blockPosition.getY(),
-						blockPosition.getZ())
+						blockPosition.getBlockX(),
+						blockPosition.getBlockY(),
+						blockPosition.getBlockZ())
 				);
 		isCaptured = true;
 	}

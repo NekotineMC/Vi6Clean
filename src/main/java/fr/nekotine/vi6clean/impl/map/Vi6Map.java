@@ -1,84 +1,86 @@
 package fr.nekotine.vi6clean.impl.map;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapElementTyped;
+import fr.nekotine.core.map.command.generator.BlockBoundingBoxCommandGenerator;
 import fr.nekotine.core.map.command.generator.PositionCommandGenerator;
-import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
-import fr.nekotine.core.map.element.MapDictionaryElement;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 
-public class Vi6Map{
-	
+public class Vi6Map {
+
 	@MapElementTyped(Artefact.class)
 	@ComposingMap
-	private MapDictionaryElement<Artefact> artefacts = new MapDictionaryElement<>();
-	
+	private Map<String,Artefact> artefacts = new HashMap<>();
+
 	@MapElementTyped(Entrance.class)
 	@ComposingMap
-	private MapDictionaryElement<Entrance> entrances = new MapDictionaryElement<>();
-	
+	private Map<String,Entrance> entrances = new HashMap<>();
+
 	@MapElementTyped(ThiefSpawn.class)
 	@ComposingMap
-	private MapDictionaryElement<ThiefSpawn> thiefSpawns = new MapDictionaryElement<>();
-	
-	@MapElementTyped(MapBlockBoundingBoxElement.class)
+	private Map<String,ThiefSpawn> thiefSpawns = new HashMap<>();
+
+	@CommandGeneratorOverride(BlockBoundingBoxCommandGenerator.class)
+	@MapElementTyped(BoundingBox.class)
 	@ComposingMap
-	private MapDictionaryElement<MapBlockBoundingBoxElement> exits = new MapDictionaryElement<>();
-	
+	private Map<String,BoundingBox> exits = new HashMap<>();
+
 	@CommandGeneratorOverride(PositionCommandGenerator.class)
 	@MapElementTyped(Location.class)
 	@ComposingMap
-	private MapDictionaryElement<Location> guardSpawns = new MapDictionaryElement<>();
-	
+	private Map<String,Location> guardSpawns = new HashMap<>();
+
 	@CommandGeneratorOverride(PositionCommandGenerator.class)
 	@MapElementTyped(Location.class)
 	@ComposingMap
-	private MapDictionaryElement<Location> thiefMinimapSpawns = new MapDictionaryElement<>();
-	
+	private Map<String,Location> thiefMinimapSpawns = new HashMap<>();
+
 	@MapElementTyped(Koth.class)
 	@ComposingMap
-	private MapDictionaryElement<Koth> koths = new MapDictionaryElement<>();
-	
+	private Map<String,Koth> koths = new HashMap<>();
+
 	@MapElementTyped(RoomCaptor.class)
 	@ComposingMap
-	private MapDictionaryElement<RoomCaptor> roomCaptors = new MapDictionaryElement<>();
-	
-	
-	public Collection<Location> getGuardSpawns(){
-		return guardSpawns.backingMap().values();
-	}
-	
-	public Collection<Location> getThiefMinimapSpawns(){
-		return thiefMinimapSpawns.backingMap().values();
+	private Map<String,RoomCaptor> roomCaptors = new HashMap<>();
+
+	public Collection<Location> getGuardSpawns() {
+		return guardSpawns.values();
 	}
 
-	public MapDictionaryElement<Artefact> getArtefacts() {
+	public Collection<Location> getThiefMinimapSpawns() {
+		return thiefMinimapSpawns.values();
+	}
+
+	public Map<String,Artefact> getArtefacts() {
 		return artefacts;
 	}
 
-	public MapDictionaryElement<Entrance> getEntrances() {
+	public Map<String,Entrance> getEntrances() {
 		return entrances;
 	}
-	
-	public MapDictionaryElement<RoomCaptor> getRoomCaptors() {
+
+	public Map<String,RoomCaptor> getRoomCaptors() {
 		return roomCaptors;
 	}
-	
-	public MapDictionaryElement<ThiefSpawn> getThiefSpawns() {
+
+	public Map<String,ThiefSpawn> getThiefSpawns() {
 		return thiefSpawns;
 	}
 
-	public MapDictionaryElement<MapBlockBoundingBoxElement> getExits() {
+	public Map<String,BoundingBox> getExits() {
 		return exits;
 	}
-	
-	public MapDictionaryElement<Koth> getKoths() {
+
+	public Map<String,Koth> getKoths() {
 		return koths;
 	}
 }

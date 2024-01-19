@@ -1,9 +1,10 @@
 package fr.nekotine.vi6clean.impl.map;
 
+import org.bukkit.Location;
+
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
-import fr.nekotine.core.map.element.MapLocationElement;
-import fr.nekotine.core.map.element.MapPositionElement;
+import fr.nekotine.core.util.BukkitUtil;
 
 public class ThiefSpawn {
 
@@ -12,16 +13,16 @@ public class ThiefSpawn {
 	private String name = "";
 	
 	@ComposingMap
-	private MapPositionElement spawnPoint = new MapPositionElement();
+	private Location spawnPoint = BukkitUtil.defaultLocation();
 	
 	@ComposingMap
-	private MapLocationElement minimapPosition = new MapLocationElement();
+	private Location minimapPosition = BukkitUtil.defaultLocation();
 
-	public MapPositionElement getSpawnPoint() {
+	public Location getSpawnPoint() {
 		return spawnPoint;
 	}
 
-	public MapLocationElement getMinimapPosition() {
+	public Location getMinimapPosition() {
 		return minimapPosition;
 	}
 

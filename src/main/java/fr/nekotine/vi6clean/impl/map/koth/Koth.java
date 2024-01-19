@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.map.koth;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -14,10 +15,11 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
-import fr.nekotine.core.map.element.MapBoundingBoxElement;
-import fr.nekotine.core.map.element.MapLocationElement;
+import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
+import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -30,9 +32,11 @@ public class Koth{
 	@ComposingMap
 	private String name = "";
 	@ComposingMap
-	private MapBoundingBoxElement boundingBox = new MapBoundingBoxElement();
+	private BoundingBox boundingBox = new BoundingBox();
+	
+	@CommandGeneratorOverride(LocationCommandGenerator.class)
 	@ComposingMap
-	private MapLocationElement displayLocation = new MapLocationElement();
+	private Location displayLocation = BukkitUtil.defaultLocation();
 	private Set<Player> inside = new HashSet<>(8);
 	
 	private boolean isEnabled = false;
@@ -49,7 +53,7 @@ public class Koth{
 	//
 	
 	public BoundingBox getBoundingBox() {
-		return boundingBox.get();
+		return boundingBox;
 	}
 	public Vi6Team getOwningTeam() {
 		return owningTeam;

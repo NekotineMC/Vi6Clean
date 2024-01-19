@@ -1,9 +1,9 @@
 package fr.nekotine.vi6clean.impl.map;
 
+import org.bukkit.util.BoundingBox;
+
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
-import fr.nekotine.core.map.element.MapBlockBoundingBoxElement;
-import fr.nekotine.core.map.element.MapBoundingBoxElement;
 
 public class Entrance {
 
@@ -12,16 +12,16 @@ public class Entrance {
 	private String name = "";
 
 	@ComposingMap
-	private MapBoundingBoxElement entranceTriggerBox = new MapBoundingBoxElement();
+	private BoundingBox entranceTriggerBox = new BoundingBox();
 	
 	@ComposingMap
-	private MapBlockBoundingBoxElement blockingBox = new MapBlockBoundingBoxElement();
+	private BoundingBox blockingBox = new BoundingBox();
 
-	public MapBoundingBoxElement getEntranceTriggerBox() {																																																
+	public BoundingBox getEntranceTriggerBox() {																																																
 		return entranceTriggerBox;
 	}
 
-	public MapBlockBoundingBoxElement getBlockingBox() {
+	public BoundingBox getBlockingBox() {
 		return blockingBox;
 	}
 

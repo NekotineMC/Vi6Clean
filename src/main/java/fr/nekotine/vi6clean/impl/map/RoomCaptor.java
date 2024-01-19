@@ -1,8 +1,9 @@
 package fr.nekotine.vi6clean.impl.map;
 
+import org.bukkit.util.BoundingBox;
+
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
-import fr.nekotine.core.map.element.MapBoundingBoxElement;
 
 public class RoomCaptor {
 
@@ -14,13 +15,13 @@ public class RoomCaptor {
 	private String room = "";
 	
 	@ComposingMap
-	private MapBoundingBoxElement triggerBox = new MapBoundingBoxElement();
+	private BoundingBox triggerBox = new BoundingBox();
 
-	public MapBoundingBoxElement getTriggerBox() {
+	public BoundingBox getTriggerBox() {
 		return triggerBox;
 	}
 	
-	public void setTriggerBox(MapBoundingBoxElement triggerBox) {
+	public void setTriggerBox(BoundingBox triggerBox) {
 		this.triggerBox = triggerBox;
 	}
 	
