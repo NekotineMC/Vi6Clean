@@ -1,24 +1,32 @@
 package fr.nekotine.vi6clean.impl.tool.personal.shadow;
 
+import java.util.Collection;
+
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+
+import com.google.common.base.Supplier;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Shadow extends Tool{
 	private ArmorStand shadow;
+	private Supplier<Collection<Player>> ourTeam;
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
@@ -31,11 +39,10 @@ public class Shadow extends Tool{
 			var x = loc.getX();
 			var y = loc.getY();
 			var z = loc.getZ();
-			var w = loc.getWorld();
 			SpatialUtil.circle2DDensity(Ioc.resolve(ShadowHandler.class).getShadowKillRangeBlock(), 3, Math.random(),
 					(offsetX, offsetZ) -> {
-						w.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
-					});
+						ourTeam.get().forEach(p -> p.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null));
+			});
 		}
 	}
 	
@@ -70,6 +77,8 @@ public class Shadow extends Tool{
 				armor.setItemMeta(meta);
 				equipments.setBoots(armor);
 				setItemStack(Ioc.resolve(ShadowHandler.class).getPlacedItem());
+				
+				ourTeam = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class)::ourTeam;	
 			}
 		}
 		return false;

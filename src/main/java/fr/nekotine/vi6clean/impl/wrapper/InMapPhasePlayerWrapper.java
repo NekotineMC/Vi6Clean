@@ -70,6 +70,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			defaultActionBar.addViewers(wrapped);
 		}
 	}
+	
+	public void tearDown() {
+		artefactActionBar.tearDown();
+		defaultActionBar.tearDown();
+	}
 
 	public boolean canLeaveMap() {
 		return canLeaveMap;

@@ -7,6 +7,7 @@ range: 20.0 #portée du radar en blocs
 cooldown: 20.0 #délai du radar en secondes
 detection_success: "<gold>Radar>></gold> <aqua><number></aqua> <green>ennemis détéctés à proximité !</green>"
 detection_fail: "<gold>Radar>></gold> <aqua>0</aqua> <red>ennemis détéctés à proximité !</red>"
+detection_detected: "<gold>Radar>></gold> <red>Vous avez été détecté !"
 is_rune: false
 lore:
    - <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
