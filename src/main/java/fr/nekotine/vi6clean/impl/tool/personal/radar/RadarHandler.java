@@ -44,7 +44,7 @@ public class RadarHandler extends ToolHandler<Radar>{
 	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown",20));
 	private final String DETECTION_SUCCESS = getConfiguration().getString("detection_success");
 	private final String DETECTION_FAIL = getConfiguration().getString("detection_fail");
-
+	private final String DETECTION_DETECTED = getConfiguration().getString("detection_detected");
 	private final ItemStack UNPLACED = new ItemStackBuilder(
 			Material.CALIBRATED_SCULK_SENSOR)
 			.unstackable()
@@ -144,6 +144,12 @@ public class RadarHandler extends ToolHandler<Radar>{
 				.addStyle(Placeholder.unparsed("number", String.valueOf(nbDetected)))
 				.addStyle(NekotineStyles.STANDART)
 				.addLine(message)
+				).buildFirst();
+	}
+	public Component getDetectedMessage() {
+		return Ioc.resolve(TextModule.class).message(Leaf.builder()
+				.addStyle(NekotineStyles.STANDART)
+				.addLine(DETECTION_DETECTED)
 				).buildFirst();
 	}
 	public double getDetectionRangeSquared() {

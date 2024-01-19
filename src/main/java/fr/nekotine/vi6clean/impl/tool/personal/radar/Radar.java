@@ -85,17 +85,19 @@ public class Radar extends Tool{
 		if(placed) {
 			var handler = Ioc.resolve(RadarHandler.class);
 			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(getOwner(), PlayerWrapper.class);
-			int ennemiNear = (int)opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared()).count();
+			var ennemiNear = opt.get().ennemiTeamInMap().filter(e -> bottom.getLocation().distanceSquared(e.getLocation()) <= handler.getDetectionRangeSquared());
+			var ennemiNearCount = (int)ennemiNear.count();
 			
 			//Son
-			if(ennemiNear > 0) {
+			if(ennemiNearCount > 0) {
 				Vi6Sound.RADAR_POSITIVE.play(bottom.getWorld(), bottom.getLocation());
 			}else {
 				Vi6Sound.RADAR_NEGATIVE.play(bottom.getWorld(), bottom.getLocation());
 			}
 			
 			//Message
-			getOwner().sendMessage(handler.getDetectionMessage(ennemiNear));
+			getOwner().sendMessage(handler.getDetectionMessage(ennemiNearCount));
+			ennemiNear.forEach(p -> p.sendMessage(handler.getDetectedMessage()));
 			
 			//Particules
 			Location loc = bottom.getLocation();
@@ -105,9 +107,9 @@ public class Radar extends Tool{
 			
 			RadarHandler.BALL.forEach(
 				triplet -> {loc.getWorld().spawnParticle(
-						(ennemiNear>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
+						(ennemiNearCount>0 ? Particle.COMPOSTER:Particle.REDSTONE), 
 						x + triplet.a(), y + triplet.b(), z + triplet.c(), 1, 0, 0, 0, 0, 
-						(ennemiNear>0 ? null:new DustOptions(Color.RED, 2)));
+						(ennemiNearCount>0 ? null:new DustOptions(Color.RED, 2)));
 			});
 			
 			cooldown = handler.getCooldownTick();
