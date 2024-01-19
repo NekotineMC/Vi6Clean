@@ -161,6 +161,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		map = null;
 		
+		
 		stolenTeam.unregister();
 		unknownTeam.unregister();
 		safeTeam.unregister();
@@ -183,6 +184,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	public void itemTearDown(Player item) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
+		wrap.tearDown();
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(true);
 			wrap.updateMapLeaveBlocker();
