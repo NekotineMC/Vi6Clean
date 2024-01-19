@@ -47,6 +47,7 @@ import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
@@ -308,7 +309,17 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		if(e.getEntity() instanceof ArmorStand || e.getEntity() instanceof Minecart) 
 			e.setCancelled(true);
 	}
-	
+	@EventHandler
+	public void onLivingEntityDamage(EntityDamageEvent e) {
+		if(e.getEntity() instanceof Player player) {
+			var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, InMapPhasePlayerWrapper.class);
+			if(wrapper==null) return;
+			if(wrapper.getParentWrapper().getTeam()==Vi6Team.GUARD) {
+				//epsilon value
+				e.setDamage(0.01);
+			}
+		}
+	}
 	@EventHandler
 	public void interactEvent(PlayerInteractEvent e) {
 		if(e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType()==Material.RESPAWN_ANCHOR) 
