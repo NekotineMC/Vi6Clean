@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -63,8 +62,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	private Vi6Map map;
 	
-	private List<BlockDisplay> debugDisplays = new LinkedList<>();
-	
 	private Objective scoreboardArtefactListObjective;
 	private final Team stolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("stolen");
 	private final Team unknownTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("unknown");
@@ -114,28 +111,27 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
-		var artefacts = map.getArtefacts().backingMap();
-		var world = game.getWorld();
+		var artefacts = map.getArtefacts();
 		for (var artefact : artefacts.values()) {
 			artefact.setup(world);
 			objectiveSafe(artefact);
 		}
-		var entrances = map.getEntrances().backingMap();
+		var entrances = map.getEntrances();
 		for (var entranceName : entrances.keySet()) {
 			var entrance = entrances.get(entranceName);
 			entrance.setName(entranceName);
 			if (game.isDebug()) {
-				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getBlockingBox().get(), Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS)));
-				debugDisplays.add(DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox().get(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS)));
+				DebugUtil.debugBoundingBox(world, entrance.getBlockingBox(), Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS));
+				DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS));
 			}
 		}
 		
 		if (game.isDebug()) {
-			for (var exit : map.getExits().backingMap().values()) {
-				DebugUtil.debugBoundingBox(world, exit.get(), Bukkit.createBlockData(Material.RED_STAINED_GLASS));
+			for (var exit : map.getExits().values()) {
+				DebugUtil.debugBoundingBox(world, exit, Bukkit.createBlockData(Material.RED_STAINED_GLASS));
 			}
-			for (var roomCaptor : map.getRoomCaptors().backingMap().values()) {
-				DebugUtil.debugBoundingBox(world, roomCaptor.getTriggerBox().get(), Bukkit.createBlockData(Material.YELLOW_STAINED_GLASS));
+			for (var roomCaptor : map.getRoomCaptors().values()) {
+				DebugUtil.debugBoundingBox(world, roomCaptor.getTriggerBox(), Bukkit.createBlockData(Material.YELLOW_STAINED_GLASS));
 			}
 		}
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()) {
@@ -150,14 +146,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getWorld().setTime(DayTime.NOON);
 		DebugUtil.clearDebugEntities();
-		for (var artefact : map.getArtefacts().backingMap().values()) {
+		for (var artefact : map.getArtefacts().values()) {
 			artefact.clean();
 		}
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()) {
 			tool.stopHandling();
 			tool.removeAll();
 		}
-		for(var koth : map.getKoths().backingMap().values()) {
+		for(var koth : map.getKoths().values()) {
 			koth.clean();
 		}
 		map = null;
@@ -222,22 +218,22 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var destVect = evt.getTo().toVector();
 		if (wrapper.isInside()) {
 			if (!wrapper.canLeaveMap()) {
-				if (map.getEntrances().backingMap().values().stream().map(e -> e.getBlockingBox().get()).anyMatch(bb -> bb.contains(destVect))){
+				if (map.getEntrances().values().stream().map(e -> e.getBlockingBox()).anyMatch(bb -> bb.contains(destVect))){
 					evt.setCancelled(true);
 					return;
 				}
-				if (map.getExits().backingMap().values().stream().map(e -> e.get()).anyMatch(bb -> bb.contains(destVect))){
+				if (map.getExits().values().stream().map(e -> e).anyMatch(bb -> bb.contains(destVect))){
 					evt.setCancelled(true);
 					return;
 				}
 			}else {
-				var exit = map.getExits().backingMap().values().stream().filter(e -> e.get().contains(destVect)).findFirst();
+				var exit = map.getExits().values().stream().filter(e -> e.contains(destVect)).findFirst();
 				if (exit.isPresent()) {
 					wrapper.thiefLeaveMap();
 					return;
 				}
 			}
-			map.getArtefacts().backingMap().values().forEach(artefact -> {
+			map.getArtefacts().values().forEach(artefact -> {
 				var zone = artefact.getInsideCaptureZone();
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
@@ -247,7 +243,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					wrapper.showDefaultBar();
 				}
 			});
-			map.getKoths().backingMap().values().stream().forEach(koth -> {
+			map.getKoths().values().stream().forEach(koth -> {
 				var zone = koth.getInsideCaptureZone();
 				if (koth.getBoundingBox().contains(destVect)) {
 					zone.add(player);
@@ -255,8 +251,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					zone.remove(player);
 				}
 			});
-			map.getRoomCaptors().backingMap().values().stream().forEach(roomcaptor -> {
-				if (roomcaptor.getTriggerBox().get().contains(destVect)) {
+			map.getRoomCaptors().values().stream().forEach(roomcaptor -> {
+				if (roomcaptor.getTriggerBox().contains(destVect)) {
 					var r = roomcaptor.getRoom();
 					if (!r.contentEquals(wrapper.getRoom())) {
 						wrapper.setRoom(r);
@@ -266,8 +262,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				}
 			});
 		}else if (wrapper.getState() == InMapState.ENTERING){
-			var entrance = map.getEntrances().backingMap().values().stream()
-					.filter(e -> e.getEntranceTriggerBox().get().contains(destVect))
+			var entrance = map.getEntrances().values().stream()
+					.filter(e -> e.getEntranceTriggerBox().contains(destVect))
 					.findFirst();
 			if (entrance.isPresent()) {
 				wrapper.thiefEnterInside(entrance.get());
@@ -277,8 +273,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		map.getArtefacts().backingMap().values().stream().forEach(Artefact::tick);
-		map.getKoths().backingMap().values().stream().forEach(Koth::tick);
+		map.getArtefacts().values().stream().forEach(Artefact::tick);
+		map.getKoths().values().stream().forEach(Koth::tick);
 	}
 
 	@EventHandler
@@ -353,14 +349,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	}
 	public void safeToUnknown() {
 		unfoundStolenArtefacts++;
-		for (var artefact : map.getArtefacts().backingMap().values()) {
+		for (var artefact : map.getArtefacts().values()) {
 			if(safeTeam.hasEntry(artefact.getName())) {
 				objectiveUnknown(artefact);
 			}
 		}
 	}
 	public void unknownToSafe() {
-		for (var artefact : map.getArtefacts().backingMap().values()) {
+		for (var artefact : map.getArtefacts().values()) {
 			if(unknownTeam.hasEntry(artefact.getName())) {
 				objectiveSafe(artefact);
 			}

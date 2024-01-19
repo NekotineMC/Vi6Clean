@@ -66,7 +66,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var world = game.getWorld();
 		var map = getParent().getMap();
 		List<AbstractKothEffect> kothEffects = new LinkedList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
-		List<Koth> koths = new LinkedList<>(map.getKoths().backingMap().values());
+		List<Koth> koths = new LinkedList<>(map.getKoths().values());
 		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
 		Collections.shuffle(kothEffects);
 		Collections.shuffle(koths);

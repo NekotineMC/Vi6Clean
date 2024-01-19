@@ -72,7 +72,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		var world = game.getWorld();
 		var map = getParent().getMap();
 		minimapSpawnIndicators.clear();
-		map.getThiefSpawns().backingMap().values().stream().forEach(entrance -> {
+		map.getThiefSpawns().values().stream().forEach(entrance -> {
 			var pos = entrance.getMinimapPosition();
 			var armorStand = (ArmorStand)world.spawnEntity(pos.toLocation(world), EntityType.ARMOR_STAND);
 			armorStand.setVisible(false);
@@ -147,7 +147,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	
 	private ThiefSpawn randomSpawn() {
 		var rand = new Random();
-		var spawns = getParent().getMap().getThiefSpawns().backingMap().values();
+		var spawns = getParent().getMap().getThiefSpawns().values();
 		return spawns.stream().skip(rand.nextInt(spawns.size()+1)-1).findFirst().orElse(null);
 	}
 	

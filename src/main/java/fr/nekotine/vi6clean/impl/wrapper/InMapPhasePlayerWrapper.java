@@ -84,11 +84,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			}
 			mapLeaveBlockers.clear();
 		}else {
-			for (var entrance : map.getEntrances().backingMap().values()) {
-				mapLeaveBlockers.addAll(entrance.getBlockingBox().applyFakeBlockPatch(wrapped, canLeaveMapBlockingPatch));
+			for (var entrance : map.getEntrances().values()) {
+				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, entrance.getBlockingBox()));
 			}
-			for (var exit : map.getExits().backingMap().values()) {
-				mapLeaveBlockers.addAll(exit.applyFakeBlockPatch(wrapped, canLeaveMapBlockingPatch));
+			for (var exit : map.getExits().values()) {
+				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, exit));
 			}
 		}
 	}

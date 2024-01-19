@@ -63,7 +63,7 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	
 	protected Optional<Artefact> getCloseArtefact(Location pLoc){
 		var watchedArticats = getTools().stream().map(w -> w.getWatched());
-		return map.getArtefacts().backingMap().values().stream().filter(art -> 
+		return map.getArtefacts().values().stream().filter(art -> 
 			 (!art.isCaptured()) && 
 			 (art.getBlockPosition().toLocation(pLoc.getWorld()).distanceSquared(pLoc) <= PLACE_RANGE_SQUARED) && 
 			 (watchedArticats.noneMatch(watched -> watched!=null && watched.equals(art)))
