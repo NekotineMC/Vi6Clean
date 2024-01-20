@@ -384,7 +384,24 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		guardUnknownTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(1);
 	}
-
+	
+	public void safeToUnknown() {
+		unfoundStolenArtefacts++;
+		updateCount();
+		for (var artefact : map.getArtefacts().values()) {
+			if(guardSafeTeam.hasEntry(artefact.getName())) {
+				objectiveUnknown(artefact);
+			}
+		}
+	}
+	public void unknownToSafe() {
+		for (var artefact : map.getArtefacts().values()) {
+			if(guardUnknownTeam.hasEntry(artefact.getName())) {
+				objectiveSafe(artefact);
+			}
+		}
+	}
+	
 	private void updateCount() {
 		guardCountTeam.suffix(Component.text(unfoundStolenArtefacts, NamedTextColor.RED));
 	}
