@@ -19,10 +19,9 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Tazer extends Tool{
 	
-	private static final StatusEffect tazedEffect = new StatusEffect(TazedStatusEffectType.get(), 30);//1.5sec
+	private static final StatusEffect tazedEffect = new StatusEffect(TazedStatusEffectType.get(), Ioc.resolve(TazerHandler.class).getTazedDurationTick());
 	
 	private int cooldown;
-	
 	//private int friendlyHits;
 	
 	@Override
@@ -34,7 +33,7 @@ public class Tazer extends Tool{
 	protected void cleanup() {
 	}
 
-	public boolean shot() {
+	public boolean shot() {		
 		var player = getOwner();
 		if (player == null) {
 			return false;
