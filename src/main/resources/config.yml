@@ -9,8 +9,8 @@ preparation.duration: 4800 #durée de la phase de préparation en ticks
 game_end_spectator_time: 5 # délais en secondes
 
 invisibility:
-   step_distance: 0.75
-   particle_count: 2
+   step_distance: 0.5
+   particle_count: 3
    
 infiltration:
    delay_between_capture: 30.0 #délai entre 2 captures d'artéfacts en secondes
