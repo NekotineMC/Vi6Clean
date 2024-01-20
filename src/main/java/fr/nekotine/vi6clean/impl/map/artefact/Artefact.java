@@ -101,10 +101,7 @@ public class Artefact{
 		if(isCaptured) {
 			
 			if(!foundAfterCapture) {
-				foundAfterCapture = inside.stream().anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam()==Vi6Team.GUARD);
-				if(foundAfterCapture) {
-					phaseInMap.objectiveStolen(this);
-				}
+				setFoundAfterCapture(inside.stream().anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam()==Vi6Team.GUARD));
 			}
 			
 			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
@@ -163,5 +160,10 @@ public class Artefact{
 	
 	public void setFoundAfterCapture(boolean foundAfterCapture) {
 		this.foundAfterCapture = foundAfterCapture;
+		if(foundAfterCapture) {
+			var game = Ioc.resolve(Vi6Game.class);
+			var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+			phaseInMap.objectiveStolen(this);
+		}
 	}
 }
