@@ -128,7 +128,7 @@ public class Artefact{
 				if (game.getGuards().contains(player)) {
 					guardCanceling = true;
 					wrapping.getWrapper(player, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(guardMsg);
-					phaseInMap.objectiveSafe(this);
+					phaseInMap.guardObjectiveSafe(this);
 				}
 				if (game.getThiefs().contains(player)) {
 					var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
@@ -152,7 +152,8 @@ public class Artefact{
 			}
 			if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
 				Ioc.resolve(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
-				phaseInMap.safeToUnknown();
+				phaseInMap.guardSafeToUnknown();
+				phaseInMap.thiefObjectiveStolen(this);
 				Bukkit.getPluginManager().callEvent(new ArtefactStealEvent(this, firstThief));
 			}
 		}
@@ -163,7 +164,7 @@ public class Artefact{
 		if(foundAfterCapture) {
 			var game = Ioc.resolve(Vi6Game.class);
 			var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-			phaseInMap.objectiveStolen(this);
+			phaseInMap.guardObjectiveStolen(this);
 		}
 	}
 }

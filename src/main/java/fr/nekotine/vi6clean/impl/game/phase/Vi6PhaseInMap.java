@@ -76,11 +76,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	private final String guardObjectiveName = "guardArtefactListing";
 	private int unfoundStolenArtefacts = 0;
 	
-	/*
 	private Objective thiefScoreboard;
 	private final Team thiefSafeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefSafe");
 	private final Team thiefStolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefStolen");
-	private final String thiefObjectiveName = "thiefArtefactListing";*/
+	private final Team thiefEscapedTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefEscaped");
+	private final Team thiefLostTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefLost");
+	private final String thiefObjectiveName = "thiefArtefactListing";
+	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
@@ -100,9 +102,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		guardUnknownTeam.color(NamedTextColor.YELLOW);
 		guardSafeTeam.color(NamedTextColor.GREEN);
 		guardCountTeam.addEntry(countString);
-		updateCount();
+		guardUpdateCount();
 		
-		/*
+		
 		thiefScoreboard = scoreboard.getObjective(thiefObjectiveName);
 		if (thiefScoreboard == null) {
 			thiefScoreboard = scoreboard.registerNewObjective(thiefObjectiveName,
@@ -110,9 +112,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					Component.text("Check-list", NamedTextColor.GOLD).decorate(TextDecoration.UNDERLINED),
 					RenderType.INTEGER);
 		}
-		guardScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_RED);
-		thiefStolenTeam.color(NamedTextColor.RED);
-		thiefSafeTeam.color(NamedTextColor.GREEN);*/
+		thiefScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_RED);
+		thiefSafeTeam.color(NamedTextColor.GREEN);
+		thiefStolenTeam.color(NamedTextColor.YELLOW);
+		thiefEscapedTeam.color(NamedTextColor.AQUA);
+		thiefLostTeam.color(NamedTextColor.RED);
 	}
 
 	@Override
@@ -143,7 +147,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var artefacts = map.getArtefacts().backingMap();
 		for (var artefact : artefacts.values()) {
 			artefact.setup(world);
-			objectiveSafe(artefact);
+			guardObjectiveSafe(artefact);
+			thiefObjectiveSafe(artefact);
 		}
 		var entrances = map.getEntrances().backingMap();
 		for (var entranceName : entrances.keySet()) {
@@ -193,7 +198,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		guardUnknownTeam.unregister();
 		guardSafeTeam.unregister();
 		guardScoreboard.unregister();
-		guardScoreboard = null;
+		
+		thiefSafeTeam.unregister();
+		thiefStolenTeam.unregister();
+		thiefEscapedTeam.unregister();
+		thiefScoreboard.unregister();
 	}
 	
 	@Override
@@ -365,54 +374,79 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	//
 	
-	public Objective getSidebarObjective() {
-		return guardScoreboard;
-	}
-	public void objectiveSafe(Artefact artefact) {
+	public void guardObjectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
 		if(guardSafeTeam.hasEntry(name)) return;
 		guardSafeTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(-1);
 	}
-	public void objectiveUnknown(Artefact artefact) {
-		var name = artefact.getName();
-		if(guardUnknownTeam.hasEntry(name)) return;
-		guardUnknownTeam.addEntry(name);
-		guardScoreboard.getScore(name).setScore(-2);
-	}
-	public void objectiveStolen(Artefact artefact) {
+	public void guardObjectiveStolen(Artefact artefact) {
 		var name = artefact.getName();
 		if(guardStolenTeam.hasEntry(name)) return;
 		guardStolenTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(-3);
 		if(--unfoundStolenArtefacts == 0) {
-			unknownToSafe();
+			guardUnknownToSafe();
 		}
-		updateCount();
+		guardUpdateCount();
 	}
-	public void objectiveEscaped(Artefact artefact) {
+	public void guardObjectiveEscaped(Artefact artefact) {
 		var name = artefact.getName();
 		if(guardEscapedTeam.hasEntry(name)) return;
 		guardEscapedTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(-4);
 	}
-	public void safeToUnknown() {
+	public void guardSafeToUnknown() {
 		unfoundStolenArtefacts++;
-		updateCount();
+		guardUpdateCount();
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			if(guardSafeTeam.hasEntry(artefact.getName())) {
-				objectiveUnknown(artefact);
+				guardObjectiveUnknown(artefact);
 			}
 		}
 	}
-	public void unknownToSafe() {
+	private void guardUnknownToSafe() {
 		for (var artefact : map.getArtefacts().backingMap().values()) {
 			if(guardUnknownTeam.hasEntry(artefact.getName())) {
-				objectiveSafe(artefact);
+				guardObjectiveSafe(artefact);
 			}
 		}
 	}
-	private void updateCount() {
+	private void guardObjectiveUnknown(Artefact artefact) {
+		var name = artefact.getName();
+		if(guardUnknownTeam.hasEntry(name)) return;
+		guardUnknownTeam.addEntry(name);
+		guardScoreboard.getScore(name).setScore(-2);
+	}
+	private void guardUpdateCount() {
 		guardScoreboard.getScore(countString).setScore(unfoundStolenArtefacts);
+	}
+	
+	//
+	
+	private void thiefObjectiveSafe(Artefact artefact) {
+		var name = artefact.getName();
+		if(thiefSafeTeam.hasEntry(name)) return;
+		thiefSafeTeam.addEntry(name);
+		thiefScoreboard.getScore(name).setScore(3);
+	}
+	public void thiefObjectiveStolen(Artefact artefact) {
+		var name = artefact.getName();
+		if(thiefStolenTeam.hasEntry(name)) return;
+		thiefStolenTeam.addEntry(name);
+		thiefScoreboard.getScore(name).setScore(2);
+	}
+	
+	public void thiefObjectiveEscaped(Artefact artefact) {
+		var name = artefact.getName();
+		if(thiefEscapedTeam.hasEntry(name)) return;
+		thiefEscapedTeam.addEntry(name);
+		thiefScoreboard.getScore(name).setScore(1);
+	}
+	public void thiefObjectiveLost(Artefact artefact) {
+		var name = artefact.getName();
+		if(thiefLostTeam.hasEntry(name)) return;
+		thiefLostTeam.addEntry(name);
+		thiefScoreboard.getScore(name).setScore(0);
 	}
 }

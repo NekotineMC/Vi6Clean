@@ -186,16 +186,18 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			//update check list
 			var stolen = infiltrationWrapper.get().getStolenArtefacts();
 			var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-			stolen.forEach(a -> phaseInMap.objectiveEscaped(a));
+			stolen.forEach(a -> phaseInMap.guardObjectiveEscaped(a));
 			
 			//Send message
 			infiltrationWrapper.get().setDead(dead);
 			if (dead) {
+				stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
 				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
 						.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
 						.append(Component.text(stolen.size(), NamedTextColor.AQUA))
 						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
 			}else {
+				stolen.forEach(a -> phaseInMap.thiefObjectiveEscaped(a));
 				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
 						.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
 						.append(Component.text(stolen.size(), NamedTextColor.AQUA))
