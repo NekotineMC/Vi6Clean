@@ -68,6 +68,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	private Objective guardScoreboard;
 	private final Team guardCountTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardCount");
+	private final Team guardEscapedTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardEscaped");
 	private final Team guardStolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardStolen");
 	private final Team guardUnknownTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardUnknown");
 	private final Team guardSafeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardSafe");
@@ -94,12 +95,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		guardScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_BLUE);
 		guardCountTeam.color(NamedTextColor.AQUA);
+		guardEscapedTeam.color(NamedTextColor.DARK_RED);
 		guardStolenTeam.color(NamedTextColor.RED);
 		guardUnknownTeam.color(NamedTextColor.YELLOW);
 		guardSafeTeam.color(NamedTextColor.GREEN);
 		guardCountTeam.addEntry(countString);
 		updateCount();
-		guardScoreboard.getScore(countString).setScore(3);
 		
 		/*
 		thiefScoreboard = scoreboard.getObjective(thiefObjectiveName);
@@ -187,6 +188,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		map = null;
 		
 		guardCountTeam.unregister();
+		guardEscapedTeam.unregister();
 		guardStolenTeam.unregister();
 		guardUnknownTeam.unregister();
 		guardSafeTeam.unregister();
@@ -366,27 +368,33 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	public Objective getSidebarObjective() {
 		return guardScoreboard;
 	}
-	public void objectiveStolen(Artefact artefact) {
-		var name = artefact.getName();
-		if(guardStolenTeam.hasEntry(name)) return;
-		guardStolenTeam.addEntry(name);
-		guardScoreboard.getScore(name).setScore(2);
-		if(--unfoundStolenArtefacts == 0) {
-			unknownToSafe();
-		}
-		updateCount();
-	}
 	public void objectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
 		if(guardSafeTeam.hasEntry(name)) return;
 		guardSafeTeam.addEntry(name);
-		guardScoreboard.getScore(name).setScore(0);
+		guardScoreboard.getScore(name).setScore(-1);
 	}
 	public void objectiveUnknown(Artefact artefact) {
 		var name = artefact.getName();
 		if(guardUnknownTeam.hasEntry(name)) return;
 		guardUnknownTeam.addEntry(name);
-		guardScoreboard.getScore(name).setScore(1);
+		guardScoreboard.getScore(name).setScore(-2);
+	}
+	public void objectiveStolen(Artefact artefact) {
+		var name = artefact.getName();
+		if(guardStolenTeam.hasEntry(name)) return;
+		guardStolenTeam.addEntry(name);
+		guardScoreboard.getScore(name).setScore(-3);
+		if(--unfoundStolenArtefacts == 0) {
+			unknownToSafe();
+		}
+		updateCount();
+	}
+	public void objectiveEscaped(Artefact artefact) {
+		var name = artefact.getName();
+		if(guardEscapedTeam.hasEntry(name)) return;
+		guardEscapedTeam.addEntry(name);
+		guardScoreboard.getScore(name).setScore(-4);
 	}
 	public void safeToUnknown() {
 		unfoundStolenArtefacts++;
@@ -405,6 +413,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 	}
 	private void updateCount() {
-		guardCountTeam.suffix(Component.text(unfoundStolenArtefacts, NamedTextColor.RED));
+		guardScoreboard.getScore(countString).setScore(unfoundStolenArtefacts);
 	}
 }
