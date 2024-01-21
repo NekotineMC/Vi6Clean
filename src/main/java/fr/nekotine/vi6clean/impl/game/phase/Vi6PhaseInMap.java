@@ -74,10 +74,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	private int unfoundStolenArtefacts = 0;
 	
 	private Objective thiefScoreboard;
-	private final Team thiefSafeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefSafe");
-	private final Team thiefStolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefStolen");
-	private final Team thiefEscapedTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefEscaped");
-	private final Team thiefLostTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("thiefLost");
 	private final String thiefObjectiveName = "thiefArtefactListing";
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
@@ -110,10 +106,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					RenderType.INTEGER);
 		}
 		thiefScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_RED);
-		thiefSafeTeam.color(NamedTextColor.GREEN);
-		thiefStolenTeam.color(NamedTextColor.YELLOW);
-		thiefEscapedTeam.color(NamedTextColor.AQUA);
-		thiefLostTeam.color(NamedTextColor.RED);
 	}
 
 	@Override
@@ -194,10 +186,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		guardUnknownTeam.unregister();
 		guardSafeTeam.unregister();
 		guardScoreboard.unregister();
-		
-		thiefSafeTeam.unregister();
-		thiefStolenTeam.unregister();
-		thiefEscapedTeam.unregister();
+
 		thiefScoreboard.unregister();
 	}
 	
@@ -422,27 +411,23 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	private void thiefObjectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
-		if(thiefSafeTeam.hasEntry(name)) return;
-		thiefSafeTeam.addEntry(name);
 		thiefScoreboard.getScore(name).setScore(3);
+		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.GREEN));
 	}
 	public void thiefObjectiveStolen(Artefact artefact) {
 		var name = artefact.getName();
-		if(thiefStolenTeam.hasEntry(name)) return;
-		thiefStolenTeam.addEntry(name);
 		thiefScoreboard.getScore(name).setScore(2);
+		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.YELLOW));
 	}
 	
 	public void thiefObjectiveEscaped(Artefact artefact) {
 		var name = artefact.getName();
-		if(thiefEscapedTeam.hasEntry(name)) return;
-		thiefEscapedTeam.addEntry(name);
 		thiefScoreboard.getScore(name).setScore(1);
+		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.AQUA));
 	}
 	public void thiefObjectiveLost(Artefact artefact) {
 		var name = artefact.getName();
-		if(thiefLostTeam.hasEntry(name)) return;
-		thiefLostTeam.addEntry(name);
 		thiefScoreboard.getScore(name).setScore(0);
+		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.RED));
 	}
 }
