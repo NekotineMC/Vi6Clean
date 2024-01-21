@@ -2,7 +2,6 @@ package fr.nekotine.vi6clean.impl.game.phase;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.bukkit.GameMode;
 import org.bukkit.configuration.Configuration;
@@ -15,11 +14,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
+import fr.nekotine.vi6clean.impl.status.effect.AsthmaStatusEffectType;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import io.papermc.paper.util.Tick;
@@ -48,6 +49,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	@Override
 	protected void globalSetup(Object inputData) {
 		var game = Ioc.resolve(Vi6Game.class);
+		
+		var asthmaEffect = new StatusEffect(AsthmaStatusEffectType.get(), -1);
+		var statusModule = Ioc.resolve(StatusEffectModule.class);
+		game.getThiefs().forEach(p -> statusModule.addEffect(p, asthmaEffect));
+		
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>) inputData);
 		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
 	}
