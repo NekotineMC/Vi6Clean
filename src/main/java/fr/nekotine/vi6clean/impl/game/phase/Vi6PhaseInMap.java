@@ -395,14 +395,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	public void guardSafeToUnknown() {
 		unfoundStolenArtefacts++;
 		guardUpdateCount();
-		for (var artefact : map.getArtefacts().backingMap().values()) {
+		for (var artefact : map.getArtefacts().values()) {
 			if(guardSafeTeam.hasEntry(artefact.getName())) {
 				guardObjectiveUnknown(artefact);
 			}
 		}
 	}
 	private void guardUnknownToSafe() {
-		for (var artefact : map.getArtefacts().backingMap().values()) {
+		for (var artefact : map.getArtefacts().values()) {
 			if(guardUnknownTeam.hasEntry(artefact.getName())) {
 				guardObjectiveSafe(artefact);
 			}
