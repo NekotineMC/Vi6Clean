@@ -1,7 +1,12 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -18,6 +23,7 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Criteria;
@@ -32,6 +38,7 @@ import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.state.ItemState;
@@ -51,7 +58,10 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
+import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
@@ -60,6 +70,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
+	
+	private Logger logger = new NekotineLogger(getClass());
 	
 	private Vi6Map map;
 	
@@ -159,6 +171,38 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()) {
 			tool.startHandling();
 		}
+		// KOTH
+		List<AbstractKothEffect> kothEffects = new LinkedList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
+		List<Koth> koths = new LinkedList<>(map.getKoths().values());
+		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
+		Collections.shuffle(kothEffects);
+		Collections.shuffle(koths);
+		var nbKothSpawned = 0;
+		var random = new Random();
+		var count = 0;
+		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
+			count++;
+			var effect = kothEffects.remove(0);
+			var probability = effect.getProbability();
+			if(random.nextDouble() > probability) {
+				continue;
+			}
+			nbKothSpawned++;
+			var koth = koths.remove(0);
+			koth.setup(effect, world);
+			logger.log(Level.INFO, 
+					String.format("Spawning koth at %s (%s) typed %s",
+							koth.getName(),
+							koth.getDisplayLocation(),
+							effect.getCode()
+							));
+		}
+		game.getGuards().sendMessage(
+				Component.text("Koth", NamedTextColor.DARK_PURPLE)
+				.append(Component.text(" >> "))
+				.append(Component.text(nbKothSpawned,NamedTextColor.AQUA))
+				.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
+		//
 		Ioc.resolve(Majordom.class).enable();
 	}
 

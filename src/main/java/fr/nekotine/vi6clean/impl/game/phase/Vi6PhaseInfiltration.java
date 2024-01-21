@@ -1,13 +1,7 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.GameMode;
@@ -26,10 +20,6 @@ import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
-import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.Koth;
-import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import io.papermc.paper.util.Tick;
@@ -39,8 +29,6 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player> {
-
-	private Logger logger = new NekotineLogger(getClass());
 	
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
@@ -62,27 +50,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>) inputData);
 		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
-		
-		var world = game.getWorld();
-		var map = getParent().getMap();
-		List<AbstractKothEffect> kothEffects = new LinkedList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
-		List<Koth> koths = new LinkedList<>(map.getKoths().values());
-		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
-		Collections.shuffle(kothEffects);
-		Collections.shuffle(koths);
-		var random = new Random();
-		var count = 0;
-		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
-			count++;
-			var effect = kothEffects.remove(0);
-			var probability = effect.getProbability();
-			if(random.nextDouble() > probability) {
-				continue;
-			}
-			var koth = koths.remove(0);
-			koth.setup(effect, world);
-			logger.log(Level.INFO, "Spawning koth at "+koth.getBoundingBox().getCenter());
-		}
 	}
 
 	@Override

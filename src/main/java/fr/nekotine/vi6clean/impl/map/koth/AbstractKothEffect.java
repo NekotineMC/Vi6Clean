@@ -52,4 +52,8 @@ public abstract class AbstractKothEffect {
 	public void setBlockDisplayData(BlockData data) {
 		koth.setBlockDisplayData(data);
 	}
+	
+	public String getCode() {
+		return code;
+	}
 }

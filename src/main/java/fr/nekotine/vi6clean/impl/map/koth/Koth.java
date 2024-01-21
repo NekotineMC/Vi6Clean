@@ -85,6 +85,14 @@ public class Koth{
 		rectangle.setBlock(data);
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public BlockVector getDisplayLocation() {
+		return displayLocation;
+	}
+	
 	//
 	
 	public void setup(AbstractKothEffect effect, World world) {
