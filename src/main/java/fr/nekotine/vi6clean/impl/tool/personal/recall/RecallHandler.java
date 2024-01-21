@@ -3,13 +3,16 @@ package fr.nekotine.vi6clean.impl.tool.personal.recall;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.track.ClientTrackModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
@@ -79,6 +82,13 @@ public class RecallHandler extends ToolHandler<Recall>{
 			tool.tickCooldown();
 			tool.tickParticle();
 		}
+	}
+	
+	@EventHandler
+	private void onPlayerDeath(PlayerDeathEvent evt) {
+		var player = evt.getPlayer();
+		if(!getTools().stream().anyMatch(r -> player.equals(r.getOwner()))) return;
+		Ioc.resolve(ClientTrackModule.class).track(player);
 	}
 	
 	//
