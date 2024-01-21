@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -202,7 +203,18 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				.append(Component.text(" >> ", NamedTextColor.WHITE))
 				.append(Component.text(nbKothSpawned,NamedTextColor.AQUA))
 				.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
-		//
+		// WEATHER
+		var weatherRand = random.nextFloat();
+		if (weatherRand < 0.2) {
+			world.setStorm(true);
+			world.setWeatherDuration(Integer.MAX_VALUE);
+			if (weatherRand < 0.1) {
+				world.setThundering(true);
+				world.setThunderDuration(Integer.MAX_VALUE);
+			}else {
+				
+			}
+		}
 		Ioc.resolve(Majordom.class).enable();
 	}
 
@@ -210,7 +222,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	public void globalTearDown() {
 		Ioc.resolve(Majordom.class).revertThenDisable();
 		var game = Ioc.resolve(Vi6Game.class);
-		game.getWorld().setTime(DayTime.NOON);
+		var world = game.getWorld();
+		world.setTime(DayTime.NOON);
+		world.setStorm(false);
+		world.setWeatherDuration(Integer.MAX_VALUE);
+		world.setThundering(false);
+		world.setThunderDuration(Integer.MAX_VALUE);
+		
 		DebugUtil.clearDebugEntities();
 		for (var artefact : map.getArtefacts().values()) {
 			artefact.clean();
