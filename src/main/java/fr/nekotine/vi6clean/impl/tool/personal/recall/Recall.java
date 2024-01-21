@@ -87,6 +87,7 @@ public class Recall extends Tool{
 	}
 	@Override
 	protected void cleanup() {
+		Ioc.resolve(ClientTrackModule.class).track(getOwner());
 	}
 	@Override
 	protected void onEmpStart() {
