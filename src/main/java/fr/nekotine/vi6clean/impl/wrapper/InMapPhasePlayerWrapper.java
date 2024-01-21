@@ -26,6 +26,7 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.map.Entrance;
+import fr.nekotine.vi6clean.impl.status.effect.AsthmaStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -172,6 +173,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		
 		wrapped.removePotionEffect(PotionEffectType.SATURATION);
+		Ioc.resolve(StatusEffectModule.class).addEffect(wrapped, new StatusEffect(AsthmaStatusEffectType.get(), -1));
 	}
 	
 	public void thiefLeaveMap() {

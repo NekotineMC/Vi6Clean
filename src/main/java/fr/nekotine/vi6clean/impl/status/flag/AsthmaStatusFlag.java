@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
@@ -24,11 +25,11 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 		WALKING,
 		IDLE
 	}
-	private static int HALF_DRUMSTICK_CONSUME_TICK = 1 * 20;
-	private static int HALF_DRUMSTICK_MOVING_REGEN_TICK = 2 * HALF_DRUMSTICK_CONSUME_TICK;
-	private static int IDLE_REGEN_MULTIPLIER = 2;
-	private static int TICK_BEFORE_CONSIDER_IDLE = 5;
-	private static int MAX_HALF_DRUMSTICK_AFTER_CAPTURE = 10;
+	private int HALF_DRUMSTICK_CONSUME_TICK = (int)(20*Ioc.resolve(JavaPlugin.class).getConfig().getDouble("half_drumstick_consumption_delay", 1));
+	private int HALF_DRUMSTICK_MOVING_REGEN_TICK = (int)(20*Ioc.resolve(JavaPlugin.class).getConfig().getDouble("half_drumsitck_moving_regeneration_delay", 2));
+	private int IDLE_REGEN_MULTIPLIER = Ioc.resolve(JavaPlugin.class).getConfig().getInt("idle_regeneration_multiplier", 2);
+	private int TICK_BEFORE_CONSIDER_IDLE = (int)(20*Ioc.resolve(JavaPlugin.class).getConfig().getDouble("delay_before_considering_idle", 0.25));
+	private int MAX_HALF_DRUMSTICK_AFTER_CAPTURE = Ioc.resolve(JavaPlugin.class).getConfig().getInt("max_half_drumstick_after_capture", 10);
 	private static AsthmaStatusFlag instance;
 	public static final AsthmaStatusFlag get() {
 		if (instance == null) {
@@ -66,11 +67,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	}
 	
 	//
-	
-	
-	
-	//
-	
+
 	@EventHandler
 	private void onFoodChange(FoodLevelChangeEvent evt) {
 		if(patients.containsKey(evt.getEntity())) {
