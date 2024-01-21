@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import fr.nekotine.core.status.flag.StatusFlag;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.tuple.Triplet;
+import fr.nekotine.core.util.EventUtil;
 
 public class AsthmaStatusFlag implements StatusFlag,Listener{
 	private static enum MovementMode {
@@ -28,6 +29,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	public static final AsthmaStatusFlag get() {
 		if (instance == null) {
 			instance = new AsthmaStatusFlag();
+			EventUtil.register(instance);
 		}
 		return instance;
 	}
