@@ -124,7 +124,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
 		var shopLore = new LinkedList<Component>(lore);
 		shopLore.add(Component.empty());
-		shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
+		if (!isRune) {
+			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
+		}
 		var menuItem = ItemStackUtil.make(iconMaterial, displayName, shopLore.toArray(Component[]::new));
 		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 		var teams = configuration.getStringList("team");
