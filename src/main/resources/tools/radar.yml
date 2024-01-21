@@ -1,7 +1,7 @@
 display_name: <light_purple>Radar
 price: 400
 amount_limit: 1
-shop_icon: CALIBRATED_SCULK_SENSOR
+shop_icon: DAYLIGHT_DETECTOR
 delay: 5.0 #durée du scan en secondes
 range: 20.0 #portée du radar en blocs
 cooldown: 20.0 #délai du radar en secondes

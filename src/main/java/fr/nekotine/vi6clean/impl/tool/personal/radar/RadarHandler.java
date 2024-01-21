@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
@@ -46,17 +47,19 @@ public class RadarHandler extends ToolHandler<Radar>{
 	private final String DETECTION_FAIL = getConfiguration().getString("detection_fail");
 	private final String DETECTION_DETECTED = getConfiguration().getString("detection_detected");
 	private final ItemStack UNPLACED = new ItemStackBuilder(
-			Material.CALIBRATED_SCULK_SENSOR)
+			Material.DAYLIGHT_DETECTOR)
 			.unstackable()
 			.name(getDisplayName())
 			.lore(getLore())
+			.flags(ItemFlag.values())
 			.build();
 	private final ItemStack PLACED = ItemStackUtil.addEnchant(UNPLACED.clone(), Enchantment.QUICK_CHARGE, 1);
 	private final ItemStack EMPED = new ItemStackBuilder(
-			Material.SCULK_SENSOR)
+			Material.DAYLIGHT_DETECTOR)
 			.unstackable()
 			.name(getDisplayName().append(Component.text(" - ").append(Component.text("Brouillé", NamedTextColor.RED))))
 			.lore(getLore())
+			.flags(ItemFlag.values())
 			.build();
 	
 	protected static final LinkedList<Triplet<Double, Double, Double>> BALL = new LinkedList<Triplet<Double, Double, Double>>();
