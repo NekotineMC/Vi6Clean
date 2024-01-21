@@ -3,7 +3,6 @@ package fr.nekotine.vi6clean.impl.map.koth;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -19,7 +19,6 @@ import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
-import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -36,7 +35,7 @@ public class Koth{
 	
 	@CommandGeneratorOverride(LocationCommandGenerator.class)
 	@ComposingMap
-	private Location displayLocation = BukkitUtil.defaultLocation();
+	private BlockVector displayLocation = new BlockVector();
 	private Set<Player> inside = new HashSet<>(8);
 	
 	private boolean isEnabled = false;

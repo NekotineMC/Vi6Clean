@@ -4,12 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.block.BlockPatch;
@@ -18,7 +18,6 @@ import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
 import fr.nekotine.core.map.annotation.ComposingMap;
 import fr.nekotine.core.map.annotation.MapDictKey;
 import fr.nekotine.core.map.command.generator.BlockLocationCommandGenerator;
-import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -48,7 +47,7 @@ public class Artefact{
 	
 	@CommandGeneratorOverride(BlockLocationCommandGenerator.class)
 	@ComposingMap
-	private Location blockPosition = BukkitUtil.defaultLocation();
+	private BlockVector blockPosition = new BlockVector();
 	
 	@ComposingMap
 	private BoundingBox boundingBox = new BoundingBox();
@@ -61,7 +60,7 @@ public class Artefact{
 		return boundingBox;
 	}
 	
-	public Location getBlockPosition() {
+	public BlockVector getBlockPosition() {
 		return blockPosition;
 	}
 
