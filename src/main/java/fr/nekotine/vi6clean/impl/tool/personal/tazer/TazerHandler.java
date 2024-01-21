@@ -29,7 +29,7 @@ public class TazerHandler extends ToolHandler<Tazer>{
 			getDisplayName(), 
 			getLore());
 	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown", 10));
-
+	private final int TAZED_DURATION_TICK = (int)(20*getConfiguration().getDouble("tazed_duration", 1));
 	
 	public TazerHandler() {
 		super(Tazer::new);
@@ -73,6 +73,9 @@ public class TazerHandler extends ToolHandler<Tazer>{
 	}
 	public int getCooldownTick() {
 		return COOLDOWN_TICK;
+	}
+	public int getTazedDurationTick() {
+		return TAZED_DURATION_TICK;
 	}
 	
 }
