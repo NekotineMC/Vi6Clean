@@ -9,7 +9,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlag;
+import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.tuple.Triplet;
 import fr.nekotine.core.util.EventUtil;
@@ -23,15 +26,18 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	private static int HALF_DRUMSTICK_CONSUME_TICK = 1 * 20;
 	private static int HALF_DRUMSTICK_MOVING_REGEN_TICK = 2 * HALF_DRUMSTICK_CONSUME_TICK;
 	private static int IDLE_REGEN_MULTIPLIER = 2;
-	private static int MAX_HALF_DRUMSTICK_AFTER_CAPTURE = 10;
 	private static int TICK_BEFORE_CONSIDER_IDLE = 5;
+	private static int MAX_HALF_DRUMSTICK_AFTER_CAPTURE = 10;
 	private static AsthmaStatusFlag instance;
 	public static final AsthmaStatusFlag get() {
 		if (instance == null) {
 			instance = new AsthmaStatusFlag();
-			EventUtil.register(instance);
 		}
 		return instance;
+	}
+	private AsthmaStatusFlag() {
+		EventUtil.register(this);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 	
 	//mode, tick_count_for_consume/regeneration, tick_count_for_consider_idle
@@ -52,6 +58,11 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	public void removeStatus(LivingEntity appliedTo) {
 		patients.remove(appliedTo);
 	}
+	public void capture(Player player) {
+		if(!patients.containsKey(player)) return;
+		var level = Math.min(MAX_HALF_DRUMSTICK_AFTER_CAPTURE, player.getFoodLevel());
+		player.setFoodLevel(level);
+	}
 	
 	//
 	
@@ -62,7 +73,6 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	@EventHandler
 	private void onPlayerToggleSprint(PlayerToggleSprintEvent evt) {
 		var player = evt.getPlayer();
-		
 		patients.computeIfPresent(player, (p,t) -> Triplet.from(
 				//On met à jour le mode de déplacement
 				evt.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING,

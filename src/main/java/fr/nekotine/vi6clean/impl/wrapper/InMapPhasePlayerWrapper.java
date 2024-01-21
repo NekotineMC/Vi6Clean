@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import fr.nekotine.core.bar.actionbar.ActionBarComponent;
@@ -169,6 +170,8 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		if (infiltrationPhase != null) {
 			infiltrationPhase.setIngameScannerDelay();
 		}
+		
+		wrapped.removePotionEffect(PotionEffectType.SATURATION);
 	}
 	
 	public void thiefLeaveMap() {

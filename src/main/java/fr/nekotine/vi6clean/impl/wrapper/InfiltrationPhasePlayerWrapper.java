@@ -10,6 +10,7 @@ import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.status.flag.AsthmaStatusFlag;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -55,6 +56,7 @@ public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 		game.getGuards().showTitle(guardTitle);
 		game.getThiefs().sendMessage(thiefMsg);
 		game.getThiefs().showTitle(thiefTitle);
+		AsthmaStatusFlag.get().capture(wrapped);
 	}
 
 	public boolean isDead() {
