@@ -199,7 +199,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		game.getGuards().sendMessage(
 				Component.text("Koth", NamedTextColor.DARK_PURPLE)
-				.append(Component.text(" >> "))
+				.append(Component.text(" >> ", NamedTextColor.WHITE))
 				.append(Component.text(nbKothSpawned,NamedTextColor.AQUA))
 				.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
 		//
