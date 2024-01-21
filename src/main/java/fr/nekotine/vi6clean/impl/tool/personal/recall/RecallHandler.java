@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.track.ClientTrackModule;
 import fr.nekotine.core.util.CustomAction;
@@ -48,7 +49,7 @@ public class RecallHandler extends ToolHandler<Recall>{
 
 	public RecallHandler() {
 		super(Recall::new);
-		//Ioc.resolve(ModuleManager.class).tryLoad(EntityTrackModule.class);
+		Ioc.resolve(ModuleManager.class).tryLoad(ClientTrackModule.class);
 	}
 
 	@Override
