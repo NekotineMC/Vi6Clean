@@ -140,18 +140,20 @@ public class Watcher extends Tool{
 	@Override
 	protected void onEmpStart() {
 		isEmp = true;
+		var handler = Ioc.resolve(WatcherHandler.class);
 		var statusModule = Ioc.resolve(StatusEffectModule.class);
 		for(Player p : ennemiesInRange) {
-			statusModule.removeEffect(p, WatcherHandler.glowEffect);
+			statusModule.removeEffect(p, handler.getPermanentGlowEffect());
 		}
 		itemUpdate();
 	}
 	@Override
 	protected void onEmpEnd() {
 		isEmp = false;
+		var handler = Ioc.resolve(WatcherHandler.class);
 		var statusModule = Ioc.resolve(StatusEffectModule.class);
 		for(Player p : ennemiesInRange) {
-			statusModule.addEffect(p, WatcherHandler.glowEffect);
+			statusModule.addEffect(p, handler.getPermanentGlowEffect());
 			Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 		}
 		if(ennemiesInRange.size() > 0) {

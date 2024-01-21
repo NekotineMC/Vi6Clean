@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.watcher;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Supplier;
@@ -32,10 +33,13 @@ import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.util.Tick;
 
 @ToolCode("watcher")
 public class WatcherHandler extends ToolHandler<Watcher>{
-	protected static final StatusEffect glowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
+	private final StatusEffect permanentGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
+	private final StatusEffect lastingGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(),
+			Tick.tick().fromDuration(Duration.ofSeconds(getConfiguration().getLong("last_delay_second",1))));
 	public WatcherHandler() {
 		super(Watcher::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
@@ -49,6 +53,9 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 			getDisplayName(), 
 			getLore());
 	
+	public StatusEffect getPermanentGlowEffect() {
+		return permanentGlowEffect;
+	}
 	
 	@Override
 	protected void onAttachedToPlayer(Watcher tool, Player player) {
@@ -121,14 +128,15 @@ public class WatcherHandler extends ToolHandler<Watcher>{
 				if (inRange.contains(p)) {
 					inRange.remove(p);
 				}else {
-					statusEffectModule.removeEffect(p, glowEffect);
+					statusEffectModule.addEffect(p, lastingGlowEffect);
+					statusEffectModule.removeEffect(p, permanentGlowEffect);
 					ite.remove();
 				}
 			}
 			for (var p : inRange) {
 				var own = tool.getOwner();
 				if(own == null || !statusFlagModule.hasAny(own, EmpStatusFlag.get())) {
-					statusEffectModule.addEffect(p, glowEffect);
+					statusEffectModule.addEffect(p, permanentGlowEffect);
 					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 					if (own != null) {
 						Vi6Sound.OMNICAPTEUR_DETECT.play(own);
