@@ -68,7 +68,7 @@ public class InviSneak extends Tool{
 		var range = Ioc.resolve(InviSneakHandler.class).getDetectionBlockRange();
 		if (revealed) {
 			var world = Ioc.resolve(Vi6Game.class).getWorld();
-			Vi6Sound.INVISNEAK_REVEALED.play(world, loc.getX(), loc.getY(), loc.getZ());
+			Vi6Sound.INVISNEAK_REVEALED.play(world, loc);
 			SpatialUtil.circle2DDensity(range, 5, 0,
 					(offsetX, offsetZ) -> {
 						player.spawnParticle(Particle.FALLING_DUST, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, Bukkit.createBlockData(Material.REDSTONE_BLOCK));
