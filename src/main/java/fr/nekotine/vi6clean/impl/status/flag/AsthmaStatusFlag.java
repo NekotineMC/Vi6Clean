@@ -51,7 +51,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	public void applyStatus(LivingEntity appliedTo) {
 		if(appliedTo instanceof Player player) {
 			patients.put(player, Triplet.from(
-					MovementMode.IDLE, 
+					player.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING, 
 					HALF_DRUMSTICK_MOVING_REGEN_TICK, 
 					TICK_BEFORE_CONSIDER_IDLE));
 		}

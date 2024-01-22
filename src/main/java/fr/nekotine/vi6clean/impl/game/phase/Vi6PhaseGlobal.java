@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -76,6 +77,11 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player> implements Lis
 	@EventHandler
 	public void onPlayerLeft(PlayerQuitEvent evt) {
 		Ioc.resolve(Vi6Game.class).removePlayer(evt.getPlayer());
+	}
+	
+	@EventHandler
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent evt) {
+		evt.getPlayer().setSprinting(false);
 	}
 
 }
