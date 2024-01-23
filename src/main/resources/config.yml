@@ -13,11 +13,11 @@ invisibility:
    particle_count: 3
   
 asthma:
-   half_drumstick_consumption_delay : 1.0 
+   half_drumstick_consumption_delay : 1.0
    half_drumsitck_moving_regeneration_delay: 2.0
-   idle_regeneration_multiplier: 2
+   idle_regeneration_multiplier: 2.0
    delay_before_considering_idle: 0.25
-   max_half_drumstick_after_capture: 10
+   max_half_drumstick_after_capture: 11
 
 infiltration:
    delay_between_capture: 30.0 #délai entre 2 captures d'artéfacts en secondes
