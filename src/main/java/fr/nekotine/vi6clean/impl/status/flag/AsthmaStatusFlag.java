@@ -17,6 +17,8 @@ import fr.nekotine.core.status.flag.StatusFlag;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 
 public class AsthmaStatusFlag implements StatusFlag,Listener{
 	private class AsthmaInfo {
@@ -55,7 +57,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 			this.cancelledFlying = cancelledFlying;
 		}
 	}
-	private static enum MovementMode {
+	public static enum MovementMode {
 		SPRINTING,
 		WALKING,
 		IDLE
@@ -91,6 +93,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 				TICK_BEFORE_CONSIDER_IDLE);
 					
 			patients.put(player, info);
+			updateActionBarMode(player, info.getMode());
 		}
 	}
 	@Override
@@ -116,6 +119,10 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 		}
 		return cancelledFlying;
 	}
+	private void updateActionBarMode(Player player, MovementMode mode) {
+		InMapPhasePlayerWrapper wrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, InMapPhasePlayerWrapper.class);
+		wrapper.updateStaminaComponent(mode);
+	}
 	
 	//
 
@@ -134,15 +141,20 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 		info.setMode(evt.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING);
 		info.setConsumeTickCount(evt.isSprinting() ? HALF_DRUMSTICK_CONSUME_TICK : HALF_DRUMSTICK_MOVING_REGEN_TICK);
 		info.setIdleTickCount(TICK_BEFORE_CONSIDER_IDLE);
+		updateActionBarMode(player, info.getMode());
 	}
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
-		if(!evt.hasChangedPosition()) return;
+		if(!evt.hasExplicitlyChangedPosition()) return;
 		var player = evt.getPlayer();
 		if(!patients.containsKey(player)) return;
 		var info = patients.get(player);
 		
-		info.setMode(info.getMode() == MovementMode.SPRINTING ? MovementMode.SPRINTING : MovementMode.WALKING);
+		if(info.getMode() == MovementMode.IDLE) {
+			info.setMode(MovementMode.WALKING);
+			updateActionBarMode(player, info.getMode());
+		}
+		
 		info.setIdleTickCount(TICK_BEFORE_CONSIDER_IDLE);
 	}
 	@EventHandler
@@ -168,6 +180,7 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 				}
 				if(--idle_tick==0) {
 					mode = MovementMode.IDLE;
+					updateActionBarMode(player, mode);
 				}
 				break;
 			default:

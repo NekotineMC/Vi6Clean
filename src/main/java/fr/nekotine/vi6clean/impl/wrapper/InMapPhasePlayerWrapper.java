@@ -28,6 +28,7 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.map.Entrance;
 import fr.nekotine.vi6clean.impl.status.effect.AsthmaStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.flag.AsthmaStatusFlag.MovementMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -58,6 +59,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	private ActionBarComponent captureComponent = new ActionBarComponent();
 	private ActionBarComponent leaveComponent = new ActionBarComponent();
 	private ActionBarComponent roomComponent = new ActionBarComponent();
+	private ActionBarComponent staminaComponent = new ActionBarComponent();
 	{artefactActionBar.addComponent(artefactComponent);
 	defaultActionBar.addComponent(roomComponent);}
 	
@@ -152,9 +154,9 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		state = InMapState.INSIDE;
 
 		var separator = Component.text(" | ");
-		defaultActionBar.addComponents(new ActionBarComponent(separator,1),new ActionBarComponent(separator,3));
-		defaultActionBar.addComponents(captureComponent,leaveComponent);
-		captureComponent.setPriority(4);leaveComponent.setPriority(2);
+		defaultActionBar.addComponents(new ActionBarComponent(separator,1),new ActionBarComponent(separator,3),new ActionBarComponent(separator,5));
+		defaultActionBar.addComponents(captureComponent,leaveComponent,staminaComponent);
+		captureComponent.setPriority(6);leaveComponent.setPriority(4);staminaComponent.setPriority(2);
 		defaultActionBar.addViewers(GetWrapped());
 		
 		var game = Ioc.resolve(Vi6Game.class);
@@ -269,5 +271,21 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	public ActionBarComponent getArtefactComponent() {
 		return artefactComponent;
+	}
+	
+	public void updateStaminaComponent(MovementMode mode) {
+		var text = Component.text("Stamina ", NamedTextColor.YELLOW);
+		switch(mode) {
+		case SPRINTING:
+			text = text.append(Component.text("↓", NamedTextColor.RED));
+			break;
+		case WALKING:
+			text = text.append(Component.text("↑", NamedTextColor.GREEN));
+			break;
+		default:
+			text = text.append(Component.text("↑↑", NamedTextColor.DARK_GREEN));
+			break;
+		}
+		staminaComponent.setText(text);
 	}
 }
