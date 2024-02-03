@@ -15,10 +15,11 @@ import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.annotation.MapDictKey;
+import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
+import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -28,13 +29,13 @@ import net.kyori.adventure.text.Component;
 
 public class Koth{
 	@MapDictKey
-	@ComposingMap
 	private String name = "";
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
 	
-	@CommandGeneratorOverride(LocationCommandGenerator.class)
-	@ComposingMap
+	@GenerateSpecificCommandFor(LocationCommandGenerator.class)
+	@ComposingConfiguration
 	private BlockVector displayLocation = new BlockVector();
 	private Set<Player> inside = new HashSet<>(8);
 	

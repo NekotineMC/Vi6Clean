@@ -14,10 +14,11 @@ import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.annotation.MapDictKey;
+import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.map.command.generator.BlockLocationCommandGenerator;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
+import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -36,7 +37,6 @@ public class Artefact{
 	private int capture_advancement;
 	
 	@MapDictKey
-	@ComposingMap
 	private String name = "";
 	
 	private Set<Player> inside = new HashSet<>(8);
@@ -45,11 +45,12 @@ public class Artefact{
 	
 	private final BlockPatch blockPatch = new BlockPatch(s -> s.setType(Material.AIR)); // For now
 	
-	@CommandGeneratorOverride(BlockLocationCommandGenerator.class)
-	@ComposingMap
+	@GenerateSpecificCommandFor(BlockLocationCommandGenerator.class)
+	@ComposingConfiguration
 	private BlockVector blockPosition = new BlockVector();
 	
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
 
 	private BlockDisplay boxDisplay;

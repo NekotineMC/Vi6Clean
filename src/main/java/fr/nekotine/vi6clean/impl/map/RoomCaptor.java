@@ -2,19 +2,21 @@ package fr.nekotine.vi6clean.impl.map;
 
 import org.bukkit.util.BoundingBox;
 
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.annotation.MapDictKey;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
+import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 
 public class RoomCaptor {
 
-	@ComposingMap
 	@MapDictKey
 	private String name = "";
 	
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private String room = "";
 	
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private BoundingBox triggerBox = new BoundingBox();
 
 	public BoundingBox getTriggerBox() {
