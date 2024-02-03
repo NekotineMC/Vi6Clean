@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,6 +13,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -39,8 +42,10 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.core.map.MapHandle;
 import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.serialization.configurationserializable.ConfigurationSerializableUtil;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.PotionEffectState;
@@ -135,16 +140,27 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var game = Ioc.resolve(Vi6Game.class);
 		var world = game.getWorld();
 		world.setTime(DayTime.MIDNIGHT);
+		// LOAD MAP
 		var mapName = game.getMapName();
 		if (mapName == null) {
-			var maps = Ioc.resolve(MapModule.class).getMapFinder().list();
-			if (maps.size() <= 0) {
+			/*var maps = Ioc.resolve(MapModule.class).getMapFinder().list();
+			if (maps.size() <= 0) {*/
 				throw new IllegalStateException("Aucune map n'est disponible");
-			}
-			mapName = maps.get(0).getName();
+			/*}
+			mapName = maps.get(0).getName();*/
 		}
-		map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
+		var fileName = mapName + ".yml";
+		var mapFolder = new File(Ioc.resolve(JavaPlugin.class).getDataFolder(), "Maps/"+mapName);
+		var files = mapFolder.listFiles((dir, n) -> n.equals(fileName));
+		if (files.length > 0) {
+			var cfg = YamlConfiguration.loadConfiguration(files[0]);
+			map = ConfigurationSerializableUtil.getObjectFrom(cfg, Vi6Map.class);
+		}else {
+			throw new RuntimeException(new FileNotFoundException("impossible de trouver le fichier "+fileName+" pour la map."));
+		}
+		//map = Ioc.resolve(MapModule.class).getMapFinder().findByName(Vi6Map.class, mapName).loadConfig();
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
+		// LOAD MAP END
 		var artefacts = map.getArtefacts();
 		for (var artefact : artefacts.values()) {
 			artefact.setup(world);
