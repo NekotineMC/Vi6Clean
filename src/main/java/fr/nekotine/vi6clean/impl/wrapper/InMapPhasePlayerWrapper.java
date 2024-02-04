@@ -194,7 +194,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			//update check list
 			var stolen = infiltrationWrapper.get().getStolenArtefacts();
 			var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-			stolen.forEach(a -> phaseInMap.guardObjectiveEscaped(a));
+			stolen.forEach(a -> {
+				a.setFoundAfterCapture(true);
+				phaseInMap.guardObjectiveEscaped(a);
+			});
 			
 			//Send message
 			infiltrationWrapper.get().setDead(dead);
