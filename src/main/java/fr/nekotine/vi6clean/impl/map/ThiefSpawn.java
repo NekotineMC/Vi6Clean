@@ -2,20 +2,22 @@ package fr.nekotine.vi6clean.impl.map;
 
 import org.bukkit.Location;
 
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.annotation.MapDictKey;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
+import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 import fr.nekotine.core.util.BukkitUtil;
 
 public class ThiefSpawn {
 
 	@MapDictKey
-	@ComposingMap
 	private String name = "";
 	
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private Location spawnPoint = BukkitUtil.defaultLocation();
 	
-	@ComposingMap
+	@GenerateCommandFor
+	@ComposingConfiguration
 	private Location minimapPosition = BukkitUtil.defaultLocation();
 
 	public Location getSpawnPoint() {

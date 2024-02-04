@@ -1,56 +1,66 @@
 package fr.nekotine.vi6clean.impl.map;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.util.BoundingBox;
 
-import fr.nekotine.core.map.annotation.CommandGeneratorOverride;
-import fr.nekotine.core.map.annotation.ComposingMap;
-import fr.nekotine.core.map.annotation.MapElementTyped;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
+import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
 import fr.nekotine.core.map.command.generator.BlockBoundingBoxCommandGenerator;
 import fr.nekotine.core.map.command.generator.PositionCommandGenerator;
+import fr.nekotine.core.reflexion.annotation.GenericBiTyped;
+import fr.nekotine.core.serialization.configurationserializable.ConfigurationSerializableAdapted;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 
-public class Vi6Map {
+public class Vi6Map extends ConfigurationSerializableAdapted {
 
-	@MapElementTyped(Artefact.class)
-	@ComposingMap
-	private Map<String,Artefact> artefacts = new HashMap<>();
+	public Vi6Map(Map<String, Object> map) {
+		super(map);
+	}
 
-	@MapElementTyped(Entrance.class)
-	@ComposingMap
-	private Map<String,Entrance> entrances = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=Artefact.class)
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private Map<String,Artefact> artefacts;
 
-	@MapElementTyped(ThiefSpawn.class)
-	@ComposingMap
-	private Map<String,ThiefSpawn> thiefSpawns = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=Entrance.class)
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private Map<String,Entrance> entrances;
 
-	@CommandGeneratorOverride(BlockBoundingBoxCommandGenerator.class)
-	@MapElementTyped(BoundingBox.class)
-	@ComposingMap
-	private Map<String,BoundingBox> exits = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=ThiefSpawn.class)
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private Map<String,ThiefSpawn> thiefSpawns;
 
-	@CommandGeneratorOverride(PositionCommandGenerator.class)
-	@MapElementTyped(Location.class)
-	@ComposingMap
-	private Map<String,Location> guardSpawns = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=BoundingBox.class)
+	@GenerateSpecificCommandFor(BlockBoundingBoxCommandGenerator.class)
+	@ComposingConfiguration
+	private Map<String,BoundingBox> exits;
 
-	@CommandGeneratorOverride(PositionCommandGenerator.class)
-	@MapElementTyped(Location.class)
-	@ComposingMap
-	private Map<String,Location> thiefMinimapSpawns = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=Location.class)
+	@GenerateSpecificCommandFor(PositionCommandGenerator.class)
+	@ComposingConfiguration
+	private Map<String,Location> guardSpawns;
 
-	@MapElementTyped(Koth.class)
-	@ComposingMap
-	private Map<String,Koth> koths = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=Location.class)
+	@GenerateSpecificCommandFor(PositionCommandGenerator.class)
+	@ComposingConfiguration
+	private Map<String,Location> thiefMinimapSpawns;
 
-	@MapElementTyped(RoomCaptor.class)
-	@ComposingMap
-	private Map<String,RoomCaptor> roomCaptors = new HashMap<>();
+	@GenericBiTyped(a=String.class,b=Koth.class)
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private Map<String,Koth> koths;
+
+	@GenericBiTyped(a=String.class,b=RoomCaptor.class)
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private Map<String,RoomCaptor> roomCaptors;
 
 	public Collection<Location> getGuardSpawns() {
 		return guardSpawns.values();

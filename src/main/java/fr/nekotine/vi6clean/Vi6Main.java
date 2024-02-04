@@ -31,6 +31,7 @@ public class Vi6Main extends JavaPlugin{
 		super.onEnable();
 		Vi6Styles.load();
 		var game = new Vi6Game();
+		game.setMapName("SolarIndustries");
 		Ioc.getProvider().registerSingleton(game);
 		Ioc.getProvider().registerSingleton(new Majordom());
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
