@@ -102,8 +102,13 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	}
 	public void capture(Player player) {
 		if(!patients.containsKey(player)) return;
+		var info = patients.get(player);
 		var level = Math.min(MAX_HALF_DRUMSTICK_AFTER_CAPTURE, player.getFoodLevel());
 		player.setFoodLevel(level);
+		if(info.getMode() != MovementMode.SPRINTING) {
+			info.setConsumeTickCount(HALF_DRUMSTICK_MOVING_REGEN_TICK);
+		}
+		
 	}
 	
 	//
