@@ -126,7 +126,9 @@ public class AsthmaStatusFlag implements StatusFlag,Listener{
 	}
 	private void updateActionBarMode(Player player, MovementMode mode) {
 		InMapPhasePlayerWrapper wrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, InMapPhasePlayerWrapper.class);
-		wrapper.updateStaminaComponent(mode);
+		if(wrapper!=null) {
+			wrapper.updateStaminaComponent(mode);
+		}
 	}
 	
 	//
