@@ -42,8 +42,6 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
-import fr.nekotine.core.map.MapHandle;
-import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.serialization.configurationserializable.ConfigurationSerializableUtil;
 import fr.nekotine.core.state.ItemState;
