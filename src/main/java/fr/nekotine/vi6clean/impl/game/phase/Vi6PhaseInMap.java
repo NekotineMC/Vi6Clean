@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -375,6 +376,25 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 	}
 	
+	@EventHandler
+	public void handleInBushDamage(PlayerInteractEvent evt) {
+		if(evt.getAction() != Action.LEFT_CLICK_BLOCK) return;
+		var player = evt.getPlayer();
+		var eyeLoc = player.getEyeLocation();
+		var result = player.getWorld().rayTrace(
+				eyeLoc, 
+				eyeLoc.getDirection(), 
+				3, 
+				FluidCollisionMode.NEVER, 
+				true, 
+				1, 
+				e -> player.canSee(e));
+		var hitE = result.getHitEntity();
+		if(hitE != null) {
+			player.attack(hitE);
+		}
+	}
+	
 	//Map protection
 	@EventHandler
 	public void itemFrameBreak(HangingBreakEvent e) {
@@ -411,7 +431,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		if(!(e.getEntity() instanceof Player)) 
 			e.setCancelled(true);	
 	}
-	
 	@EventHandler
 	public void vehicleDestroyEvent(VehicleDestroyEvent e) {
 		e.setCancelled(true);
