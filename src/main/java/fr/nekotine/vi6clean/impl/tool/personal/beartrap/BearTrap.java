@@ -110,6 +110,9 @@ public class BearTrap extends Tool{
 		if(!ourTeam.get().contains(trying)) {
 			return false;
 		}
+		if(triggered) {
+			return false;
+		}
 		var handler = Ioc.resolve(BearTrapHandler.class);
 		if(location.distanceSquared(trying.getLocation()) > handler.getSquaredPickupRange()) {
 			return false;
