@@ -31,6 +31,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 @ToolCode("omnicaptor")
 public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",3);
+	private final int EFFECT_DURATION = (int)(20 * getConfiguration().getDouble("duration",1));
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	private final ItemStack DISPONIBLE_ITEM () {return new ItemStackBuilder(Material.REPEATER)
 			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE)))
@@ -149,5 +150,8 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
 	}
 	public ItemStack getTriggeredItem() {
 		return TRIGGERED_ITEM();
+	}
+	public int getEffectDuration() {
+		return EFFECT_DURATION;
 	}
 }

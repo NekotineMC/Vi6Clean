@@ -26,12 +26,10 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class OmniCaptor extends Tool{
-
 	private boolean emp;
 	
-	private StatusEffect omniCaptedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
-	
-	
+	private StatusEffect temporaryEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), Ioc.resolve(OmniCaptorHandler.class).getEffectDuration());
+	private StatusEffect unlimitedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
 	
 	private boolean sneaking;
 	
@@ -139,12 +137,13 @@ public class OmniCaptor extends Tool{
 			return;
 		}
 		var effectModule = Ioc.resolve(StatusEffectModule.class);
-		effectModule.addEffect(player, omniCaptedEffect);
+		effectModule.addEffect(player, unlimitedEffect);
 	}
 	
 	public void removeEffect(Player player) {
 		var effectModule = Ioc.resolve(StatusEffectModule.class);
-		effectModule.removeEffect(player, omniCaptedEffect);
+		effectModule.addEffect(player, temporaryEffect);
+		effectModule.removeEffect(player, unlimitedEffect);
 	}
 
 	@Override
