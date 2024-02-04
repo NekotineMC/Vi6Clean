@@ -35,6 +35,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
+	private final StatusEffect asthmaEffect = new StatusEffect(AsthmaStatusEffectType.get(), -1);
 	
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
 	
@@ -175,7 +176,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		
 		wrapped.removePotionEffect(PotionEffectType.SATURATION);
-		Ioc.resolve(StatusEffectModule.class).addEffect(wrapped, new StatusEffect(AsthmaStatusEffectType.get(), -1));
+		effectModule.addEffect(wrapped, asthmaEffect);
 	}
 	
 	public void thiefLeaveMap() {
@@ -186,7 +187,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		var game = Ioc.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
 		wrapped.setGameMode(GameMode.SPECTATOR);
-		
+		Ioc.resolve(StatusEffectModule.class).removeEffect(wrapped, asthmaEffect);
 		var infiltrationWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(wrapped, InfiltrationPhasePlayerWrapper.class);
 		if (infiltrationWrapper.isPresent()) {
 			
