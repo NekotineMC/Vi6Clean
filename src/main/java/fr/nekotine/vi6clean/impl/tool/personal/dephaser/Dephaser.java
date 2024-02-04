@@ -49,15 +49,20 @@ public class Dephaser extends Tool{
 		if (emp) {
 			return;
 		}
-		Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
-		Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
-		getOwner().setCooldown(Material.IRON_NUGGET,Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
-		inv = true;
+		if(getOwner() != null) {
+			Ioc.resolve(StatusEffectModule.class).addEffect(getOwner(), effect);
+			Vi6Sound.DEPHASER_ACTIVATE.play(getOwner());
+			getOwner().setCooldown(Material.IRON_NUGGET,Ioc.resolve(DephaserHandler.class).getInvisibilityDurationTick());
+			inv = true;
+		}
+		
 	}
 	protected void deactivate() {
-		var handler = Ioc.resolve(DephaserHandler.class);
-		Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
-		getOwner().setCooldown(Material.IRON_NUGGET, handler.getDelayBetweenInvisibilityTick() - handler.getInvisibilityDurationTick());
+		if(getOwner() != null) {
+			var handler = Ioc.resolve(DephaserHandler.class);
+			Vi6Sound.DEPHASER_DEACTIVATE.play(getOwner());
+			getOwner().setCooldown(Material.IRON_NUGGET, handler.getDelayBetweenInvisibilityTick() - handler.getInvisibilityDurationTick());
+		}
 		inv = false;
 	}
 
