@@ -34,6 +34,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 			PotionEffectType.NIGHT_VISION, -1, 0, false, false, false);
 	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_other", 200);
 	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_guard", 400);
+	private final float SLOW_MULTIPLIER = (float)getConfiguration().getDouble("slowness",0.8);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
 	
 	//
@@ -50,6 +51,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 			for(Player guard : game.getGuards()) {
 				statusEffectModule.addEffect(guard, unlimitedDarkened);
 				guard.addPotionEffect(unlimitedNightVision);
+				guard.setWalkSpeed(guard.getWalkSpeed() * SLOW_MULTIPLIER);
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont désactivé le générateur", NamedTextColor.YELLOW));
@@ -60,6 +62,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 			for(Player guard : game.getGuards()) {
 				statusEffectModule.removeEffect(guard, unlimitedDarkened);
 				guard.removePotionEffect(PotionEffectType.NIGHT_VISION);
+				guard.setWalkSpeed(guard.getWalkSpeed() / SLOW_MULTIPLIER);
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont redémarré le générateur", NamedTextColor.RED));
