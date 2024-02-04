@@ -1,0 +1,20 @@
+display_name: <dark_purple>Caméra</dark_purple>
+price: 150
+amount_limit: 1
+shop_icon: ENDER_CHEST
+is_rune: true
+charges: 2 #Nombre de caméras activables en même temps par utilisateur
+lifetime: 30.0 #temps en secondes où la caméra reste activée
+chargetime: 3.0 #temps en secondes où la caméra charge
+glow_duration: 3.0 #temps en secondes où l'ennemi est glow
+
+inactive_url: "cc36ec5323f765ff59f916d2d1a1ec7496854cf7bd26dd2f2cbadc3dd49279c8"
+starting_url: "306107dee7f8d298a4486fd4d6044b90922e63bd29f069fdfbf26f54fd4ebec5"
+active_url: "415e470805d5fc611c44b87c39e7e4dfd474049b24f3f6bba230e250f9b4b87c"
+
+lore:
+   - <lore>Permet d'activer <variable><charges></variable> caméras dans la carte.
+   - <lore>Les caméras affichent les ennemis qu'elles voient.
+   - <lore>Les caméras restent activées pendant <variable><lifetime>s</variable>.
+team:
+   - guard
