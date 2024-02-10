@@ -8,7 +8,7 @@ pickup_range: 0.9 #distance pour récupérer un piège en blocs
 spacing_distance: 0.9 #distance minimale entre 2 pièges à ours
 is_rune: false
 lore:
-   - <lore>Permet de poser et déplacer un piège à ours.
+   - <lore>Permet de poser et déplacer un <important>piège à ours</important>.
    - "<lore>Dégats: <variable><damage></variable><red>❤</red>."
 team:
    - guard

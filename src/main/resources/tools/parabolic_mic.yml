@@ -5,7 +5,7 @@ shop_icon: CALIBRATED_SCULK_SENSOR
 range: 20.0 # distance en block
 is_rune: true
 lore:
-   - <lore>Vous permet d'entendre les ennemis qui bougent
+   - <lore>Vous permet <important>d'entendre les ennemis qui bougent</important>
    - <lore>jusqu'à <variable><range> blocs</variable>.
 team:
    - thief

@@ -7,7 +7,7 @@ particle_number: 2 #nombre de particules dans le visuel
 cooldown: 6.0 #délai de récupération en secondes
 is_rune: false
 lore:
-   - <lore>Vous téléporte au même endroit après <variable><teleport_delay>s</variable>.
+   - <lore>Vous <important>téléporte au même endroit</important> après <variable><teleport_delay>s</variable>.
    - "<lore>Délai: <variable><cooldown>s</variable>."
    
 team:

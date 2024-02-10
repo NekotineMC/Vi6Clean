@@ -6,9 +6,9 @@ statusname: Invisible
 range: 3.0
 is_rune: false
 lore:
-   - <lore>Vous rend <variable><statusname></variable>
+   - <lore>Vous rend <important><statusname></important>
    - <lore>lorsque vous êtes <important>accroupis (<key:key.sneak/>).</important>
    - <lore>Vous êtes visible si un ennemi est
-   - <lore>à moins de <variable><range> blocs</variable> de vous.
+   - <lore>à moins de <variable><range> blocs</variable> de vous !
 team:
    - thief

@@ -6,8 +6,8 @@ range: 3.0 #portée de détection en blocs
 duration: 1.0 #durée du glow en secondes
 is_rune: false
 lore:
-   - <lore>Pose un capteur qui affiche
-   - <lore>en surbrillance les ennemis
+   - <lore>Pose un capteur qui <important>affiche</important>
+   - <lore><important>en surbrillance les ennemis</important>
    - <lore>à moins de <variable><range> blocs</variable>.
    - <lore>Durée de l'effet: <variable><duration>s</variable>.
    - <lore>Peut être récupéré et déplacé.

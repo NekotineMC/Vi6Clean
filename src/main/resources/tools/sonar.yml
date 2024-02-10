@@ -6,7 +6,7 @@ range: 5.0 #portée en blocs
 delay: 3.0 #délai en secondes
 is_rune: false
 lore:
-   - <lore>Détecte un ennemi à
+   - <lore><important>Détecte un ennemi</important> à
    - <lore>moins de <variable><range> blocs</variable>
    - <lore>toutes les <variable><delay>s</variable>.
 team:
