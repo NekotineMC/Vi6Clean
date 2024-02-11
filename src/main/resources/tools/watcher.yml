@@ -7,8 +7,8 @@ range: 3.0 #portée des balises en blocs
 is_rune: false
 last_delay_second: 1
 lore:
-   - <lore>Pose une balise qui affiche en surbrillance les enemis à proximité.
-   - <lore>Les gardes peuvent détruire les balises en marchant dessus.
+   - <lore>Pose une balise qui affiche en <important>surbrillance les enemis à proximité</important>.
+   - <lore>Les gardes peuvent <important>détruire les balises</important> en marchant dessus.
    - <lore>Vous pouvez en poser <variable><nbmax></variable> simultanément.
    - <lore>La portée est de <variable><range> blocs</variable>.
 team:

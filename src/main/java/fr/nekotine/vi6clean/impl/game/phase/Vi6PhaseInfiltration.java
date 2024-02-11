@@ -80,8 +80,8 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	public void checkForCompletion() {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
-		if (game.getThiefs().stream()
-				.allMatch(guard -> !wrappingModule.getWrapper(guard, InMapPhasePlayerWrapper.class).isInside())) {
+		if (game.getThiefs().stream().allMatch(
+				thief -> wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class).hasLeft())) {
 			try {
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),

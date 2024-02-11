@@ -7,7 +7,7 @@ squared_pickup_range: 2.25 #distance en blocs au carré pour utiliser une lanter
 is_rune: false
 lore:
    - <lore>Permet de poser jusqu'à <variable><max_lantern></variable> lanternes
-   - <lore>que vos alliés peuvent prendre pour se téléporter à vous.
+   - <lore>que vos alliés peuvent prendre pour se <important>téléporter à vous</important>.
 team:
    - thief
    - guard

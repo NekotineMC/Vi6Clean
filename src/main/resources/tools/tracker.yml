@@ -5,6 +5,6 @@ shop_icon: CROSSBOW
 is_rune: false
 lore:
    - <lore>Tire un projectile à grande vitesse.
-   - <lore>Obtenez une boussole qui pointe vers l'ennemi touché.
+   - <lore>Obtenez une boussole qui <important>pointe vers l'ennemi touché</important>.
 team:
    - thief

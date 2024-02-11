@@ -5,7 +5,7 @@ shop_icon: WITHER_SKELETON_SKULL
 kill_range: 1.0 #distance pour marcher sur l'ombre en blocs
 is_rune: false
 lore:
-   - <lore>Placer une ombre pour revenir plus tard,
-   - <lore>ou mourrez si un garde la trouve!
+   - <lore>Placer une ombre pour <important>revenir plus tard</important>,
+   - <lore>ou <important>mourrez si un garde la trouve</important>!
 team:
    - thief

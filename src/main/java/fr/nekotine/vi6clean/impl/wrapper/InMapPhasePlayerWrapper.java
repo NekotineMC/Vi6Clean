@@ -292,4 +292,8 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		staminaComponent.setText(text);
 	}
+	
+	public boolean hasLeft() {
+		return state == InMapState.LEFT;
+	}
 }

@@ -6,7 +6,7 @@ fadeoff: 20 # delai en tick
 reveal_range: 2.0 # distance en block
 is_rune: false
 lore:
-   - <lore>Vous rend invisible dans les buissons
+   - <lore>Vous rend <important>invisible</important> dans les <important>buissons</important>
    - <lore>et un court instant après en être sorti.
 team:
    - thief

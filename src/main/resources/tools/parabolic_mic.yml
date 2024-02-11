@@ -1,11 +1,11 @@
-display_name: Micro parabolique
+display_name: <light_purple>Micro parabolique</light_purple>
 price: 600
 amount_limit: 1
 shop_icon: CALIBRATED_SCULK_SENSOR
 range: 20.0 # distance en block
 is_rune: true
 lore:
-   - <lore>Vous permet d'entendre les enemis qui bouge
-   - <lore>jusqu'a <variable><range></variable>.
+   - <lore>Vous permet <important>d'entendre les ennemis qui bougent</important>
+   - <lore>jusqu'à <variable><range> blocs</variable>.
 team:
    - thief

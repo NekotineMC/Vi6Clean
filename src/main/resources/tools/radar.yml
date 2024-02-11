@@ -11,7 +11,7 @@ detection_detected: "<gold>Radar</gold> >> <red>Vous avez été détecté !"
 is_rune: false
 lore:
    - <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
-   - <lore>indique le nombre d'enemis dans un rayon de <variable><range> blocs</variable>.
+   - <lore><important>indique le nombre d'ennemis dans un rayon</important> de <variable><range> blocs</variable>.
    - "<lore>Temps de recharge: <variable><cooldown>s</variable>."
 team:
    - guard

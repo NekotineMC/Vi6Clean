@@ -7,6 +7,6 @@ inv_duration: 2.0 #durée en secondes
 is_rune: false
 lore:
    - <lore>Toutes les <variable><inv_delay>s</variable>,
-   - <lore>gagnez <variable><inv_duration>s</variable> d'invisibilité.
+   - <lore>gagnez <variable><inv_duration>s</variable> d'<important>invisibilité</important>.
 team:
    - thief
