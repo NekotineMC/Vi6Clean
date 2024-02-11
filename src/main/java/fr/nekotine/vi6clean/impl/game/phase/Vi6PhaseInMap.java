@@ -145,8 +145,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			}
 			mapName = maps.stream().findAny().get().getName();
 		}
-		mapModule.getMapMetadata(mapName);
-		
+		var metadata = mapModule.getMapMetadata(mapName);
+		map = mapModule.getContent(metadata, Vi6Map.class);
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
 		// LOAD MAP END
 		var artefacts = map.getArtefacts();
