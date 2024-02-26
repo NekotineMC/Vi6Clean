@@ -6,6 +6,7 @@
 /gradle.properties
 /.settings/
 /bin/
+/.idea/
 
 # Compiled class file
 *.class
