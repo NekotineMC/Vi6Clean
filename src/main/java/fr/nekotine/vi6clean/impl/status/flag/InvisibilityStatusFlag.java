@@ -65,6 +65,7 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 		}
 		for (var ennemi : optionalWrap.get().ennemiTeam()) {
 			ennemi.hideEntity(Ioc.resolve(JavaPlugin.class), player);
+			ennemi.listPlayer(player);
 		}
 	}
 	@Override
