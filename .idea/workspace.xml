@@ -8,6 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Added .idea folder to .gitignore">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -199,7 +200,7 @@
       <workItem from="1709119774869" duration="3578000" />
       <workItem from="1709378423302" duration="1411000" />
       <workItem from="1709580652315" duration="19000" />
-      <workItem from="1711907601863" duration="459000" />
+      <workItem from="1711907601863" duration="852000" />
     </task>
     <task id="LOCAL-00001" summary="Added .idea folder to .gitignore">
       <option name="closed" value="true" />
