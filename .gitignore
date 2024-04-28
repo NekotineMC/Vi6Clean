@@ -1,8 +1,8 @@
 /target/
 /.gradle/
 /build/
-/gradlew
-/gradlew.bat
+# /gradlew
+# /gradlew.bat
 /gradle.properties
 /.settings/
 /bin/
