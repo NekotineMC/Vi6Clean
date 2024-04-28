@@ -25,8 +25,6 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
@@ -72,7 +70,7 @@ public class WarnerHandler extends ToolHandler<Warner>{
 	
 	@Override
 	protected void onStartHandling() {
-		map = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class).getMap();
+		map = Ioc.resolve(Vi6Map.class);
 	}
 	
 	//

@@ -48,6 +48,10 @@ shadowJar{
 
 // DEFAULT TASKS
 
+task genWrapper(type: Wrapper) {
+   gradleVersion = '8.7' //version required
+}
+
 defaultTasks 'build'
 
 tasks.register('dev', Copy) {

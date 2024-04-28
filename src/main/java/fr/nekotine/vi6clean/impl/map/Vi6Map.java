@@ -26,7 +26,7 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private Map<String,Artefact> artefacts;
-
+	
 	@GenericBiTyped(a=String.class,b=Entrance.class)
 	@GenerateCommandFor
 	@ComposingConfiguration
@@ -61,6 +61,11 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private Map<String,RoomCaptor> roomCaptors;
+	
+	@GenericBiTyped(a=String.class,b=BoundingBox.class)
+	@GenerateSpecificCommandFor(BlockBoundingBoxCommandGenerator.class)
+	@ComposingConfiguration
+	private Map<String,BoundingBox> gates;
 
 	public Collection<Location> getGuardSpawns() {
 		return guardSpawns.values();
@@ -92,5 +97,9 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 
 	public Map<String,Koth> getKoths() {
 		return koths;
+	}
+	
+	public Map<String,BoundingBox> getGates() {
+		return gates;
 	}
 }
