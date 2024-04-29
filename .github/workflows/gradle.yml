@@ -22,10 +22,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: ./Vi6Clean
     - uses: actions/checkout@v4
       with:
          repository: NekotineMC/NekotineCore
-         path: ../NekotineCore
+         path: ./NekotineCore
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
@@ -38,10 +40,10 @@ jobs:
       uses: gradle/actions/setup-gradle@v3 # v3.1.0
 
     - name: Permission for wrapper
-      run: chmod +x ./gradlew
+      run: chmod +x ./Vi6Clean/gradlew
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./Vi6Clean/gradlew build
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
