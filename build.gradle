@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
 	implementation project(":NekotineCore")
-	implementation group: "io.papermc.paper", name: "paper-api", version: "1.+"
+	implementation group: "io.papermc.paper", name: "paper-api", version: "1.20.4+"
 	implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
 	implementation group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
 }
