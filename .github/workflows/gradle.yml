@@ -22,6 +22,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+      with:
+         repository: NekotineMC/NekotineCore
+         path: ../NekotineCore
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
