@@ -48,6 +48,20 @@ jobs:
     - name: Build with Gradle Wrapper
       working-directory: ./Vi6Clean
       run: ./gradlew build
+    
+    - name: Login to DigitalOcean Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ secrets.IMAGE_REGISTRY }}
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_SECRET }}
+    
+    - name: Docker build and publish # https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.IMAGE_DESTINATION }}
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
