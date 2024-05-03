@@ -8,6 +8,7 @@ RUN ./gradlew build
 
 FROM eclipse-temurin:21-alpine AS runServer
 ADD https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/496/downloads/paper-1.20.4-496.jar paper-server.jar
+COPY eula.txt .
 RUN echo stop | java -jar paper-server.jar
 
 EXPOSE 25565/tcp

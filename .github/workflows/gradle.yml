@@ -58,6 +58,7 @@ jobs:
     
     - name: Docker build and publish # https://github.com/docker/build-push-action
       uses: docker/build-push-action@v5
+      working-directory: ./Vi6Clean/Docker
       with:
         push: true
         tags: ${{ secrets.IMAGE_DESTINATION }}
