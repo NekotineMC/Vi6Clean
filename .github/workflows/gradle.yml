@@ -57,9 +57,9 @@ jobs:
         password: ${{ secrets.REGISTRY_SECRET }}
     
     - name: Docker build and publish # https://github.com/docker/build-push-action
-      working-directory: ./Vi6Clean/Docker
       uses: docker/build-push-action@v5
       with:
+        context: ./Vi6Clean/Docker
         push: true
         tags: ${{ secrets.IMAGE_DESTINATION }}
 
