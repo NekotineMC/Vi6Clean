@@ -47,7 +47,7 @@ jobs:
 
     - name: Build with Gradle Wrapper
       working-directory: ./Vi6Clean
-      run: ./gradlew build
+      run: ./gradlew shadowJar
     
     - name: Login to registry
       uses: docker/login-action@v3

@@ -17,6 +17,7 @@ COPY server.properties .
 COPY server-icon.png .
 COPY world/ world/
 COPY plugins/ plugins/
+COPY ../build/libs/Vi6Clean-0.0.1-coreShaded.jar plugins/
 COPY --from=runServer cache/ cache/
 COPY --from=runServer libraries/ libraries/
 COPY --from=runServer versions/ versions/
