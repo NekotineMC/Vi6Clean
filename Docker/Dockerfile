@@ -18,9 +18,9 @@ COPY server.properties .
 COPY server-icon.png .
 COPY world/ .world/
 COPY plugins/ plugins/
-COPY --from=runServer ./cache .
-COPY --from=runServer ./libraries .
-COPY --from=runServer ./versions .
+COPY --from=runServer cache/ cache/
+COPY --from=runServer libraries/ libraries/
+COPY --from=runServer versions/ versions
 COPY --from=runServer paper-server.jar .
 
 EXPOSE 25565/tcp
