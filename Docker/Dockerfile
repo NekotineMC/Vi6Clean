@@ -21,6 +21,7 @@ COPY plugins .
 COPY --from=runServer ./cache .
 COPY --from=runServer ./libraries .
 COPY --from=runServer ./versions .
+COPY --from=runServer paper-server.jar .
 
 EXPOSE 25565/tcp
 EXPOSE 25565/udp
