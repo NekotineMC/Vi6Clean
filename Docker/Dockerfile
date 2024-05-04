@@ -13,4 +13,4 @@ RUN echo stop | java -jar paper-server.jar
 
 EXPOSE 25565/tcp
 EXPOSE 25565/udp
-ENTRYPOINT [ "java -jar paper-server.jar nogui" ]
+ENTRYPOINT [ "java", "-jar", "paper-server.jar", "nogui" ]
