@@ -1,0 +1,14 @@
+display_name: <green>Avertisseur
+price: 150
+amount_limit: -1
+shop_icon: ENDER_EYE
+delay: 2.0
+place_range: 8.0
+warn_message: <gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été
+  volé !</red>
+is_rune: false
+lore:
+- <lore>S'attache à un artéfact et <important>avertit lorsqu'il est volé</important>.
+- '<lore>Délai du message: <variable><delay>s</variable>'
+team:
+- guard

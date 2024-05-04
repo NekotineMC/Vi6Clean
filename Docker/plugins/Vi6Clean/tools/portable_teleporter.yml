@@ -1,0 +1,16 @@
+display_name: <aqua>Téléporteur portatif</aqua>
+price: 300
+amount_limit: -1
+shop_icon: SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE
+is_rune: false
+teleportation_charges: 3
+teleportation_delay: 4.0
+teleportation_cooldown: 10.0
+vfx_delay: 5
+lore:
+- <lore>Placez jusqu'à <variable><teleportation_charges></variable> réceptacles
+- <lore>de téléportation avec <important><key:key.sneak> + <key:key.attack></important>.
+- <lore>Vous pouvez vous y <important>téléporter</important> avec <important><key:key.attack></important>.
+- <lore>Durée de canalisation: <variable><teleportation_delay>s</variable>.
+team:
+- guard

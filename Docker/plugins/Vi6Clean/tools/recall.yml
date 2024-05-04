@@ -1,0 +1,13 @@
+display_name: <light_purple>Retour
+price: 150
+amount_limit: 1
+shop_icon: CHORUS_FRUIT
+teleport_delay: 6.0
+particle_number: 2
+cooldown: 6.0
+is_rune: false
+lore:
+- <lore>Vous <important>téléporte au même endroit</important> après <variable><teleport_delay>s</variable>.
+- '<lore>Délai: <variable><cooldown>s</variable>.'
+team:
+- thief

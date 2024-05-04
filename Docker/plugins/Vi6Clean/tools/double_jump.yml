@@ -1,0 +1,12 @@
+display_name: <yellow>Double saut
+price: 300
+amount_limit: 1
+shop_icon: GOLDEN_BOOTS
+power: 0.5
+is_rune: false
+lore:
+- <lore>Permet de faire un <important>double</important>
+- <lore><important>saut</important> en appuyant deux fois
+- <lore>sur <important><key:key.jump></important> en l'air.
+team:
+- thief
