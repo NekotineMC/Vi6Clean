@@ -16,8 +16,8 @@ COPY eula.txt .
 COPY ops.json .
 COPY server.properties .
 COPY server-icon.png .
-COPY world .
-COPY plugins .
+COPY world/ .world/
+COPY plugins/ plugins/
 COPY --from=runServer ./cache .
 COPY --from=runServer ./libraries .
 COPY --from=runServer ./versions .
