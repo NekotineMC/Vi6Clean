@@ -1,0 +1,23 @@
+groups:
+  default:
+    default: true
+    permissions: []
+    inheritance: []
+    info:
+      build: false
+  admin:
+    default: false
+    permissions:
+    - minecraft.*
+    - bukkit.*
+    - spigot.*
+    - paper.*
+    inheritance: []
+    info:
+      prefix: '&3'
+      build: true
+users:
+  XxGoldenbluexX:
+    subgroups: []
+    permissions: []
+    group: admin
