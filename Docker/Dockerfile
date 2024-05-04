@@ -15,6 +15,7 @@ FROM eclipse-temurin:21-alpine
 COPY eula.txt .
 COPY ops.json .
 COPY server.properties .
+COPY server-icon.png .
 COPY world .
 COPY plugins .
 COPY --from=runServer ./cache .
