@@ -9,8 +9,6 @@
 FROM eclipse-temurin:21-alpine AS runServer
 ADD https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/496/downloads/paper-1.20.4-496.jar paper-server.jar
 RUN echo stop | java -jar paper-server.jar
-RUN pwd
-RUN ls
 
 FROM eclipse-temurin:21-alpine
 COPY eula.txt .
@@ -19,6 +17,9 @@ COPY server.properties .
 COPY server-icon.png .
 COPY world/ world/
 COPY plugins/ plugins/
+RUN ls .
+RUN pwd
+RUN ls ..
 COPY ../build/libs/Vi6Clean-0.0.1-coreShaded.jar plugins/
 COPY --from=runServer cache/ cache/
 COPY --from=runServer libraries/ libraries/

@@ -50,7 +50,7 @@ jobs:
       run: ./gradlew shadowJar
       
     - run: ls Vi6Clean/
-    - run: ls Vi6Clean/build/
+    - run: ls Vi6Clean/build/libs
     
     - name: Login to registry
       uses: docker/login-action@v3
