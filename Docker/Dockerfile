@@ -17,7 +17,7 @@ COPY Docker/server.properties .
 COPY Docker/server-icon.png .
 COPY Docker/world/ world/
 COPY Docker/plugins/ plugins/
-COPY build/libs/Vi6Clean-0.0.1-coreShaded.jar plugins/
+COPY build/libs/Vi6Clean-0.0.1-coreShaded.jar Docker/plugins/
 COPY --from=runServer cache/ cache/
 COPY --from=runServer libraries/ libraries/
 COPY --from=runServer versions/ versions/
