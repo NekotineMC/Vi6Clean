@@ -48,9 +48,6 @@ jobs:
     - name: Build with Gradle Wrapper
       working-directory: ./Vi6Clean
       run: ./gradlew shadowJar
-      
-    - run: ls Vi6Clean/
-    - run: ls Vi6Clean/build/libs
     
     - name: Login to registry
       uses: docker/login-action@v3
@@ -62,7 +59,7 @@ jobs:
     - name: Docker build and publish # https://github.com/docker/build-push-action
       uses: docker/build-push-action@v5
       with:
-        context: ./Vi6Clean/Docker
+        context: ./Vi6Clean
         push: true
         tags: ${{ secrets.IMAGE_DESTINATION }}
 
