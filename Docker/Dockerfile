@@ -11,18 +11,18 @@ ADD https://api.papermc.io/v2/projects/paper/versions/1.20.4/builds/496/download
 RUN echo stop | java -jar paper-server.jar
 
 FROM eclipse-temurin:21-alpine
-COPY Docker/eula.txt minecraft/
-COPY Docker/ops.json minecraft/
-COPY Docker/server.properties minecraft/
-COPY Docker/server-icon.png minecraft/
-COPY Docker/world/ minecraft/world/
-COPY Docker/plugins/ minecraft/plugins/
-COPY build/libs/Vi6Clean-0.0.1-coreShaded.jar minecraft/plugins/
-COPY --from=runServer cache/ minecraft/cache/
-COPY --from=runServer libraries/ minecraft/libraries/
-COPY --from=runServer versions/ minecraft/versions/
-COPY --from=runServer paper-server.jar minecraft/
+COPY Docker/eula.txt .
+COPY Docker/ops.json .
+COPY Docker/server.properties .
+COPY Docker/server-icon.png .
+COPY Docker/world/ world/
+COPY Docker/plugins/ plugins/
+COPY build/libs/Vi6Clean-0.0.1-coreShaded.jar plugins/
+COPY --from=runServer cache/ cache/
+COPY --from=runServer libraries/ libraries/
+COPY --from=runServer versions/ versions/
+COPY --from=runServer paper-server.jar .
 
 EXPOSE 25565/tcp
 EXPOSE 25565/udp
-ENTRYPOINT [ "java", "-jar", "minecraft/paper-server.jar", "nogui" ]
+ENTRYPOINT [ "java", "-jar", "paper-server.jar", "nogui" ]
