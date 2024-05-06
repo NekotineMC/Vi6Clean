@@ -60,7 +60,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: ./Vi6Clean
-        file: Docker/Dockerfile
+        file: ./Docker/Dockerfile
         push: true
         tags: ${{ secrets.IMAGE_DESTINATION }}
 
