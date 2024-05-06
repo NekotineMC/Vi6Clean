@@ -25,4 +25,4 @@ COPY --from=runServer paper-server.jar minecraft/
 
 EXPOSE 25565/tcp
 EXPOSE 25565/udp
-ENTRYPOINT [ "java", "-jar", "paper-server.jar", "nogui" ]
+ENTRYPOINT [ "java", "-jar", "minecraft/paper-server.jar", "nogui" ]
