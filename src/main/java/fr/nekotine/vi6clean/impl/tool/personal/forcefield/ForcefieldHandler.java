@@ -23,6 +23,7 @@ import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
@@ -48,6 +49,7 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var bdata = Bukkit.createBlockData(Material.GLASS);
 		for (var gateEntry : map.getGates().entrySet()) {
 			var display = SpatialUtil.fillBoundingBox(world, gateEntry.getValue(), bdata);
+			display.setVisibleByDefault(false);
 			fieldsDisplay.put(gateEntry.getKey(), display);
 		}
 	}
@@ -111,7 +113,6 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var fields = map.getGates();
 		var fieldBound = fields.get(field);
 		BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
-		System.out.println("PLACED "+field);
 		activatedFields.add(field);
 	}
 	
@@ -121,7 +122,6 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var fields = map.getGates();
 		var fieldBound = fields.get(field);
 		BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.AIR);
-		System.out.println("REMOVED "+field);
 		activatedFields.remove(field);
 	}
 	
@@ -151,15 +151,19 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var target = getTargetedGate(player);
 		var enabled = target == door ? TeamColor.DARK_AQUA : TeamColor.GOLD;
 		var disabled = target == door ? TeamColor.AQUA : TeamColor.YELLOW;
+		var doorEntity = fieldsDisplay.get(door);
+		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity);
 		if (activatedFields.contains(door)) {
-			glowingModule.glowEntityFor(fieldsDisplay.get(door), player, enabled);
+			glowingModule.glowEntityFor(doorEntity, player, enabled);
 		}else {
-			glowingModule.glowEntityFor(fieldsDisplay.get(door), player, disabled);
+			glowingModule.glowEntityFor(doorEntity, player, disabled);
 		}
 	}
 	
 	private void hideDoor(String door, Player player) {
-		glowingModule.unglowEntityFor(fieldsDisplay.get(door), player);
+		var doorEntity = fieldsDisplay.get(door);
+		player.hideEntity(Ioc.resolve(Vi6Main.class), doorEntity);
+		glowingModule.unglowEntityFor(doorEntity, player);
 	}
 	
 }
