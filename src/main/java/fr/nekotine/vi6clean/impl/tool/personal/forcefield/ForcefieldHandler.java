@@ -1,8 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.forcefield;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -31,10 +29,8 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 
 @ToolCode("forcefield")
 public class ForcefieldHandler extends ToolHandler<Forcefield>{
-
-	private List<String> activatedFields = new LinkedList<>();
 	
-	private Map<String,BlockDisplay> fieldsDisplay = new HashMap<>();
+	private Map<String,DoorData> fieldsDisplay = new HashMap<>();
 	
 	private EntityGlowModule glowingModule = Ioc.resolve(EntityGlowModule.class);
 	
@@ -50,14 +46,14 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		for (var gateEntry : map.getGates().entrySet()) {
 			var display = SpatialUtil.fillBoundingBox(world, gateEntry.getValue(), bdata);
 			display.setVisibleByDefault(false);
-			fieldsDisplay.put(gateEntry.getKey(), display);
+			fieldsDisplay.put(gateEntry.getKey(), new DoorData(display));
 		}
 	}
 	
 	@Override
 	protected void onStopHandling() {
 		for (var field : fieldsDisplay.values()) {
-			field.remove();
+			field.display.remove();
 		}
 		fieldsDisplay.clear();
 		super.onStopHandling();
@@ -105,24 +101,71 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 				}
 			}
 		}
+		var gates = Ioc.resolve(Vi6Map.class).getGates();
+		for (var doorKey : fieldsDisplay.keySet()) {
+			var door = fieldsDisplay.get(doorKey);
+			var bb = gates.get(doorKey);
+			if (door.activated) {
+				bb.expand(1);
+				if (!door.playerOpened &&
+						Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					openField(doorKey);
+				}
+				if (door.playerOpened &&
+						!Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					closeField(doorKey);
+				}
+				bb.expand(-1);
+			}
+		}
 	}
 	
 	public void placeField(String field) {
-		var map = Ioc.resolve(Vi6Map.class);
-		var world = Ioc.resolve(Vi6Game.class).getWorld();
-		var fields = map.getGates();
-		var fieldBound = fields.get(field);
-		BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
-		activatedFields.add(field);
+		var door = fieldsDisplay.get(field);
+		if (!door.playerOpened) {
+			var map = Ioc.resolve(Vi6Map.class);
+			var world = Ioc.resolve(Vi6Game.class).getWorld();
+			var fields = map.getGates();
+			var fieldBound = fields.get(field);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
+		}
+		door.activated = true;
 	}
 	
 	public void removeField(String field) {
-		var map = Ioc.resolve(Vi6Map.class);
-		var world = Ioc.resolve(Vi6Game.class).getWorld();
-		var fields = map.getGates();
-		var fieldBound = fields.get(field);
-		BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.AIR);
-		activatedFields.remove(field);
+		var door = fieldsDisplay.get(field);
+		if (!door.playerOpened) {
+			var map = Ioc.resolve(Vi6Map.class);
+			var world = Ioc.resolve(Vi6Game.class).getWorld();
+			var fields = map.getGates();
+			var fieldBound = fields.get(field);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.AIR);
+		}
+		door.activated = false;
+	}
+	
+	public void closeField(String field) {
+		var door = fieldsDisplay.get(field);
+		if (door.activated) {
+			var map = Ioc.resolve(Vi6Map.class);
+			var world = Ioc.resolve(Vi6Game.class).getWorld();
+			var fields = map.getGates();
+			var fieldBound = fields.get(field);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
+		}
+		door.playerOpened = false;
+	}
+	
+	public void openField(String field) {
+		var door = fieldsDisplay.get(field);
+		if (door.activated) {
+			var map = Ioc.resolve(Vi6Map.class);
+			var world = Ioc.resolve(Vi6Game.class).getWorld();
+			var fields = map.getGates();
+			var fieldBound = fields.get(field);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.AIR);
+		}
+		door.playerOpened = true;
 	}
 	
 	public @Nullable String getTargetedGate(Player player) {
@@ -138,11 +181,12 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	private boolean tryPlaceField(Forcefield ff) {
 		var gate = getTargetedGate(ff.getOwner());
 		if (gate != null) {
-			if (activatedFields.contains(gate)) {
+			if (fieldsDisplay.get(gate).activated) {
 				removeField(gate);
 			}else {
 				placeField(gate);
 			}
+			return true;
 		}
 		return false;
 	}
@@ -152,18 +196,32 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var enabled = target == door ? TeamColor.DARK_AQUA : TeamColor.GOLD;
 		var disabled = target == door ? TeamColor.AQUA : TeamColor.YELLOW;
 		var doorEntity = fieldsDisplay.get(door);
-		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity);
-		if (activatedFields.contains(door)) {
-			glowingModule.glowEntityFor(doorEntity, player, enabled);
+		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
+		if (doorEntity.activated) {
+			glowingModule.glowEntityFor(doorEntity.display, player, enabled);
 		}else {
-			glowingModule.glowEntityFor(doorEntity, player, disabled);
+			glowingModule.glowEntityFor(doorEntity.display, player, disabled);
 		}
 	}
 	
 	private void hideDoor(String door, Player player) {
 		var doorEntity = fieldsDisplay.get(door);
-		player.hideEntity(Ioc.resolve(Vi6Main.class), doorEntity);
-		glowingModule.unglowEntityFor(doorEntity, player);
+		player.hideEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
+		glowingModule.unglowEntityFor(doorEntity.display, player);
+	}
+	
+	private class DoorData{
+		
+		private DoorData(BlockDisplay display) {
+			this.display = display;
+		}
+		
+		private BlockDisplay display;
+		
+		private boolean activated;
+		
+		private boolean playerOpened;
+		
 	}
 	
 }
