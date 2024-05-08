@@ -15,7 +15,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.glow.TeamColor;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
@@ -32,6 +35,8 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	
 	private Map<String,BlockDisplay> fieldsDisplay = new HashMap<>();
 	
+	private EntityGlowModule glowingModule = Ioc.resolve(EntityGlowModule.class);
+	
 	public ForcefieldHandler() {
 		super(Forcefield::new);
 	}
@@ -43,7 +48,6 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var bdata = Bukkit.createBlockData(Material.GLASS);
 		for (var gateEntry : map.getGates().entrySet()) {
 			var display = SpatialUtil.fillBoundingBox(world, gateEntry.getValue(), bdata);
-			display.setGlowing(true);
 			fieldsDisplay.put(gateEntry.getKey(), display);
 		}
 	}
@@ -77,6 +81,27 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		}
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && tryPlaceField(optionalTool.get())) {
 			evt.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	private void onTick(TickElapsedEvent evt) {
+		for (var tool : getTools()) {
+			var owner = tool.getOwner();
+			if (owner == null) {
+				continue;
+			}
+			var inv = owner.getInventory();
+			if (inv.getItemInMainHand().isSimilar(tool.getItemStack()) ||
+					inv.getItemInOffHand().isSimilar(tool.getItemStack())) {
+				for (var door : fieldsDisplay.keySet()) {
+					displayDoor(door, owner);
+				}
+			}else {
+				for (var door : fieldsDisplay.keySet()) {
+					hideDoor(door, owner);
+				}
+			}
 		}
 	}
 	
@@ -120,6 +145,21 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 			}
 		}
 		return false;
+	}
+	
+	private void displayDoor(String door, Player player) {
+		var target = getTargetedGate(player);
+		var enabled = target == door ? TeamColor.DARK_AQUA : TeamColor.GOLD;
+		var disabled = target == door ? TeamColor.AQUA : TeamColor.YELLOW;
+		if (activatedFields.contains(door)) {
+			glowingModule.glowEntityFor(fieldsDisplay.get(door), player, enabled);
+		}else {
+			glowingModule.glowEntityFor(fieldsDisplay.get(door), player, disabled);
+		}
+	}
+	
+	private void hideDoor(String door, Player player) {
+		glowingModule.unglowEntityFor(fieldsDisplay.get(door), player);
 	}
 	
 }
