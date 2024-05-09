@@ -1,9 +1,11 @@
 package fr.nekotine.vi6clean.impl.map;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
@@ -68,10 +70,10 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	@ComposingConfiguration
 	private Map<String,BoundingBox> gates;
 	
-	@GenericBiTyped(a=String.class,b=Location.class)
+	@GenericBiTyped(a=String.class,b=BlockVector.class)
 	@GenerateSpecificCommandFor(BlockLocationCommandGenerator.class)
 	@ComposingConfiguration
-	private Map<String, Location> vents;
+	private Map<String, BlockVector> vents;
 
 	public Collection<Location> getGuardSpawns() {
 		return guardSpawns.values();
@@ -109,7 +111,7 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 		return gates;
 	}
 	
-	public Map<String,Location> getVents() {
+	public Map<String,BlockVector> getVents() {
 		return vents;
 	}
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
@@ -30,6 +29,9 @@ public class VentManager {
 		var random = new Random();
 		var map = Ioc.resolve(Vi6Map.class);
 		var allVents = map.getVents();
+		if (allVents == null) {
+			return;
+		}
 		var totalVents = allVents.size();
 		var nbVents = totalVents > 2 ? random.nextInt(2, totalVents+1) : totalVents;
 		if (nbVents <= 1) {
@@ -140,8 +142,8 @@ public class VentManager {
 	
 	private class Vent {
 
-		private Vent(Location location) {
-			this.ventLocation = location.toVector().toBlockVector();
+		private Vent(BlockVector location) {
+			this.ventLocation = location;
 		}
 		
 		private BlockVector ventLocation;
