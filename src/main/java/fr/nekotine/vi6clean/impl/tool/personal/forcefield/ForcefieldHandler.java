@@ -52,8 +52,11 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	
 	@Override
 	protected void onStopHandling() {
-		for (var field : fieldsDisplay.values()) {
-			field.display.remove();
+		var world = Ioc.resolve(Vi6Game.class).getWorld();
+		var fields = Ioc.resolve(Vi6Map.class).getGates();
+		for (var field : fieldsDisplay.keySet()) {
+			BukkitUtil.fillBoundingBoxWith(world, fields.get(field), Material.AIR);
+			fieldsDisplay.get(field).display.remove();
 		}
 		fieldsDisplay.clear();
 		super.onStopHandling();
