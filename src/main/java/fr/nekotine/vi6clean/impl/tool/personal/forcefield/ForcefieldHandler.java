@@ -109,13 +109,18 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 				bb.expand(1);
 				if (!door.playerOpened &&
 						Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					bb.expand(-1);
 					openField(doorKey);
+				}else {
+					bb.expand(-1);
 				}
 				if (door.playerOpened &&
 						!Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					bb.expand(-1);
 					closeField(doorKey);
+				}else {
+					bb.expand(-1);
 				}
-				bb.expand(-1);
 			}
 		}
 	}
