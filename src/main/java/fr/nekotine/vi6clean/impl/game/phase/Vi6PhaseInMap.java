@@ -63,6 +63,7 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
+import fr.nekotine.vi6clean.impl.map.vent.VentManager;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
@@ -88,6 +89,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	
 	private Objective thiefScoreboard;
 	private final String thiefObjectiveName = "thiefArtefactListing";
+	
+	private VentManager ventManager;
 	
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
@@ -219,6 +222,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				
 			}
 		}
+		// VENTS
+		ventManager = new VentManager();
 		Ioc.resolve(Majordom.class).enable();
 	}
 
@@ -232,6 +237,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		world.setWeatherDuration(Integer.MAX_VALUE);
 		world.setThundering(false);
 		world.setThunderDuration(Integer.MAX_VALUE);
+		
+		ventManager.dispose();
 		
 		DebugUtil.clearDebugEntities();
 		for (var artefact : map.getArtefacts().values()) {

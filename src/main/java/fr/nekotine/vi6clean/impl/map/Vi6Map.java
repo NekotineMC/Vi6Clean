@@ -9,6 +9,7 @@ import org.bukkit.util.BoundingBox;
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
 import fr.nekotine.core.map.command.generator.BlockBoundingBoxCommandGenerator;
+import fr.nekotine.core.map.command.generator.BlockLocationCommandGenerator;
 import fr.nekotine.core.map.command.generator.PositionCommandGenerator;
 import fr.nekotine.core.reflexion.annotation.GenericBiTyped;
 import fr.nekotine.core.serialization.configurationserializable.ConfigurationSerializableAdapted;
@@ -66,6 +67,11 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	@GenerateSpecificCommandFor(BlockBoundingBoxCommandGenerator.class)
 	@ComposingConfiguration
 	private Map<String,BoundingBox> gates;
+	
+	@GenericBiTyped(a=String.class,b=Location.class)
+	@GenerateSpecificCommandFor(BlockLocationCommandGenerator.class)
+	@ComposingConfiguration
+	private Map<String, Location> vents;
 
 	public Collection<Location> getGuardSpawns() {
 		return guardSpawns.values();
@@ -101,5 +107,9 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	
 	public Map<String,BoundingBox> getGates() {
 		return gates;
+	}
+	
+	public Map<String,Location> getVents() {
+		return vents;
 	}
 }
