@@ -43,7 +43,11 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var world = Ioc.resolve(Vi6Game.class).getWorld();
 		var map = Ioc.resolve(Vi6Map.class);
 		var bdata = Bukkit.createBlockData(Material.GLASS);
-		for (var gateEntry : map.getGates().entrySet()) {
+		var gates = map.getGates();
+		if (gates == null) {
+			return;
+		}
+		for (var gateEntry : gates.entrySet()) {
 			var display = SpatialUtil.fillBoundingBox(world, gateEntry.getValue(), bdata);
 			display.setVisibleByDefault(false);
 			fieldsDisplay.put(gateEntry.getKey(), new DoorData(display));
@@ -54,6 +58,9 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	protected void onStopHandling() {
 		var world = Ioc.resolve(Vi6Game.class).getWorld();
 		var fields = Ioc.resolve(Vi6Map.class).getGates();
+		if (fields == null) {
+			return;
+		}
 		for (var field : fieldsDisplay.keySet()) {
 			BukkitUtil.fillBoundingBoxWith(world, fields.get(field), Material.AIR);
 			fieldsDisplay.get(field).display.remove();
