@@ -6,20 +6,33 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.type.TrapDoor;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Interaction;
+import org.bukkit.entity.Marker;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.EntityDismountEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 
-public class VentManager {
+public class VentManager implements Listener{
 
 	private List<Vent> vents = new LinkedList<>();
 	
@@ -67,7 +80,7 @@ public class VentManager {
 			item.connectedVentsList.add(shortest);
 			spanTree.add(item);
 		}
-		var ventPatch = new BlockPatch(b -> b.setType(Material.AIR));
+		var ventPatch = new BlockPatch(b -> b.setType(Material.BARRIER));
 		var northGridPatch = new BlockPatch(b -> {
 			b.setType(Material.IRON_TRAPDOOR);
 			var data = (TrapDoor)b.getBlockData();
@@ -128,23 +141,84 @@ public class VentManager {
 			if (block.getType().isEmpty()) {
 				ventPatchs.add(westGridPatch.patch(block));
 			}
+			var seat = (ArmorStand)world.spawnEntity(new Location(world,
+					vent.ventLocation.getX()+0.5,
+					vent.ventLocation.getY()-0.5,
+					vent.ventLocation.getZ()+0.5), EntityType.ARMOR_STAND, SpawnReason.CUSTOM);
+			seat.setInvisible(true);
+			seat.setMarker(true);
+			vent.seat = seat;
 			// libérer de la ram (micro opti de merde)
 			vent.connectedVents = vent.connectedVentsList.toArray(Vent[]::new);
 			vent.connectedVentsList = null;
 		}
+		EventUtil.register(this);
 	}
 	
 	public void dispose() {
 		for (var patch : ventPatchs) {
 			patch.unpatch(false);
 		}
+		for (var vent : vents) {
+			vent.seat.remove();
+		}
+		EventUtil.unregister(this);
+	}
+	
+	@EventHandler
+	public void onPlayerInterract(PlayerInteractEvent evt) {
+		if (evt.hasBlock()) {
+			var block = evt.getClickedBlock();
+			var player = evt.getPlayer();
+			//var playerWrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
+			var blockLoc = block.getLocation().toVector().toBlockVector();
+			Vent vent = null;
+			for (var v : vents) {
+				if (v.ventLocation.equals(blockLoc)) {
+					vent = v;
+					break;
+				}
+			}
+			if (vent == null) {
+				return;
+			}
+			if (player.getLocation().toVector().distanceSquared(blockLoc) <= 9) {
+				if (vent.player == null) {
+					block.setType(Material.AIR);
+					vent.player = player;
+					vent.seat.addPassenger(player);
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onEntityDismount(EntityDismountEvent evt) {
+		var dismounted = evt.getDismounted();
+		if (dismounted instanceof Player player) {
+			for (var v : vents) {
+				if (v.player == player) {
+					System.out.println("FOUND");
+					 v.player = null;
+					 var world = Ioc.resolve(Vi6Game.class).getWorld();
+					 world.getBlockAt(new Location(world,
+							 v.ventLocation.getBlockX(),
+							 v.ventLocation.getBlockY(),
+							 v.ventLocation.getBlockZ())).setType(Material.BARRIER);
+					 return;
+				}
+			}
+		}
 	}
 	
 	private class Vent {
-
 		private Vent(BlockVector location) {
 			this.ventLocation = location;
 		}
+		
+		private Entity seat;
+		
+		private Player player = null;
 		
 		private BlockVector ventLocation;
 		
