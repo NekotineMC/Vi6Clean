@@ -1,8 +1,6 @@
 /target/
 /.gradle/
 /build/
-/gradlew
-/gradlew.bat
 /gradle.properties
 /.settings/
 /bin/
@@ -12,7 +10,7 @@
 *.class
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.nar
 *.ear

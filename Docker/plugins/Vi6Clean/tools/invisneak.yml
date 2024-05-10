@@ -1,0 +1,14 @@
+display_name: InviSneak
+price: 400
+amount_limit: 1
+shop_icon: GLASS_PANE
+statusname: Invisible
+range: 3.0
+is_rune: false
+lore:
+- <lore>Vous rend <important><statusname></important>
+- <lore>lorsque vous êtes <important>accroupis (<key:key.sneak/>).</important>
+- <lore>Vous êtes visible si un ennemi est
+- <lore>à moins de <variable><range> blocs</variable> de vous !
+team:
+- thief

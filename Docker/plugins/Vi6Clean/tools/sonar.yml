@@ -1,0 +1,13 @@
+display_name: <gold>Sonar
+price: 400
+amount_limit: 1
+shop_icon: TARGET
+range: 5.0
+delay: 3.0
+is_rune: false
+lore:
+- <lore><important>Détecte un ennemi</important> à
+- <lore>moins de <variable><range> blocs</variable>
+- <lore>toutes les <variable><delay>s</variable>.
+team:
+- guard

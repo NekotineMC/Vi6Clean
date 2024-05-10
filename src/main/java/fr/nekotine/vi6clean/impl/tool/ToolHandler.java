@@ -23,10 +23,12 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 
 import fr.nekotine.core.configuration.ConfigurationUtil;
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
 import fr.nekotine.core.inventory.menu.element.MenuElement;
 import fr.nekotine.core.ioc.Ioc;
@@ -35,7 +37,6 @@ import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -127,7 +128,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!isRune) {
 			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
 		}
-		var menuItem = ItemStackUtil.make(iconMaterial, displayName, shopLore.toArray(Component[]::new));
+		var menuItem = new ItemStackBuilder(iconMaterial)
+				.name(displayName)
+				.lore(shopLore)
+				.flags(ItemFlag.values())
+				.build();
 		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
 		var teams = configuration.getStringList("team");
 		if (teams.stream().anyMatch(s -> s.equalsIgnoreCase("guard"))) {

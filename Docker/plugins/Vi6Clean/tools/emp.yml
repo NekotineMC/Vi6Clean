@@ -1,0 +1,11 @@
+display_name: <aqua>IEM
+price: 150
+amount_limit: -1
+shop_icon: BEACON
+duration: 5.0
+is_rune: false
+lore:
+- <lore><important>Désactive</important> pendant <variable><duration>s</variable>
+  les <important>objets ennemis</important>.
+team:
+- thief

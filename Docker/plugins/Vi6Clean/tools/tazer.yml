@@ -1,0 +1,13 @@
+display_name: <aqua>Tazer
+price: 300
+amount_limit: 1
+shop_icon: SHEARS
+cooldown: 10.0
+tazed_duration: 1.0
+is_rune: false
+lore:
+- <lore><important>Taze les ennemis en ligne de mire</important> pendant <variable><tazed_duration>s</variable>.
+- <lore>Utilisez <important><key:key.attack></important> pour tirer.
+- '<lore>Temps de recharge: <variable><cooldown>s</variable>.'
+team:
+- guard

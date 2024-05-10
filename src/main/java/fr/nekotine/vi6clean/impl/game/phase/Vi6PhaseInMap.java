@@ -148,6 +148,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var metadata = mapModule.getMapMetadata(mapName);
 		map = mapModule.getContent(metadata, Vi6Map.class);
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
+		Ioc.getProvider().registerSingleton(map);
 		// LOAD MAP END
 		var artefacts = map.getArtefacts();
 		for (var artefact : artefacts.values()) {

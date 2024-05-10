@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import fr.nekotine.core.bar.actionbar.ActionBarComponent;
 import fr.nekotine.core.bar.actionbar.SharedActionBar;
@@ -54,6 +55,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	
 	private String room = "";
 	
+	private BukkitTask scheduledCanLeaveMap;
+	
+	private BukkitTask scheduledCanCaptureArtefact;
+	
 	private SharedActionBar artefactActionBar = new SharedActionBar();
 	private ActionBarComponent artefactComponent = new ActionBarComponent();
 	private SharedActionBar defaultActionBar = new SharedActionBar();
@@ -77,6 +82,12 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 	
 	public void tearDown() {
+		if (scheduledCanLeaveMap != null && !scheduledCanLeaveMap.isCancelled()) {
+			scheduledCanLeaveMap.cancel();
+		}
+		if (scheduledCanCaptureArtefact != null && !scheduledCanCaptureArtefact.isCancelled()) {
+			scheduledCanCaptureArtefact.cancel();
+		}
 		artefactActionBar.tearDown();
 		defaultActionBar.tearDown();
 	}
@@ -124,12 +135,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		wrapped.sendMessage(
 				Component.text("Vous pouvez pas vous enfuir avant ", NamedTextColor.RED).append(
 				Component.text(DELAY_BEFORE_ESCAPE+"s", NamedTextColor.AQUA)));
-		new BukkitRunnable() {
+		scheduledCanLeaveMap = new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				setCanLeaveMap(true);
 				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuir", NamedTextColor.GOLD));
+				scheduledCanLeaveMap = null;
 			}
 			
 		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BEFORE_ESCAPE_TICKS);
@@ -140,12 +152,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		wrapped.sendMessage(
 				Component.text("Vous pouvez pas voler d'artefacts avant ", NamedTextColor.RED).append(
 				Component.text(DELAY_BETWEEN_CAPTURE+"s", NamedTextColor.AQUA)));
-		new BukkitRunnable() {
+		scheduledCanCaptureArtefact = new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				setCanCaptureArtefact(true);
 				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
+				scheduledCanCaptureArtefact = null;
 			}
 			
 		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BETWEEN_CAPTURE_TICKS);
