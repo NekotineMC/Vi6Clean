@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -30,22 +32,16 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 	private final int DELAY_TICK = (int)(20 * getConfiguration().getDouble("teleportation_delay",4));
 	private final int COOLDOWN_TICK = (int)(20 * getConfiguration().getDouble("teleportation_cooldown",10));
 	private final int VFX_DELAY_TICK = getConfiguration().getInt("vfx_delay",5);
-	private final ItemStack ITEM = new ItemStackBuilder(
-			Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE)
-			.lore(getLore())
-			.name(getDisplayName())
-			.flags(ItemFlag.values())
-			.build();
 	private final ItemStack EMP_ITEM = new ItemStackBuilder(
 			Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE)
 			.lore(getLore())
 			.name(getDisplayName().decorate(TextDecoration.STRIKETHROUGH))
 			.flags(ItemFlag.values())
 			.build();
-	private final List<Consumer<Location>> PLAYER_VFX_1 = new ArrayList<Consumer<Location>>();
-	private final List<Consumer<Location>> PLAYER_VFX_2 = new ArrayList<Consumer<Location>>();
-	private final List<Consumer<Location>> PAD_VFX_1 = new ArrayList<Consumer<Location>>();
-	private final List<Consumer<Location>> PAD_VFX_2 = new ArrayList<Consumer<Location>>();
+	private final List<Consumer<Location>> PLAYER_VFX_1 = new ArrayList<>();
+	private final List<Consumer<Location>> PLAYER_VFX_2 = new ArrayList<>();
+	private final List<Consumer<Location>> PAD_VFX_1 = new ArrayList<>();
+	private final List<Consumer<Location>> PAD_VFX_2 = new ArrayList<>();
 	
 	public PortableTeleporterHandler() {
 		super(PortableTeleporter::new);
@@ -63,7 +59,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		getTools().forEach(pt -> pt.tick());
+		getTools().forEach(PortableTeleporter::tick);
 	}
 	
 	@EventHandler
@@ -82,8 +78,11 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 
 			if(evtP.isSneaking()) {
 				evt.setCancelled(tool.tryPlace());
-			}else {
-				evt.setCancelled(tool.tryTeleport(0));
+			}else if(!tool.getOwner().hasCooldown(tool.getItemStack().getType())){
+				if(tool.tryTeleport()) {
+					tool.getOwner().setCooldown(tool.getItemStack().getType(), DELAY_TICK);
+					evt.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -99,8 +98,19 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 
 	//
 	
-	protected ItemStack getItem() {
-		return ITEM;
+	protected ItemStack getItem(int amount) {
+		var amountcpnt =
+				Component.text(" [", NamedTextColor.WHITE)
+				.append(Component.text(amount, NamedTextColor.GREEN))
+				.append(Component.text("/", NamedTextColor.WHITE))
+				.append(Component.text(CHARGES,NamedTextColor.GREEN))
+				.append(Component.text("]", NamedTextColor.WHITE));
+		return new ItemStackBuilder(
+				Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE)
+				.lore(getLore())
+				.name(getDisplayName().append(amountcpnt))
+				.flags(ItemFlag.values())
+				.build();
 	}
 	protected ItemStack getEmpItem() {
 		return EMP_ITEM;
@@ -111,9 +121,6 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 	protected int getDelayTick() {
 		return DELAY_TICK;
 	}
-	protected int getCooldownTick() {
-		return COOLDOWN_TICK;
-	}
 	protected Pair<List<Consumer<Location>>,List<Consumer<Location>>> getPlayerVFX(){
 		return Pair.from(PLAYER_VFX_1, PLAYER_VFX_2);
 	}
@@ -122,5 +129,8 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporter>{
 	}
 	protected int getVfxDelayTick() {
 		return VFX_DELAY_TICK;
+	}
+	protected int getCooldownTick() {
+		return COOLDOWN_TICK;
 	}
 }

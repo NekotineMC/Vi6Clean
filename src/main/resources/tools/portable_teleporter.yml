@@ -1,8 +1,8 @@
 display_name: <aqua>Téléporteur portatif</aqua>
 price: 300
-amount_limit: -1
+amount_limit: 1
 shop_icon: SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE
-is_rune: false
+is_rune: true
 teleportation_charges: 3 #nombre de réceptacles posables
 teleportation_delay: 4.0 #durée de la canalisation en secondes
 teleportation_cooldown: 10.0 #durée de la récupération de la téléportation en secondes

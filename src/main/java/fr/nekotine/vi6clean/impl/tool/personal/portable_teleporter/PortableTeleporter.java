@@ -2,40 +2,52 @@ package fr.nekotine.vi6clean.impl.tool.personal.portable_teleporter;
 
 import java.util.ArrayList;
 
+import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.glow.TeamColor;
+import fr.nekotine.core.util.EventUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.data.type.StructureBlock;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.vi6clean.impl.tool.Tool;
+import org.bukkit.util.Vector;
 
-public class PortableTeleporter extends Tool{
-	private class TeleportationPad {
-		protected static final boolean canPlace(Location location) {
+public class PortableTeleporter extends Tool {
+	private class TeleportationPad implements Listener{
+		protected static boolean canPlace(Location location) {
 			return location.clone().subtract(0, 0.1, 0).getBlock().isSolid();
 		}
 		private static final float CARPET_SIZE = 0.06f;
 		
-		private BlockDisplay display;
+		private final BlockDisplay display;
 		private boolean teleporting;
+		private final Vector eyeDirection;
 		private int teleportationDelayTick;
 		private int vfxDelayTick;
 		
-		protected TeleportationPad(Location location) {
+		protected TeleportationPad(Location location, Vector eyeDirection) {
 			var padLoc = location.getBlock().getLocation()/*.subtract(0, TEMP, 0)*/;
 			this.display = (BlockDisplay)padLoc.getWorld().spawnEntity(padLoc, EntityType.BLOCK_DISPLAY, SpawnReason.CUSTOM);
+			this.eyeDirection = eyeDirection;
+
 			var transformation = display.getTransformation();
-			transformation.getScale().set(1, CARPET_SIZE, 1);
+			var scale = transformation.getScale();
+			scale.set(1, CARPET_SIZE, 1);
+
 			var bd = (StructureBlock)Material.STRUCTURE_BLOCK.createBlockData();
 			bd.setMode(StructureBlock.Mode.CORNER);
 			display.setBlock(bd);
 			display.setTransformation(transformation);
-			
+
+			EventUtil.register(this);
 			//EntityUtil.fixLighting(display);
 		}
 		protected void teleport() {
@@ -43,9 +55,24 @@ public class PortableTeleporter extends Tool{
 			teleporting = true;
 			teleportationDelayTick = handler.getDelayTick();
 			vfxDelayTick = handler.getVfxDelayTick();
-			if(getOwner() != null)
-				EntityUtil.freeze(getOwner());
+			if (getOwner() != null) {
+				getOwner().setAllowFlight(true);
+				getOwner().teleport(getOwner().getLocation().add(0,0.1,0));
+				getOwner().setFlying(true);
+				getOwner().setFlySpeed(0);
+				getOwner().setVelocity(new Vector(0,0,0));
+			}
+
 		}
+
+		@EventHandler
+		public void onToggleFlight(PlayerToggleFlightEvent evt) {
+			if(evt.getPlayer().equals(getOwner()) && teleporting && !evt.isFlying()) {
+				getOwner().setVelocity(new Vector(0,0,0));
+				evt.setCancelled(true);
+			}
+		}
+
 		protected void cleanup() {
 			display.remove();
 		}
@@ -55,8 +82,12 @@ public class PortableTeleporter extends Tool{
 				teleporting = false;
 				if(getOwner() != null) {
 					var disLoc = display.getLocation().add(0.5,0,0.5);
+					disLoc.setDirection(eyeDirection);
 					getOwner().teleport(disLoc);
-					EntityUtil.unfreeze(getOwner());
+					getOwner().setCooldown(getItemStack().getType(), Ioc.resolve(PortableTeleporterHandler.class).getCooldownTick());
+					getOwner().setAllowFlight(false);
+					getOwner().setFlying(false);
+					getOwner().setFlySpeed(0.1F);
 				}
 				//Sound here
 			}
@@ -96,19 +127,33 @@ public class PortableTeleporter extends Tool{
 		protected boolean isTeleporting() {
 			return teleporting;
 		}
+
+		protected void glow(){
+			var color = this.equals(targeted) ? TeamColor.AQUA : TeamColor.DARK_PURPLE;
+			Ioc.resolve(EntityGlowModule.class).glowEntityFor(display, getOwner(), color);
+		}
+
+		protected void unglow() {
+			Ioc.resolve(EntityGlowModule.class).unglowEntityFor(display, getOwner());
+		}
+
+		protected BlockDisplay getDisplay() {
+			return display;
+		}
 	}
 	
-	private final ArrayList<TeleportationPad> pads = new ArrayList<TeleportationPad>();
+	private final ArrayList<TeleportationPad> pads = new ArrayList<>();
+	private TeleportationPad targeted;
 	
 	//
 	
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return Ioc.resolve(PortableTeleporterHandler.class).getItem();
+		return Ioc.resolve(PortableTeleporterHandler.class).getItem(Ioc.resolve(PortableTeleporterHandler.class).getCharges());
 	}
 	@Override
 	protected void cleanup() {
-		pads.forEach(tp -> tp.cleanup());
+		pads.forEach(TeleportationPad::cleanup);
 	}
 	@Override
 	protected void onEmpStart() {
@@ -116,7 +161,8 @@ public class PortableTeleporter extends Tool{
 	}
 	@Override
 	protected void onEmpEnd() {
-		setItemStack(Ioc.resolve(PortableTeleporterHandler.class).getItem());
+		var handler = Ioc.resolve(PortableTeleporterHandler.class);
+		setItemStack(handler.getItem(handler.getCharges() - pads.size()));
 	}
 	
 	//
@@ -128,17 +174,56 @@ public class PortableTeleporter extends Tool{
 		var pLoc = getOwner().getLocation();
 		if(!TeleportationPad.canPlace(pLoc)) return false;
 		
-		pads.add(new TeleportationPad(pLoc));
+		pads.add(new TeleportationPad(pLoc, getOwner().getEyeLocation().getDirection()));
+		setItemStack(handler.getItem(handler.getCharges() - pads.size()));
 		return true;
 	}
-	protected boolean tryTeleport(int padIndex) {
-		if(pads.stream().anyMatch(tp -> tp.isTeleporting())) return false;
-		var pad = pads.get(padIndex);
-		pad.teleport();
-		return false;
+	protected boolean tryTeleport() {
+		if(pads.stream().anyMatch(TeleportationPad::isTeleporting)) return false;
+		if (targeted==null) return false;
+
+		targeted.teleport();
+		return true;
+	}
+
+	private boolean isTargeted(TeleportationPad pad) {
+		var eyeLoc = getOwner().getEyeLocation();
+		var start = eyeLoc.toVector();
+		var dir = eyeLoc.getDirection();
+
+		var bb = pad.getDisplay().getBoundingBox();
+		var scale = pad.getDisplay().getTransformation().getScale();
+		var x1= bb.getMinX();
+		var y1= bb.getMinY();
+		var z1= bb.getMinZ();
+
+		return bb.resize(x1-0.25,y1-0.5,z1-0.25,x1+scale.x+0.25, y1+0.5, z1+scale.z+0.25)
+				.rayTrace(start, dir, 100.0) != null;
 	}
 	protected void tick() {
-		pads.forEach(tp -> 
-		{tp.tickTeleportation();tp.tickVFX();});
+		boolean check =
+				(getOwner() != null) &&
+				(getOwner().getInventory().getItemInMainHand().isSimilar(getItemStack())
+						|| getOwner().getInventory().getItemInOffHand().isSimilar(getItemStack()));
+
+		this.targeted = check ?
+				pads.stream()
+						.filter(this::isTargeted)
+						.min((o1, o2) -> (int)
+                        		(o1.getDisplay().getLocation().distanceSquared(getOwner().getLocation())
+								- o2.getDisplay().getLocation().distanceSquared(getOwner().getLocation())))
+						.orElse(null)
+				: null;
+
+		for (var tp : pads){
+			tp.tickTeleportation();
+			tp.tickVFX();
+
+			if (check) {
+				tp.glow();
+			}else {
+				tp.unglow();
+			}
+		}
 	}
 }
