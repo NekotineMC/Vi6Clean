@@ -82,6 +82,7 @@ public class RecallHandler extends ToolHandler<Recall>{
 		for(var tool : getTools()) {
 			tool.tickCooldown();
 			tool.tickParticle();
+			tool.tickTest();
 		}
 	}
 	

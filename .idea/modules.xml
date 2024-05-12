@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Vi6Clean.iml" filepath="$PROJECT_DIR$/.idea/modules/Vi6Clean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.iml" filepath="$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.main.iml" filepath="$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.test.iml" filepath="$PROJECT_DIR$/.idea/modules/564551247/Vi6Clean.NekotineCore.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Vi6Clean.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Vi6Clean.test.iml" />
+    </modules>
+  </component>
+</project>
