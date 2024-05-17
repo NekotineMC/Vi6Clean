@@ -14,14 +14,13 @@ import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Interaction;
-import org.bukkit.entity.Marker;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -29,6 +28,7 @@ import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 
@@ -194,18 +194,100 @@ public class VentManager implements Listener{
 	
 	@EventHandler
 	public void onEntityDismount(EntityDismountEvent evt) {
-		var dismounted = evt.getDismounted();
+		var dismounted = evt.getEntity();
 		if (dismounted instanceof Player player) {
 			for (var v : vents) {
 				if (v.player == player) {
-					System.out.println("FOUND");
 					 v.player = null;
 					 var world = Ioc.resolve(Vi6Game.class).getWorld();
-					 world.getBlockAt(new Location(world,
+					 player.setInvulnerable(true);
+					 new BukkitRunnable() {// Pour éviter de suffoquer un tick, on délais
+
+						 @Override
+						public void run() {
+							 player.setInvulnerable(false);
+						 }
+						 
+					 }.runTask(Ioc.resolve(Vi6Main.class));
+					world.getBlockAt(new Location(world,
 							 v.ventLocation.getBlockX(),
 							 v.ventLocation.getBlockY(),
 							 v.ventLocation.getBlockZ())).setType(Material.BARRIER);
-					 return;
+					 
+					//// Select available places
+					var vect = new BlockVector(v.ventLocation);
+					var aim = player.getEyeLocation().getDirection().add(v.ventLocation);
+					double smallestDist = 3;
+					Vector nearest = null;
+					// NORTH
+					vect.add(new Vector(0,-1,-1));
+					var dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType().isEmpty()) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// SOUTH
+					vect.add(new Vector(0,0,2));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType().isEmpty()) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// EAST
+					vect.add(new Vector(1,0,-1));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType().isEmpty()) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// WEST
+					vect.add(new Vector(-2,0,0));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType().isEmpty()) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					if (nearest != null) {
+						nearest.add(new Vector(0.5,0,0.5));
+						player.teleport(nearest.toLocation(world, player.getYaw(), player.getPitch()));
+						return;
+					}
+					//// Select available upper places
+					vect = new BlockVector(v.ventLocation);
+					// NORTH
+					vect.add(new Vector(0,-1,-1));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType() == Material.IRON_TRAPDOOR) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// SOUTH
+					vect.add(new Vector(0,0,2));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType() == Material.IRON_TRAPDOOR) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// EAST
+					vect.add(new Vector(1,0,-1));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType() == Material.IRON_TRAPDOOR) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					// WEST
+					vect.add(new Vector(-2,0,0));
+					dist = vect.distanceSquared(aim);
+					if (dist < smallestDist && vect.toLocation(world).getBlock().getType() == Material.IRON_TRAPDOOR) {
+						dist = smallestDist;
+						nearest = new BlockVector().copy(vect);
+					}
+					if (nearest != null) {
+						nearest.add(new Vector(0.5,0,0.5));
+						player.teleport(nearest.toLocation(world, player.getYaw(), player.getPitch()));
+						return;
+					}
+					return;
 				}
 			}
 		}
@@ -225,6 +307,8 @@ public class VentManager implements Listener{
 		private List<Vent> connectedVentsList = new LinkedList<>();
 		
 		private Vent[] connectedVents;
+		
+		private BlockVector[] exists;
 		
 	}
 	
