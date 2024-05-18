@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,13 +24,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockVector;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
+import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.glow.TeamColor;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -80,6 +90,7 @@ public class VentManager implements Listener{
 			item.connectedVentsList.add(shortest);
 			spanTree.add(item);
 		}
+		//
 		var ventPatch = new BlockPatch(b -> b.setType(Material.BARRIER));
 		var northGridPatch = new BlockPatch(b -> {
 			b.setType(Material.IRON_TRAPDOOR);
@@ -141,6 +152,13 @@ public class VentManager implements Listener{
 			if (block.getType().isEmpty()) {
 				ventPatchs.add(westGridPatch.patch(block));
 			}
+			vent.display = (BlockDisplay)world.spawnEntity(new Location(world,
+					vent.ventLocation.getX(),
+					vent.ventLocation.getY(),
+					vent.ventLocation.getZ()), EntityType.BLOCK_DISPLAY, SpawnReason.CUSTOM);
+			vent.display.setBlock(Bukkit.createBlockData(Material.STONE));
+			vent.display.setVisibleByDefault(false);
+			vent.display.setGlowing(true);
 			var seat = (ArmorStand)world.spawnEntity(new Location(world,
 					vent.ventLocation.getX()+0.5,
 					vent.ventLocation.getY()-0.5,
@@ -161,15 +179,29 @@ public class VentManager implements Listener{
 		}
 		for (var vent : vents) {
 			vent.seat.remove();
+			vent.display.remove();
 		}
 		EventUtil.unregister(this);
 	}
 	
 	@EventHandler
-	public void onPlayerInterract(PlayerInteractEvent evt) {
+	private void onPlayerInterract(PlayerInteractEvent evt) {
+		if (evt.getHand() != EquipmentSlot.HAND) {
+			return;
+		}
+		var player = evt.getPlayer();
+		// Player is inside vent
+		for (var v : vents) {
+			if (v.player == player) {
+				if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && tryCrawlVent(v)) {
+					evt.setCancelled(true);
+				}
+				return;
+			}
+		}
+		// Player is outside vent
 		if (evt.hasBlock()) {
 			var block = evt.getClickedBlock();
-			var player = evt.getPlayer();
 			//var playerWrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
 			var blockLoc = block.getLocation().toVector().toBlockVector();
 			Vent vent = null;
@@ -193,9 +225,10 @@ public class VentManager implements Listener{
 	}
 	
 	@EventHandler
-	public void onEntityDismount(EntityDismountEvent evt) {
+	private void onEntityDismount(EntityDismountEvent evt) {
 		var dismounted = evt.getEntity();
 		if (dismounted instanceof Player player) {
+			var plugin = Ioc.resolve(Vi6Main.class);
 			for (var v : vents) {
 				if (v.player == player) {
 					 v.player = null;
@@ -208,11 +241,15 @@ public class VentManager implements Listener{
 							 player.setInvulnerable(false);
 						 }
 						 
-					 }.runTask(Ioc.resolve(Vi6Main.class));
+					 }.runTask(plugin);
 					world.getBlockAt(new Location(world,
 							 v.ventLocation.getBlockX(),
 							 v.ventLocation.getBlockY(),
 							 v.ventLocation.getBlockZ())).setType(Material.BARRIER);
+					for (var nearVent : v.connectedVents) {
+						player.hideEntity(plugin, nearVent.display);
+					}
+					player.hideEntity(plugin, player);
 					 
 					//// Select available places
 					var vect = new BlockVector(v.ventLocation);
@@ -293,12 +330,115 @@ public class VentManager implements Listener{
 		}
 	}
 	
+	@EventHandler
+	private void onTick(TickElapsedEvent evt) {
+		var plugin = Ioc.resolve(Vi6Main.class);
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
+		for (var v :  vents) {
+			if (v.player != null) {
+				var targetVent = getTargetedVent(v.player);
+				var enabled = targetVent == v ? TeamColor.BLUE : TeamColor.YELLOW;
+				var disabled = targetVent == v ? TeamColor.DARK_RED : TeamColor.RED;
+				for (var nearVent : v.connectedVents) {
+					v.player.showEntity(plugin, nearVent.display);
+					if (nearVent.isTraveledTo || nearVent.player != null) {
+						glowModule.glowEntityFor(nearVent.display, v.player, disabled);
+					}else {
+						glowModule.glowEntityFor(nearVent.display, v.player, enabled);
+					}
+				}
+			}
+		}
+		/*
+		///
+		var target = getTargetedGate(player);
+		
+		var doorEntity = fieldsDisplay.get(door);
+		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
+		if (doorEntity.activated) {
+			glowingModule.glowEntityFor(doorEntity.display, player, enabled);
+		}else {
+			glowingModule.glowEntityFor(doorEntity.display, player, disabled);
+		}
+		//
+		var doorEntity = fieldsDisplay.get(door);
+		player.hideEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
+		glowingModule.unglowEntityFor(doorEntity.display, player);
+		//
+		for (var tool : getTools()) {
+			var owner = tool.getOwner();
+			if (owner == null) {
+				continue;
+			}
+			var inv = owner.getInventory();
+			if (inv.getItemInMainHand().isSimilar(tool.getItemStack()) ||
+					inv.getItemInOffHand().isSimilar(tool.getItemStack())) {
+				for (var door : fieldsDisplay.keySet()) {
+					displayDoor(door, owner);
+				}
+			}else {
+				for (var door : fieldsDisplay.keySet()) {
+					hideDoor(door, owner);
+				}
+			}
+		}
+		var gates = Ioc.resolve(Vi6Map.class).getGates();
+		for (var doorKey : fieldsDisplay.keySet()) {
+			var door = fieldsDisplay.get(doorKey);
+			var bb = gates.get(doorKey);
+			if (door.activated) {
+				bb.expand(1);
+				if (!door.playerOpened &&
+						Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					bb.expand(-1);
+					openField(doorKey);
+				}else {
+					bb.expand(-1);
+				}
+				bb.expand(1);
+				if (door.playerOpened &&
+						!Ioc.resolve(Vi6Game.class).getGuards().stream().anyMatch(p -> bb.contains(p.getLocation().toVector()))) {
+					bb.expand(-1);
+					closeField(doorKey);
+				}else {
+					bb.expand(-1);
+				}
+			}
+		}*/
+	}
+	
+	private boolean tryCrawlVent(Vent vent) {
+		System.out.println("CRAWL");
+		return false;
+	}
+	
+	private @Nullable Vent getTargetedVent(Player player) {
+		var eyeLoc = player.getEyeLocation();
+		var start = eyeLoc.toVector();
+		var dir = eyeLoc.getDirection();
+		return vents.stream()
+				.filter(v -> {
+					var bb = new BoundingBox(
+							v.ventLocation.getX(),
+							v.ventLocation.getY(),
+							v.ventLocation.getZ(),
+							v.ventLocation.getX()+1,
+							v.ventLocation.getY()+1,
+							v.ventLocation.getZ()+1);
+					return bb.rayTrace(start, dir, 100.0) != null;
+				})
+				.sorted((a,b)-> (int)(start.distanceSquared(a.ventLocation)-start.distanceSquared(b.ventLocation)))
+				.findFirst().orElse(null);
+	}
+	
 	private class Vent {
 		private Vent(BlockVector location) {
 			this.ventLocation = location;
 		}
 		
 		private Entity seat;
+		
+		private BlockDisplay display;
 		
 		private Player player = null;
 		
@@ -308,7 +448,7 @@ public class VentManager implements Listener{
 		
 		private Vent[] connectedVents;
 		
-		private BlockVector[] exists;
+		private boolean isTraveledTo;
 		
 	}
 	
