@@ -3,6 +3,7 @@ version: 1.0
 main: fr.nekotine.vi6clean.Vi6Main
 api-version: '1.21.4'
 author: XxGoldenbluexX
+load: POSTWORLD
 dependencies:
   server:
     ProtocolLib:
@@ -14,6 +15,10 @@ dependencies:
       required: true
       join-classpath: true
     FastAsyncWorldEdit:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    voicechat:
       load: BEFORE
       required: true
       join-classpath: true

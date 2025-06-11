@@ -18,11 +18,17 @@ repositories {
     maven {
     	url = "https://repo.codemc.org/repository/maven-public/"
     }
+    // Simple Voice Chat
+    maven {
+        name = "henkelmax.public"
+        url = 'https://maven.maxhenkel.de/repository/public'
+    }
 }
 
 dependencies {
 	implementation group: "fr.nekotine", name: "NekotineCore", version: "+"
-	implementation group: "io.papermc.paper", name: "paper-api", version: "1.21.4-R0.1-SNAPSHOT"
+    compileOnly group: "io.papermc.paper", name: "paper-api", version: "1.21.4-R0.1-SNAPSHOT"
+    compileOnly group: "de.maxhenkel.voicechat", name: "voicechat-api", version: "+"
 	compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
 	compileOnly group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
 }

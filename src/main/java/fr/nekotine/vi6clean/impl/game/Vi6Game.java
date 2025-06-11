@@ -5,9 +5,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.nekotine.core.util.EventUtil;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.scoreboard.Team.Option;
@@ -34,7 +42,7 @@ import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class Vi6Game implements ForwardingAudience, AutoCloseable{
+public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	
 	private final Logger logger = new NekotineLogger(getClass());
 	
@@ -95,10 +103,12 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 		}catch(Exception e){
 			logger.log(Level.SEVERE, "Une erreur est survenue lors du chargement de la game", e);
 		}
+		EventUtil.register(this);
 	}
 
 	@Override
 	public void close(){
+		EventUtil.unregister(this);
 		try {
 			phaseMachine.end();
 			scoreboardGuard.unregister();
@@ -249,6 +259,18 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	@EventHandler
+	private void onPlayerChangeItem(PlayerItemHeldEvent evt){
+		var previous = evt.getPlayer().getInventory().getItem(evt.getPreviousSlot());
+		var next = evt.getPlayer().getInventory().getItem(evt.getNewSlot());
+		if (previous != null && previous.getType() == Material.LEATHER_HORSE_ARMOR){
+			Ioc.resolve(Vi6Game.class).getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE,1.0f,1.5f));
+		}
+		if (next != null && next.getType() == Material.LEATHER_HORSE_ARMOR){
+			Ioc.resolve(Vi6Game.class).getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE,1.0f,2f));
+		}
 	}
 	
 }

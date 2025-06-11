@@ -7,41 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Added .idea folder to .gitignore">
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/.project" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/.project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/bin/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/bin/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/track/ClientTrackModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/track/ClientTrackModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" afterDir="false" />
+    <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Pas d'idée">
+      <change afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/voicechat/Vi6VoiceChatPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.project" beforeDir="false" afterPath="$PROJECT_DIR$/.project" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/Vi6Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/Vi6Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/Vi6Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/Vi6Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseLobby.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseLobby.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/artefact/Artefact.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/artefact/Artefact.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/invisneak/InviSneak.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/invisneak/InviSneak.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/omnicaptor/OmniCaptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/omnicaptor/OmniCaptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/radar/Radar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/radar/Radar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/regenerator/Regenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/regenerator/Regenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/shadow/Shadow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/shadow/Shadow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/smokepool/SmokePool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/smokepool/SmokePool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/sonar/Sonar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/sonar/Sonar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tazer/Tazer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tazer/Tazer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tracker/Tracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tracker/Tracker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/warner/Warner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/warner/Warner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/watcher/Watcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/watcher/Watcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/paper-plugin.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/paper-plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/paper-plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +62,14 @@
         </projects_view>
       </state>
     </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Class" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -147,7 +127,9 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="2cuEtsOxXNwle1841ACxGig54ho" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -244,7 +226,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708953779573</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Pas d'idée">
+      <option name="closed" value="true" />
+      <created>1749662528370</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749662528370</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -275,7 +265,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added .idea folder to .gitignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added .idea folder to .gitignore" />
+    <MESSAGE value="Pas d'idée" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pas d'idée" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>
