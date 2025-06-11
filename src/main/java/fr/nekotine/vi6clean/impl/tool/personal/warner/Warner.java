@@ -91,7 +91,7 @@ public class Warner extends Tool{
 			var y = loc.getY();
 			var z = loc.getZ();
 			SpatialUtil.circle2DDensity(Ioc.resolve(WarnerHandler.class).getPlaceRange(), 5, 0,(offsetX, offsetZ) -> {
-			getOwner().spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);});
+			getOwner().spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);});
 		}
 	}
 	protected void setInHand(boolean inHand) {

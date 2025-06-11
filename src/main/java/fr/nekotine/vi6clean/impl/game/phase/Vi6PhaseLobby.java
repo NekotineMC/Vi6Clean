@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.game.phase;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,7 +53,11 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	
 	@Override
 	protected void globalSetup(Object inputData) {
-		var scoreboard = Ioc.resolve(Vi6Game.class).getScoreboard();
+		var game = Ioc.resolve(Vi6Game.class);
+		for (var p : Bukkit.getServer().getOnlinePlayers()) {
+			game.addPlayer(p);
+		}
+		var scoreboard = game.getScoreboard();
 		scoreboardPlayerListingObjective = scoreboard.getObjective("playerListing");
 		if (scoreboardPlayerListingObjective == null) {
 			scoreboardPlayerListingObjective = scoreboard.registerNewObjective("playerListing",

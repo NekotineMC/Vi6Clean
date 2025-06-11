@@ -30,37 +30,37 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class Artefact{
-	
+public class Artefact {
+
 	private static final int CAPTURE_AMOUNT_NEEDED = 200;
-	
+
 	private int capture_advancement;
-	
+
 	@MapDictKey
 	private String name = "";
-	
+
 	private Set<Player> inside = new HashSet<>(8);
-	
+
 	private boolean isCaptured;
-	
+
 	private final BlockPatch blockPatch = new BlockPatch(s -> s.setType(Material.AIR)); // For now
-	
+
 	@GenerateSpecificCommandFor(BlockLocationCommandGenerator.class)
 	@ComposingConfiguration
 	private BlockVector blockPosition = new BlockVector();
-	
+
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
 
 	private BlockDisplay boxDisplay;
-	
+
 	private boolean foundAfterCapture;
-	
+
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
 	}
-	
+
 	public BlockVector getBlockPosition() {
 		return blockPosition;
 	}
@@ -68,32 +68,30 @@ public class Artefact{
 	public String getName() {
 		return name;
 	}
-	
+
 	public void capture() {
-		blockPatch.patch(Ioc.resolve(Vi6Game.class).getWorld().getBlockAt(
-						blockPosition.getBlockX(),
-						blockPosition.getBlockY(),
-						blockPosition.getBlockZ())
-				);
+		blockPatch.patch(Ioc.resolve(Vi6Game.class).getWorld().getBlockAt(blockPosition.getBlockX(),
+				blockPosition.getBlockY(), blockPosition.getBlockZ()));
 		isCaptured = true;
 	}
-	
+
 	public void setup(World world) {
-		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.ORANGE_STAINED_GLASS.createBlockData());
+		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(),
+				Material.ORANGE_STAINED_GLASS.createBlockData());
 	}
-	
+
 	public void clean() {
 		blockPatch.unpatchAll();
 		isCaptured = false;
 		capture_advancement = 0;
 		boxDisplay.remove();
 	}
-	
+
 	public boolean isCaptured() {
 		return isCaptured;
 	}
-	
-	public Set<Player> getInsideCaptureZone(){
+
+	public Set<Player> getInsideCaptureZone() {
 		return inside;
 	}
 
@@ -101,19 +99,23 @@ public class Artefact{
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-		if(isCaptured) {
-			
-			if(!foundAfterCapture) {
-				setFoundAfterCapture(inside.stream().anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam()==Vi6Team.GUARD));
+		if (isCaptured) {
+
+			if (!foundAfterCapture) {
+				setFoundAfterCapture(inside.stream()
+						.anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam() == Vi6Team.GUARD));
 			}
-			
-			game.getWorld().spawnParticle(Particle.SPELL_WITCH, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 1, 0.5, 0.5, 0.5, 0);
+
+			game.getWorld().spawnParticle(Particle.WITCH, blockPosition.getX() + 0.5d, blockPosition.getY() + 0.5d,
+					blockPosition.getZ() + 0.5d, 1, 0.5, 0.5, 0.5, 0);
 			var stolenMessage = Component.text(name, NamedTextColor.GOLD)
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Volé", NamedTextColor.RED));
-			inside.forEach(p -> wrapping.getWrapper(p, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(stolenMessage));
-		}else {
-			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX()+0.5d, blockPosition.getY()+0.5d, blockPosition.getZ()+0.5d, 2, 0.5, 0.5, 0.5);
+			inside.forEach(p -> wrapping.getWrapper(p, InMapPhasePlayerWrapper.class).getArtefactComponent()
+					.setText(stolenMessage));
+		} else {
+			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX() + 0.5d, blockPosition.getY() + 0.5d,
+					blockPosition.getZ() + 0.5d, 2, 0.5, 0.5, 0.5);
 			int tickAdvancement = 0;
 			boolean guardCanceling = false;
 			Player firstThief = null;
@@ -124,9 +126,8 @@ public class Artefact{
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Vole", NamedTextColor.GREEN))
 					.append(Component.text(" (", NamedTextColor.WHITE))
-					.append(Component.text(capture_advancement*100/CAPTURE_AMOUNT_NEEDED, NamedTextColor.AQUA))
-					.append(Component.text("%", NamedTextColor.GOLD))
-					.append(Component.text(")", NamedTextColor.WHITE));
+					.append(Component.text(capture_advancement * 100 / CAPTURE_AMOUNT_NEEDED, NamedTextColor.AQUA))
+					.append(Component.text("%", NamedTextColor.GOLD)).append(Component.text(")", NamedTextColor.WHITE));
 			for (var player : inside) {
 				if (game.getGuards().contains(player)) {
 					guardCanceling = true;
@@ -154,17 +155,18 @@ public class Artefact{
 				capture_advancement = 0;
 			}
 			if (capture_advancement >= CAPTURE_AMOUNT_NEEDED) {
-				Ioc.resolve(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class).capture(this);
+				Ioc.resolve(WrappingModule.class).getWrapper(firstThief, InfiltrationPhasePlayerWrapper.class)
+						.capture(this);
 				phaseInMap.guardSafeToUnknown();
 				phaseInMap.thiefObjectiveStolen(this);
 				Bukkit.getPluginManager().callEvent(new ArtefactStealEvent(this, firstThief));
 			}
 		}
 	}
-	
+
 	public void setFoundAfterCapture(boolean foundAfterCapture) {
 		this.foundAfterCapture = foundAfterCapture;
-		if(foundAfterCapture) {
+		if (foundAfterCapture) {
 			var game = Ioc.resolve(Vi6Game.class);
 			var phaseInMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
 			phaseInMap.guardObjectiveStolen(this);

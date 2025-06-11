@@ -63,7 +63,7 @@ public class Tracker extends Tool{
 			eyeLoc.getDirection(),
 			range, 
 			4, 
-			(vec) -> getOwner().spawnParticle(Particle.FIREWORKS_SPARK, vec.getX(), vec.getY(), vec.getZ(), 0, 0, 0, 0, 0f));
+			(vec) -> getOwner().spawnParticle(Particle.FIREWORK, vec.getX(), vec.getY(), vec.getZ(), 0, 0, 0, 0, 0f));
 		
 		if(res == null || res.getHitEntity()==null) {
 			Vi6Sound.TRACKER_FAIL.play(getOwner());

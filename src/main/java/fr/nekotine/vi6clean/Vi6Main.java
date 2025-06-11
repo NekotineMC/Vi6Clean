@@ -2,6 +2,8 @@ package fr.nekotine.vi6clean;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.executors.ExecutorType;
 import fr.nekotine.core.NekotinePlugin;

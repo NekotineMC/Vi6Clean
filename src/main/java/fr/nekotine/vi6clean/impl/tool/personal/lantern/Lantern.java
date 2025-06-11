@@ -27,50 +27,44 @@ import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
-public class Lantern extends Tool{
-	
+public class Lantern extends Tool {
+
 	private ArmorStand fallingArmorStand;
-	
+
 	private List<BlockDisplay> displayedLanterns = new LinkedList<>();
-	
-	
+
 	@Override
 	protected ItemStack makeInitialItemStack() {
-		return ItemStackUtil.make(
-				Material.LANTERN, 
-				Ioc.resolve(LanternHandler.class).getMaxLantern()-displayedLanterns.size(), 
-				Ioc.resolve(LanternHandler.class).getDisplayName(), 
-				Ioc.resolve(LanternHandler.class).getLore());
+		return ItemStackUtil.make(Material.LANTERN,
+				Ioc.resolve(LanternHandler.class).getMaxLantern() - displayedLanterns.size(),
+				Ioc.resolve(LanternHandler.class).getDisplayName(), Ioc.resolve(LanternHandler.class).getLore());
 	}
-	
+
 	@Override
 	protected void cleanup() {
-		for(var lantern : displayedLanterns) {
+		for (var lantern : displayedLanterns) {
 			lantern.remove();
 		}
 		if (fallingArmorStand != null) {
 			fallingArmorStand.remove();
 		}
 	}
-	
+
 	public void updateItemStack() {
 		var handler = Ioc.resolve(LanternHandler.class);
-		var amount = handler.getMaxLantern()-displayedLanterns.size();
+		var amount = handler.getMaxLantern() - displayedLanterns.size();
 		if (amount <= 0) {
 			setItemStack(handler.getNoLanternItemstack());
-		}else {
-			setItemStack(
-					ItemStackUtil.make(
-							Material.LANTERN, 
-							handler.getMaxLantern()-displayedLanterns.size(),
-							Ioc.resolve(LanternHandler.class).getDisplayName(), 
-							handler.getLore()));
+		} else {
+			setItemStack(ItemStackUtil.make(Material.LANTERN, handler.getMaxLantern() - displayedLanterns.size(),
+					Ioc.resolve(LanternHandler.class).getDisplayName(), handler.getLore()));
 		}
 	}
-	
+
 	public boolean tryPlace() {
 		var owner = getOwner();
-		if (displayedLanterns.size() >= Ioc.resolve(LanternHandler.class).getMaxLantern() || fallingArmorStand != null || owner == null) {
+		if (displayedLanterns.size() >= Ioc.resolve(LanternHandler.class).getMaxLantern() || fallingArmorStand != null
+				|| owner == null) {
 			return false;
 		}
 		if (fallingArmorStand != null) {
@@ -79,15 +73,13 @@ public class Lantern extends Tool{
 		var loc = owner.getLocation();
 		loc.setYaw(0);
 		loc.setPitch(0);
-		var lantern = (BlockDisplay)owner.getWorld().spawnEntity(loc, EntityType.BLOCK_DISPLAY, SpawnReason.CUSTOM);
-		var transf = new Transformation(
-				new Vector3f(-0.5f, -0.7405f, -0.5f),
-				new AxisAngle4f(),
-				new Vector3f(1, 1, 1),
+		var lantern = (BlockDisplay) owner.getWorld().spawnEntity(loc, EntityType.BLOCK_DISPLAY, SpawnReason.CUSTOM);
+		var transf = new Transformation(new Vector3f(-0.5f, -0.7405f, -0.5f), new AxisAngle4f(), new Vector3f(1, 1, 1),
 				new AxisAngle4f());
 		lantern.setTransformation(transf);
 		lantern.setBlock(Bukkit.createBlockData(Material.LANTERN));
-		fallingArmorStand = (ArmorStand)owner.getWorld().spawnEntity(owner.getLocation(), EntityType.ARMOR_STAND, SpawnReason.CUSTOM);
+		fallingArmorStand = (ArmorStand) owner.getWorld().spawnEntity(owner.getLocation(), EntityType.ARMOR_STAND,
+				SpawnReason.CUSTOM);
 		fallingArmorStand.addPassenger(lantern);
 		fallingArmorStand.setInvisible(true);
 		fallingArmorStand.setSilent(true);
@@ -98,19 +90,20 @@ public class Lantern extends Tool{
 		var wrapOpt = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
 		if (wrapOpt.isPresent()) {
 			var glowModule = Ioc.resolve(EntityGlowModule.class);
-			wrapOpt.get().ourTeam().stream().filter(p -> !p.equals(owner)).forEach(p -> glowModule.glowEntityFor(lantern, p, TeamColor.DARK_BLUE));
+			wrapOpt.get().ourTeam().stream().filter(p -> !p.equals(owner))
+					.forEach(p -> glowModule.glowEntityFor(lantern, p, TeamColor.DARK_BLUE));
 			glowModule.glowEntityFor(lantern, owner, TeamColor.YELLOW);
 		}
 		return true;
 	}
-	
+
 	public boolean allyTryPickup(Player picking) {
 		var owner = getOwner();
 		if (owner == null) {
 			return false;
 		}
 		var flagModule = Ioc.resolve(StatusFlagModule.class);
-		if(flagModule.hasAny(owner, EmpStatusFlag.get())) {
+		if (flagModule.hasAny(owner, EmpStatusFlag.get())) {
 			return false;
 		}
 		var ite = displayedLanterns.iterator();
@@ -125,7 +118,7 @@ public class Lantern extends Tool{
 				Vi6Sound.LANTERNE_PRE_TELEPORT.play(w, lanternLoc);
 				if (!owner.equals(picking)) {
 					var ownerLoc = owner.getLocation();
-					w.spawnParticle(Particle.EXPLOSION_LARGE, lanternLoc, 1);
+					w.spawnParticle(Particle.EXPLOSION, lanternLoc, 1);
 					picking.teleport(ownerLoc);
 					Vi6Sound.LANTERNE_POST_TELEPORT.play(w, ownerLoc);
 				}
@@ -140,7 +133,7 @@ public class Lantern extends Tool{
 		}
 		return false;
 	}
-	
+
 	public void tryRemoveFallingArmorStand() {
 		if (fallingArmorStand != null && fallingArmorStand.isOnGround()) {
 			Vi6Sound.LANTERNE_POSE.play(fallingArmorStand.getWorld(), fallingArmorStand.getLocation());
@@ -148,11 +141,11 @@ public class Lantern extends Tool{
 			fallingArmorStand = null;
 		}
 	}
-	
-	public List<BlockDisplay> getDisplayedLanternList(){
+
+	public List<BlockDisplay> getDisplayedLanternList() {
 		return displayedLanterns;
 	}
-	
+
 	public void lanternSmokes(double offsetX, double offsetZ) {
 		var owner = getOwner();
 		if (owner == null) {
@@ -164,8 +157,7 @@ public class Lantern extends Tool{
 			var x = loc.getX();
 			var y = loc.getY() - 0.74f;
 			var z = loc.getZ();
-			w.spawnParticle(Particle.FIREWORKS_SPARK, x+offsetX, y, z+offsetZ, 0, 
-					0, 0, 0, 0f);
+			w.spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 0, 0, 0, 0, 0f);
 		}
 	}
 
@@ -174,6 +166,7 @@ public class Lantern extends Tool{
 	@Override
 	protected void onEmpStart() {
 	}
+
 	@Override
 	protected void onEmpEnd() {
 	}

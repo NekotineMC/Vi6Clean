@@ -75,7 +75,7 @@ public class OmniCaptor extends Tool{
 			var z = loc.getZ();
 			SpatialUtil.circle2DDensity(Ioc.resolve(OmniCaptorHandler.class).getDetectionBlockRange(), 5, 0,
 					(offsetX, offsetZ) -> {
-						player.spawnParticle(Particle.FIREWORKS_SPARK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+						player.spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 		}
 	}

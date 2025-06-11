@@ -76,7 +76,7 @@ public class InviSneak extends Tool{
 		}else {
 			SpatialUtil.circle2DDensity(range, 5, 0,
 					(offsetX, offsetZ) -> {
-						player.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+						player.spawnParticle(Particle.SMOKE, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 					});
 		}
 	}

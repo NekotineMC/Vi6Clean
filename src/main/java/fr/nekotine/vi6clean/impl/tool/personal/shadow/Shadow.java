@@ -41,7 +41,7 @@ public class Shadow extends Tool{
 			var z = loc.getZ();
 			SpatialUtil.circle2DDensity(Ioc.resolve(ShadowHandler.class).getShadowKillRangeBlock(), 3, Math.random(),
 					(offsetX, offsetZ) -> {
-						ourTeam.get().forEach(p -> p.spawnParticle(Particle.SMOKE_NORMAL, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null));
+						ourTeam.get().forEach(p -> p.spawnParticle(Particle.SMOKE, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null));
 			});
 		}
 	}

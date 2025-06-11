@@ -32,7 +32,7 @@ public class Regenerator extends Tool{
 		if(!healing) {
 			return;
 		}
-		double maxHealth = getOwner().getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+		double maxHealth = getOwner().getAttribute(Attribute.MAX_HEALTH).getValue();
 		double newHealth = Math.min(maxHealth, getOwner().getHealth() + Ioc.resolve(RegeneratorHandler.class).REGENERATION_AMOUNT);
 		getOwner().setHealth(newHealth);
 		if(newHealth!=maxHealth) {

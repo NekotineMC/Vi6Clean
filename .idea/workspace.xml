@@ -8,10 +8,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Added .idea folder to .gitignore">
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/damage/DamageFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/damage/DamageFunction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/.classpath" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/.project" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/bin/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/bin/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/track/ClientTrackModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/track/ClientTrackModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/Vi6Clean.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.project" beforeDir="false" afterPath="$PROJECT_DIR$/.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/Vi6Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/Vi6Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/Vi6Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/Vi6Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseLobby.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseLobby.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/artefact/Artefact.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/artefact/Artefact.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/status/flag/InvisibilityStatusFlag.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/invisneak/InviSneak.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/invisneak/InviSneak.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/omnicaptor/OmniCaptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/omnicaptor/OmniCaptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/radar/Radar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/radar/Radar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/regenerator/Regenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/regenerator/Regenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/shadow/Shadow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/shadow/Shadow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/smokepool/SmokePool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/smokepool/SmokePool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/sonar/Sonar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/sonar/Sonar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tazer/Tazer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tazer/Tazer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tracker/Tracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/tracker/Tracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/warner/Warner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/warner/Warner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/watcher/Watcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/watcher/Watcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/paper-plugin.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,19 +69,20 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="Vi6Clean" type="f1a62948:ProjectNode" />
+                <item name="Vi6Clean" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="Vi6Clean" type="f1a62948:ProjectNode" />
+                <item name="Vi6Clean" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="Vi6Clean" type="f1a62948:ProjectNode" />
+                <item name="Vi6Clean" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="developpement" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="Vi6Clean" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="documentation" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -121,34 +152,36 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Gradle.Vi6Clean [dev].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev-tool-portabletp&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.39655173&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;inlay.hints&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Gradle.Vi6Clean [dev].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "git-widget-placeholder": "master",
+    "go.import.settings.migrated": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/shared/EclipseProjects/minecraft-hologram",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.39655173",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.Java",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;cockroach&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "cockroach"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="Vi6Clean [dev]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
@@ -177,13 +210,6 @@
         <item itemvalue="Gradle.Vi6Clean [dev]" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-4f524021" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

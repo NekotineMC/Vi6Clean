@@ -69,7 +69,7 @@ public class Tazer extends Tool{
 			range = hitp.distance(eyeLoc.toVector());
 		}
 		SpatialUtil.line3DFromDir(eyeLoc.toVector(), eyeLoc.getDirection(), range, 4,
-				(vec) -> world.spawnParticle(Particle.FIREWORKS_SPARK, vec.getX(), vec.getY(), vec.getZ(), 0,
+				(vec) -> world.spawnParticle(Particle.FIREWORK, vec.getX(), vec.getY(), vec.getZ(), 0,
 						0, 0, 0, 0f));
 		cooldown = Ioc.resolve(TazerHandler.class).getCooldownTick();
 		player.setCooldown(getItemStack().getType(), cooldown);

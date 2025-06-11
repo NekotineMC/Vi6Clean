@@ -48,7 +48,7 @@ public class Sonar extends Tool{
 		Vi6Sound.SONAR_NEGATIVE.play(player);
 		SpatialUtil.circle2DDensity(handler.getDetectionBlockRange(), 5, 0,
 				(offsetX, offsetZ) -> {
-					player.spawnParticle(Particle.CRIT_MAGIC, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+					player.spawnParticle(Particle.CRIT, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
 				});
 		player.setCooldown(getItemStack().getType(), handler.getDelayTick());
 	}

@@ -21,10 +21,10 @@ repositories {
 }
 
 dependencies {
-	implementation project(":NekotineCore")
-	implementation group: "io.papermc.paper", name: "paper-api", version: "1.20.4+"
-	implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
-	implementation group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
+	implementation group: "fr.nekotine", name: "NekotineCore", version: "+"
+	implementation group: "io.papermc.paper", name: "paper-api", version: "1.21.4-R0.1-SNAPSHOT"
+	compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
+	compileOnly group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
 }
 
 // CONFIGURATION
@@ -34,16 +34,20 @@ version = '0.0.1'
 description = 'Vi6 avec du code plus propre'
 
 compileJava.options.encoding = 'UTF-8'
-
+/*
 shadowJar{
-	/* <Workaround for https://github.com/johnrengelman/shadow/issues/448> */
+	/* <Workaround for https://github.com/johnrengelman/shadow/issues/448> *//*
 	project.configurations.implementation.canBeResolved = true
     configurations = [project.configurations.implementation]
-    /* </Workaround> */
+    /* </Workaround> *//*
     dependencies{
     	include project(':NekotineCore')
     }
     archiveFileName = "${project.name}-${version}-coreShaded.jar"
+}*/
+
+tasks.build {
+    dependsOn("shadowJar")
 }
 
 // DEFAULT TASKS

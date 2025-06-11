@@ -91,7 +91,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable{
 	public final void start() {
 		// Launch game
 		try {
-			phaseMachine.goTo(Vi6PhaseLobby.class, null);
+			phaseMachine.goTo(Vi6PhaseLobby.class, null);;
 		}catch(Exception e){
 			logger.log(Level.SEVERE, "Une erreur est survenue lors du chargement de la game", e);
 		}

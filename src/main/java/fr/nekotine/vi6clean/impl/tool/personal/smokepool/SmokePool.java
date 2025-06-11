@@ -15,7 +15,7 @@ import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 
-public class SmokePool extends Tool{
+public class SmokePool extends Tool {
 	private Location placedLoc;
 	private ArrayList<Player> inside = new ArrayList<Player>();
 	private boolean placed = false;
@@ -25,19 +25,20 @@ public class SmokePool extends Tool{
 	private final double DIAMETER = Ioc.resolve(SmokePoolHandler.class).getDiameter();
 	private final double RADIUS = Ioc.resolve(SmokePoolHandler.class).getRadius();
 	private final Random RNG = SmokePoolHandler.RNG;
+
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return Ioc.resolve(SmokePoolHandler.class).getItem();
 	}
-	
+
 	protected boolean cast() {
-		if(getOwner() == null) {
+		if (getOwner() == null) {
 			return false;
 		}
-		if(placed || cooldownLeft > 0) {
+		if (placed || cooldownLeft > 0) {
 			return false;
 		}
-		if(Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get())) {
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get())) {
 			return false;
 		}
 		var handler = Ioc.resolve(SmokePoolHandler.class);
@@ -48,54 +49,60 @@ public class SmokePool extends Tool{
 		getOwner().setCooldown(handler.getItem().getType(), handler.getDurationTick());
 		return true;
 	}
+
 	protected void tickCooldown() {
-		if(placed) {
-			if(--life <= 0) {
+		if (placed) {
+			if (--life <= 0) {
 				cleanup();
 			}
-		}else if(cooldownLeft > 0){
+		} else if (cooldownLeft > 0) {
 			cooldownLeft--;
-			if(cooldownLeft == 0 && (getOwner() == null || !Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get()))) {
+			if (cooldownLeft == 0 && (getOwner() == null
+					|| !Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get()))) {
 				setItemStack(Ioc.resolve(SmokePoolHandler.class).getItem());
 			}
 		}
 	}
+
 	protected void tickParticle() {
-		if(!placed) {
+		if (!placed) {
 			return;
 		}
-		Location l = new Location(placedLoc.getWorld(),0,0,0);
-		for (int i=0;i<AIR;i++) {
-			double angle = RNG.nextFloat()*DIAMETER;
-			double point = RNG.nextFloat()*RADIUS;
-			l.setX(placedLoc.getX()+(Math.cos(angle)*point));
-			l.setZ(placedLoc.getZ()+(Math.sin(angle)*point));
-			l.setY(placedLoc.getY()-1);
-			double maxy = l.getY()+2.5;
-			while (l.getY()<maxy) {
+		Location l = new Location(placedLoc.getWorld(), 0, 0, 0);
+		for (int i = 0; i < AIR; i++) {
+			double angle = RNG.nextFloat() * DIAMETER;
+			double point = RNG.nextFloat() * RADIUS;
+			l.setX(placedLoc.getX() + (Math.cos(angle) * point));
+			l.setZ(placedLoc.getZ() + (Math.sin(angle) * point));
+			l.setY(placedLoc.getY() - 1);
+			double maxy = l.getY() + 2.5;
+			while (l.getY() < maxy) {
 				if (l.getBlock().getBoundingBox().contains(l.toVector())) {
 					l.add(0, 0.1, 0);
-				}else{
-					l.getWorld().spawnParticle(Particle.SMOKE_NORMAL, l, 1,0,0,0,0);
+				} else {
+					l.getWorld().spawnParticle(Particle.SMOKE, l, 1, 0, 0, 0, 0);
 					break;
-				};
+				}
+				;
 			}
 		}
 	}
-	
+
 	//
-	
+
 	protected boolean isPlaced() {
-		
+
 		return placed;
 	}
-	protected ArrayList<Player> getInside(){
+
+	protected ArrayList<Player> getInside() {
 		return inside;
 	}
+
 	protected Location getPlacedLocation() {
 		return placedLoc;
 	}
-	
+
 	//
 
 	@Override
@@ -106,22 +113,22 @@ public class SmokePool extends Tool{
 		inside.clear();
 		placed = false;
 		cooldownLeft = handler.getCooldownTick();
-		setItemStack(handler.getCooldownItem());	
-		if(getOwner() != null) {
-			getOwner().setCooldown(handler.getCooldownItem().getType(), handler.getCooldownTick());	
+		setItemStack(handler.getCooldownItem());
+		if (getOwner() != null) {
+			getOwner().setCooldown(handler.getCooldownItem().getType(), handler.getCooldownTick());
 		}
 	}
 
 	@Override
 	protected void onEmpStart() {
-		if(placed) {
+		if (placed) {
 			cleanup();
 		}
 	}
 
 	@Override
 	protected void onEmpEnd() {
-		if(cooldownLeft == 0) {
+		if (cooldownLeft == 0) {
 			setItemStack(Ioc.resolve(SmokePoolHandler.class).getItem());
 		}
 	}

@@ -1,0 +1,19 @@
+name: Vi6Clean
+version: 1.0
+main: fr.nekotine.vi6clean.Vi6Main
+api-version: '1.21.4'
+author: XxGoldenbluexX
+dependencies:
+  server:
+    ProtocolLib:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    CommandAPI:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    FastAsyncWorldEdit:
+      load: BEFORE
+      required: true
+      join-classpath: true

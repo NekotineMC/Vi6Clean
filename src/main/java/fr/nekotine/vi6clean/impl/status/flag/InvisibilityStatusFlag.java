@@ -133,7 +133,7 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener{
 			var sound = InvisibilityStatusEffectType.get().equals(type);
 			for(Player enemy : wrapper.ennemiTeam()) {
 				enemy.spawnParticle(
-						Particle.BLOCK_CRACK,
+						Particle.BLOCK,
 						pLoc,
 						PARTICLE_COUNT, 
 						0, 0, 0, 
