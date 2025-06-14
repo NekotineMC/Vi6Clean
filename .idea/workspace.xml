@@ -7,18 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Pas d'idée">
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/glow/EntityGlowModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/glow/EntityGlowModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/glow/ScoreboardTeamCreatePacketWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/glow/ScoreboardTeamCreatePacketWrapper.java" afterDir="false" />
+    <list default="true" id="19ab0c0b-2249-4c99-844d-b1751b8634e2" name="Changes" comment="Fix emp price, fix glow color">
+      <change beforePath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/util/SpatialUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../NekotineCore/src/main/java/fr/nekotine/core/util/SpatialUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseInMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/game/phase/Vi6PhaseInMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/forcefield/Forcefield.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/forcefield/Forcefield.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/forcefield/ForcefieldHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/forcefield/ForcefieldHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/lantern/Lantern.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/portable_teleporter/PortableTeleporter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/tool/personal/portable_teleporter/PortableTeleporter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/voicechat/Vi6VoiceChatPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/voicechat/Vi6VoiceChatPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/tools/emp.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/tools/emp.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/tools/forcefield.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/tools/forcefield.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/koth/Koth.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fr/nekotine/vi6clean/impl/map/koth/Koth.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749662528370</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Fix emp price, fix glow color">
+      <option name="closed" value="true" />
+      <created>1749922906072</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1749922906072</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -271,7 +271,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added .idea folder to .gitignore" />
     <MESSAGE value="Pas d'idée" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pas d'idée" />
+    <MESSAGE value="Fix emp price, fix glow color" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix emp price, fix glow color" />
   </component>
   <component name="VgoProject">
     <integration-enabled>false</integration-enabled>

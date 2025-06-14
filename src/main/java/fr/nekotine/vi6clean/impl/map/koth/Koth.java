@@ -11,6 +11,7 @@ import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
@@ -98,9 +99,13 @@ public class Koth{
 	
 	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
-		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY);
-		display.setBillboard(Billboard.CENTER);
-		display.setShadowed(true);
+		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
+			if (display instanceof TextDisplay d){
+				d.setBillboard(Billboard.CENTER);
+				d.setShadowed(true);
+				d.setPersistent(false);
+			}
+		});
 		rectangle = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.BARRIER.createBlockData());
 		isEnabled = true;
 		effect.setKoth(this);
