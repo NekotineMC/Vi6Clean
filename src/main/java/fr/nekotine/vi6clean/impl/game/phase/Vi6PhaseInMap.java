@@ -8,6 +8,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.maxhenkel.voicechat.api.BukkitVoicechatService;
+import fr.nekotine.core.util.ItemStackUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -264,6 +266,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();
+
+			var vc_service = Bukkit.getServer().getServicesManager().load(BukkitVoicechatService.class);
+			if (vc_service != null) {
+				// On donne un talkie walkie
+				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR,Component.text("Talkie-walkie"),Component.text("Tenir en main pour parler"));
+				item.give(tw);
+			}
 		}
 	}
 

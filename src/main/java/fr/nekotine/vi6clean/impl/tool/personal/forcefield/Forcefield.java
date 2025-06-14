@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 
 public class Forcefield extends Tool{
 
+	public int nbPosed = 0;
+
 	@Override
 	protected ItemStack makeInitialItemStack() {
 		return ItemStackUtil.make(Material.IRON_DOOR, Component.text("Champ de force"));

@@ -6,13 +6,15 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
-import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class Vi6VoiceChatPlugin implements VoicechatPlugin {
 
@@ -21,8 +23,6 @@ public class Vi6VoiceChatPlugin implements VoicechatPlugin {
     private Map<Player, short[]> audioData = new HashMap<>();
 
     private Random rand = new Random();
-
-    private OpusEncoder encoder;
 
     private OpusDecoder decoder;
 
@@ -66,10 +66,6 @@ public class Vi6VoiceChatPlugin implements VoicechatPlugin {
         }
 
         var api = evt.getVoicechat();
-
-        if (encoder == null){
-            encoder = api.createEncoder();
-        }
 
         if (decoder == null){
             decoder = api.createDecoder();
@@ -118,8 +114,19 @@ public class Vi6VoiceChatPlugin implements VoicechatPlugin {
 
             // Send a static audio packet of the microphone data to the connection of each player
             audioData.put(p,result);
-            var channel = api.createStaticAudioChannel(p.getUniqueId(),connection.getPlayer().getServerLevel(),connection);
-            var audioPlayer = audioPlayers.computeIfAbsent(p, pl -> api.createAudioPlayer(channel,encoder,() -> audioData.get(pl)));
+            var audioPlayer = audioPlayers.computeIfAbsent(p, pl -> api.createAudioPlayer(
+                    api.createStaticAudioChannel(p.getUniqueId(),connection.getPlayer().getServerLevel(),connection),
+                    api.createEncoder(),
+                    () -> {
+                        var a = audioData.get(pl);
+                        if (a == null){
+                            audioPlayers.get(pl).stopPlaying();
+                            audioPlayers.remove(pl);
+                        }
+                        audioData.remove(pl);
+                        return a;
+                    }
+            ));
             if (!audioPlayer.isPlaying()){
                 audioPlayer.startPlaying();
             }

@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.lantern;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -91,8 +92,8 @@ public class Lantern extends Tool {
 		if (wrapOpt.isPresent()) {
 			var glowModule = Ioc.resolve(EntityGlowModule.class);
 			wrapOpt.get().ourTeam().stream().filter(p -> !p.equals(owner))
-					.forEach(p -> glowModule.glowEntityFor(lantern, p, TeamColor.DARK_BLUE));
-			glowModule.glowEntityFor(lantern, owner, TeamColor.YELLOW);
+					.forEach(p -> glowModule.glowEntityFor(lantern, p, EnumWrappers.ChatFormatting.DARK_BLUE));
+			glowModule.glowEntityFor(lantern, owner, EnumWrappers.ChatFormatting.YELLOW);
 		}
 		return true;
 	}

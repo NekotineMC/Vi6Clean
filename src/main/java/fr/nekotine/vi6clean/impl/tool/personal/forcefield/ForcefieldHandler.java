@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -33,6 +34,8 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	private Map<String,DoorData> fieldsDisplay = new HashMap<>();
 	
 	private EntityGlowModule glowingModule = Ioc.resolve(EntityGlowModule.class);
+
+	private final int FORCEFIELD_NB_MAX = getConfiguration().getInt("nbmax",2);
 	
 	public ForcefieldHandler() {
 		super(Forcefield::new);
@@ -209,8 +212,8 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	
 	private void displayDoor(String door, Player player) {
 		var target = getTargetedGate(player);
-		var enabled = target == door ? TeamColor.DARK_AQUA : TeamColor.GOLD;
-		var disabled = target == door ? TeamColor.AQUA : TeamColor.YELLOW;
+		var enabled = target == door ? EnumWrappers.ChatFormatting.DARK_AQUA : EnumWrappers.ChatFormatting.GOLD;
+		var disabled = target == door ? EnumWrappers.ChatFormatting.AQUA : EnumWrappers.ChatFormatting.YELLOW;
 		var doorEntity = fieldsDisplay.get(door);
 		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
 		if (doorEntity.activated) {

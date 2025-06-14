@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.portable_teleporter;
 
 import java.util.ArrayList;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.glow.TeamColor;
 import fr.nekotine.core.util.EventUtil;
@@ -129,7 +130,7 @@ public class PortableTeleporter extends Tool {
 		}
 
 		protected void glow(){
-			var color = this.equals(targeted) ? TeamColor.AQUA : TeamColor.DARK_PURPLE;
+			var color = this.equals(targeted) ? EnumWrappers.ChatFormatting.AQUA : EnumWrappers.ChatFormatting.DARK_PURPLE;
 			Ioc.resolve(EntityGlowModule.class).glowEntityFor(display, getOwner(), color);
 		}
 
