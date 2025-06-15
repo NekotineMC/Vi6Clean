@@ -22,6 +22,10 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 		super(map);
 	}
 
+	@GenerateCommandFor
+	@ComposingConfiguration
+	private String worldName;
+
 	@GenericBiTyped(a=String.class,b=Artefact.class)
 	@GenerateCommandFor
 	@ComposingConfiguration
@@ -102,4 +106,6 @@ public class Vi6Map extends ConfigurationSerializableAdapted {
 	public Map<String,BoundingBox> getGates() {
 		return gates;
 	}
+
+	public String getWorldName(){ return worldName;}
 }

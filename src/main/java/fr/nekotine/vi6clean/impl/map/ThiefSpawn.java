@@ -6,6 +6,8 @@ import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
 import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 import fr.nekotine.core.util.BukkitUtil;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.Vector;
 
 public class ThiefSpawn {
 

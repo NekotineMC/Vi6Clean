@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.util.EventUtil;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -45,10 +46,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	
 	private final Logger logger = new NekotineLogger(getClass());
+
+	private String mapName;
 	
-	private final World world = Bukkit.getWorlds().get(0);
-	
-	
+	private World world = Bukkit.getWorlds().getFirst();
+
 	private final Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 	
 	private final Team scoreboardGuard = scoreboard.registerNewTeam("guard");
@@ -62,8 +64,6 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	private final ThiefTeam thiefs = new ThiefTeam();
 	
 	private IPhaseMachine phaseMachine = new PhaseMachine();
-	
-	private String mapName;
 	
 	private boolean debug = false;
 	
@@ -94,6 +94,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		phaseMachine.registerPhase(Vi6PhasePreparation.class, Vi6PhasePreparation::new);
 		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
 		phaseMachine.setLooping(true);
+		var mm = Ioc.resolve(MapModule.class);
+		mapName = mm.listMaps().stream().findFirst().orElse(null).getName();
 	}
 	
 	public final void start() {
@@ -188,7 +190,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	public World getWorld() {
 		return world;
 	}
-	
+
+	public void setWorld(World world) {
+		this.world = world;
+	}
+
 	public IPhaseMachine getPhaseMachine() {
 		return phaseMachine;
 	}
@@ -272,5 +278,5 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 			Ioc.resolve(Vi6Game.class).getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE,1.0f,2f));
 		}
 	}
-	
+
 }

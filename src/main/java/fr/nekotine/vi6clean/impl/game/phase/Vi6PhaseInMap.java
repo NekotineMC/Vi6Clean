@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -135,8 +136,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	@Override
 	public void globalSetup(Object inputData) {
 		var game = Ioc.resolve(Vi6Game.class);
-		var world = game.getWorld();
-		world.setTime(DayTime.MIDNIGHT);
 		// LOAD MAP
 		var mapModule = Ioc.resolve(IMapModule.class);
 		var mapName = game.getMapName();
@@ -150,6 +149,13 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var metadata = mapModule.getMapMetadata(mapName);
 		map = mapModule.getContent(metadata, Vi6Map.class);
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
+		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getName().equals(map.getWorldName())).findFirst();
+		if (w.isEmpty()){
+			throw new RuntimeException("Le monde "+map.getWorldName()+" correspondant à la carte "+mapName+" n'existe pas");
+		}
+		var world = w.get();
+		world.setTime(DayTime.MIDNIGHT);
+		game.setWorld(world);
 		Ioc.getProvider().registerSingleton(map);
 		// LOAD MAP END
 		var artefacts = map.getArtefacts();
@@ -267,8 +273,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();
 
-			var vc_service = Bukkit.getServer().getServicesManager().load(BukkitVoicechatService.class);
-			if (vc_service != null) {
+			var vcplugin = Ioc.resolve(Vi6VoiceChatPlugin.class);
+			// Check if the player is actually connected to the voice chat
+			if (vcplugin != null && vcplugin.getApi().getConnectionOf(item.getUniqueId()) != null) {
 				// On donne un talkie walkie
 				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR,Component.text("Talkie-walkie"),Component.text("Tenir en main pour parler"));
 				item.give(tw);

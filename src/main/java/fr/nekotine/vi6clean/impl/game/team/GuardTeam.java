@@ -11,7 +11,8 @@ import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 public class GuardTeam extends Team{
 
 	public void spawnInMap() {
-		var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var inMapPhase = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
 		var map = inMapPhase.getMap();
 		var spawns = map.getGuardSpawns();
 		if (spawns.size() < 1) {
@@ -23,7 +24,7 @@ public class GuardTeam extends Team{
 			var wrap = wrappingModule.getWrapper(guard, InMapPhasePlayerWrapper.class);
 			wrap.setState(InMapState.INSIDE);
 			var loc = spawnsIte.next();
-			guard.teleport(loc.toLocation(guard.getWorld()));
+			guard.teleport(loc.toLocation(game.getWorld()));
 			if (!spawnsIte.hasNext()) {
 				spawnsIte = spawns.iterator();
 			}

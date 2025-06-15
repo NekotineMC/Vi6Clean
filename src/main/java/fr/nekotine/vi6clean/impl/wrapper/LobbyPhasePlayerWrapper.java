@@ -1,5 +1,8 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
+import fr.nekotine.core.inventory.menu.element.ClickableDisplayMenuItem;
+import fr.nekotine.core.inventory.menu.element.ComponentDisplayMenuItem;
+import fr.nekotine.core.map.MapModule;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -17,6 +20,10 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	
@@ -43,6 +50,25 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase,
 				this::setReadyForNextPhase);
+		var changeMapItem = new ClickableDisplayMenuItem(new ItemStack(Material.GRASS_BLOCK),
+				() -> {
+					return Component.text("Carte: "+Ioc.resolve(Vi6Game.class).getMapName());
+				},
+				p -> {
+					var mapname = game.getMapName();
+					var mm = Ioc.resolve(MapModule.class);
+					var maps = new ArrayList<>(mm.listMaps());
+					var current = maps.indexOf(maps.stream().filter(m -> m.getName().equals(mapname)).findFirst().orElse(null));
+					System.out.println("current: "+current);
+					System.out.println("size: "+maps.size());
+					if (current >= maps.size()-1){
+						game.setMapName(maps.getFirst().getName());
+					}else{
+						game.setMapName(maps.get(current+1).getName());
+					}
+					System.out.println(game.getMapName());
+				}
+		);
 		var debugItem = new BooleanInputMenuItem(
 				new ItemStackBuilder(Material.GOLDEN_PICKAXE).flags(ItemFlag.values()).enchant().name(Component.text("Débug activé", NamedTextColor.YELLOW)).build(),
 				ItemStackUtil.make(Material.GOLDEN_PICKAXE, Component.text("Débug désactivé", NamedTextColor.GRAY)),
@@ -51,6 +77,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 		var wrapLayout = new WrapMenuLayout();
 		wrapLayout.addElement(readyItem);
 		wrapLayout.addElement(changeTeamItem);
+		wrapLayout.addElement(changeMapItem);
 		wrapLayout.addElement(debugItem);
 		var border = new BorderMenuLayout(ItemStackUtil.make(Material.GREEN_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
 		menu = new MenuInventory(border,3);

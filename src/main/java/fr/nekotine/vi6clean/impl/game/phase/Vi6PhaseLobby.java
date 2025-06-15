@@ -57,6 +57,7 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		for (var p : Bukkit.getServer().getOnlinePlayers()) {
 			game.addPlayer(p);
 		}
+		game.setWorld(Bukkit.getWorld("world"));
 		var scoreboard = game.getScoreboard();
 		scoreboardPlayerListingObjective = scoreboard.getObjective("playerListing");
 		if (scoreboardPlayerListingObjective == null) {
@@ -96,6 +97,8 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		wrappingModule.getWrapper(item, LobbyPhasePlayerWrapper.class).setReadyForNextPhase(false);
 		scoreboardPlayerListingObjective.getScore(item).setScore(0);
 		item.getInventory().addItem(openMenuUsable.getItemStack());
+		var game = Ioc.resolve(Vi6Game.class);
+		item.teleport(game.getWorld().getSpawnLocation());
 	}
 
 	@Override

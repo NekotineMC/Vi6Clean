@@ -17,7 +17,8 @@ import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 public class ThiefTeam extends Team{
 
 	public void spawnInMinimap() {
-		var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		var inMapPhase = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
 		var map = inMapPhase.getMap();
 		var spawns = map.getThiefMinimapSpawns();
 		if (spawns.size() < 1) {
@@ -26,7 +27,7 @@ public class ThiefTeam extends Team{
 		var spawnsIte = spawns.iterator();
 		for(var thief : this){
 			var loc = spawnsIte.next();
-			thief.teleport(loc.toLocation(thief.getWorld()));
+			thief.teleport(loc.toLocation(game.getWorld()));
 			if (!spawnsIte.hasNext()) {
 				spawnsIte = spawns.iterator();
 			}

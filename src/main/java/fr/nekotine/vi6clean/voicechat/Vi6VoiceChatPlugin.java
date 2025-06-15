@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.voicechat;
 
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
@@ -26,6 +27,12 @@ public class Vi6VoiceChatPlugin implements VoicechatPlugin {
 
     private OpusDecoder decoder;
 
+    private VoicechatServerApi api;
+
+    public VoicechatServerApi getApi(){
+        return api;
+    }
+
     @Override
     public String getPluginId() {
         return "vi6clean";
@@ -34,6 +41,9 @@ public class Vi6VoiceChatPlugin implements VoicechatPlugin {
     @Override
     public void initialize(VoicechatApi api) {
         VoicechatPlugin.super.initialize(api);
+        if (api instanceof VoicechatServerApi serverapi){
+            this.api = serverapi;
+        }
     }
 
     @Override

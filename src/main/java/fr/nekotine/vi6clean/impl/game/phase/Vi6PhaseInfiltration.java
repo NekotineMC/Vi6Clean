@@ -62,6 +62,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 	@Override
 	public void itemTearDown(Player item) {
+		item.spigot().respawn();
 		Ioc.resolve(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
 	}
 
@@ -98,20 +99,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 				@Override
 				public void run() {
-					var spawnsIte = spawns.iterator();
-					for(var player : getItemCollection()){
-						var loc = spawnsIte.next();
-						player.teleport(loc.toLocation(player.getWorld()));
-						player.setGameMode(GameMode.ADVENTURE);
-						if (!spawnsIte.hasNext()) {
-							spawnsIte = spawns.iterator();
-						}
-					}
+					complete();
 				}
 
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
 			}finally {
-				complete();
 			}
 		}
 	}
