@@ -27,10 +27,10 @@ repositories {
 
 dependencies {
 	implementation group: "fr.nekotine", name: "NekotineCore", version: "+"
-    compileOnly group: "io.papermc.paper", name: "paper-api", version: "1.21.4-R0.1-SNAPSHOT"
+    compileOnly group: "io.papermc.paper", name: "paper-api", version: "1.21.7-R0.1-20250706.190012-14"
     compileOnly group: "de.maxhenkel.voicechat", name: "voicechat-api", version: "+"
 	compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "+"
-	compileOnly group: "dev.jorel", name: "commandapi-bukkit-core", version: "+"
+	compileOnly group: "dev.jorel", name: "commandapi-bukkit-core", version: "10.1.1"
 }
 
 // CONFIGURATION
@@ -68,5 +68,5 @@ tasks.register('dev', Copy) {
 	group = "developpement"
 	description = "Envoie le jar sur le server de développement"
 	from shadowJar
-	into DevServerPluginDirectory
+	into Vi6CleanServerPluginDirectory
 }

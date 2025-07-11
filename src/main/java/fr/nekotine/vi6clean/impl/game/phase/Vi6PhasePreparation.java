@@ -128,6 +128,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	@Override
 	public void itemTearDown(Player item) {
 		item.getInventory().remove(openMenuUsable.getItemStack());
+		item.setAllowFlight(false);
+		item.setFlying(false);
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -76,6 +77,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		if(pw.get().getTeam()==Vi6Team.THIEF) {
 			var effectModule = Ioc.resolve(StatusEffectModule.class);
 			effectModule.addEffect(wrapped, invisibleEffect);
+			pw.get().wrapped.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,-1,0,false));
 		}else {
 			defaultActionBar.addViewers(wrapped);
 		}

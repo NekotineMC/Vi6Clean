@@ -70,13 +70,13 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		openMenuUsable = new Usable(ItemStackUtil.make(Material.BEACON, Component.text("Menu Vi6", NamedTextColor.GOLD))) {
 			@Override
 			protected void OnInteract(PlayerInteractEvent e) {
-				Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).getMenu().displayTo(e.getPlayer());
+				Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).displayMenu();
 				e.setCancelled(true);
 			}
 			
 			@Override
 			protected void OnDrop(PlayerDropItemEvent e) {
-				Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).getMenu().displayTo(e.getPlayer());
+				Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class).displayMenu();
 				e.setCancelled(true);
 			}
 		}.register();

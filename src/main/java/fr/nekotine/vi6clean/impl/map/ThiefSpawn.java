@@ -20,13 +20,13 @@ public class ThiefSpawn {
 	
 	@GenerateCommandFor
 	@ComposingConfiguration
-	private Location minimapPosition = BukkitUtil.defaultLocation();
+	private BlockVector minimapPosition = new BlockVector();
 
 	public Location getSpawnPoint() {
 		return spawnPoint;
 	}
 
-	public Location getMinimapPosition() {
+	public BlockVector getMinimapPosition() {
 		return minimapPosition;
 	}
 

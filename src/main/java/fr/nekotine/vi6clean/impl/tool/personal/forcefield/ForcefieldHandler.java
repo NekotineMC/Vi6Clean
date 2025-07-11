@@ -201,8 +201,10 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		var gate = getTargetedGate(ff.getOwner());
 		if (gate != null) {
 			if (fieldsDisplay.get(gate).activated) {
+				ff.nbPosed = Math.max(0,ff.nbPosed-1);
 				removeField(gate);
-			}else {
+			}else if (ff.nbPosed >= FORCEFIELD_NB_MAX){
+				ff.nbPosed++;
 				placeField(gate);
 			}
 			return true;

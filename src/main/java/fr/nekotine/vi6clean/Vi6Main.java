@@ -1,11 +1,6 @@
 package fr.nekotine.vi6clean;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
-import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import dev.jorel.commandapi.CommandAPI;
-import dev.jorel.commandapi.CommandAPIBukkitConfig;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.executors.ExecutorType;
 import fr.nekotine.core.NekotinePlugin;
@@ -19,6 +14,8 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
+import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Vi6Main extends JavaPlugin{
 	
@@ -36,14 +33,18 @@ public class Vi6Main extends JavaPlugin{
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		var vc_service = getServer().getServicesManager().load(BukkitVoicechatService.class);
-		if (vc_service != null){
-			var vc_plugin = new Vi6VoiceChatPlugin();
-			Ioc.getProvider().registerSingleton(vc_plugin);
-			vc_service.registerPlugin(vc_plugin);
-			getLogger().info("Vi6Clean voice chat plugin hooked");
-		}else{
-			getLogger().info("Simple Voice Chat plugin not found");
+		try {
+			var vc_service = getServer().getServicesManager().load(BukkitVoicechatService.class);
+			if (vc_service != null) {
+				var vc_plugin = new Vi6VoiceChatPlugin();
+				Ioc.getProvider().registerSingleton(vc_plugin);
+				vc_service.registerPlugin(vc_plugin);
+				getLogger().info("Vi6Clean voice chat plugin hooked");
+			} else {
+				getLogger().info("Simple Voice Chat plugin not found");
+			}
+		}catch(NoClassDefFoundError e){
+			// ignore, ca arrive quand il n'y a pas SimpleVoiceChat
 		}
 		Vi6Styles.load();
 		var game = new Vi6Game();

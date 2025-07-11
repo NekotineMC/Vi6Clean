@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.wrapper;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -98,6 +99,9 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		runesToolbar.addTool(runesReadyItem);
 		runesToolbar.addTool(backItem);
 		runesMenu = new MenuInventory(runesToolbar,6);
+		if (team== Vi6Team.THIEF){
+			wrapped.setAllowFlight(true);
+		}
 	}
 
 	public MenuInventory getMenu() {
