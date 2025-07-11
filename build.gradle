@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '+'
-}
+}//
 
 repositories {
     mavenLocal()
