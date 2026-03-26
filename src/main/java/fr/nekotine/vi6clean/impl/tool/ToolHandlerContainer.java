@@ -2,17 +2,16 @@ package fr.nekotine.vi6clean.impl.tool;
 
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.reflexion.ReflexionUtil;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class ToolHandlerContainer {
 
-	private Logger logger = new NekotineLogger(getClass());
+	private final ComponentLogger logger = NekotineLogger.make();
 	
 	private Collection<ToolHandler<?>> toolHandlers = new LinkedList<>();
 	
@@ -34,7 +33,7 @@ public class ToolHandlerContainer {
 				logger.info(String.format("Type: %s",tool.getSimpleName()));
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Une erreur est survenue lors de l'ajout des class ToolHandler au registre", e);
+			logger.error("Une erreur est survenue lors de l'ajout des class ToolHandler au registre", e);
 		}
 	}
 	

@@ -14,12 +14,15 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import io.papermc.paper.dialog.Dialog;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
+import io.papermc.paper.registry.keys.DialogKeys;
 import net.kyori.adventure.dialog.DialogLike;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
@@ -31,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +100,6 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 		return Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class);
 	}
 
-	@SuppressWarnings("UnstableApiUsage") // Pour les dialogs
 	public void displayMenu() {
 		var game = Ioc.resolve(Vi6Game.class);
 		var mapModule = Ioc.resolve(MapModule.class);
@@ -138,7 +141,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 											game.setMapName(response.getText("map"));
 											setReadyForNextPhase(response.getBoolean("ready"));
 										},
-										ClickCallback.Options.builder().build()
+										ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()
 									))
 								.build(),
 							ActionButton.builder(Component.text("Annuler",NamedTextColor.RED))

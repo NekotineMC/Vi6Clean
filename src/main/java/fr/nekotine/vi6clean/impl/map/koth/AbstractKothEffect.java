@@ -1,8 +1,6 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.Configuration;
@@ -11,9 +9,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.vi6clean.constant.Vi6Team;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public abstract class AbstractKothEffect {
-	private final Logger logger = new NekotineLogger(getClass());
+	private final ComponentLogger logger = NekotineLogger.make();
 	private final String code;
 	private Koth koth;
 	private Configuration configuration;
@@ -23,7 +22,7 @@ public abstract class AbstractKothEffect {
 		try {
 			configuration = ConfigurationUtil.updateAndLoadYaml("koths/" + code + ".yml", "/koths/" + code + ".yml");
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration du koth " + code, e);
+			logger.error("Erreur lors du chargement du fichier de configuration du koth " + code, e);
 			configuration = new YamlConfiguration();
 		}
 	}

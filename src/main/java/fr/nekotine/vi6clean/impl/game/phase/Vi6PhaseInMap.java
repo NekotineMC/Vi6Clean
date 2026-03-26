@@ -5,12 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import de.maxhenkel.voicechat.api.BukkitVoicechatService;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -54,6 +49,7 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.DebugUtil;
+import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.InMapState;
@@ -68,14 +64,16 @@ import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
 	
-	private Logger logger = new NekotineLogger(getClass());
+	private final ComponentLogger logger = NekotineLogger.make();
 	
 	private Vi6Map map;
 	
@@ -203,12 +201,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			nbKothSpawned++;
 			var koth = koths.remove(0);
 			koth.setup(effect, world);
-			logger.log(Level.INFO, 
-					String.format("Spawning koth at %s (%s) typed %s",
+			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s",
 							koth.getName(),
 							koth.getDisplayLocation(),
 							effect.getCode()
-							));
+							)), NamedTextColor.GOLD);
 		}
 		game.getGuards().sendMessage(
 				Component.text("Koth", NamedTextColor.DARK_PURPLE)

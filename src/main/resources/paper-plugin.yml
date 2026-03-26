@@ -3,6 +3,7 @@ version: 1.0
 api-version: '1.21.11'
 author: XxGoldenbluexX
 load: POSTWORLD
+main: fr.nekotine.vi6clean.Vi6Main
 bootstrapper: fr.nekotine.vi6clean.Vi6Bootstrapper
 dependencies:
   server:

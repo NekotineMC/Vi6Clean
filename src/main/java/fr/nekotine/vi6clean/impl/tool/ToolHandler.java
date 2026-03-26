@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 import org.bukkit.Material;
@@ -22,7 +20,6 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
@@ -45,6 +42,7 @@ import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -59,7 +57,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
  */
 public abstract class ToolHandler<T extends Tool> implements Listener {
 
-	protected final Logger logger = new NekotineLogger(getClass());
+	protected final ComponentLogger logger = NekotineLogger.make();
 
 	private final Supplier<T> toolSupplier;
 
@@ -97,7 +95,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		try {
 			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + code + ".yml", "/tools/" + code + ".yml");
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Erreur lors du chargement du fichier de configuration de l'outil " + code, e);
+			logger.error("Erreur lors du chargement du fichier de configuration de l'outil " + code, e);
 			configuration = new YamlConfiguration();
 		}
 		//
@@ -170,12 +168,12 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			try {
 				detachFromOwner(tool);
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du detachement d'un outil " + code, e);
+				logger.error("Une erreur est survenue lors du detachement d'un outil " + code, e);
 			}
 			try {
 				tool.cleanup();
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Une erreur est survenue lors du cleanup d'un outil " + code, e);
+				logger.error("Une erreur est survenue lors du cleanup d'un outil " + code, e);
 			}
 		}
 		tools.clear();
@@ -388,7 +386,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return;
 		}
 		var slot = (int) emptySlots[random.nextInt(0, emptySlots.length)];
-		player.getEquipment().setItem(EquipmentSlot.valueOf(evt.getSlotType().name()), evt.getOldItem(), true);
+		player.getEquipment().setItem(evt.getSlot(), evt.getOldItem(), true);
 		player.getInventory().setItem(slot, evt.getNewItem());
 	}
 

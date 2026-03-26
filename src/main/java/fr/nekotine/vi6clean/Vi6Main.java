@@ -6,6 +6,7 @@ import dev.jorel.commandapi.executors.ExecutorType;
 import fr.nekotine.core.NekotinePlugin;
 import fr.nekotine.core.eventguard.PlayerDoubleEventGuard;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
@@ -14,8 +15,11 @@ import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class Vi6Main extends NekotinePlugin{
+	
+	private final ComponentLogger logger = NekotineLogger.make();
 	
 	@Override
 	public void onLoad() {
@@ -33,9 +37,9 @@ public class Vi6Main extends NekotinePlugin{
 				var vc_plugin = new Vi6VoiceChatPlugin();
 				Ioc.getProvider().registerSingleton(vc_plugin);
 				vc_service.registerPlugin(vc_plugin);
-				getLogger().info("Vi6Clean voice chat plugin hooked");
+				logger.info("SimpleVoiceChat plugin hooked");
 			} else {
-				getLogger().info("Simple Voice Chat plugin not found");
+				logger.info("SimpleVoiceChat plugin not found");
 			}
 		}catch(NoClassDefFoundError e){
 			// ignore, ca arrive quand il n'y a pas SimpleVoiceChat
@@ -50,6 +54,7 @@ public class Vi6Main extends NekotinePlugin{
 		container.discoverHandlers();
 		Ioc.getProvider().registerSingleton(container);
 		game.start();
+		
 	}
 	
 	@Override

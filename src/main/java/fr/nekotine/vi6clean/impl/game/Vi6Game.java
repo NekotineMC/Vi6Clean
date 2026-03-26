@@ -2,8 +2,6 @@ package fr.nekotine.vi6clean.impl.game;
 
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -41,10 +39,11 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	
-	private final Logger logger = new NekotineLogger(getClass());
+	private final ComponentLogger logger = NekotineLogger.make();
 
 	private String mapName;
 	
@@ -102,7 +101,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		try {
 			phaseMachine.goTo(Vi6PhaseLobby.class, null);;
 		}catch(Exception e){
-			logger.log(Level.SEVERE, "Une erreur est survenue lors du chargement de la game", e);
+			logger.error("Une erreur est survenue lors du chargement de la game", e);
 		}
 		EventUtil.register(this);
 	}
@@ -115,7 +114,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 			scoreboardGuard.unregister();
 			scoreboardThief.unregister();
 		}catch(Exception e) {
-			logger.log(Level.SEVERE, "Un erreur est survenur lors du déchargement de la game", e);
+			logger.error("Un erreur est survenur lors du déchargement de la game", e);
 		}
 	}
 	
