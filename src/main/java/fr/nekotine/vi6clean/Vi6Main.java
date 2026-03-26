@@ -19,7 +19,7 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class Vi6Main extends NekotinePlugin{
 	
-	private final ComponentLogger logger = NekotineLogger.make();
+	private final ComponentLogger logger = NekotineLogger.make(this);
 	
 	@Override
 	public void onLoad() {
