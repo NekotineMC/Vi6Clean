@@ -1,16 +1,13 @@
 name: Vi6Clean
 version: 1.0
 main: fr.nekotine.vi6clean.Vi6Main
-api-version: '1.21.7'
+api-version: '1.21.11'
 author: XxGoldenbluexX
 load: POSTWORLD
+bootstrapper: fr.nekotine.vi6clean.Vi6Bootstrapper
 dependencies:
   server:
     ProtocolLib:
-      load: BEFORE
-      required: true
-      join-classpath: true
-    CommandAPI:
       load: BEFORE
       required: true
       join-classpath: true

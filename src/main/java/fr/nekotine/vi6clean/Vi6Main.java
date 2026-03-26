@@ -7,7 +7,6 @@ import fr.nekotine.core.NekotinePlugin;
 import fr.nekotine.core.eventguard.PlayerDoubleEventGuard;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
-import fr.nekotine.core.setup.PluginBuilder;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -15,19 +14,14 @@ import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
-public class Vi6Main extends JavaPlugin{
-	
-	private NekotinePlugin nekotinePlugin;
+public class Vi6Main extends NekotinePlugin{
 	
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		var builder = new PluginBuilder(this);
-		builder.mapCommandsFor(Vi6Map.class);
+		mapCommandsFor(Vi6Map.class);
 		gameCommands();
-		nekotinePlugin = builder.build();
 	}
 	
 	@Override
@@ -62,13 +56,12 @@ public class Vi6Main extends JavaPlugin{
 	public void onDisable() {
 		var game = Ioc.resolve(Vi6Game.class);
 		game.close();
-		nekotinePlugin.disable();
 		super.onDisable();
 	}
 	
 	private void gameCommands() {
 		var gameC = new CommandAPICommand("game");
-		var sub = new CommandAPICommand("lobby").executes(e -> {
+		var sub = new CommandAPICommand("lobby").executes(_ -> {
 			Ioc.resolve(Vi6Game.class).start();
 		}, ExecutorType.ALL);
 		gameC.withSubcommand(sub);

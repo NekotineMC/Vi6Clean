@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.scanner;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -181,7 +182,7 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 		var metadataPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		metadataPacket.getIntegers().write(0, eid);										// Entity id
 		var dataValues = new ArrayList<WrappedDataValue>(2);
-		var serializer = WrappedDataWatcher.Registry.get(Byte.class);
+		var serializer = WrappedDataWatcher.Registry.get((Type)Byte.class);
 		dataValues.add(new WrappedDataValue(0, serializer, (byte)(0x20 | 0x40))); 		// Invisible + Glowing effect
 		dataValues.add(new WrappedDataValue(15, serializer, (byte)(0x04 | 0x08))); 		// Has arm + no BasePlate
 		metadataPacket.getDataValueCollectionModifier().write(0, dataValues);

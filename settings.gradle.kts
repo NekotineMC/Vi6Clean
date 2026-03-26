@@ -5,6 +5,8 @@
 include ':NekotineCore'
 project(':NekotineCore').projectDir = new File('../NekotineCore')
 */
-rootProject.name = 'Vi6Clean'
+rootProject.name = "Vi6Clean"
 
-includeBuild("../NekotineCore")
+includeBuild("../NekotineCore")/*{
+	name = "nekotinecore"
+}*/

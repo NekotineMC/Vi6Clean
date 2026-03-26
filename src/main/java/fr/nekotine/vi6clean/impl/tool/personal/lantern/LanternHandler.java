@@ -22,7 +22,7 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 @ToolCode("lantern")
 public class LanternHandler extends ToolHandler<Lantern>{
 	private final ItemStack NO_LANTERN_ITEMSTACK = ItemStackUtil.make(
-			Material.CHAIN, 1,
+			Material.IRON_CHAIN, 1,
 			getDisplayName(), 
 			getLore());
 	private final int MAX_LANTERN = getConfiguration().getInt("max_lantern",2);	
