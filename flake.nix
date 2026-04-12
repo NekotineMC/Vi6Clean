@@ -19,8 +19,9 @@
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            gradle
+            gradle_9
             jdt-language-server
+            jdk25_headless
           ];
         };
       }
