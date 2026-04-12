@@ -8,3 +8,4 @@ lore:
    - <lore><important>Désactive</important> pendant <variable><duration>s</variable> les <important>objets ennemis</important>.
 team:
    - thief
+   - guard

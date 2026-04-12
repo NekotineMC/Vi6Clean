@@ -1,0 +1,12 @@
+display_name: <gold>Minifier</gold>
+price: 600
+amount_limit: 1
+shop_icon: OXIDIZED_COPPER_GOLEM_STATUE
+scale_multiplier: 0.5 #délai du scan en secondes
+gravity_multiplier: 0.5 #durée du scan en secondes 
+is_rune: true
+lore:
+   - <lore>Vous permet de <important>rétrécir</important>
+   - <lore>Réduit aussi la gravité.
+team:
+   - thief

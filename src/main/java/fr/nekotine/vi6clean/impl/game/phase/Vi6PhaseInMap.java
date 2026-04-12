@@ -9,7 +9,10 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.Material;
+import org.bukkit.block.Container;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -154,6 +157,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var world = w.get();
 		world.setTime(DayTime.MIDNIGHT);
 		game.setWorld(world);
+		world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
 		Ioc.getProvider().registerSingleton(map);
 		// LOAD MAP END
 		var artefacts = map.getArtefacts();
@@ -384,6 +388,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 	@EventHandler
 	private void onPlayerDeath(PlayerDeathEvent evt) {
+		if (evt.isCancelled()) {
+			return;
+		}
 		var game = Ioc.resolve(Vi6Game.class);
 		var player = evt.getPlayer();
 		if (game.getThiefs().contains(evt.getPlayer())){
@@ -440,8 +447,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	}
 	@EventHandler
 	public void interactEvent(PlayerInteractEvent e) {
-		if(e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType()==Material.RESPAWN_ANCHOR) 
+		if(e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType()==Material.RESPAWN_ANCHOR) {
 			e.setCancelled(true);
+		}
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getState() instanceof Container) {
+			e.setCancelled(true);
+		}
 		
 	}
 	@EventHandler

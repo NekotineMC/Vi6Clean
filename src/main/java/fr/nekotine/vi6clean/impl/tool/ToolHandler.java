@@ -1,28 +1,33 @@
 package fr.nekotine.vi6clean.impl.tool;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemFlag;
-
-import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.inventory.ItemStackBuilder;
@@ -33,13 +38,14 @@ import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
+import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
-import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
@@ -57,50 +63,60 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
  */
 public abstract class ToolHandler<T extends Tool> implements Listener {
 
+	public static NamespacedKey TOOL_TYPE_KEY = new NamespacedKey(Ioc.resolve(JavaPlugin.class), "tool/type");
+	
+	public static NamespacedKey TOOL_ID_KEY = new NamespacedKey(Ioc.resolve(JavaPlugin.class), "tool/id");
+	
 	protected final ComponentLogger logger = NekotineLogger.make();
 
-	private final Supplier<T> toolSupplier;
+	private final Function<ToolHandler<?>,T>  toolSupplier;
 
-	private final Collection<T> tools = new LinkedList<>();
+	private final Map<Integer,T> tools = new HashMap<>();
+	
+	private boolean active;
 
-	private final Random random = new Random();
-
-	private String code;
-
-	private final MenuElement shopItem;
-
-	private Material iconMaterial;
-
+	private final String toolCode;
+	
+	// configuartion
+	
+	private Configuration configuration;
+	
 	private final Component displayName;
-
+	
+	private final List<Component> lore;
+	
 	private final int price;
 
 	private final int limite;
 
 	private final boolean isRune;
 
-	protected final List<Component> lore;
-
-	private boolean active;
-
-	private Configuration configuration;
-
 	private final Set<Vi6Team> forTeams = new HashSet<>(2);
 
-	public ToolHandler(Supplier<T> toolSupplier) {
+	public ToolHandler(Function<ToolHandler<?>,T> toolSupplier) {
 		this.toolSupplier = toolSupplier;
+		
+		// Fetch code on annotation
 		var an = getClass().getDeclaredAnnotation(ToolCode.class);
-		code = an.value();
+		toolCode = an.value();
+		
 		// load configuration
 		try {
-			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + code + ".yml", "/tools/" + code + ".yml");
+			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + toolCode + ".yml", "/tools/" + toolCode + ".yml");
 		} catch (IOException e) {
-			logger.error("Erreur lors du chargement du fichier de configuration de l'outil " + code, e);
+			logger.error("Erreur lors du chargement du fichier de configuration de l'outil " + toolCode, e);
 			configuration = new YamlConfiguration();
 		}
-		//
+		
+		// fetch values from configuration
 		isRune = configuration.getBoolean("is_rune", false);
-		// Lore construction
+		limite = configuration.getInt("amount_limit", -1);
+		price = configuration.getInt("price", 9999);
+		displayName = Ioc
+				.resolve(TextModule.class).message(Leaf.builder()
+						.addLine(configuration.getString("display_name", "Unnamed")).addStyle(NekotineStyles.NEKOTINE))
+				.buildFirst();
+		// fetch lore
 		var loreTagResolvers = new LinkedList<TagResolver>();
 		for (var key : configuration.getKeys(false)) {
 			if (key.equalsIgnoreCase("lore")) {
@@ -112,26 +128,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		var serializedLore = configuration.getStringList("lore");
 		lore = Ioc.resolve(TextModule.class).message(Leaf.builder().addLine(serializedLore.toArray(String[]::new))
 				.addStyle(Vi6Styles.TOOL_LORE).addStyle(loreTagResolvers.toArray(TagResolver[]::new))).build();
-		// Values
-		limite = configuration.getInt("amount_limit", -1);
-		price = configuration.getInt("price", 9999);
-		displayName = Ioc
-				.resolve(TextModule.class).message(Leaf.builder()
-						.addLine(configuration.getString("display_name", "Unnamed")).addStyle(NekotineStyles.NEKOTINE))
-				.buildFirst();
-		// Shop item
-		iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
-		var shopLore = new LinkedList<Component>(lore);
-		shopLore.add(Component.empty());
-		if (!isRune) {
-			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
-		}
-		var menuItem = new ItemStackBuilder(iconMaterial)
-				.name(displayName)
-				.lore(shopLore)
-				.flags(ItemFlag.values())
-				.build();
-		shopItem = new ActionMenuItem(menuItem, this::tryBuy);
+		// fetch available teams
 		var teams = configuration.getStringList("team");
 		if (teams.stream().anyMatch(s -> s.equalsIgnoreCase("guard"))) {
 			forTeams.add(Vi6Team.GUARD);
@@ -164,178 +161,14 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	public final void removeAll() {
-		for (var tool : tools) {
-			try {
-				detachFromOwner(tool);
-			} catch (Exception e) {
-				logger.error("Une erreur est survenue lors du detachement d'un outil " + code, e);
-			}
-			try {
-				tool.cleanup();
-			} catch (Exception e) {
-				logger.error("Une erreur est survenue lors du cleanup d'un outil " + code, e);
-			}
-		}
+		tools.values().forEach(this::remove);
 		tools.clear();
 	}
-
-	/**
-	 * Try to make and attach new tool to player. Attachment can be denied if there
-	 * is a limit on this type of tool. If tool attachment is denied, the new tool
-	 * is discarded.
-	 * 
-	 * @param player
-	 * @return If tool could be attached.
-	 */
-	public final T attachNewToPlayer(Player player) {
-		var tool = toolSupplier.get();
-		tool.setHandler(this);
-		if (attachToPlayer(tool, player)) {
-			player.getInventory().addItem(tool.getItemStack());
-			tools.add(tool);
-			return tool;
-		}
-		return null;
-	}
-
-	/**
-	 * Try to attach tool to player. Attachment can be denied if there is a limit on
-	 * this type of tool
-	 * 
-	 * @param player
-	 * @return If tool could be attached.
-	 */
-	public final boolean attachToPlayer(T tool, Player player) {
-		if (limite >= 0 && limite <= tools.stream().filter(t -> player.equals(t.getOwner())).count()) {
-			return false;
-		}
-		tool.setOwner(player);
-		onAttachedToPlayer(tool, player);
-		return true;
-	}
-
-	public final void detachFromOwner(T tool) {
-		var owner = tool.getOwner();
-		if (owner == null) {
-			return;
-		}
-		owner.getInventory().remove(tool.getItemStack());
-		onDetachFromPlayer(tool, owner);
-		tool.setOwner(null);
-	}
-
-	public final void remove(T tool) {
-		detachFromOwner(tool);
-		tool.cleanup();
-		tools.remove(tool);
-	}
-
-	protected void onStartHandling() {
-	}
-
-	protected void onStopHandling() {
-	}
-
-	protected abstract void onAttachedToPlayer(T tool, Player player);
-
-	protected abstract void onDetachFromPlayer(T tool, Player player);
-
-	public Collection<T> getTools() {
-		return tools;
-	}
-
-	public MenuElement getShopMenuItem() {
-		return shopItem;
-	}
-
-	public List<Component> getLore() {
-		return lore;
-	}
-
-	public Component getDisplayName() {
-		return displayName;
-	}
-
-	public Set<Vi6Team> getTeamsAvailableFor() {
-		return forTeams;
-	}
-
-	/**
-	 * 
-	 * @param player
-	 * @return buy succesfull
-	 */
-	public boolean tryBuy(InventoryClickEvent evt) {
-		if (!(evt.getWhoClicked() instanceof Player player)) {
-			return false;
-		}
-		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player,
-				PreparationPhasePlayerWrapper.class);
-		if (optionalWrap.isEmpty()) {
-			return false;
-		}
-		var wrap = optionalWrap.get();
-		if (!isRune) {
-			if (wrap.getMoney() >= price && attachNewToPlayer(player) != null) {
-				wrap.setMoney(wrap.getMoney() - price);
-				return true;
-			}
-		}else {
-			var r = wrap.getRune();
-			if (r != null) {
-				r.getHandler().trySell(player, r);
-			}
-			var t = attachNewToPlayer(player);
-			if (t != null) {
-				wrap.setRune(t);
-				return true;
-			}
-		}
-		return false;
-	}
 	
-	public int getPrice() {
-		return price;
-	}
-
-	/**
-	 * 
-	 * @param player
-	 * @param tool
-	 * @return La vente n'as pas eu lieu
-	 */
-	public boolean trySell(Player player, Tool tool) {
-		if (tool.getHandler() != this) {
-			return false;
-		}
-		@SuppressWarnings("unchecked")
-		T t = (T)tool;
-		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty()) {
-			return false;
-		}
-		var sellEvent = new PlayerSellToolEvent(player, tool, price);
-		EventUtil.call(sellEvent);
-		if (sellEvent.isCancelled()) {
-			return false;
-		}
-		remove(t);
-		if (!isRune) {
-			var wrap = optWrap.get();
-			wrap.setMoney(wrap.getMoney() + sellEvent.getPrice());
-		}
-		return true;
-	}
-
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent evt) {
-		var optionalTool = tools.stream().filter(t -> evt.getItemDrop().getItemStack().equals(t.getItemStack()))
-				.findFirst();
-		if (optionalTool.isEmpty()) {
-			return;
-		}
-		var tool = optionalTool.get();
-		if (evt.getPlayer().equals(tool.getOwner())) {
+		var tool = getToolFromItem(evt.getItemDrop().getItemStack());
+		if (tool != null) {
 			detachFromOwner(tool);
 		}
 	}
@@ -345,76 +178,234 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getEntity() instanceof Player player)) {
 			return;
 		}
-		var optionalTool = tools.stream()
-				.filter(t -> t.getOwner() == null && evt.getItem().getItemStack().equals(t.getItemStack())).findFirst();
-		if (optionalTool.isEmpty()) {
+		
+		var tool = getToolFromItem(evt.getItem().getItemStack());
+		if (tool == null) {
 			return;
 		}
-		if (!attachToPlayer(optionalTool.get(), player)) {
+		// On limite le nombre d'items de ce type dans l'inventaire du joueur
+		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite) {
 			evt.setCancelled(true);
+			return;
+		}
+		attachToPlayer(tool, player);
+		/*
+		evt.setCancelled(true);
+		evt.getItem().remove();
+		*/
+	}
+	
+	public final T makeNewTool() {
+		var tool = toolSupplier.apply(this);
+		tools.put(tool.getId(), tool);
+		return tool;
+	}
+
+	/**
+	 * Try to attach tool to player. remove previous attachment if existing
+	 * 
+	 */
+	public final void attachToPlayer(T tool, Player player) {
+		detachFromOwner(tool);
+		tool.setOwner(player);
+		var inventory = player.getInventory();
+		if (!InventoryUtil.anyMatch(inventory, i -> itemMatch(tool, i))) {
+			var item = makeItem(tool);
+			// Add some specification to item
+			AssertUtil.nonNull(item);
+			if (!item.getPersistentDataContainer().getKeys().containsAll(Set.of(ToolHandler.TOOL_TYPE_KEY, ToolHandler.TOOL_ID_KEY))) {
+				// Edit item's content
+				item.editPersistentDataContainer(pdc -> {
+					pdc.set(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING, toolCode);
+					pdc.set(ToolHandler.TOOL_ID_KEY, PersistentDataType.INTEGER, tool.getId());
+				});
+				if (item.hasData(DataComponentTypes.EQUIPPABLE)) {
+					item.unsetData(DataComponentTypes.EQUIPPABLE);
+				}
+			}
+			inventory.addItem();
+		}
+		onAttachedToPlayer(tool);
+	}
+
+	public final void detachFromOwner(T tool) {
+		var owner = tool.getOwner();
+		if (owner == null) {
+			return;
+		}
+		onDetachFromPlayer(tool);
+		InventoryUtil.removeIf(owner.getInventory(), item -> {
+			var pdc = item.getPersistentDataContainer();
+			return pdc.get(TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
+		});
+		tool.setOwner(null);
+	}
+
+	public final void remove(T tool) {
+		detachFromOwner(tool);
+		onToolCleanup(tool);
+		tools.remove(tool.getId());
+	}
+	
+	private final void removeGeneric(Tool tool) {
+		@SuppressWarnings("unchecked")
+		var typed = (T)tool;
+		detachFromOwner(typed);
+		onToolCleanup(typed);
+		tools.remove(typed.getId());
+	}
+
+	protected void onStartHandling() {
+	}
+
+	protected void onStopHandling() {
+	}
+
+	protected abstract void onAttachedToPlayer(T tool);
+
+	protected abstract void onDetachFromPlayer(T tool);
+	
+	protected abstract void onToolCleanup(T tool);
+	
+	protected abstract ItemStack makeItem(T tool);
+
+	public Collection<T> getTools() {
+		return tools.values();
+	}
+
+	public MenuElement makeShopMenuItem() {
+		// Shop item
+		var iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
+		//
+		var shopLore = new LinkedList<Component>(getLore());
+		shopLore.add(Component.empty());
+		if (!isRune) {
+			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
+		}
+		//
+		var menuItem = new ItemStackBuilder(iconMaterial)
+				.name(displayName)
+				.lore(shopLore)
+				.flags(ItemFlag.values())
+				.build();
+		//
+		return new ActionMenuItem(menuItem, this::tryBuy);
+	}
+
+	public List<Component> getLore() {
+		return lore;
+	}
+
+	public Component getDisplayName() {
+		return displayName;
+	}
+	
+	public int getPrice() {
+		return price;
+	}
+
+	public Set<Vi6Team> getTeamsAvailableFor() {
+		return forTeams;
+	}
+	
+	public T getToolFromItem(ItemStack item) {
+		var pdc = item.getPersistentDataContainer();
+		if (pdc.get(TOOL_TYPE_KEY, PersistentDataType.STRING) != toolCode) {
+			return null;
+		}
+		var id = pdc.get(TOOL_ID_KEY, PersistentDataType.INTEGER);
+		if (id == null) {
+			return null;
+		}
+		return tools.get(id);
+	}
+
+	public void tryBuy(InventoryClickEvent evt) {
+		if (!(evt.getWhoClicked() instanceof Player player)) {
+			return;
+		}
+		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite) {
+			evt.setCancelled(true);
+			return;
+		}
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player,
+				PreparationPhasePlayerWrapper.class);
+		if (optionalWrap.isEmpty()) {
+			return;
+		}
+		var wrap = optionalWrap.get();
+		if (!isRune) {
+			if (wrap.getMoney() >= price) {
+				wrap.setMoney(wrap.getMoney() - price);
+				var tool = makeNewTool();
+				attachToPlayer(tool, player);
+			}
+		}else {
+			var r = wrap.getRune();
+			if (r != null) {
+				r.getHandler().removeGeneric(r);
+			}
+			var tool = makeNewTool();
+			attachToPlayer(tool, player);
+			wrap.setRune(tool);
 		}
 	}
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent evt) {
-		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction.PICKUP_HALF) {
+		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction. PICKUP_HALF) {
 			return;
 		}
+		var tool = getToolFromItem(evt.getCurrentItem());
+		if (tool == null) {
+			return;
+		}
+		// Check if inventory is the shop menu
 		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
 		if (optWrap.isEmpty() || optWrap.get().getMenu().getInventory() != evt.getInventory()) {
 			return;
 		}
-		var match = tools.stream()
-				.filter(t -> t.getItemStack().isSimilar(evt.getCurrentItem()) && t.getOwner() == evt.getWhoClicked())
-				.findFirst();
-		if (match.isEmpty()) {
-			return;
+		remove(tool);
+		if (!isRune) {
+			var wrap = optWrap.get();
+			wrap.setMoney(wrap.getMoney() + price);
 		}
-		trySell(player, match.get());
 	}
-
+	
 	@EventHandler
-	public void onPlayerArmorChange(PlayerArmorChangeEvent evt) {
-		var match = tools.stream().filter(t -> t.getItemStack().equals(evt.getNewItem())).findFirst();
-		if (match.isEmpty()) {
+	private void onPlayerDeath(PlayerDeathEvent evt) {
+		if (evt.isCancelled()) {
 			return;
 		}
-		var player = evt.getPlayer();
-		var storage = player.getInventory().getStorageContents();
-		var emptySlots = IntStream.range(0, storage.length).filter(i -> storage[i] == null).mapToObj(i -> i).toArray();
-		if (emptySlots.length == 0) {
-			return;
-		}
-		var slot = (int) emptySlots[random.nextInt(0, emptySlots.length)];
-		player.getEquipment().setItem(evt.getSlot(), evt.getOldItem(), true);
-		player.getInventory().setItem(slot, evt.getNewItem());
+		tools.values().stream().filter(tool -> evt.getPlayer().equals(tool.getOwner())).forEach(this::detachFromOwner);
 	}
 
 	public boolean isActive() {
 		return active;
 	}
 
-	@EventHandler
-	public void onEntityEmpStart(EntityEmpStartEvent evt) {
-		if (!(evt.getEntity() instanceof Player player))
-			return;
-		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty())
-			return;
-		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpStart());
-	}
-
-	@EventHandler
-	public void onEntityEmpEnd(EntityEmpEndEvent evt) {
-		if (!(evt.getEntity() instanceof Player player))
-			return;
-		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PreparationPhasePlayerWrapper.class);
-		if (optWrap.isEmpty())
-			return;
-		tools.stream().filter(t -> player.equals(t.getOwner())).forEach(t -> t.onEmpEnd());
-	}
-
 	public boolean isRune() {
 		return isRune;
+	}
+	
+	public String getToolCode() {
+		return toolCode;
+	}
+	
+	public void editItem(Tool tool, Consumer<ItemStack> action) {
+		AssertUtil.nonNull(tool);
+		var owner = tool.getOwner();
+		if (owner == null) {
+			return;
+		}
+		Arrays.stream(owner.getInventory().getContents()).filter(i -> itemMatch(tool, i)).forEach(action);
+	}
+	
+	public final boolean itemMatch(Tool tool,ItemStack item) {
+		if (item == null) {
+			return false;
+		}
+		var pdc = item.getPersistentDataContainer();
+		return pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.INTEGER) == tool.getId();
 	}
 }

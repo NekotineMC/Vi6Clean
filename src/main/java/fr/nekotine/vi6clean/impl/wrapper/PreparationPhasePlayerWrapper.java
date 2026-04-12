@@ -68,7 +68,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 				.filter(t -> t.getTeamsAvailableFor().contains(team) && !t.isRune())
 				.sorted((a,b)->{return b.getPrice()-a.getPrice();})
 				.collect(Collectors.toCollection(ArrayList::new))){
-			wrapLayout.addElement(tool.getShopMenuItem());
+			wrapLayout.addElement(tool.makeShopMenuItem());
 		}
 		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
 		toolbar.addTool(readyItem);
@@ -93,7 +93,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 				.filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune())
 				.sorted((a,b)->{return b.getPrice()-a.getPrice();})
 				.collect(Collectors.toCollection(ArrayList::new))){
-			runesWrapLayout.addElement(tool.getShopMenuItem());
+			runesWrapLayout.addElement(tool.makeShopMenuItem());
 		}
 		var runesToolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.BLUE_STAINED_GLASS_PANE,Component.empty()), runesWrapLayout);
 		runesToolbar.addTool(runesReadyItem);

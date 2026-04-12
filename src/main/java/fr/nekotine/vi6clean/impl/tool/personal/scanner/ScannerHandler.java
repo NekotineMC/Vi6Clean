@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,6 +26,7 @@ import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.ItemStackUtil;
@@ -39,7 +41,7 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 @ToolCode("scanner")
-public class ScannerHandler extends ToolHandler<Scanner>{
+public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 	private final int SCAN_DELAY_TICK = (int)(20*getConfiguration().getDouble("delay",30));
 	
 	private final int SCAN_LIFETIME_TICK = (int)(20*getConfiguration().getDouble("duration",30));
@@ -48,12 +50,6 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 	
 	public ScannerHandler() {
 		super(Scanner::new);
-	}
-	@Override
-	protected void onAttachedToPlayer(Scanner tool, Player player) {
-	}
-	@Override
-	protected void onDetachFromPlayer(Scanner tool, Player player) {
 	}
 	
 	public void startScanning() {
@@ -199,4 +195,31 @@ public class ScannerHandler extends ToolHandler<Scanner>{
 				
 		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket, equipPacket});
 	}
+	@Override
+	protected void onAttachedToPlayer(Scanner tool) {
+	}
+	@Override
+	protected void onDetachFromPlayer(Scanner tool) {
+	}
+	@Override
+	protected void onToolCleanup(Scanner tool) {
+	}
+	@Override
+	protected ItemStack makeItem(Scanner tool) {
+		return new ItemStackBuilder(Material.CLOCK)
+				.name(getDisplayName())
+				.lore(getLore())
+				.unstackable()
+				.flags(ItemFlag.values())
+				.build();
+	}
+	
+	public static class Scanner extends Tool{
+
+		public Scanner(ToolHandler<?> handler) {
+			super(handler);
+		}
+		
+	}
+	
 }

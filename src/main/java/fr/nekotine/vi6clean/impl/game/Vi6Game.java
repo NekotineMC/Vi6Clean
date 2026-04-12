@@ -1,6 +1,8 @@
 package fr.nekotine.vi6clean.impl.game;
 
+import java.time.Duration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -26,6 +28,7 @@ import fr.nekotine.core.map.MapModule;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
@@ -33,13 +36,24 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.game.team.GuardTeam;
 import fr.nekotine.vi6clean.impl.game.team.ThiefTeam;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.connection.PlayerGameConnection;
+import io.papermc.paper.dialog.Dialog;
+import io.papermc.paper.event.player.PlayerCustomClickEvent;
+import io.papermc.paper.registry.data.dialog.ActionButton;
+import io.papermc.paper.registry.data.dialog.DialogBase;
+import io.papermc.paper.registry.data.dialog.action.DialogAction;
+import io.papermc.paper.registry.data.dialog.input.DialogInput;
+import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
+import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	
@@ -275,6 +289,60 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		if (next != null && next.getType() == Material.LEATHER_HORSE_ARMOR){
 			Ioc.resolve(Vi6Game.class).getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE,1.0f,2f));
 		}
+	}
+	
+	@EventHandler
+	private void onDialogCustomClick(PlayerCustomClickEvent evt) {
+		if (!(evt.getCommonConnection() instanceof PlayerGameConnection conn)) {
+			return;
+		}
+		var player = conn.getPlayer();
+		switch (evt.getIdentifier().asString()) {
+		case Vi6Keys.DIALOG_GAME_SETTINGS:
+			// open game settings dialog
+			displayGameSettingsDialog(player);
+			break;
+		default:
+			break;
+			
+		}
+	}
+	
+	private void displayGameSettingsDialog(Player player) {
+		var game = Ioc.resolve(Vi6Game.class);
+		var mapModule = Ioc.resolve(MapModule.class);
+		var maps = mapModule.listMaps();
+		var dialog = Dialog.create(builder -> builder.empty()
+				.base(DialogBase.builder(MiniMessage.miniMessage().deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
+						.canCloseWithEscape(true)
+						.pause(false)
+						.inputs(List.of(
+								DialogInput.singleOption("map",Component.text("Carte"),maps.stream().map(mapMetadata ->
+										SingleOptionDialogInput.OptionEntry.create(mapMetadata.getName(),mapMetadata.getDisplayName(),mapMetadata.getName()==game.getMapName())
+								).toList()).build(),
+								DialogInput.bool("debug",MiniMessage.miniMessage().deserialize ("Activer le mode debug <yellow>⚠"))
+										.initial(game.isDebug())
+										.build()
+						))
+						.build())
+				.type(
+					DialogType.confirmation(
+							ActionButton.builder(Component.text("Enregistrer",NamedTextColor.GREEN))
+									.action(DialogAction.customClick((response,audiance) -> {
+											game.setDebug(response.getBoolean("debug"));
+											game.setMapName(response.getText("map"));
+											var mapMetadata = Ioc.resolve(MapModule.class).getMapMetadata(response.getText("map"));
+											audiance.sendMessage(Component.text("Carte selectionnée: ").append(mapMetadata.getDisplayName()));
+											audiance.sendMessage(Component.text("Mode débug: ").append(Component.text(response.getBoolean("debug")?"Activé":"Désactivé")));
+										},
+										ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()
+									))
+								.build(),
+							ActionButton.builder(Component.text("Annuler",NamedTextColor.RED))
+									.build()
+				))
+		);
+		player.showDialog(dialog);
 	}
 
 }

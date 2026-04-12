@@ -5,153 +5,287 @@ import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.impl.status.flag.OmniCaptedStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("omnicaptor")
-public class OmniCaptorHandler extends ToolHandler<OmniCaptor>{
-	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",3);
-	private final int EFFECT_DURATION = (int)(20 * getConfiguration().getDouble("duration",1));
+public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>{
+	
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",4);
+	
+	private final int EFFECT_DURATION = (int)(20 * getConfiguration().getDouble("duration",3));
+	
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	private final ItemStack DISPONIBLE_ITEM () {return new ItemStackBuilder(Material.REPEATER)
-			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE)))
-			.lore(getLore())
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
-	}
-	private final ItemStack PLACED_ITEM () {return new ItemStackBuilder(Material.LEVER)
-			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY)))
-			.lore(getLore())
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
-	}
-	private final ItemStack TRIGGERED_ITEM () {return new ItemStackBuilder(Material.REDSTONE_TORCH)
-			.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Activé", NamedTextColor.RED)))
-			.lore(getLore())
-			.unstackable()
-			.flags(ItemFlag.values())
-			.build();
-	}
+	
+	private StatusEffect temporaryEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), EFFECT_DURATION);
+	
+	private StatusEffect unlimitedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
 	
 	public OmniCaptorHandler() {
 		super(OmniCaptor::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
-
-	@Override
-	protected void onAttachedToPlayer(OmniCaptor tool, Player player) {
-		tool.setSneaking(false);
-	}
-
-	@Override
-	protected void onDetachFromPlayer(OmniCaptor tool, Player player) {
-	}
 	
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
-		if (evt.getHand() != EquipmentSlot.HAND) {
+		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
-		var evtP = evt.getPlayer();
-		var optionalTool = getTools().stream().filter(t -> evtP.equals(t.getOwner()) && t.getItemStack().isSimilar(evt.getItem())).findFirst();
-		if (optionalTool.isEmpty()) {
+		var tool = getToolFromItem(evt.getItem());
+		if (tool == null) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY) && optionalTool.get().tryPickup()) {
-			evt.setCancelled(true);
+		var player = evt.getPlayer();
+		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
+			// TRY PICKUP
+			var ploc = player.getLocation();
+			if (tool.placed != null) {
+				if (ploc.distanceSquared(tool.placed.getLocation()) <= DETECTION_RANGE_SQUARED) {
+					tool.placed.remove();
+					tool.placed = null;
+					Vi6Sound.OMNICAPTEUR_PICKUP.play(ploc.getWorld(),ploc);
+					editItem(tool, item -> {
+						item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+						item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE))));
+					});
+					var flagModule = Ioc.resolve(StatusFlagModule.class);
+					for (var p : tool.ennemiesInRange) {
+						flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
+					}
+					tool.ennemiesInRange.clear();
+					evt.setCancelled(true);
+				}
+			}
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && optionalTool.get().tryPlace()) {
-			evt.setCancelled(true);
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
+			// TRY PLACE
+			var ploc = player.getLocation();
+			if (tool.placed == null) {
+				if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
+					tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
+						if (e instanceof ItemDisplay display) {
+							display.setPersistent(false);
+							var stack = new ItemStack(Material.REDSTONE_TORCH);
+							stack.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+							display.setItemStack(stack);
+						}
+					});
+					Vi6Sound.OMNICAPTEUR_PLACE.play(ploc.getWorld(),ploc);
+					editItem(tool, item -> {
+						item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
+						item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY))));
+					});
+					evt.setCancelled(true);
+				}
+			}
 		}
 	}
 	
 	@EventHandler
 	private void onPlayerToggleSneak(PlayerToggleSneakEvent evt) {
-		var tools = getTools().stream().filter(t -> evt.getPlayer().equals(t.getOwner())).collect(Collectors.toUnmodifiableSet());
-		for (var tool : tools) {
-			tool.setSneaking(evt.isSneaking());
+		var player = evt.getPlayer();
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
+		for (var item : InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, getToolCode())) {
+			var tool = getToolFromItem(item);
+			if (tool.sneaking != evt.isSneaking()) {
+				tool.sneaking = evt.isSneaking();
+				if (tool.placed != null) {
+					if (tool.sneaking) {
+						glowModule.glowEntityFor(tool.placed, tool.getOwner());
+					}else {
+						glowModule.unglowEntityFor(tool.placed, tool.getOwner());
+					}
+				}
+			}
 		}
 	}
 	
-	private Collection<Player> inRange(ArmorStand as, OmniCaptor captor) {
-		return captor.getEnemyTeam()
+	private Collection<Player> inRange(Entity as, OmniCaptor captor) {
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var wrapper = wrappingModule.getWrapper(captor.getOwner(), PlayerWrapper.class);
+		return wrapper.ennemiTeamInMap()
 		.filter(ennemi -> ennemi.getLocation().distanceSquared(as.getLocation()) <= DETECTION_RANGE_SQUARED)
 		.collect(Collectors.toCollection(LinkedList::new));
 	}
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		var effectModule = Ioc.resolve(StatusEffectModule.class);
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
-			var as = tool.getPlaced();
-			if (as == null) {
-				if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
-					tool.lowTick();
+			var owner = tool.getOwner();
+			if (owner == null) {
+				continue;
+			}
+			if (tool.placed == null) {
+				if (evt.timeStampReached(TickTimeStamp.QuartSecond) && tool.sneaking && itemMatch(tool, owner.getInventory().getItemInMainHand())){
+					// Low tick
+					var loc = owner.getLocation();
+					var x = loc.getX();
+					var y = loc.getY();
+					var z = loc.getZ();
+					SpatialUtil.circle2DDensity(DETECTION_BLOCK_RANGE, 5, 0,
+							(offsetX, offsetZ) -> {
+								owner.spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+							});
 				}
 				continue;
 			}
-			var inRange = inRange(as, tool);
-			var oldInRange = tool.getEnnemiesInRange();
-			if (inRange.size() <= 0 && oldInRange.size() <= 0) {
+			var inRange = inRange(tool.placed, tool);
+			if (inRange.size() <= 0 && tool.ennemiesInRange.size() <= 0) {
 				continue;
 			}
-			var ite = oldInRange.iterator();
+			var ite = tool.ennemiesInRange.iterator();
 			while (ite.hasNext()) {
 				var p = ite.next();
 				if (inRange.contains(p)) {
 					inRange.remove(p);
 				}else {
-					tool.removeEffect(p);
+					effectModule.addEffect(p, temporaryEffect);
+					effectModule.removeEffect(p, unlimitedEffect);
 					ite.remove();
 				}
 			}
-			for (var p : inRange) {
-				tool.applyEffect(p);
-				oldInRange.add(p);
-				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
-				var own = tool.getOwner();
-				if (own != null) {
-					Vi6Sound.OMNICAPTEUR_DETECT.play(own);
-				}
+			if (flagModule.hasAny(owner, EmpStatusFlag.get())) {
+				return;
 			}
-			tool.itemUpdate();
+			for (var p : inRange) {
+				effectModule.addEffect(p, unlimitedEffect);
+				tool.ennemiesInRange.add(p);
+				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
+				Vi6Sound.OMNICAPTEUR_DETECT.play(owner);
+			}
+			
+			if (tool.ennemiesInRange.size() > 0) {
+				editItem(tool, item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Material.REDSTONE_TORCH.key());
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Activé", NamedTextColor.RED))));
+				});
+			}else {
+				editItem(tool, item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY))));
+				});
+			}
 		}
 	}
 	
-	public double getDetectionBlockRange() {
-		return DETECTION_BLOCK_RANGE;
+	@Override
+	protected void onAttachedToPlayer(OmniCaptor tool) {
 	}
-	public ItemStack getDisponibleItem() {
-		return DISPONIBLE_ITEM();
+	
+	@Override
+	protected void onDetachFromPlayer(OmniCaptor tool) {
 	}
-	public ItemStack getPlacedItem() {
-		return PLACED_ITEM();
+	
+	@Override
+	protected void onToolCleanup(OmniCaptor tool) {
+		if (tool.placed != null) {
+			tool.placed.remove();
+			tool.placed = null;
+		}
 	}
-	public ItemStack getTriggeredItem() {
-		return TRIGGERED_ITEM();
+	@Override
+	protected ItemStack makeItem(OmniCaptor tool) {
+		return new ItemStackBuilder(Material.REPEATER)
+				.name(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE)))
+				.lore(getLore())
+				.unstackable()
+				.flags(ItemFlag.values())
+				.postApply(item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+				})
+				.build();
 	}
-	public int getEffectDuration() {
-		return EFFECT_DURATION;
+	
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			var effectModule = Ioc.resolve(StatusEffectModule.class);
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED))));
+				var tool = getToolFromItem(item);
+				var ite = tool.ennemiesInRange.iterator();
+				while (ite.hasNext()) {
+					var target = ite.next();
+					effectModule.removeEffect(target, temporaryEffect);
+					effectModule.removeEffect(target, unlimitedEffect);
+					ite.remove();
+				}
+			});
+		}
 	}
+	
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				var tool = getToolFromItem(item);
+				if (tool.placed != null) {
+					item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY))));
+				}else {
+					item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE))));
+				}
+			});
+		}
+	}
+	
+	public static class OmniCaptor extends Tool {
+
+		public OmniCaptor(ToolHandler<?> handler) {
+			super(handler);
+		}
+		
+		private boolean sneaking;
+		
+		private ItemDisplay placed;
+		
+		private Collection<Player> ennemiesInRange = new LinkedList<>();
+		
+	}
+	
 }

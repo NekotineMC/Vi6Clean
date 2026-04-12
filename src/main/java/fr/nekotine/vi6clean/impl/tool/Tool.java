@@ -1,55 +1,35 @@
 package fr.nekotine.vi6clean.impl.tool;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import fr.nekotine.core.util.AssertUtil;
-import fr.nekotine.core.util.InventoryUtil;
 
 public abstract class Tool {
-	
-	private ToolHandler<?> handler;
-	
-	private ItemStack itemStack;
+
+	private static int lastId = 0;
 	
 	private Player owner;
 	
-	protected abstract ItemStack makeInitialItemStack();
+	private final int id = ++lastId;
 	
-	protected abstract void cleanup();
+	private final ToolHandler<?> handler;
 	
-	protected abstract void onEmpStart();
-	
-	protected abstract void onEmpEnd();
-	
-	public final ItemStack getItemStack() {
-		if (itemStack == null) {
-			itemStack = makeInitialItemStack();
-		}
-		return itemStack;
+	public Tool(ToolHandler<?> handler) {
+		this.handler = handler;
 	}
 	
-	public final void setItemStack(ItemStack stack) {
-		AssertUtil.nonNull(stack);
-		if (owner != null) {
-			InventoryUtil.replaceItem(owner.getInventory(), itemStack, stack);
-		}
-		itemStack = stack;
-	}
-
-	public Player getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Player owner) {
-		this.owner = owner;
-	}
-
-	public ToolHandler<?> getHandler() {
+	public ToolHandler<?> getHandler(){
 		return handler;
 	}
 	
-	public void setHandler(ToolHandler<?> handler) {
-		this.handler = handler;
+	public Player getOwner() {
+		return owner;
 	}
+	
+	public void setOwner(Player player) {
+		owner = player;
+	}
+
+	public int getId() {
+		return id;
+	}
+
 }

@@ -1,5 +1,14 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.BooleanInputMenuItem;
@@ -14,29 +23,16 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import io.papermc.paper.dialog.Dialog;
-import io.papermc.paper.registry.RegistryAccess;
-import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
-import io.papermc.paper.registry.keys.DialogKeys;
-import net.kyori.adventure.dialog.DialogLike;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickCallback;
-import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 	
@@ -67,7 +63,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 				() -> {
 					return Component.text("Carte: "+Ioc.resolve(Vi6Game.class).getMapName());
 				},
-				p -> {
+				_ -> {
 					var mapname = game.getMapName();
 					var mm = Ioc.resolve(MapModule.class);
 					var maps = new ArrayList<>(mm.listMaps());
@@ -102,9 +98,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void displayMenu() {
 		var game = Ioc.resolve(Vi6Game.class);
-		var mapModule = Ioc.resolve(MapModule.class);
 		var playerWrapper = getParentWrapper();
-		var maps = mapModule.listMaps();
 		var dialog = Dialog.create(builder -> builder.empty()
 				.base(DialogBase.builder(MiniMessage.miniMessage().deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
 						.canCloseWithEscape(true)
@@ -114,12 +108,6 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 										SingleOptionDialogInput.OptionEntry.create("guard",Component.text("Garde",NamedTextColor.BLUE), playerWrapper.isGuard()),
 										SingleOptionDialogInput.OptionEntry.create("thief",Component.text("Voleur",NamedTextColor.RED), playerWrapper.isThief())
 								)).build(),
-								DialogInput.singleOption("map",Component.text("Carte"),maps.stream().map(mapMetadata ->
-										SingleOptionDialogInput.OptionEntry.create(mapMetadata.getName(),mapMetadata.getDisplayName(),mapMetadata.getName()==game.getMapName())
-								).toList()).build(),
-								DialogInput.bool("debug",MiniMessage.miniMessage().deserialize ("Activer le mode debug <yellow>⚠"))
-										.initial(game.isDebug())
-										.build(),
 								DialogInput.bool("ready",Component.text("Je suis prêt"))
 										.initial(this.isReadyForNextPhase())
 										.build()
@@ -128,7 +116,7 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 				.type(
 					DialogType.confirmation(
 							ActionButton.builder(Component.text("Enregistrer",NamedTextColor.GREEN))
-									.action(DialogAction.customClick((response,audiance) -> {
+									.action(DialogAction.customClick((response,_) -> {
 											switch (response.getText("team")){
 												case "guard":
 													game.addPlayerInGuards(wrapped);
@@ -137,8 +125,6 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 													game.addPlayerInThiefs(wrapped);
 													break;
 											}
-											game.setDebug(response.getBoolean("debug"));
-											game.setMapName(response.getText("map"));
 											setReadyForNextPhase(response.getBoolean("ready"));
 										},
 										ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()

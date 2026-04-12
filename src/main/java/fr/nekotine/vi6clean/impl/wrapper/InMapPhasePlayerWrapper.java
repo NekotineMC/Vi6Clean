@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -35,6 +39,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
+	
+	private final NamespacedKey noF5AttributeModifierKey = NamespacedKey.fromString("no_f5", Ioc.resolve(JavaPlugin.class));
+	
+	private final NamespacedKey noKnockbackAttributeModifierKey = NamespacedKey.fromString("no_knockback", Ioc.resolve(JavaPlugin.class));
 	
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	private final StatusEffect asthmaEffect = new StatusEffect(AsthmaStatusEffectType.get(), -1);
@@ -81,9 +89,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}else {
 			defaultActionBar.addViewers(wrapped);
 		}
+		wrapped.getAttribute(Attribute.CAMERA_DISTANCE).addModifier(new AttributeModifier(noF5AttributeModifierKey, -5, Operation.ADD_NUMBER)); // Avoid F5
+		wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE).addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid Knockback
 	}
 	
 	public void tearDown() {
+		wrapped.getAttribute(Attribute.CAMERA_DISTANCE).removeModifier(noF5AttributeModifierKey); // Allow F5 again
+		wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE).removeModifier(noKnockbackAttributeModifierKey); // Allow knockback again
 		if (scheduledCanLeaveMap != null && !scheduledCanLeaveMap.isCancelled()) {
 			scheduledCanLeaveMap.cancel();
 		}

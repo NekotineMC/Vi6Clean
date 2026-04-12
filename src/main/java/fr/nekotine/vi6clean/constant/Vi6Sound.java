@@ -1,6 +1,7 @@
 package fr.nekotine.vi6clean.constant;
 
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.util.Vector;
 
 import net.kyori.adventure.audience.Audience;
@@ -69,7 +70,9 @@ public enum Vi6Sound {
 	Sound.sound(Key.key("entity.shulker.shoot"), Sound.Source.MASTER, 2, 0.1f),
 	Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 1, 1.5f)
 	}),
-	
+	LANTERNE_CANNOT_PLACE(new Sound[] {
+			Sound.sound(NamespacedKey.minecraft("entity.villager.no"), Sound.Source.MASTER, 1, 1.6f)
+			}),
 	SHADOW_KILL(new Sound[] {
 	Sound.sound(Key.key("entity.wither.spawn"), Sound.Source.MASTER, 0.5F, 1.0F),
 	Sound.sound(Key.key("entity.zombie_villager.cure"), Sound.Source.MASTER, 0.5F, 1.0F)

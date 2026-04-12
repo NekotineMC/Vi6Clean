@@ -2,8 +2,8 @@ display_name: <red>Omnicapteur
 price: 250
 amount_limit: 2
 shop_icon: REDSTONE_TORCH
-range: 3.0 #portée de détection en blocs
-duration: 1.0 #durée du glow en secondes
+range: 4.0 #portée de détection en blocs
+duration: 3.0 #durée du glow en secondes
 is_rune: false
 lore:
    - <lore>Pose un capteur qui <important>affiche</important>

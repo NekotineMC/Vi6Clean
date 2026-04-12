@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
@@ -78,6 +79,8 @@ public class Artefact {
 	public void setup(World world) {
 		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(),
 				Material.ORANGE_STAINED_GLASS.createBlockData());
+		boxDisplay.setGlowing(true);
+		boxDisplay.setGlowColorOverride(Color.BLUE);
 	}
 
 	public void clean() {

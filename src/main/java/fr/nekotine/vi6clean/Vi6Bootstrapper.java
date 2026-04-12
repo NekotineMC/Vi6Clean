@@ -1,60 +1,76 @@
 package fr.nekotine.vi6clean;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
+import org.bukkit.entity.EntityType;
+
 import fr.nekotine.core.NekotineCoreBootstrapper;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.body.DialogBody;
-import io.papermc.paper.registry.data.dialog.input.DialogInput;
-import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.DialogKeys;
+import io.papermc.paper.registry.keys.tags.DialogTagKeys;
+import io.papermc.paper.registry.keys.tags.EntityTypeTagKeys;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
-public class Vi6Bootstrapper extends NekotineCoreBootstrapper{
-
+public class Vi6Bootstrapper extends NekotineCoreBootstrapper {
+	
 	@Override
 	public void bootstrap(BootstrapContext context) {
-		
+
 		var lifecycle = context.getLifecycleManager();
+
+		var menuDialogKey = DialogKeys.create(Key.key(Vi6Keys.DIALOG_SETTINGS));
+
+		lifecycle.registerEventHandler(RegistryEvents.DIALOG.compose().newHandler(evt -> {
+			evt.registry()
+					.register(menuDialogKey,
+							builder -> builder
+									.base(DialogBase
+											.builder(MiniMessage.miniMessage().deserialize(
+													"<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
+											.canCloseWithEscape(true)
+											.externalTitle(MiniMessage.miniMessage().deserialize(
+													"<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
+											.pause(false)
+											.body(List
+													.of(DialogBody.plainMessage(Component.text(new Date().toString()))))
+											.build())
+									.type(DialogType.multiAction(
+											List.of(
+													ActionButton
+													.builder(Component.text("Paramètre partie", NamedTextColor.WHITE))
+													.action(DialogAction.customClick(Key.key(Vi6Keys.DIALOG_GAME_SETTINGS), null))
+													.build()
+													),
+											ActionButton.builder(Component.text("Quitter", NamedTextColor.WHITE))
+													.build(),
+											2)));
+		}));
+
+		lifecycle.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.DIALOG).newHandler(evt -> {
+			var registrar = evt.registrar();
+			registrar.addToTag(DialogTagKeys.PAUSE_SCREEN_ADDITIONS, List.of(menuDialogKey));
+		}));
 		
-		lifecycle.registerEventHandler(RegistryEvents.DIALOG.entryAdd().newHandler( evt -> {
-			evt.builder()
-					.base(DialogBase.builder(MiniMessage.miniMessage().deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
-							.canCloseWithEscape(true)
-							.externalTitle(MiniMessage.miniMessage().deserialize("<red>V<aqua>oleur <red>I<aqua>ndustriel <red>6"))
-							.pause(false)
-							.inputs(List.of(
-									DialogInput.singleOption("team",Component.text("Équipe"),List.of(
-											SingleOptionDialogInput.OptionEntry.create("guard",Component.text("Garde",NamedTextColor.BLUE), true),
-											SingleOptionDialogInput.OptionEntry.create("thief",Component.text("Voleur",NamedTextColor.RED), false)
-									)).build()
-							))
-							.body(List.of(
-									DialogBody.plainMessage(Component.text(new Date().toString()))
-									))
-							.build())
-					.type(
-						DialogType.notice(
-								ActionButton.builder(Component.text("Enregistrer",NamedTextColor.GREEN))
-										.action(DialogAction.customClick((response,audiance) -> {
-												audiance.sendMessage(Component.text("Selected team is "+response.getText("team")));
-											},
-											ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()
-										))
-									.build()
-					));
-		}).filter(DialogKeys.CUSTOM_OPTIONS));
-		
+		lifecycle.registerEventHandler(LifecycleEvents.TAGS.postFlatten(RegistryKey.ENTITY_TYPE).newHandler(evt -> {
+			var registrar = evt.registrar();
+			registrar.addToTag(EntityTypeTagKeys.IMMUNE_TO_OOZING, List.of(TypedKey.create(RegistryKey.ENTITY_TYPE, EntityType.PLAYER.getKey())));
+			registrar.addToTag(EntityTypeTagKeys.IMMUNE_TO_INFESTED, List.of(TypedKey.create(RegistryKey.ENTITY_TYPE, EntityType.PLAYER.getKey())));
+		}));
+
 	}
-	
+
 }

@@ -5,35 +5,38 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.glow.EntityGlowModule;
-import fr.nekotine.core.glow.TeamColor;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import net.kyori.adventure.text.Component;
 
 @ToolCode("forcefield")
-public class ForcefieldHandler extends ToolHandler<Forcefield>{
+public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>{
 	
 	private Map<String,DoorData> fieldsDisplay = new HashMap<>();
-	
-	private EntityGlowModule glowingModule = Ioc.resolve(EntityGlowModule.class);
 
 	private final int FORCEFIELD_NB_MAX = getConfiguration().getInt("nbmax",2);
 	
@@ -53,6 +56,7 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		for (var gateEntry : gates.entrySet()) {
 			var display = SpatialUtil.fillBoundingBox(world, gateEntry.getValue(), bdata);
 			display.setVisibleByDefault(false);
+			display.setGlowing(true);
 			fieldsDisplay.put(gateEntry.getKey(), new DoorData(display));
 		}
 	}
@@ -71,26 +75,17 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		fieldsDisplay.clear();
 		super.onStopHandling();
 	}
-
-	@Override
-	protected void onAttachedToPlayer(Forcefield tool, Player player) {
-	}
-
-	@Override
-	protected void onDetachFromPlayer(Forcefield tool, Player player) {
-	}
 	
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		if (evt.getHand() != EquipmentSlot.HAND) {
 			return;
 		}
-		var evtP = evt.getPlayer();
-		var optionalTool = getTools().stream().filter(t -> evtP.equals(t.getOwner()) && t.getItemStack().isSimilar(evt.getItem())).findFirst();
-		if (optionalTool.isEmpty()) {
+		var tool = getToolFromItem(evt.getItem());
+		if (tool == null) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && tryPlaceField(optionalTool.get())) {
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && tryPlaceField(tool)) {
 			evt.setCancelled(true);
 		}
 	}
@@ -103,8 +98,9 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 				continue;
 			}
 			var inv = owner.getInventory();
-			if (inv.getItemInMainHand().isSimilar(tool.getItemStack()) ||
-					inv.getItemInOffHand().isSimilar(tool.getItemStack())) {
+			
+			if (itemMatch(tool, inv.getItemInMainHand()) ||
+					itemMatch(tool, inv.getItemInOffHand())) {
 				for (var door : fieldsDisplay.keySet()) {
 					displayDoor(door, owner);
 				}
@@ -113,6 +109,19 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 					hideDoor(door, owner);
 				}
 			}
+		}
+		
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		if (Ioc.resolve(Vi6Game.class).getGuards().stream()
+				.filter(guard -> InventoryUtil.containTaggerItem(guard.getInventory(), TOOL_TYPE_KEY, getToolCode()))
+				.allMatch(guard -> statusFlagModule.hasAny(guard, EmpStatusFlag.get()))) {
+			for (var doorKey : fieldsDisplay.keySet()) {
+				var door = fieldsDisplay.get(doorKey);
+				if (door.activated && !door.playerOpened) {
+					openField(doorKey);
+				}
+			}
+			return;
 		}
 		var gates = Ioc.resolve(Vi6Map.class).getGates();
 		for (var doorKey : fieldsDisplay.keySet()) {
@@ -214,21 +223,16 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 	
 	private void displayDoor(String door, Player player) {
 		var target = getTargetedGate(player);
-		var enabled = target == door ? EnumWrappers.ChatFormatting.DARK_AQUA : EnumWrappers.ChatFormatting.GOLD;
-		var disabled = target == door ? EnumWrappers.ChatFormatting.AQUA : EnumWrappers.ChatFormatting.YELLOW;
+		var enabled = target == door ? Color.TEAL : Color.ORANGE;
+		var disabled = target == door ? Color.AQUA : Color.YELLOW;
 		var doorEntity = fieldsDisplay.get(door);
 		player.showEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
-		if (doorEntity.activated) {
-			glowingModule.glowEntityFor(doorEntity.display, player, enabled);
-		}else {
-			glowingModule.glowEntityFor(doorEntity.display, player, disabled);
-		}
+		doorEntity.display.setGlowColorOverride(doorEntity.activated?enabled:disabled);
 	}
 	
 	private void hideDoor(String door, Player player) {
 		var doorEntity = fieldsDisplay.get(door);
 		player.hideEntity(Ioc.resolve(Vi6Main.class), doorEntity.display);
-		glowingModule.unglowEntityFor(doorEntity.display, player);
 	}
 	
 	private class DoorData{
@@ -243,6 +247,33 @@ public class ForcefieldHandler extends ToolHandler<Forcefield>{
 		
 		private boolean playerOpened;
 		
+	}
+
+	@Override
+	protected void onAttachedToPlayer(Forcefield tool) {
+	}
+
+	@Override
+	protected void onDetachFromPlayer(Forcefield tool) {
+	}
+
+	@Override
+	protected void onToolCleanup(Forcefield tool) {
+	}
+
+	@Override
+	protected ItemStack makeItem(Forcefield tool) {
+		return ItemStackUtil.make(Material.IRON_DOOR, Component.text("Champ de force"));
+	}
+	
+	public static class Forcefield extends Tool{
+
+		public Forcefield(ToolHandler<?> handler) {
+			super(handler);
+		}
+
+		private int nbPosed = 0;
+
 	}
 	
 }

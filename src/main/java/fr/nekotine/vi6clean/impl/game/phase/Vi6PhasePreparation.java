@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -19,6 +20,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
@@ -36,8 +39,16 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.AttackRange;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.PiercingWeapon;
+import io.papermc.paper.datacomponent.item.SwingAnimation;
+import io.papermc.paper.datacomponent.item.SwingAnimation.Animation;
+import io.papermc.paper.datacomponent.item.consumable.ConsumeEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.util.TriState;
 
 public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> implements Listener{
 	private final ItemStack guardSword = new ItemStackBuilder(Material.DIAMOND_SWORD)
@@ -46,6 +57,31 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			.oldPvp()
 			.flags(ItemFlag.values())
 			.attackDamage(5)
+			.postApply(i -> i.setData(DataComponentTypes.CONSUMABLE,Consumable.consumable() // we do a little bit of trolling
+					.addEffect(ConsumeEffect.applyStatusEffects(List.of(
+							new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 1),
+							new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 0)), 1)))) 
+			.build();
+	
+	private final ItemStack guardGun = new ItemStackBuilder(Material.STONE_AXE)
+			.name(Component.text("Flashball de garde", NamedTextColor.GOLD))
+			.unbreakable()
+			.oldPvp()
+			.flags(ItemFlag.values())
+			.attackDamage(3)
+			.postApply(i ->{
+				i.setData(DataComponentTypes.ATTACK_RANGE,AttackRange.attackRange().maxReach(64).maxCreativeReach(64).build());
+				i.setData(DataComponentTypes.MINIMUM_ATTACK_CHARGE,1f);
+				i.setData(DataComponentTypes.SWING_ANIMATION,SwingAnimation.swingAnimation().duration(0).type(Animation.NONE).build());
+				i.setData(DataComponentTypes.PIERCING_WEAPON,
+						PiercingWeapon.piercingWeapon()
+						.dealsKnockback(true)
+						.dismounts(true)
+						.sound(NamespacedKey.minecraft("entity.iron_golem.repair"))
+						.hitSound(NamespacedKey.minecraft("entity.villager.celebrate")) // a voir pour changer
+						.build()
+						);
+			}) 
 			.build();
 	
 	private Map<ArmorStand, ThiefSpawn> minimapSpawnIndicators = new HashMap<>();
@@ -78,7 +114,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			armorStand.setVisible(false);
 			armorStand.setInvulnerable(true);
 			armorStand.setGravity(false);
-			armorStand.setVisualFire(true);
+			armorStand.setVisualFire(TriState.TRUE);
 			armorStand.addDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HAND,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.OFF_HAND);
 			minimapSpawnIndicators.put(armorStand, entrance);
 		});
@@ -122,6 +158,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		inv.setItem(8, openMenuUsable.getItemStack());
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
+			inv.addItem(guardGun);
 		}
 	}
 

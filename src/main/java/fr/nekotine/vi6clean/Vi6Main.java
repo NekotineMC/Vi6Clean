@@ -54,7 +54,6 @@ public class Vi6Main extends NekotinePlugin{
 		container.discoverHandlers();
 		Ioc.getProvider().registerSingleton(container);
 		game.start();
-		
 	}
 	
 	@Override
@@ -71,5 +70,5 @@ public class Vi6Main extends NekotinePlugin{
 		}, ExecutorType.ALL);
 		gameC.withSubcommand(sub);
 		gameC.register();
-	}
+	} 
 }
