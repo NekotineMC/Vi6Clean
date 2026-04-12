@@ -1,22 +1,20 @@
 package fr.nekotine.vi6clean.impl.tool.personal.smokepool;
 
-import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
@@ -27,6 +25,7 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
@@ -34,63 +33,68 @@ import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.tool.personal.minifier.MinifierHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.format.TextDecoration;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 
 @ToolCode("smokepool")
-public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool>{ // TODO Git Submodules and composite build
+public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool>{
 	protected static final Random RNG = new Random();
-	static {RNG.setSeed(System.currentTimeMillis());}
 	
-	private final double RADIUS = getConfiguration().getDouble("radius", 5); 
+	private final double RADIUS = getConfiguration().getDouble("radius", 5);
+	
 	private final double SQUARED_RADIUS = RADIUS * RADIUS;
-	private final double AIR = getConfiguration().getDouble("air", 78.5398);
-	private final double DIAMETER = getConfiguration().getDouble("diameter", 31.4159);
+	
+	private final double PARTICLE_DENSITY = getConfiguration().getDouble("particle_density", 78.5398);
+	
 	private final int DURATION_TICK = (int)(20*getConfiguration().getDouble("duration", 8));
+	
 	private final int COOLDOWN_TICK = (int)(20*getConfiguration().getDouble("cooldown", 20));
+	
 	private final StatusEffect INVISIBLE = new StatusEffect(TrueInvisibilityStatusEffectType.get(), DURATION_TICK);
-	private final ItemStack COOLDOWN_ITEM = new ItemStackBuilder(
-			Material.GRAY_DYE)
-			.name(getDisplayName().decorate(TextDecoration.STRIKETHROUGH))
-			.lore(getLore())
-			.flags(ItemFlag.values())
-			.build();
-		
-	//
 	
 	public SmokePoolHandler() {
 		super(SmokePool::new);
 	}
-	@Override
-	protected void onAttachedToPlayer(SmokePool tool, Player player) {
-	}
-	@Override
-	protected void onDetachFromPlayer(SmokePool tool, Player player) {
-	}
 	
-	//
-	
-	private Collection<Player> inRange(SmokePool pool) {
-		var team = Ioc.resolve(WrappingModule.class).getWrapper(pool.getOwner(), PlayerWrapper.class).ourTeam();
-
-		return team.stream()
-		.filter(ennemi -> ennemi.getLocation().distanceSquared(pool.getPlacedLocation()) <= SQUARED_RADIUS)
-		.collect(Collectors.toCollection(LinkedList::new));
-	}
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		for(var tool : getTools()) {
-			tool.tickCooldown();
-			tool.tickParticle();
+			var owner = tool.getOwner();
+			if (tool.position != null && owner.getCooldown(Material.FIREWORK_STAR) <= COOLDOWN_TICK) {
+				tool.position = null; // La pool a expirée et n'est plus active
+				editItem(tool, item -> item.unsetData(DataComponentTypes.ITEM_MODEL));
+			}
+			// PARTICLE
+			if (tool.position != null) {
+				var l = tool.position.toLocation(owner.getWorld());
+				SpatialUtil.disk2DDensity(RADIUS, PARTICLE_DENSITY, (x,y) -> {
+					l.set(tool.position.getX() + x, tool.position.getY() - 1, tool.position.getZ() + y);
+					double maxy = l.getY() + 2.5;
+					while (l.getY() < maxy) {
+						if (l.getBlock().getBoundingBox().contains(l.toVector())) {
+							l.add(0, 0.1, 0);
+						} else {
+							l.getWorld().spawnParticle(Particle.SMOKE, l, 1, 0, 0, 0, 0);
+							break;
+						}
+						;
+					} 
+				});
+			}
 			
 			if(evt.timeStampReached(TickTimeStamp.QuartSecond)) {
 				//Copied from OmniCaptorHandler
-				if(!tool.isPlaced()) {
+				if(tool.position == null) {
 					continue;
 				}
-				var inRange = inRange(tool);
-				var oldInRange = tool.getInside();
+				
+				//
+				var team = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).ourTeam();
+				var inRange = team.stream()
+				.filter(ennemi -> ennemi.getLocation().toVector().distanceSquared(tool.position) <= SQUARED_RADIUS * tool.scale)
+				.collect(Collectors.toCollection(LinkedList::new));
+				
+				var oldInRange = tool.inside;
 				if (inRange.size() <= 0 && oldInRange.size() <= 0) {
 					continue;
 				}
@@ -120,30 +124,19 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool>{ /
 		}
 		var statusModule = Ioc.resolve(StatusFlagModule.class);
 		var player = evt.getPlayer();
-		var tool = getToolFromItem(evt.getItem());
-		if (tool == null || statusModule.hasAny(player, EmpStatusFlag.get()) || player.getCooldown(Material.FIREWORK_STAR) <= 0) {
+		var item = evt.getItem();
+		var tool = getToolFromItem(item);
+		if (tool == null || statusModule.hasAny(player, EmpStatusFlag.get()) || player.getCooldown(item) <= 0) {
 			return;
 		}
-		// TODO HERE
-		var ownerScale = (float) player.getAttribute(Attribute.SCALE).getValue();
-		if (ownerScale != 1) {
-			var scaleAttr = man.getAttribute(Attribute.SCALE);
-			scaleAttr.addModifier(new AttributeModifier(MinifierHandler.SCALE_ATTRIBUTE_KEY,ownerScale-1,Operation.MULTIPLY_SCALAR_1));
-		}
+		
+		tool.scale = player.getAttribute(Attribute.SCALE).getValue();
+		player.setCooldown(item, COOLDOWN_TICK + DURATION_TICK);
+		var ploc = player.getLocation();
+		tool.position = ploc.toVector();
+		Vi6Sound.SMOKEPOOL.play(ploc.getWorld(), ploc);
+		item.setData(DataComponentTypes.ITEM_MODEL,Material.GRAY_DYE.key());
 		evt.setCancelled(true);
-		if (placed || cooldownLeft > 0) {
-			return false;
-		}
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(getOwner(), EmpStatusFlag.get())) {
-			return false;
-		}
-		var handler = Ioc.resolve(SmokePoolHandler.class);
-		life = handler.getDurationTick();
-		placed = true;
-		placedLoc = getOwner().getLocation();
-		Vi6Sound.SMOKEPOOL.play(placedLoc.getWorld(), placedLoc);
-		getOwner().setCooldown(handler.getItem().getType(), handler.getDurationTick());
-		return true;
 	}
 
 	@Override
@@ -165,11 +158,17 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool>{ /
 				.name(getDisplayName())
 				.lore(getLore())
 				.flags(ItemFlag.values())
-				.build();;
+				.build();
 	}
 	
 	public static class SmokePool extends Tool{
 
+		private final List<Player> inside = new LinkedList<Player>();
+		
+		private Vector position;
+		
+		private double scale;
+		
 		public SmokePool(ToolHandler<?> handler) {
 			super(handler);
 		}
