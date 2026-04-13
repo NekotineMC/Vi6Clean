@@ -1,4 +1,5 @@
-val JarOutputPath: String by project
+val JarOutputPath: String? by project
+val Vi6CleanServerPluginDirectory: String? by project
 
 plugins {
     java
@@ -56,11 +57,17 @@ tasks.jar {
 
 // Configuration
 
+
+var outputDir = JarOutputPath
+if (!Vi6CleanServerPluginDirectory.isNullOrEmpty()) {
+    outputDir = Vi6CleanServerPluginDirectory
+}
+
 tasks.register<Copy>("output") {
 	group = "dev"
 	description = "Sends jar to a custom output directory"
 	from(tasks.shadowJar)
-	into(JarOutputPath)
+	into(outputDir!!)
 }
 
 defaultTasks("shadowJar")
