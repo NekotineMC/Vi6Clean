@@ -1,5 +1,4 @@
-val DevServerPluginDirectory: String by project
-val Vi6CleanServerPluginDirectory: String by project
+val JarOutputPath: String by project
 
 plugins {
     java
@@ -8,23 +7,26 @@ plugins {
 
 group = "fr.nekotine"
 version = "0.0.1"
-description = "Vi6 avec du code plus propre"
+description = "vi6clean"
 
 repositories {
     mavenLocal()
     mavenCentral()
-     // PAPERMC
+
+    // PaperMC
     maven("https://repo.papermc.io/repository/maven-public/"){
     	name = "papermc"
     }
     // CommandAPI
     maven ("https://repo.codemc.org/repository/maven-public/"){
     	name = "commandapi"
-    }/*
-    // PROTOCOLIB
+    }
+    /*
+    // ProtocolLib
     maven("https://repo.dmulloy2.net/repository/public/") {
         name = "protocolib"
-    }*/
+    }
+    */
     // Simple Voice Chat
     maven("https://maven.maxhenkel.de/repository/public") {
         name = "simplevoicechat"
@@ -52,13 +54,13 @@ tasks.jar {
   archiveClassifier = "noshadow"
 }
 
-// CONFIGURATION
+// Configuration
 
-tasks.register<Copy>("dev") {
-	group = "developpement"
-	description = "Envoie le jar sur le server de développement"
+tasks.register<Copy>("output") {
+	group = "dev"
+	description = "Sends jar to a custom output directory"
 	from(tasks.shadowJar)
-	into(Vi6CleanServerPluginDirectory)
+	into(JarOutputPath)
 }
 
 defaultTasks("shadowJar")
