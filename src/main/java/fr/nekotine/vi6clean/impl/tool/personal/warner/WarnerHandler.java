@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.tool.personal.warner;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -53,7 +54,7 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner>{
 	
 	private final String WARN_MESSAGE = "<gold>Avertisseur>></gold> <red>L'artéfact <aqua><name></aqua> à été volé !</red>";
 	
-	private final Set<String> watchedArtefacts = Set.of();
+	private final Set<String> watchedArtefacts = new HashSet<>();
 	
 	public WarnerHandler() {
 		super(Warner::new);

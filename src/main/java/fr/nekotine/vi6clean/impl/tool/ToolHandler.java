@@ -223,7 +223,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 					item.unsetData(DataComponentTypes.EQUIPPABLE);
 				}
 			}
-			inventory.addItem();
+			inventory.addItem(item);
 		}
 		onAttachedToPlayer(tool);
 	}
@@ -245,6 +245,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		detachFromOwner(tool);
 		onToolCleanup(tool);
 		tools.remove(tool.getId());
+		System.out.println(getToolCode()+" REMOVED");
 	}
 	
 	private final void removeGeneric(Tool tool) {
@@ -309,6 +310,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 	
 	public T getToolFromItem(ItemStack item) {
+		if (item == null) {
+			return null;
+		}
 		var pdc = item.getPersistentDataContainer();
 		if (pdc.get(TOOL_TYPE_KEY, PersistentDataType.STRING) != toolCode) {
 			return null;
@@ -398,7 +402,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (owner == null) {
 			return;
 		}
-		Arrays.stream(owner.getInventory().getContents()).filter(i -> itemMatch(tool, i)).forEach(action);
+		Arrays.stream(owner.getInventory().getContents()).filter(i -> i != null && itemMatch(tool, i)).forEach(action);
 	}
 	
 	public final boolean itemMatch(Tool tool,ItemStack item) {

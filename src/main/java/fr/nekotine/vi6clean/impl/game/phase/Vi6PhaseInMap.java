@@ -122,6 +122,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					RenderType.INTEGER);
 		}
 		thiefScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_RED);
+		var game = Ioc.resolve(Vi6Game.class);
+		game.getGuards().spawnInMap();
+		game.getThiefs().spawnInMinimap();
 	}
 
 	@Override
@@ -270,6 +273,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
 		item.setGameMode(GameMode.ADVENTURE);
+		System.out.println("Change player GameMode to ADVENTURE:"+item.getName());
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();

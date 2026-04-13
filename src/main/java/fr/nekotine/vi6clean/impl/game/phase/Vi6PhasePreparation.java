@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,6 +23,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -66,9 +70,9 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 	private final ItemStack guardGun = new ItemStackBuilder(Material.STONE_AXE)
 			.name(Component.text("Flashball de garde", NamedTextColor.GOLD))
 			.unbreakable()
-			.oldPvp()
 			.flags(ItemFlag.values())
 			.attackDamage(3)
+			.attributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(NamespacedKey.fromString("gun_cooldown", Ioc.resolve(JavaPlugin.class)), -3.4, Operation.ADD_NUMBER))// Default is 4, go to 0.6
 			.postApply(i ->{
 				i.setData(DataComponentTypes.ATTACK_RANGE,AttackRange.attackRange().maxReach(64).maxCreativeReach(64).build());
 				i.setData(DataComponentTypes.MINIMUM_ATTACK_CHARGE,1f);

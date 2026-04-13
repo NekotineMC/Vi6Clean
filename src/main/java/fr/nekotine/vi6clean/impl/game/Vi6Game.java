@@ -311,6 +311,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	private void displayGameSettingsDialog(Player player) {
 		var mapModule = Ioc.resolve(MapModule.class);
 		var maps = mapModule.listMaps();
+		System.out.println("MAP NAME="+getMapName());
 		var dialog = Dialog.create(builder -> builder.empty()
 				.base(DialogBase.builder(MiniMessage.miniMessage().deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
 						.canCloseWithEscape(true)
@@ -319,7 +320,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 								DialogInput.singleOption("map",Component.text("Carte"),maps.stream().map(mapMetadata ->
 										SingleOptionDialogInput.OptionEntry.create(mapMetadata.getName(),mapMetadata.getDisplayName(),mapMetadata.getName()==this.getMapName())
 								).toList()).build(),
-								DialogInput.bool("debug",MiniMessage.miniMessage().deserialize ("Activer le mode debug <yellow>⚠"))
+								DialogInput.bool("debug",MiniMessage.miniMessage().deserialize("Activer le mode debug <yellow>⚠"))
 										.initial(this.isDebug())
 										.build()
 						))
