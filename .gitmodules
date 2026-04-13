@@ -1,0 +1,3 @@
+[submodule "NekotineCore"]
+	path = NekotineCore
+	url = https://github.com/NekotineMC/NekotineCore.git
