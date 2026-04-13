@@ -1,6 +1,5 @@
 package fr.nekotine.vi6clean;
 
-import java.util.Date;
 import java.util.List;
 
 import org.bukkit.entity.EntityType;
@@ -14,7 +13,6 @@ import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
-import io.papermc.paper.registry.data.dialog.body.DialogBody;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.DialogKeys;
@@ -45,8 +43,6 @@ public class Vi6Bootstrapper extends NekotineCoreBootstrapper {
 											.externalTitle(MiniMessage.miniMessage().deserialize(
 													"<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
 											.pause(false)
-											.body(List
-													.of(DialogBody.plainMessage(Component.text(new Date().toString()))))
 											.build())
 									.type(DialogType.multiAction(
 											List.of(
