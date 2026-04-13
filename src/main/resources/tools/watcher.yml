@@ -3,7 +3,7 @@ price: 200
 amount_limit: 1
 shop_icon: SILVERFISH_SPAWN_EGG
 nbmax: 3 #nombre max de balises simultanées
-range: 3.0 #portée des balises en blocs
+range: 5.0 #portée des balises en blocs
 is_rune: false
 last_delay_second: 1
 lore:
