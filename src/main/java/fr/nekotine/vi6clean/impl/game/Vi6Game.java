@@ -309,7 +309,6 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	}
 	
 	private void displayGameSettingsDialog(Player player) {
-		var game = Ioc.resolve(Vi6Game.class);
 		var mapModule = Ioc.resolve(MapModule.class);
 		var maps = mapModule.listMaps();
 		var dialog = Dialog.create(builder -> builder.empty()
@@ -318,10 +317,10 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 						.pause(false)
 						.inputs(List.of(
 								DialogInput.singleOption("map",Component.text("Carte"),maps.stream().map(mapMetadata ->
-										SingleOptionDialogInput.OptionEntry.create(mapMetadata.getName(),mapMetadata.getDisplayName(),mapMetadata.getName()==game.getMapName())
+										SingleOptionDialogInput.OptionEntry.create(mapMetadata.getName(),mapMetadata.getDisplayName(),mapMetadata.getName()==this.getMapName())
 								).toList()).build(),
 								DialogInput.bool("debug",MiniMessage.miniMessage().deserialize ("Activer le mode debug <yellow>⚠"))
-										.initial(game.isDebug())
+										.initial(this.isDebug())
 										.build()
 						))
 						.build())
@@ -329,8 +328,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 					DialogType.confirmation(
 							ActionButton.builder(Component.text("Enregistrer",NamedTextColor.GREEN))
 									.action(DialogAction.customClick((response,audiance) -> {
-											game.setDebug(response.getBoolean("debug"));
-											game.setMapName(response.getText("map"));
+											this.setDebug(response.getBoolean("debug"));
+											this.setMapName(response.getText("map"));
 											var mapMetadata = Ioc.resolve(MapModule.class).getMapMetadata(response.getText("map"));
 											audiance.sendMessage(Component.text("Carte selectionnée: ").append(mapMetadata.getDisplayName()));
 											audiance.sendMessage(Component.text("Mode débug: ").append(Component.text(response.getBoolean("debug")?"Activé":"Désactivé")));

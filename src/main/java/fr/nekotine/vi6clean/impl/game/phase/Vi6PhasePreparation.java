@@ -72,7 +72,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 			.postApply(i ->{
 				i.setData(DataComponentTypes.ATTACK_RANGE,AttackRange.attackRange().maxReach(64).maxCreativeReach(64).build());
 				i.setData(DataComponentTypes.MINIMUM_ATTACK_CHARGE,1f);
-				i.setData(DataComponentTypes.SWING_ANIMATION,SwingAnimation.swingAnimation().duration(0).type(Animation.NONE).build());
+				i.setData(DataComponentTypes.SWING_ANIMATION,SwingAnimation.swingAnimation().type(Animation.NONE).build());
 				i.setData(DataComponentTypes.PIERCING_WEAPON,
 						PiercingWeapon.piercingWeapon()
 						.dealsKnockback(true)
