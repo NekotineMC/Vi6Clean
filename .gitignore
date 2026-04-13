@@ -168,6 +168,8 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# Direnv
+# Custom
+.idea/
 .direnv
 .envrc
+gradle.properties
