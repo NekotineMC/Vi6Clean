@@ -9,7 +9,6 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
-import org.bukkit.GameRule;
 import org.bukkit.GameRules;
 import org.bukkit.Material;
 import org.bukkit.block.Container;
@@ -122,9 +121,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					RenderType.INTEGER);
 		}
 		thiefScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_RED);
-		var game = Ioc.resolve(Vi6Game.class);
-		game.getGuards().spawnInMap();
-		game.getThiefs().spawnInMinimap();
 	}
 
 	@Override

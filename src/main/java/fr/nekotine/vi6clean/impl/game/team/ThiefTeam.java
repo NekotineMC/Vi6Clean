@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.impl.game.team;
 
 import java.util.Map;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,6 +29,7 @@ public class ThiefTeam extends Team{
 		for(var thief : this){
 			var loc = spawnsIte.next();
 			thief.teleport(loc.toLocation(game.getWorld()));
+			thief.setGameMode(GameMode.ADVENTURE); // On change le gamemode dans le nouveau monde
 			if (!spawnsIte.hasNext()) {
 				spawnsIte = spawns.iterator();
 			}

@@ -410,6 +410,6 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return false;
 		}
 		var pdc = item.getPersistentDataContainer();
-		return pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.INTEGER) == tool.getId();
+		return pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(ToolHandler.TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
 	}
 }
