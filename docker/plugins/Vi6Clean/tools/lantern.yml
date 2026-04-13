@@ -1,0 +1,13 @@
+display_name: <gold>Lanterne
+price: 200
+amount_limit: 1
+shop_icon: LANTERN
+max_lantern: 2
+squared_pickup_range: 2.25
+is_rune: false
+lore:
+- <lore>Permet de poser jusqu'à <variable><max_lantern></variable> lanternes
+- <lore>que vos alliés peuvent prendre pour se <important>téléporter à vous</important>.
+team:
+- thief
+- guard

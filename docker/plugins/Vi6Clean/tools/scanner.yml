@@ -1,0 +1,12 @@
+display_name: <gold>Scanner</gold>
+price: 600
+amount_limit: 1
+shop_icon: CLOCK
+delay: 25.0
+duration: 7.0
+is_rune: true
+lore:
+- <lore>Vous permet de <important>détecter les ennemis</important>
+- <lore>toutes les <variable><delay>s</variable>.
+team:
+- thief

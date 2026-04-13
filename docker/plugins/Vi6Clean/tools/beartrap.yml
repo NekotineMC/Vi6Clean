@@ -1,0 +1,14 @@
+display_name: <dark_gray>Piège à ours
+price: 100
+amount_limit: -1
+shop_icon: DRAGON_HEAD
+damage: 5.0
+trigger_range: 0.9
+pickup_range: 0.9
+spacing_distance: 0.9
+is_rune: false
+lore:
+- <lore>Permet de poser et déplacer un <important>piège à ours</important>.
+- '<lore>Dégats: <variable><damage></variable><red>❤</red>.'
+team:
+- guard

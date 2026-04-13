@@ -1,0 +1,1464 @@
+exits:
+  Hangar:
+    minX: 107.0
+    minY: 9.0
+    minZ: 99.0
+    maxX: 109.0
+    maxY: 11.0
+    maxZ: 100.0
+  Camion:
+    minX: 102.0
+    minY: 16.0
+    minZ: 142.0
+    maxX: 103.0
+    maxY: 22.0
+    maxZ: 153.0
+  Couloir:
+    minX: 106.0
+    minY: 13.0
+    minZ: 198.0
+    maxX: 109.0
+    maxY: 15.0
+    maxZ: 199.0
+  Secretariat:
+    minX: 200.0
+    minY: 13.0
+    minZ: 145.0
+    maxX: 201.0
+    maxY: 15.0
+    maxZ: 148.0
+  Jardin:
+    minX: 188.0
+    minY: 10.0
+    minZ: 99.0
+    maxX: 191.0
+    maxY: 12.0
+    maxZ: 100.0
+  Livraison:
+    minX: 167.0
+    minY: 9.0
+    minZ: 198.0
+    maxX: 175.0
+    maxY: 11.0
+    maxZ: 199.0
+koths:
+  Escalier:
+    boundingBox:
+      minX: 141.5
+      minY: 13.0
+      minZ: 158.5
+      maxX: 147.5
+      maxY: 16.0
+      maxZ: 162.5
+    displayLocation:
+      x: 144.70280837968645
+      y: 14.0
+      z: 159.30000001192093
+  archives:
+    boundingBox:
+      minX: 126.0
+      minY: 9.0
+      minZ: 193.0
+      maxX: 132.0
+      maxY: 13.0
+      maxZ: 197.0
+    displayLocation:
+      x: 129.0
+      y: 10.0
+      z: 196.5
+  boss:
+    boundingBox:
+      minX: 104.0
+      minY: 9.0
+      minZ: 177.0
+      maxX: 110.0
+      maxY: 14.0
+      maxZ: 180.0
+    displayLocation:
+      x: 107.0
+      y: 10.0
+      z: 179.5
+  imprimante_3d_2:
+    boundingBox:
+      minX: 152.0
+      minY: 5.0
+      minZ: 159.0
+      maxX: 160.0
+      maxY: 8.0
+      maxZ: 163.0
+    displayLocation:
+      x: 156.0
+      y: 6.0
+      z: 162.5
+  imprimante_3d_1:
+    boundingBox:
+      minX: 152.0
+      minY: 9.0
+      minZ: 155.0
+      maxX: 157.0
+      maxY: 14.0
+      maxZ: 162.0
+    displayLocation:
+      x: 154.5
+      y: 10.0
+      z: 159.0
+  camion_1:
+    boundingBox:
+      minX: 127.0
+      minY: 13.0
+      minZ: 149.0
+      maxX: 135.0
+      maxY: 18.0
+      maxZ: 153.0
+    displayLocation:
+      x: 131.0
+      y: 16.0
+      z: 152.5
+  salle_garde:
+    boundingBox:
+      minX: 165.0
+      minY: 9.0
+      minZ: 142.0
+      maxX: 172.0
+      maxY: 13.0
+      maxZ: 148.0
+    displayLocation:
+      x: 169.0
+      y: 10.0
+      z: 145.5
+  entrepot_2:
+    boundingBox:
+      minX: 113.0
+      minY: 9.0
+      minZ: 100.0
+      maxX: 119.0
+      maxY: 14.0
+      maxZ: 104.0
+    displayLocation:
+      x: 117.0
+      y: 11.0
+      z: 101.5
+  biochimie_1:
+    boundingBox:
+      minX: 129.0
+      minY: 9.0
+      minZ: 122.0
+      maxX: 136.0
+      maxY: 12.5
+      maxZ: 126.0
+    displayLocation:
+      x: 133.0
+      y: 10.0
+      z: 122.5
+  entrepot_1:
+    boundingBox:
+      minX: 103.0
+      minY: 12.0
+      minZ: 101.0
+      maxX: 107.0
+      maxY: 15.0
+      maxZ: 109.0
+    displayLocation:
+      x: 103.5
+      y: 13.0
+      z: 105.0
+  jardin_1:
+    boundingBox:
+      minX: 195.0
+      minY: 9.0
+      minZ: 117.0
+      maxX: 200.0
+      maxY: 14.0
+      maxZ: 125.0
+    displayLocation:
+      x: 199.0
+      y: 10.0
+      z: 121.0
+  four:
+    boundingBox:
+      minX: 148.0
+      minY: 9.0
+      minZ: 175.0
+      maxX: 152.0
+      maxY: 13.0
+      maxZ: 179.0
+    displayLocation:
+      x: 149.0
+      y: 10.0
+      z: 177.5
+  construction:
+    boundingBox:
+      minX: 157.5
+      minY: 9.0
+      minZ: 111.5
+      maxX: 162.5
+      maxY: 12.0
+      maxZ: 117.5
+    displayLocation:
+      x: 159.0
+      y: 10.0
+      z: 115.0
+  couloir_bureaux_interne:
+    boundingBox:
+      minX: 120.0
+      minY: 8.0
+      minZ: 161.0
+      maxX: 127.0
+      maxY: 12.0
+      maxZ: 165.0
+    displayLocation:
+      x: 124.0
+      y: 10.0
+      z: 164.5
+  bureaux_1:
+    boundingBox:
+      minX: 136.0
+      minY: 12.0
+      minZ: 174.0
+      maxX: 140.0
+      maxY: 15.0
+      maxZ: 179.0
+    displayLocation:
+      x: 136.5
+      y: 13.0
+      z: 176.0
+  processeur:
+    boundingBox:
+      minX: 184.0
+      minY: 9.0
+      minZ: 192.0
+      maxX: 189.0
+      maxY: 14.0
+      maxZ: 197.0
+    displayLocation:
+      x: 185.5
+      y: 10.0
+      z: 196.0
+  livraison:
+    boundingBox:
+      minX: 170.0
+      minY: 9.0
+      minZ: 181.0
+      maxX: 175.0
+      maxY: 13.0
+      maxZ: 186.0
+    displayLocation:
+      x: 173.0
+      y: 10.0
+      z: 182.5
+  couloir_est:
+    boundingBox:
+      minX: 195.0
+      minY: 9.0
+      minZ: 157.0
+      maxX: 199.0
+      maxY: 13.0
+      maxZ: 165.0
+    displayLocation:
+      x: 198.5
+      y: 10.0
+      z: 161.0
+  openspace:
+    boundingBox:
+      minX: 103.0
+      minY: 9.0
+      minZ: 156.0
+      maxX: 107.0
+      maxY: 14.0
+      maxZ: 163.0
+    displayLocation:
+      x: 103.5
+      y: 10.0
+      z: 160.0
+thiefMinimapSpawns:
+  '1':
+    x: 304.5
+    y: 12.0
+    z: 115.5
+    pitch: 0.0
+    yaw: 45.0
+  '2':
+    x: 305.5
+    y: 12.0
+    z: 117.5
+    pitch: 0.0
+    yaw: 60.0
+  '3':
+    x: 302.5
+    y: 12.0
+    z: 114.5
+    pitch: 0.0
+    yaw: 30.0
+roomCaptors:
+  camion_2:
+    triggerBox:
+      minX: 106.0
+      minY: 9.0
+      minZ: 152.0
+      maxX: 135.0
+      maxY: 13.0
+      maxZ: 153.0
+    room: Camion
+  foundry:
+    triggerBox:
+      minX: 159.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 175.0
+      maxY: 16.0
+      maxZ: 181.0
+    room: Production - Fonderie
+  com:
+    triggerBox:
+      minX: 124.0
+      minY: 9.0
+      minZ: 166.0
+      maxX: 134.0
+      maxY: 15.0
+      maxZ: 173.0
+    room: Bureaux - Communication
+  parking:
+    triggerBox:
+      minX: 168.0
+      minY: 7.0
+      minZ: 101.0
+      maxX: 186.0
+      maxY: 16.0
+      maxZ: 125.0
+    room: Extérieur - Parking
+  camion_3:
+    triggerBox:
+      minX: 134.0
+      minY: 9.0
+      minZ: 142.0
+      maxX: 135.0
+      maxY: 11.0
+      maxZ: 145.0
+    room: Camion
+  camion_4:
+    triggerBox:
+      minX: 104.0
+      minY: 15.0
+      minZ: 142.0
+      maxX: 105.0
+      maxY: 22.0
+      maxZ: 153.0
+    room: Camion
+  furnace:
+    triggerBox:
+      minX: 148.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 159.0
+      maxY: 16.0
+      maxZ: 181.0
+    room: Production - Four
+  camion_1:
+    triggerBox:
+      minX: 104.0
+      minY: 9.0
+      minZ: 141.0
+      maxX: 123.0
+      maxY: 13.0
+      maxZ: 142.0
+    room: Camion
+  east_corridor_1:
+    triggerBox:
+      minX: 176.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 177.0
+      maxY: 13.0
+      maxZ: 173.0
+    room: Couloir est
+  east_corridor_2:
+    triggerBox:
+      minX: 181.0
+      minY: 9.0
+      minZ: 172.0
+      maxX: 185.0
+      maxY: 13.0
+      maxZ: 173.0
+    room: Couloir est
+  construction_internal:
+    triggerBox:
+      minX: 134.0
+      minY: 9.0
+      minZ: 101.0
+      maxX: 150.0
+      maxY: 20.0
+      maxZ: 116.0
+    room: Entrepôt - Travaux
+  fenwick:
+    triggerBox:
+      minX: 111.0
+      minY: 9.0
+      minZ: 116.0
+      maxX: 118.0
+      maxY: 17.0
+      maxZ: 125.0
+    room: Entrepôt - Fenwick
+  drh:
+    triggerBox:
+      minX: 104.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 110.0
+      maxY: 15.0
+      maxZ: 180.0
+    room: Bureaux - DRH
+  couloir_compta_3:
+    triggerBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    room: Bureaux - Couloir Comptabilité
+  logs:
+    triggerBox:
+      minX: 111.0
+      minY: 9.0
+      minZ: 101.0
+      maxX: 118.0
+      maxY: 17.0
+      maxZ: 115.0
+    room: Entrepôt - Bûches
+  couloir_compta_1:
+    triggerBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    room: Bureaux - Couloir Comptabilité
+  couloir_compta_2:
+    triggerBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    room: Bureaux - Couloir Comptabilité
+  secreteriat:
+    triggerBox:
+      minX: 188.0
+      minY: 9.0
+      minZ: 137.0
+      maxX: 199.0
+      maxY: 15.0
+      maxZ: 152.0
+    room: Administration - Secreteriat
+  package:
+    triggerBox:
+      minX: 103.0
+      minY: 9.0
+      minZ: 126.0
+      maxX: 118.0
+      maxY: 14.0
+      maxZ: 133.0
+    room: Entrepôt - Colis
+  construction_external:
+    triggerBox:
+      minX: 151.0
+      minY: 7.0
+      minZ: 101.0
+      maxX: 168.0
+      maxY: 16.0
+      maxZ: 125.0
+    room: Extérieur - Travaux
+  couloir_rh_2:
+    triggerBox:
+      minX: 111.0
+      minY: 9.0
+      minZ: 161.0
+      maxX: 126.0
+      maxY: 16.0
+      maxZ: 165.0
+    room: Bureaux - Couloir RH
+  couloir_rh_1:
+    triggerBox:
+      minX: 111.0
+      minY: 8.0
+      minZ: 154.0
+      maxX: 115.0
+      maxY: 16.0
+      maxZ: 161.0
+    room: Bureaux - Couloir RH
+  impression_2:
+    triggerBox:
+      minX: 152.0
+      minY: 9.0
+      minZ: 142.0
+      maxX: 162.0
+      maxY: 14.0
+      maxZ: 158.0
+    room: Recherche - Impression
+  cargaison:
+    triggerBox:
+      minX: 119.0
+      minY: 9.0
+      minZ: 101.0
+      maxX: 133.0
+      maxY: 20.0
+      maxZ: 116.0
+    room: Entrepôt - Cargaison
+  impression_1:
+    triggerBox:
+      minX: 148.0
+      minY: 9.0
+      minZ: 158.0
+      maxX: 162.0
+      maxY: 14.0
+      maxZ: 168.0
+    room: Recherche - Impression
+  east_corridor_7:
+    triggerBox:
+      minX: 188.0
+      minY: 9.0
+      minZ: 153.0
+      maxX: 189.0
+      maxY: 13.0
+      maxZ: 157.0
+    room: Couloir est
+  coeur_2:
+    triggerBox:
+      minX: 156.0
+      minY: 9.0
+      minZ: 140.0
+      maxX: 162.0
+      maxY: 14.0
+      maxZ: 141.0
+    room: Labo - Coeur
+  coeur_1:
+    triggerBox:
+      minX: 151.0
+      minY: 9.0
+      minZ: 134.0
+      maxX: 152.0
+      maxY: 15.0
+      maxZ: 137.0
+    room: Labo - Coeur
+  tech_storage_3:
+    triggerBox:
+      minX: 188.0
+      minY: 9.0
+      minZ: 163.0
+      maxX: 189.0
+      maxY: 13.0
+      maxZ: 167.0
+    room: Recherche - Reserve
+  tech_storage_2:
+    triggerBox:
+      minX: 193.0
+      minY: 12.0
+      minZ: 164.0
+      maxX: 194.0
+      maxY: 14.0
+      maxZ: 167.0
+    room: Recherche - Reserve
+  openspace_1:
+    triggerBox:
+      minX: 103.0
+      minY: 9.0
+      minZ: 166.0
+      maxX: 118.0
+      maxY: 15.0
+      maxZ: 173.0
+    room: Bureaux - OpenSpace
+  coeur_3:
+    triggerBox:
+      minX: 161.0
+      minY: 14.0
+      minZ: 126.0
+      maxX: 162.0
+      maxY: 15.0
+      maxZ: 127.0
+    room: Labo - Coeur
+  tech_storage_1:
+    triggerBox:
+      minX: 193.0
+      minY: 9.0
+      minZ: 160.0
+      maxX: 194.0
+      maxY: 13.0
+      maxZ: 164.0
+    room: Recherche - Reserve
+  fiche:
+    triggerBox:
+      minX: 116.0
+      minY: 9.0
+      minZ: 154.0
+      maxX: 126.0
+      maxY: 15.0
+      maxZ: 160.0
+    room: Bureaux - Fiche
+  openspace_2:
+    triggerBox:
+      minX: 103.0
+      minY: 9.0
+      minZ: 154.0
+      maxX: 110.0
+      maxY: 15.0
+      maxZ: 166.0
+    room: Bureaux - OpenSpace
+  east_corridor_3:
+    triggerBox:
+      minX: 179.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 183.0
+      maxY: 13.0
+      maxZ: 170.0
+    room: Couloir est
+  east_corridor_4:
+    triggerBox:
+      minX: 189.0
+      minY: 9.0
+      minZ: 172.0
+      maxX: 192.0
+      maxY: 11.0
+      maxZ: 173.0
+    room: Couloir est
+  east_corridor_5:
+    triggerBox:
+      minX: 195.0
+      minY: 12.0
+      minZ: 164.0
+      maxX: 196.0
+      maxY: 14.0
+      maxZ: 167.0
+    room: Couloir est
+  transit:
+    triggerBox:
+      minX: 103.0
+      minY: 5.0
+      minZ: 134.0
+      maxX: 118.0
+      maxY: 14.0
+      maxZ: 141.0
+    room: Entrepôt - Transit
+  east_corridor_6:
+    triggerBox:
+      minX: 195.0
+      minY: 10.0
+      minZ: 160.0
+      maxX: 196.0
+      maxY: 13.0
+      maxZ: 164.0
+    room: Couloir est
+  cartographie_2:
+    triggerBox:
+      minX: 127.0
+      minY: 9.0
+      minZ: 154.0
+      maxX: 135.0
+      maxY: 16.0
+      maxZ: 165.0
+    room: Bureaux - Cartographie
+  cartographie_1:
+    triggerBox:
+      minX: 135.0
+      minY: 9.0
+      minZ: 158.0
+      maxX: 147.0
+      maxY: 16.0
+      maxZ: 168.0
+    room: Bureaux - Cartographie
+  basement:
+    triggerBox:
+      minX: 152.0
+      minY: 5.0
+      minZ: 152.0
+      maxX: 162.0
+      maxY: 8.0
+      maxZ: 163.0
+    room: Recherche - Sous-sol
+  archives:
+    triggerBox:
+      minX: 120.0
+      minY: 9.0
+      minZ: 190.0
+      maxX: 135.0
+      maxY: 15.0
+      maxZ: 197.0
+    room: Bureaux - Archives
+  couloir_sud_2:
+    triggerBox:
+      minX: 143.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 147.0
+      maxY: 15.0
+      maxZ: 191.0
+    room: Couloir sud
+  couloir_sud_1:
+    triggerBox:
+      minX: 135.0
+      minY: 9.0
+      minZ: 169.0
+      maxX: 143.0
+      maxY: 15.0
+      maxZ: 173.0
+    room: Couloir sud
+  couloir_admin_2:
+    triggerBox:
+      minX: 164.0
+      minY: 9.0
+      minZ: 140.0
+      maxX: 166.0
+      maxY: 12.0
+      maxZ: 141.0
+    room: Administration - Couloir
+  couloir_admin_3:
+    triggerBox:
+      minX: 163.0
+      minY: 9.0
+      minZ: 126.0
+      maxX: 167.0
+      maxY: 15.0
+      maxZ: 127.0
+    room: Administration - Couloir
+  couloir_admin_4:
+    triggerBox:
+      minX: 170.0
+      minY: 9.0
+      minZ: 137.0
+      maxX: 174.0
+      maxY: 12.0
+      maxZ: 138.0
+    room: Administration - Couloir
+  chests:
+    triggerBox:
+      minX: 103.0
+      minY: 9.0
+      minZ: 101.0
+      maxX: 110.0
+      maxY: 17.0
+      maxZ: 125.0
+    room: Entrepôt - Coffres
+  couloir_admin_1:
+    triggerBox:
+      minX: 177.0
+      minY: 9.0
+      minZ: 137.0
+      maxX: 178.0
+      maxY: 12.0
+      maxZ: 140.0
+    room: Administration - Couloir
+  prototype_1:
+    triggerBox:
+      minX: 178.0
+      minY: 9.0
+      minZ: 162.0
+      maxX: 187.0
+      maxY: 14.0
+      maxZ: 168.0
+    room: Recherche - Prototype
+  prototype_2:
+    triggerBox:
+      minX: 163.0
+      minY: 7.0
+      minZ: 154.0
+      maxX: 178.0
+      maxY: 14.0
+      maxZ: 168.0
+    room: Recherche - Prototype
+  garde_3:
+    triggerBox:
+      minX: 163.0
+      minY: 9.0
+      minZ: 147.0
+      maxX: 164.0
+      maxY: 12.0
+      maxZ: 149.0
+    room: Administration - Salle de garde
+  garde_2:
+    triggerBox:
+      minX: 164.0
+      minY: 9.0
+      minZ: 144.0
+      maxX: 165.0
+      maxY: 10.0
+      maxZ: 145.0
+    room: Administration - Salle de garde
+  toilettes:
+    triggerBox:
+      minX: 143.0
+      minY: 9.0
+      minZ: 191.0
+      maxX: 147.0
+      maxY: 15.0
+      maxZ: 197.0
+    room: Production - Toilettes
+  boss_1:
+    triggerBox:
+      minX: 175.0
+      minY: 9.0
+      minZ: 126.0
+      maxX: 177.0
+      maxY: 12.0
+      maxZ: 127.0
+    room: Administration - Boss
+  garde_4:
+    triggerBox:
+      minX: 164.0
+      minY: 9.0
+      minZ: 151.0
+      maxX: 165.0
+      maxY: 10.0
+      maxZ: 152.0
+    room: Administration - Salle de garde
+  library:
+    triggerBox:
+      minX: 179.0
+      minY: 9.0
+      minZ: 137.0
+      maxX: 187.0
+      maxY: 14.0
+      maxZ: 161.0
+    room: Administration - Bibliothèque
+  oeuf:
+    triggerBox:
+      minX: 124.0
+      minY: 9.0
+      minZ: 122.0
+      maxX: 139.0
+      maxY: 15.0
+      maxZ: 141.0
+    room: Labo - Oeuf
+  garde_1:
+    triggerBox:
+      minX: 164.0
+      minY: 9.0
+      minZ: 142.0
+      maxX: 166.0
+      maxY: 12.0
+      maxZ: 143.0
+    room: Administration - Salle de garde
+  specimen:
+    triggerBox:
+      minX: 136.0
+      minY: 9.0
+      minZ: 142.0
+      maxX: 151.0
+      maxY: 12.0
+      maxZ: 157.0
+    room: Labo - Specimen
+  livraison_3:
+    triggerBox:
+      minX: 167.0
+      minY: 9.0
+      minZ: 182.0
+      maxX: 171.0
+      maxY: 13.0
+      maxZ: 183.0
+    room: Production - Livraison
+  processor_3:
+    triggerBox:
+      minX: 176.0
+      minY: 11.0
+      minZ: 174.0
+      maxX: 177.0
+      maxY: 15.0
+      maxZ: 176.0
+    room: Production - Processeur
+  corridor_hangar_2:
+    triggerBox:
+      minX: 119.0
+      minY: 9.0
+      minZ: 121.0
+      maxX: 123.0
+      maxY: 13.0
+      maxZ: 140.0
+    room: Entrepôt - Couloir
+  livraison_2:
+    triggerBox:
+      minX: 174.0
+      minY: 9.0
+      minZ: 188.0
+      maxX: 175.0
+      maxY: 13.0
+      maxZ: 192.0
+    room: Production - Livraison
+  processor_4:
+    triggerBox:
+      minX: 189.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 192.0
+      maxY: 11.0
+      maxZ: 175.0
+    room: Production - Processeur
+  corridor_hangar_1:
+    triggerBox:
+      minX: 119.0
+      minY: 9.0
+      minZ: 117.0
+      maxX: 150.0
+      maxY: 13.0
+      maxZ: 121.0
+    room: Entrepôt - Couloir
+  processor_1:
+    triggerBox:
+      minX: 176.0
+      minY: 9.0
+      minZ: 188.0
+      maxX: 177.0
+      maxY: 13.0
+      maxZ: 192.0
+    room: Production - Processeur
+  lecture:
+    triggerBox:
+      minX: 136.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 142.0
+      maxY: 15.0
+      maxZ: 197.0
+    room: Bureaux - Lecture
+  livraison_5:
+    triggerBox:
+      minX: 148.0
+      minY: 9.0
+      minZ: 189.0
+      maxX: 149.0
+      maxY: 14.0
+      maxZ: 197.0
+    room: Production - Livraison
+  livraison_4:
+    triggerBox:
+      minX: 163.0
+      minY: 9.0
+      minZ: 189.0
+      maxX: 164.0
+      maxY: 14.0
+      maxZ: 196.0
+    room: Production - Livraison
+  processor_2:
+    triggerBox:
+      minX: 181.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 185.0
+      maxY: 13.0
+      maxZ: 175.0
+    room: Production - Processeur
+  reception:
+    triggerBox:
+      minX: 183.0
+      minY: 9.0
+      minZ: 126.0
+      maxX: 199.0
+      maxY: 15.0
+      maxZ: 136.0
+    room: Administration - Accueil
+  livraison_1:
+    triggerBox:
+      minX: 167.0
+      minY: 9.0
+      minZ: 196.0
+      maxX: 175.0
+      maxY: 11.0
+      maxZ: 197.0
+    room: Production - Livraison
+  boss_3:
+    triggerBox:
+      minX: 168.0
+      minY: 14.0
+      minZ: 126.0
+      maxX: 169.0
+      maxY: 15.0
+      maxZ: 127.0
+    room: Administration - Boss
+  boss_2:
+    triggerBox:
+      minX: 170.0
+      minY: 9.0
+      minZ: 135.0
+      maxX: 174.0
+      maxY: 12.0
+      maxZ: 136.0
+    room: Administration - Boss
+  boss_4:
+    triggerBox:
+      minX: 181.0
+      minY: 14.0
+      minZ: 135.0
+      maxX: 182.0
+      maxY: 15.0
+      maxZ: 136.0
+    room: Administration - Boss
+  cantine:
+    triggerBox:
+      minX: 120.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 135.0
+      maxY: 15.0
+      maxZ: 189.0
+    room: Bureaux - Cantine
+  donnees:
+    triggerBox:
+      minX: 108.0
+      minY: 9.0
+      minZ: 181.0
+      maxX: 119.0
+      maxY: 15.0
+      maxZ: 192.0
+    room: Bureaux - Données
+  reunion:
+    triggerBox:
+      minX: 111.0
+      minY: 9.0
+      minZ: 174.0
+      maxX: 119.0
+      maxY: 15.0
+      maxZ: 180.0
+    room: Bureaux - Réunion
+  garden:
+    triggerBox:
+      minX: 186.0
+      minY: 7.0
+      minZ: 101.0
+      maxX: 200.0
+      maxY: 16.0
+      maxZ: 125.0
+    room: Extérieur - Jardin
+  chimie:
+    triggerBox:
+      minX: 140.0
+      minY: 9.0
+      minZ: 122.0
+      maxX: 150.0
+      maxY: 15.0
+      maxZ: 141.0
+    room: Labo - Chimie
+entrances:
+  FabLab:
+    blockingBox:
+      minX: 156.0
+      minY: 15.0
+      minZ: 162.0
+      maxX: 158.0
+      maxY: 16.0
+      maxZ: 165.0
+    entranceTriggerBox:
+      minX: 156.0
+      minY: 14.0
+      minZ: 162.0
+      maxX: 158.0
+      maxY: 15.0
+      maxZ: 165.0
+  Prototype:
+    blockingBox:
+      minX: 171.0
+      minY: 15.0
+      minZ: 157.0
+      maxX: 174.0
+      maxY: 16.0
+      maxZ: 160.0
+    entranceTriggerBox:
+      minX: 171.0
+      minY: 14.0
+      minZ: 157.0
+      maxX: 174.0
+      maxY: 15.0
+      maxZ: 160.0
+  Hangar:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 107.0
+      minY: 9.0
+      minZ: 101.0
+      maxX: 109.0
+      maxY: 11.0
+      maxZ: 102.0
+  HangarToit:
+    blockingBox:
+      minX: 116.0
+      minY: 22.0
+      minZ: 107.0
+      maxX: 118.0
+      maxY: 23.0
+      maxZ: 110.0
+    entranceTriggerBox:
+      minX: 116.0
+      minY: 21.0
+      minZ: 107.0
+      maxX: 118.0
+      maxY: 22.0
+      maxZ: 110.0
+  Camion:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 104.0
+      minY: 16.0
+      minZ: 142.0
+      maxX: 105.0
+      maxY: 22.0
+      maxZ: 153.0
+  Couloir:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 106.0
+      minY: 13.0
+      minZ: 196.0
+      maxX: 109.0
+      maxY: 15.0
+      maxZ: 197.0
+  Secretariat:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 198.0
+      minY: 13.0
+      minZ: 145.0
+      maxX: 199.0
+      maxY: 15.0
+      maxZ: 148.0
+  Donnees:
+    blockingBox:
+      minX: 110.0
+      minY: 16.0
+      minZ: 183.0
+      maxX: 111.0
+      maxY: 17.0
+      maxZ: 184.0
+    entranceTriggerBox:
+      minX: 110.0
+      minY: 15.0
+      minZ: 183.0
+      maxX: 111.0
+      maxY: 16.0
+      maxZ: 184.0
+  Jardin:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 188.0
+      minY: 10.0
+      minZ: 101.0
+      maxX: 191.0
+      maxY: 12.0
+      maxZ: 102.0
+  Livraison:
+    blockingBox:
+      minX: 0.0
+      minY: 0.0
+      minZ: 0.0
+      maxX: 0.0
+      maxY: 0.0
+      maxZ: 0.0
+    entranceTriggerBox:
+      minX: 167.0
+      minY: 9.0
+      minZ: 196.0
+      maxX: 175.0
+      maxY: 11.0
+      maxZ: 197.0
+  OpenSpace:
+    blockingBox:
+      minX: 106.0
+      minY: 16.0
+      minZ: 165.0
+      maxX: 107.0
+      maxY: 17.0
+      maxZ: 166.0
+    entranceTriggerBox:
+      minX: 106.0
+      minY: 15.0
+      minZ: 165.0
+      maxX: 107.0
+      maxY: 16.0
+      maxZ: 166.0
+thiefSpawns:
+  Prototype:
+    minimapPosition:
+      x: 291.5
+      y: 10.0
+      z: 135.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 162.5
+      y: 16.0
+      z: 167.5
+      pitch: 0.0
+      yaw: -180.0
+  Hangar:
+    minimapPosition:
+      x: 276.5
+      y: 10.0
+      z: 122.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 107.5
+      y: 9.0
+      z: 96.5
+      pitch: 0.0
+      yaw: 0.0
+  Camion:
+    minimapPosition:
+      x: 275.5
+      y: 10.0
+      z: 132.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 99.5
+      y: 18.0
+      z: 147.5
+      pitch: 20.0
+      yaw: -90.0
+  Secretariat:
+    minimapPosition:
+      x: 297.5
+      y: 10.0
+      z: 132.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 203.5
+      y: 12.0
+      z: 146.5
+      pitch: 0.0
+      yaw: 90.0
+  Couloir:
+    minimapPosition:
+      x: 275.5
+      y: 10.0
+      z: 144.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 107.5
+      y: 13.0
+      z: 200.5
+      pitch: 0.0
+      yaw: 180.0
+  Jardin:
+    minimapPosition:
+      x: 296.5
+      y: 10.0
+      z: 123.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 189.5
+      y: 10.0
+      z: 93.5
+      pitch: 0.0
+      yaw: 0.0
+  Livraison:
+    minimapPosition:
+      x: 288.5
+      y: 10.0
+      z: 143.5
+      pitch: 0.0
+      yaw: 0.0
+    spawnPoint:
+      x: 171.5
+      y: 9.0
+      z: 203.5
+      pitch: 0.0
+      yaw: -180.0
+artefacts:
+  Specimen:
+    boundingBox:
+      minX: 138.0
+      minY: 8.0
+      minZ: 144.0
+      maxX: 145.0
+      maxY: 13.0
+      maxZ: 151.0
+    blockPosition:
+      x: 141.0
+      y: 9.0
+      z: 147.0
+  Coeur:
+    boundingBox:
+      minX: 151.0
+      minY: 9.0
+      minZ: 126.0
+      maxX: 159.0
+      maxY: 15.0
+      maxZ: 134.0
+    blockPosition:
+      x: 153.0
+      y: 10.0
+      z: 128.0
+  Prototype:
+    boundingBox:
+      minX: 168.0
+      minY: 9.0
+      minZ: 154.0
+      maxX: 177.0
+      maxY: 14.0
+      maxZ: 163.0
+    blockPosition:
+      x: 172.0
+      y: 10.0
+      z: 154.0
+  Fiche:
+    boundingBox:
+      minX: 119.0
+      minY: 9.0
+      minZ: 155.0
+      maxX: 125.0
+      maxY: 15.0
+      maxZ: 160.0
+    blockPosition:
+      x: 121.0
+      y: 9.0
+      z: 157.0
+  Processeur:
+    boundingBox:
+      minX: 186.0
+      minY: 5.0
+      minZ: 174.0
+      maxX: 195.0
+      maxY: 15.0
+      maxZ: 182.0
+    blockPosition:
+      x: 190.0
+      y: 10.0
+      z: 176.0
+  Cargaison:
+    boundingBox:
+      minX: 125.0
+      minY: 16.0
+      minZ: 102.0
+      maxX: 129.0
+      maxY: 20.0
+      maxZ: 110.0
+    blockPosition:
+      x: 126.0
+      y: 16.0
+      z: 104.0
+  Donnees:
+    boundingBox:
+      minX: 110.0
+      minY: 8.0
+      minZ: 183.0
+      maxX: 119.0
+      maxY: 15.0
+      maxZ: 192.0
+    blockPosition:
+      x: 114.0
+      y: 13.0
+      z: 187.0
+  Idole:
+    boundingBox:
+      minX: 189.0
+      minY: 9.0
+      minZ: 105.0
+      maxX: 197.0
+      maxY: 14.0
+      maxZ: 112.0
+    blockPosition:
+      x: 195.0
+      y: 10.0
+      z: 110.0
+  Colis:
+    boundingBox:
+      minX: 106.0
+      minY: 9.0
+      minZ: 127.0
+      maxX: 115.0
+      maxY: 14.0
+      maxZ: 133.0
+    blockPosition:
+      x: 109.0
+      y: 9.0
+      z: 130.0
+  Registre:
+    boundingBox:
+      minX: 188.0
+      minY: 9.0
+      minZ: 143.0
+      maxX: 195.0
+      maxY: 15.0
+      maxZ: 152.0
+    blockPosition:
+      x: 190.0
+      y: 11.0
+      z: 151.0
+  Produit:
+    boundingBox:
+      minX: 152.0
+      minY: 8.0
+      minZ: 188.0
+      maxX: 161.0
+      maxY: 15.0
+      maxZ: 197.0
+    blockPosition:
+      x: 155.0
+      y: 10.0
+      z: 192.0
+guardSpawns:
+  '1':
+    x: 172.5
+    y: 9.0
+    z: 147.5
+    pitch: -10.0
+    yaw: -90.0
+  '2':
+    x: 173.5
+    y: 9.0
+    z: 144.5
+    pitch: -10.0
+    yaw: -45.0
+  '3':
+    x: 173.5
+    y: 9.0
+    z: 145.5
+    pitch: -10.0
+    yaw: -135.0
+gates:
+  accueil_library:
+    minX: 184.0
+    minY: 9.0
+    minZ: 136.0
+    maxX: 186.0
+    maxY: 12.0
+    maxZ: 137.0
+  jardin_accueil:
+    minX: 190.0
+    minY: 9.0
+    minZ: 125.0
+    maxX: 192.0
+    maxY: 12.0
+    maxZ: 126.0

@@ -1,0 +1,10 @@
+display_name: <gray>Traceur
+price: 100
+amount_limit: -1
+shop_icon: CROSSBOW
+is_rune: false
+lore:
+- <lore>Tire un projectile à grande vitesse.
+- <lore>Obtenez une boussole qui <important>pointe vers l'ennemi touché</important>.
+team:
+- thief

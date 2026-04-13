@@ -1,0 +1,20 @@
+display_name: <light_purple>Radar
+price: 400
+amount_limit: 1
+shop_icon: DAYLIGHT_DETECTOR
+delay: 5.0
+range: 20.0
+cooldown: 20.0
+detection_success: <gold>Radar</gold> >> <aqua><number></aqua> <green>ennemis détéctés
+  à proximité !</green>
+detection_fail: <gold>Radar</gold> >> <aqua>0</aqua> <red>ennemis détéctés à proximité
+  !</red>
+detection_detected: <gold>Radar</gold> >> <red>Vous avez été détecté !
+is_rune: false
+lore:
+- <lore>Permet de poser un radar qui, après <variable><delay>s</variable>,
+- <lore><important>indique le nombre d'ennemis dans un rayon</important> de <variable><range>
+  blocs</variable>.
+- '<lore>Temps de recharge: <variable><cooldown>s</variable>.'
+team:
+- guard
