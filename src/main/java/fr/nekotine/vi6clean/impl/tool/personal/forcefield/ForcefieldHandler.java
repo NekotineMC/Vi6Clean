@@ -78,16 +78,25 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 	
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
-		if (evt.getHand() != EquipmentSlot.HAND) {
+		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
 		var tool = getToolFromItem(evt.getItem());
 		if (tool == null) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY) && tryPlaceField(tool)) {
+		var gate = getTargetedGate(tool.getOwner());
+		if (gate != null) {
+			if (fieldsDisplay.get(gate).activated) {
+				tool.nbPosed = Math.max(0,tool.nbPosed-1);
+				removeField(gate);
+			}else if (tool.nbPosed < FORCEFIELD_NB_MAX){
+				tool.nbPosed++;
+				placeField(gate);
+			}
 			evt.setCancelled(true);
 		}
+		
 	}
 	
 	@EventHandler
@@ -204,21 +213,6 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 				.filter(bb -> bb.getValue().rayTrace(start, dir, 100.0) != null)
 				.sorted((a,b)-> (int)(start.distanceSquared(a.getValue().getCenter())-start.distanceSquared(b.getValue().getCenter())))
 				.map(e -> e.getKey()).findFirst().orElse(null);
-	}
-	
-	private boolean tryPlaceField(Forcefield ff) {
-		var gate = getTargetedGate(ff.getOwner());
-		if (gate != null) {
-			if (fieldsDisplay.get(gate).activated) {
-				ff.nbPosed = Math.max(0,ff.nbPosed-1);
-				removeField(gate);
-			}else if (ff.nbPosed >= FORCEFIELD_NB_MAX){
-				ff.nbPosed++;
-				placeField(gate);
-			}
-			return true;
-		}
-		return false;
 	}
 	
 	private void displayDoor(String door, Player player) {
