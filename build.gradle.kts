@@ -70,10 +70,10 @@ val outputDir = project.findProperty("Vi6CleanJarOutputPath")
     ?: layout.buildDirectory.dir("dist")
 
 tasks.register<Copy>("output") {
-	group = "dev"
-	description = "Sends jar to a custom output directory"
-	from(tasks.shadowJar)
-	into(outputDir)
+    group = "dev"
+    description = "Sends jar to a custom output directory"
+    from(tasks.shadowJar)
+    into(outputDir)
 }
 
 defaultTasks("shadowJar")
