@@ -3,7 +3,7 @@ val Vi6CleanServerPluginDirectory: String? by project
 
 plugins {
     java
-    id("com.gradleup.shadow") version "+"
+    alias(libs.plugins.shadow)
 }
 
 group = "fr.nekotine"
@@ -16,11 +16,11 @@ repositories {
 
     // PaperMC
     maven("https://repo.papermc.io/repository/maven-public/"){
-    	name = "papermc"
+        name = "papermc"
     }
     // CommandAPI
     maven ("https://repo.codemc.org/repository/maven-public/"){
-    	name = "commandapi"
+        name = "commandapi"
     }
     /*
     // ProtocolLib
@@ -35,11 +35,29 @@ repositories {
 }
 
 dependencies {
-	compileOnly("io.papermc.paper:paper-api:1.21.11+")
-	compileOnly("net.dmulloy2:ProtocolLib:+")
-	compileOnly("dev.jorel:commandapi-paper-shade:11.1+")
-	implementation( "fr.nekotine:NekotineCore:+")
-    compileOnly("de.maxhenkel.voicechat:voicechat-api:+")
+    compileOnly(libs.paper.api)
+    compileOnly(libs.protocollib)
+    compileOnly(libs.commandapi)
+    implementation("fr.nekotine:NekotineCore:+")
+    compileOnly(libs.voicechat.api)
+}
+
+dependencyLocking {
+    lockAllConfigurations()
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<ProcessResources> {
+    filteringCharset = "UTF-8"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
