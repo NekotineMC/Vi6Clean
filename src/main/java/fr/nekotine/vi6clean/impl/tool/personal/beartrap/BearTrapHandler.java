@@ -117,6 +117,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 					a.getEquipment().setHelmet(ARMED_HELMET_ITEM);
 				}
 			}));
+			tool.setArmed(true);
 			editItem(tool, i -> {
 				i.setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile(UNARMED_PLAYER_PROFILE));
 			});

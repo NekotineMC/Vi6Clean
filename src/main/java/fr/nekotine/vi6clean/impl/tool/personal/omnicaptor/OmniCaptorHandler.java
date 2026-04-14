@@ -78,47 +78,41 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 			return;
 		}
 		var player = evt.getPlayer();
-		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
-			// TRY PICKUP
-			var ploc = player.getLocation();
-			if (tool.placed != null) {
-				if (ploc.distanceSquared(tool.placed.getLocation()) <= DETECTION_RANGE_SQUARED) {
-					tool.placed.remove();
-					tool.placed = null;
-					Vi6Sound.OMNICAPTEUR_PICKUP.play(ploc.getWorld(),ploc);
-					editItem(tool, item -> {
-						item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
-						item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE))));
-					});
-					var flagModule = Ioc.resolve(StatusFlagModule.class);
-					for (var p : tool.ennemiesInRange) {
-						flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
-					}
-					tool.ennemiesInRange.clear();
-					evt.setCancelled(true);
+		// TRY PICKUP
+		var ploc = player.getLocation();
+		if (tool.placed != null) {
+			if (ploc.distanceSquared(tool.placed.getLocation()) <= DETECTION_RANGE_SQUARED) {
+				tool.placed.remove();
+				tool.placed = null;
+				Vi6Sound.OMNICAPTEUR_PICKUP.play(ploc.getWorld(),ploc);
+				editItem(tool, item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE))));
+				});
+				var flagModule = Ioc.resolve(StatusFlagModule.class);
+				for (var p : tool.ennemiesInRange) {
+					flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
 				}
+				tool.ennemiesInRange.clear();
+				evt.setCancelled(true);
 			}
-		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
+		}else {
 			// TRY PLACE
-			var ploc = player.getLocation();
-			if (tool.placed == null) {
-				if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
-					tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
-						if (e instanceof ItemDisplay display) {
-							display.setPersistent(false);
-							var stack = new ItemStack(Material.REDSTONE_TORCH);
-							stack.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
-							display.setItemStack(stack);
-						}
-					});
-					Vi6Sound.OMNICAPTEUR_PLACE.play(ploc.getWorld(),ploc);
-					editItem(tool, item -> {
-						item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
-						item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY))));
-					});
-					evt.setCancelled(true);
-				}
+			if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
+				tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
+					if (e instanceof ItemDisplay display) {
+						display.setPersistent(false);
+						var stack = new ItemStack(Material.REDSTONE_TORCH);
+						display.setItemStack(stack);
+						stack.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+					}
+				});
+				Vi6Sound.OMNICAPTEUR_PLACE.play(ploc.getWorld(),ploc);
+				editItem(tool, item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
+					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Placé", NamedTextColor.GRAY))));
+				});
+				evt.setCancelled(true);
 			}
 		}
 	}

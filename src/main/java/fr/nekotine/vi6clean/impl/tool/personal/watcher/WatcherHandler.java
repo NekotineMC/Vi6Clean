@@ -76,7 +76,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		var player = evt.getPlayer();
 		var tool = getToolFromItem(evt.getItem());
-		if (tool == null || tool.watchers.size() < NB_MAX_WATCHER || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
+		if (tool == null || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
 			return;
 		}
 		

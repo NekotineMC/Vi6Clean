@@ -104,7 +104,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 			}
 			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
 				// LOW TICK
-				if (tool.isSneaking() || tool.getOwner() == null) {
+				if (!tool.isSneaking() || tool.getOwner() == null) {
 					return;
 				}
 				var player = tool.getOwner();
