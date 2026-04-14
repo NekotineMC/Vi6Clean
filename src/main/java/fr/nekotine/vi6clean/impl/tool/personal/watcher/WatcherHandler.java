@@ -30,6 +30,8 @@ import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
@@ -70,7 +72,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 	
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
-		if (evt.getHand() != EquipmentSlot.HAND) {
+		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
 		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);

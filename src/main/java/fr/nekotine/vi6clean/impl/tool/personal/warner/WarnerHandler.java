@@ -2,6 +2,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.warner;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -116,9 +117,7 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner>{
 	
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var iterator = getTools().iterator();
-		while(iterator.hasNext()) {
-			var tool = iterator.next();
+		for (var tool : getTools().stream().collect(Collectors.toList())) {
 
 			if(tool.watched != null && tool.watched.isCaptured() && ++tool.warnDelay >= WARN_DELAY_TICK) {
 				var message = Ioc.resolve(TextModule.class).message(Leaf.builder()

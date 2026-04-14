@@ -60,7 +60,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer>{
 		var player = evt.getPlayer();
 		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		var tool = getToolFromItem(evt.getItem());
-		if (tool == null || player.getCooldown(NamespacedKey.fromString(getToolCode()+'/'+tool.getId(), Ioc.resolve(JavaPlugin.class))) <= 0 || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
+		if (tool == null || player.getCooldown(NamespacedKey.fromString(getToolCode()+'/'+tool.getId(), Ioc.resolve(JavaPlugin.class))) > 0 || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
 			return;
 		}
 		// SHOT

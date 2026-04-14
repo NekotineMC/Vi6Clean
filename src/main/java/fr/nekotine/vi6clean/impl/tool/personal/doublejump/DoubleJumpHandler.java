@@ -7,6 +7,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -82,7 +83,7 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	}
 	
 	public boolean isOnGround(Player p) {
-		return !p.isFlying() && EntityUtil.IsOnGround(p) && p.getFallDistance() <= 0;
+		return !p.isFlying() && EntityUtil.IsOnGround((Entity)p) && p.getFallDistance() <= 0;
 	}
 
 	@Override
@@ -95,6 +96,8 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 		boots.addEnchantment(Enchantment.BINDING_CURSE, 1);
 		boots.addItemFlags(ItemFlag.values());
 		boots.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.itemAttributes().addModifier(Attribute.ARMOR, new AttributeModifier(bootNoArmorAttributeKey, -1, Operation.MULTIPLY_SCALAR_1)));
+		boots.unsetData(DataComponentTypes.DAMAGE);
+		boots.unsetData(DataComponentTypes.MAX_DAMAGE);
 		player.getInventory().setBoots(boots);
 	}
 

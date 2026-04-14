@@ -29,6 +29,7 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
@@ -98,13 +99,13 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 			}
 		}else {
 			// TRY PLACE
-			if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
-				tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
+			if (EntityUtil.IsOnGround(player)) {
+				tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc.toVector().toLocation(ploc.getWorld())/*On retire la rotation*/, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
 					if (e instanceof ItemDisplay display) {
 						display.setPersistent(false);
 						var stack = new ItemStack(Material.REDSTONE_TORCH);
-						display.setItemStack(stack);
 						stack.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+						display.setItemStack(stack);
 					}
 				});
 				Vi6Sound.OMNICAPTEUR_PLACE.play(ploc.getWorld(),ploc);

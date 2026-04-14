@@ -54,8 +54,8 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier>{
 	protected void onDetachFromPlayer(Minifier tool) {
 		var player = tool.getOwner();
 		player.getAttribute(Attribute.SCALE).removeModifier(SCALE_ATTRIBUTE_KEY);
-		player.getAttribute(Attribute.SCALE).removeModifier(gravityAttributeKey);
-		player.getAttribute(Attribute.SCALE).removeModifier(healthAttributeKey);
+		player.getAttribute(Attribute.GRAVITY).removeModifier(gravityAttributeKey);
+		player.getAttribute(Attribute.MAX_HEALTH).removeModifier(healthAttributeKey);
 	}
 
 	@Override

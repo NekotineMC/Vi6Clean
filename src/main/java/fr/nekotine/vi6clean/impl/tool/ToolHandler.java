@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -161,7 +162,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	public final void removeAll() {
-		tools.values().forEach(this::remove);
+		tools.values().stream().collect(Collectors.toList()).forEach(this::remove);
 		tools.clear();
 	}
 	
@@ -245,7 +246,6 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		detachFromOwner(tool);
 		onToolCleanup(tool);
 		tools.remove(tool.getId());
-		System.out.println(getToolCode()+" REMOVED");
 	}
 	
 	private final void removeGeneric(Tool tool) {

@@ -17,6 +17,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -114,12 +115,16 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap,Player> i
 		minimapSpawnIndicators.clear();
 		map.getThiefSpawns().values().stream().forEach(entrance -> {
 			var pos = entrance.getMinimapPosition();
-			var armorStand = (ArmorStand)world.spawnEntity(pos.toLocation(world), EntityType.ARMOR_STAND);
-			armorStand.setVisible(false);
-			armorStand.setInvulnerable(true);
-			armorStand.setGravity(false);
-			armorStand.setVisualFire(TriState.TRUE);
-			armorStand.addDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HAND,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.OFF_HAND);
+			var armorStand = (ArmorStand)world.spawnEntity(pos.toLocation(world), EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
+				if (e instanceof ArmorStand stand) {
+					stand.setPersistent(false);
+					stand.setVisible(false);
+					stand.setInvulnerable(true);
+					stand.setGravity(false);
+					stand.setVisualFire(TriState.TRUE);
+					stand.addDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HAND,EquipmentSlot.LEGS,EquipmentSlot.FEET,EquipmentSlot.OFF_HAND);
+				}
+			});
 			minimapSpawnIndicators.put(armorStand, entrance);
 		});
 		game.getGuards().spawnInMap();
