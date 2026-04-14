@@ -311,7 +311,6 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	private void displayGameSettingsDialog(Player player) {
 		var mapModule = Ioc.resolve(MapModule.class);
 		var maps = mapModule.listMaps();
-		System.out.println("MAP NAME="+getMapName());
 		var dialog = Dialog.create(builder -> builder.empty()
 				.base(DialogBase.builder(MiniMessage.miniMessage().deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
 						.canCloseWithEscape(true)

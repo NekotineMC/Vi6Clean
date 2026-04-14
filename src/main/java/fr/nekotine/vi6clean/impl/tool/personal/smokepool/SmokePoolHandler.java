@@ -62,7 +62,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool>{
 			var owner = tool.getOwner();
 			if (tool.position != null && owner.getCooldown(Material.FIREWORK_STAR) <= COOLDOWN_TICK) {
 				tool.position = null; // La pool a expirée et n'est plus active
-				editItem(tool, item -> item.unsetData(DataComponentTypes.ITEM_MODEL));
+				editItem(tool, item -> item.resetData(DataComponentTypes.ITEM_MODEL));
 			}
 			// PARTICLE
 			if (tool.position != null) {

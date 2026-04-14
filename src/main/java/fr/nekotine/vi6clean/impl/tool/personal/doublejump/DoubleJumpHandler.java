@@ -139,8 +139,8 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var boots = p.getInventory().getBoots();
-				item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
-				boots.unsetData(DataComponentTypes.ITEM_MODEL);
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
+				boots.resetData(DataComponentTypes.ITEM_MODEL);
 				item.editMeta(m -> m.displayName(getDisplayName()));
 				boots.editMeta(m -> m.displayName(getDisplayName()));
 			});

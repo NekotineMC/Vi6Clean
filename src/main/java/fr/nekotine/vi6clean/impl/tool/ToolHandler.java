@@ -184,7 +184,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			return;
 		}
 		// On limite le nombre d'items de ce type dans l'inventaire du joueur
-		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite) {
+		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite && limite >= 0) {
 			evt.setCancelled(true);
 			return;
 		}
@@ -328,7 +328,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getWhoClicked() instanceof Player player)) {
 			return;
 		}
-		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite) {
+		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite && limite >= 0) {
 			evt.setCancelled(true);
 			return;
 		}

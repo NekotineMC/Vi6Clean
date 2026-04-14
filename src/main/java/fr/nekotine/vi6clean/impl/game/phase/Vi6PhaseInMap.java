@@ -269,7 +269,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var wrap = wrappingModule.getWrapper(item, InMapPhasePlayerWrapper.class);
 		item.setGameMode(GameMode.ADVENTURE);
-		System.out.println("Change player GameMode to ADVENTURE:"+item.getName());
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();

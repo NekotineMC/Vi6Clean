@@ -269,7 +269,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
-				item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName().append(
 						Component.text(" [", NamedTextColor.WHITE)
 						.append(Component.text(CHARGES-tool.pads.size(), NamedTextColor.GREEN))

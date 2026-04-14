@@ -91,7 +91,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow>{
 			if (!EntityUtil.IsOnGround(player)) {
 				return;
 			}
-			tool.shadow = (Mannequin) ploc.getWorld().spawnEntity(ploc, EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
+			tool.shadow = (Mannequin) ploc.getWorld().spawnEntity(ploc, EntityType.MANNEQUIN, SpawnReason.CUSTOM, e -> {
 				if (e instanceof Mannequin man) {
 					man.setProfile(SHADOW_PROFILE);
 					var helmet = ItemStack.of(Material.PLAYER_HEAD);
@@ -196,7 +196,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow>{
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				if (tool.shadow == null) {
-					item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
+					item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Disponible", NamedTextColor.BLUE))));
 				}else {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.SKELETON_SKULL.key());

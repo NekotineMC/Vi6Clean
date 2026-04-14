@@ -88,7 +88,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 			tool.watchers.remove(sf);
 			sf.remove();
 			editItem(tool, item -> {
-				item.unsetData(DataComponentTypes.ITEM_MODEL);
+				item.resetData(DataComponentTypes.ITEM_MODEL);
 				item.setAmount(NB_MAX_WATCHER-tool.watchers.size());
 			});
 			evt.setCancelled(true);
@@ -159,7 +159,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 				sf.remove();
 				tool.watchers.remove(sf);
 				editItem(tool, item -> {
-					item.unsetData(DataComponentTypes.ITEM_MODEL);
+					item.resetData(DataComponentTypes.ITEM_MODEL);
 					item.setAmount(NB_MAX_WATCHER-tool.watchers.size());
 				});
 			}
@@ -256,7 +256,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 				item.editMeta(m -> m.displayName(getDisplayName()));
 				
 				if (NB_MAX_WATCHER - tool.watchers.size() > 0) {
-					item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
+					item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				}else {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.ENDERMITE_SPAWN_EGG.key());
 				}

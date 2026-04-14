@@ -59,7 +59,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak>{
 				statusEffectModule.removeEffect(tool.getOwner(), invisibleEffect);
 			}else {
 				editItem(tool, item -> {
-					item.unsetData(DataComponentTypes.ITEM_MODEL);
+					item.resetData(DataComponentTypes.ITEM_MODEL);
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Invisible", NamedTextColor.GRAY))));
 				});
 				statusEffectModule.addEffect(tool.getOwner(), invisibleEffect);

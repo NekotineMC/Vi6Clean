@@ -121,7 +121,7 @@ public class SonarHandler extends ToolHandler<SonarHandler.Sonar>{
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
 		}

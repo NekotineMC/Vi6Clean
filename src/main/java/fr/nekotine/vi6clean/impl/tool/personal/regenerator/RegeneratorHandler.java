@@ -51,7 +51,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 				owner.heal(REGENERATION_AMOUNT, RegainReason.MAGIC_REGEN);
 				if (owner.getHealth() >= maxHealth) {
 					editItem(tool, item -> {
-						item.unsetData(DataComponentTypes.ITEM_MODEL);
+						item.resetData(DataComponentTypes.ITEM_MODEL);
 						item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Désactivé" , NamedTextColor.RED))));
 					});
 				}else {
@@ -69,7 +69,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 	private void onDamage(EntityDamageEvent evt) {
 		getTools().stream().filter(t -> evt.getEntity().equals(t.getOwner())).forEach(tool -> {
 			editItem(tool, item -> {
-				item.unsetData(DataComponentTypes.ITEM_MODEL);
+				item.resetData(DataComponentTypes.ITEM_MODEL);
 				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Désactivé" , NamedTextColor.RED))));
 				tool.getOwner().setCooldown(item, DELAY_BEFORE_REGENERATING_TICKS);
 			});
@@ -101,7 +101,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				editItem(tool, i -> {
-					i.unsetData(DataComponentTypes.ITEM_MODEL);
+					i.resetData(DataComponentTypes.ITEM_MODEL);
 					i.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED))));
 				});
 			});
@@ -114,7 +114,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				editItem(tool, i -> {
-					i.unsetData(DataComponentTypes.ITEM_MODEL);
+					i.resetData(DataComponentTypes.ITEM_MODEL);
 					i.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ")).append(Component.text("Désactivé" , NamedTextColor.RED))));
 				});
 				tool.lastHitCounter = DELAY_BEFORE_REGENERATING_TICKS;

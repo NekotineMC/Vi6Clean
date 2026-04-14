@@ -104,7 +104,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 			var ploc = player.getLocation();
 			if (tool.placed == null) {
 				if (ploc.subtract(0, 0.1, 0).getBlock().getType().isSolid()) {
-					tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
+					tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(ploc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
 						if (e instanceof ItemDisplay display) {
 							display.setPersistent(false);
 							var stack = new ItemStack(Material.REDSTONE_TORCH);

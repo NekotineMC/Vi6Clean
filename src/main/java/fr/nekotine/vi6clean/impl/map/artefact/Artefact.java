@@ -77,7 +77,6 @@ public class Artefact {
 	}
 
 	public void setup(World world) {
-		System.out.println("ARTEFACT SETUP "+name);
 		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(),
 				Material.ORANGE_STAINED_GLASS.createBlockData());
 		boxDisplay.setGlowing(true);
@@ -90,7 +89,6 @@ public class Artefact {
 		isCaptured = false;
 		capture_advancement = 0;
 		boxDisplay.remove();
-		System.out.println("ARTEFACT CLEAN "+name);
 	}
 
 	public boolean isCaptured() {

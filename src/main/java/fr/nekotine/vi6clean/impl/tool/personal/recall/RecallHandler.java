@@ -108,7 +108,7 @@ public class RecallHandler extends ToolHandler<RecallHandler.Recall>{
 		trackModule.track(owner);
 		owner.teleport(tool.placedLocation);
 		owner.setCooldown(Material.CHORUS_FRUIT, COOLDOWN_TICKS);
-		editItem(tool, item -> item.unsetData(DataComponentTypes.ITEM_MODEL));
+		editItem(tool, item -> item.resetData(DataComponentTypes.ITEM_MODEL));
 	}
 
 

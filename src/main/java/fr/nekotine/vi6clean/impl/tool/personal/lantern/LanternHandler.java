@@ -102,7 +102,7 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern>{
 				
 				var amount = MAX_LANTERN - tool.displayedLanterns.size();
 				editItem(tool, item -> {
-					item.unsetData(DataComponentTypes.ITEM_MODEL);
+					item.resetData(DataComponentTypes.ITEM_MODEL);
 					item.setAmount(amount);
 				});
 				return true;

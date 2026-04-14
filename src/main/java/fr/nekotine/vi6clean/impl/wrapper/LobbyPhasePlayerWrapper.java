@@ -68,14 +68,11 @@ public class LobbyPhasePlayerWrapper extends WrapperBase<Player> {
 					var mm = Ioc.resolve(MapModule.class);
 					var maps = new ArrayList<>(mm.listMaps());
 					var current = maps.indexOf(maps.stream().filter(m -> m.getName().equals(mapname)).findFirst().orElse(null));
-					System.out.println("current: "+current);
-					System.out.println("size: "+maps.size());
 					if (current >= maps.size()-1){
 						game.setMapName(maps.getFirst().getName());
 					}else{
 						game.setMapName(maps.get(current+1).getName());
 					}
-					System.out.println(game.getMapName());
 				}
 		);
 		var debugItem = new BooleanInputMenuItem(

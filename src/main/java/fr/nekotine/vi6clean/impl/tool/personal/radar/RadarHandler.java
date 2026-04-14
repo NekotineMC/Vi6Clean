@@ -168,7 +168,7 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar>{
 		}
 		var player = evt.getPlayer();
 		var tool = getToolFromItem(evt.getItem());
-		if (tool == null || player.getCooldown(NamespacedKey.fromString(getToolCode()+'/'+tool.getId(), Ioc.resolve(JavaPlugin.class))) <= 0) {
+		if (tool == null || player.getCooldown(NamespacedKey.fromString(getToolCode()+'/'+tool.getId(), Ioc.resolve(JavaPlugin.class))) > 0) {
 			return;
 		}
 		
@@ -222,12 +222,15 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar>{
 		
 		if (tool.top != null) {
 			tool.top.remove();
+			tool.top = null;
 		}
 		if (tool.middle != null) {
 			tool.middle.remove();
+			tool.middle = null;
 		}
 		if (tool.bottom != null) {
 			tool.bottom.remove();
+			tool.bottom = null;
 		}
 		
 	}

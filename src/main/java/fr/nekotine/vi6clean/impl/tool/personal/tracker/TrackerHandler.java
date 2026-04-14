@@ -177,7 +177,7 @@ public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker>{
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				if (tool.tracked == null) {
-					item.unsetData(DataComponentTypes.ITEM_MODEL); // back to default model
+					item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - ").append(Component.text("Armé",NamedTextColor.AQUA)))));
 				}else {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.COMPASS.key());

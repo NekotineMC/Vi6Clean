@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.impl.game.team;
 
+import org.bukkit.GameMode;
+
 import fr.nekotine.core.game.team.Team;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -25,6 +27,7 @@ public class GuardTeam extends Team{
 			wrap.setState(InMapState.INSIDE);
 			var loc = spawnsIte.next();
 			guard.teleport(loc.toLocation(game.getWorld()));
+			guard.setGameMode(GameMode.ADVENTURE); // On change le gamemode dans le nouveau monde
 			if (!spawnsIte.hasNext()) {
 				spawnsIte = spawns.iterator();
 			}
