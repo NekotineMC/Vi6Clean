@@ -1,0 +1,15 @@
+[versions]
+paper = "1.21.11-rc3-R0.1-SNAPSHOT"
+protocollib = "5.4.0"
+commandapi = "11.1.1-SNAPSHOT"
+voicechat = "2.6.13"
+shadow = "9.4.1"
+
+[libraries]
+paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+protocollib = { group = "net.dmulloy2", name = "ProtocolLib", version.ref = "protocollib" }
+commandapi = { group = "dev.jorel", name = "commandapi-paper-shade", version.ref = "commandapi" }
+voicechat-api = { group = "de.maxhenkel.voicechat", name = "voicechat-api", version.ref = "voicechat" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
