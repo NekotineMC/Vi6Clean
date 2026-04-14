@@ -113,7 +113,7 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 		
 		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		if (Ioc.resolve(Vi6Game.class).getGuards().stream()
-				.filter(guard -> InventoryUtil.containTaggerItem(guard.getInventory(), TOOL_TYPE_KEY, getToolCode()))
+				.filter(guard -> InventoryUtil.containTaggedItem(guard.getInventory(), TOOL_TYPE_KEY, getToolCode()))
 				.allMatch(guard -> statusFlagModule.hasAny(guard, EmpStatusFlag.get()))) {
 			for (var doorKey : fieldsDisplay.keySet()) {
 				var door = fieldsDisplay.get(doorKey);

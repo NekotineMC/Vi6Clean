@@ -47,12 +47,9 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		for (var tool : getTools()) {
-			if (tool.canDoubleJump()) {
-				continue;
-			}
-			if (evt.getPlayer().equals(tool.getOwner()) && isOnGround(tool.getOwner())) {
-				tool.setCanDoubleJump(true);
-				tool.getOwner().setAllowFlight(true);
+			var owner = tool.getOwner();
+			if (evt.getPlayer().equals(owner) && !owner.getAllowFlight() && isOnGround(tool.getOwner())) {
+				owner.setAllowFlight(true);
 				return;
 			}
 		}
@@ -60,25 +57,15 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 	
 	@EventHandler
 	private void onPlayerToggleFlight(PlayerToggleFlightEvent evt) {
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(evt.getPlayer(), EmpStatusFlag.get())) {
+		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
 			return;
 		}
-		for (var tool : getTools()) {
-			if (!tool.canDoubleJump()) {
-				continue;
-			}
-			if (evt.getPlayer().equals(tool.getOwner())) {
-				//
-				var player = tool.getOwner();
-				var loc = player.getLocation();
-				player.setVelocity(player.getVelocity().setY(POWER));
-				Vi6Sound.DOUBLE_JUMP.play(player, loc);
-				tool.setCanDoubleJump(false);
-				player.setAllowFlight(false);
-				//
-				evt.setCancelled(true);
-				return;
-			}
+		if (InventoryUtil.containTaggedItem(player.getInventory(), TOOL_TYPE_KEY, getToolCode())) {
+			player.setVelocity(player.getVelocity().setY(POWER));
+			Vi6Sound.DOUBLE_JUMP.play(player, player.getLocation());
+			player.setAllowFlight(false);
+			evt.setCancelled(true);
 		}
 	}
 	

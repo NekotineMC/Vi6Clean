@@ -8,13 +8,4 @@ public class DoubleJump extends Tool{
 	public DoubleJump(ToolHandler<?> handler) {
 		super(handler);
 	}
-	private boolean canDoubleJump;
-
-	public boolean canDoubleJump() {
-		return canDoubleJump;
-	}
-	
-	public void setCanDoubleJump(boolean canDoubleJump) {
-		this.canDoubleJump = canDoubleJump;
-	}
 }
