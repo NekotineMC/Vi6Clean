@@ -1,6 +1,3 @@
-val JarOutputPath: String? by project
-val Vi6CleanServerPluginDirectory: String? by project
-
 plugins {
     java
     alias(libs.plugins.shadow)
@@ -14,21 +11,17 @@ repositories {
     mavenLocal()
     mavenCentral()
 
-    // PaperMC
     maven("https://repo.papermc.io/repository/maven-public/"){
         name = "papermc"
     }
-    // CommandAPI
     maven ("https://repo.codemc.org/repository/maven-public/"){
         name = "commandapi"
     }
     /*
-    // ProtocolLib
     maven("https://repo.dmulloy2.net/repository/public/") {
         name = "protocolib"
     }
     */
-    // Simple Voice Chat
     maven("https://maven.maxhenkel.de/repository/public") {
         name = "simplevoicechat"
     }
@@ -73,19 +66,14 @@ tasks.jar {
   archiveClassifier = "noshadow"
 }
 
-// Configuration
-
-
-var outputDir = JarOutputPath
-if (!Vi6CleanServerPluginDirectory.isNullOrEmpty()) {
-    outputDir = Vi6CleanServerPluginDirectory
-}
+val outputDir = project.findProperty("Vi6CleanJarOutputPath")
+    ?: layout.buildDirectory.dir("dist")
 
 tasks.register<Copy>("output") {
 	group = "dev"
 	description = "Sends jar to a custom output directory"
 	from(tasks.shadowJar)
-	into(outputDir!!)
+	into(outputDir)
 }
 
 defaultTasks("shadowJar")

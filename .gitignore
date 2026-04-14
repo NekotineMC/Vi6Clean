@@ -172,4 +172,3 @@ gradle-app.setting
 .idea/
 .direnv
 .envrc
-gradle.properties
