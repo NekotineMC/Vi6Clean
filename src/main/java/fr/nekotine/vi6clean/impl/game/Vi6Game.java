@@ -24,7 +24,9 @@ import fr.nekotine.core.game.phase.PhaseMachine;
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.core.map.IMapModule;
 import fr.nekotine.core.map.MapModule;
+import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -35,6 +37,7 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.game.team.GuardTeam;
 import fr.nekotine.vi6clean.impl.game.team.ThiefTeam;
+import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.connection.PlayerGameConnection;
 import io.papermc.paper.dialog.Dialog;
@@ -107,7 +110,13 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		phaseMachine.registerPhase(Vi6PhaseInfiltration.class, Vi6PhaseInfiltration::new);
 		phaseMachine.setLooping(true);
 		var mm = Ioc.resolve(MapModule.class);
-		mapName = mm.listMaps().stream().findFirst().orElse(null).getName();
+		if (mapName == null) {
+			var maps = mm.listMaps();
+			if (maps.size() <= 0) {
+				throw new IllegalStateException("Aucune map n'est disponible");
+			}
+			setMapName(maps.stream().findAny().get().getName());
+		}
 	}
 	
 	public final void start() {
@@ -147,6 +156,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		}else {
 			addPlayerInGuards(player);
 		}
+		var loc = world.getSpawnLocation();
+		player.teleport(loc);
 	}
 	
 	public void addPlayerInGuards(Player player) {
@@ -189,6 +200,19 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	
 	public void setMapName(String name) {
 		mapName = name;
+		var mapModule = Ioc.resolve(IMapModule.class);
+		var metadata = mapModule.getMapMetadata(mapName);
+		var map = mapModule.getContent(metadata, Vi6Map.class);
+		AssertUtil.nonNull(map, String.format("La map %s n'a pas pus etre chargee",name));
+		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getName().equals(map.getWorldName())).findFirst();
+		if (w.isEmpty()){
+			throw new RuntimeException("Le monde "+map.getWorldName()+" correspondant à la carte "+mapName+" n'existe pas");
+		}
+		world = w.get();
+		var loc = world.getSpawnLocation();
+		for (var p : players) {
+			p.teleport(loc);
+		}
 	}
 	
 	public GuardTeam getGuards() {

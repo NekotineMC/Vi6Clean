@@ -57,7 +57,6 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		for (var p : Bukkit.getServer().getOnlinePlayers()) {
 			game.addPlayer(p);
 		}
-		game.setWorld(Bukkit.getWorld("world"));
 		var scoreboard = game.getScoreboard();
 		scoreboardPlayerListingObjective = scoreboard.getObjective("playerListing");
 		if (scoreboardPlayerListingObjective == null) {

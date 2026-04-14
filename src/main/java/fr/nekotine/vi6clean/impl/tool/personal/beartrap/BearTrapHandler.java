@@ -103,7 +103,9 @@ public class BearTrapHandler extends ToolHandler<BearTrap>{
 			}
 		}else {
 			var loc = player.getLocation();
-			if (!loc.clone().add(0, -0.1, 0).getBlock().isSolid() || getTools().stream().filter(t -> t.isPlaced()).anyMatch(t -> loc.distanceSquared(t.getLocation()) <= SQUARED_SPACING_DISTANCE))
+			if (!loc.clone().add(0, -0.1, 0).getBlock().isSolid() || getTools().stream().filter(t -> t.isPlaced()).anyMatch(t -> loc.distanceSquared(t.getLocation()) <= SQUARED_SPACING_DISTANCE)) {
+				return;
+			}
 			tool.setLocation(loc);
 			tool.setTrap((ArmorStand)player.getWorld().spawnEntity(tool.getLocation().clone().subtract(0, 1.95, 0), EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
 				if (e instanceof ArmorStand a) {

@@ -30,9 +30,13 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier>{
 	
 	private final NamespacedKey gravityAttributeKey = NamespacedKey.fromString("minifier/gravity", Ioc.resolve(JavaPlugin.class));
 	
+	private final NamespacedKey healthAttributeKey = NamespacedKey.fromString("minifier/health", Ioc.resolve(JavaPlugin.class));
+	
 	private final double SCALE_MULTIPLIER = getConfiguration().getDouble("scale_multiplier", 0.5);
 	
 	private final double GRAVITY_MULTIPLIER = getConfiguration().getDouble("gravity_multiplier", 0.5);
+	
+	private final double HEALTH_MULTIPLIER = getConfiguration().getDouble("max_health_multiplier", 0.5);
 	
 	public MinifierHandler() {
 		super(Minifier::new);
@@ -43,6 +47,7 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier>{
 		var player = tool.getOwner();
 		player.getAttribute(Attribute.SCALE).addModifier(new AttributeModifier(SCALE_ATTRIBUTE_KEY, SCALE_MULTIPLIER-1, Operation.MULTIPLY_SCALAR_1));
 		player.getAttribute(Attribute.GRAVITY).addModifier(new AttributeModifier(gravityAttributeKey, GRAVITY_MULTIPLIER-1, Operation.MULTIPLY_SCALAR_1));
+		player.getAttribute(Attribute.MAX_HEALTH).addModifier(new AttributeModifier(healthAttributeKey, HEALTH_MULTIPLIER-1, Operation.MULTIPLY_SCALAR_1));
 	}
 
 	@Override
@@ -50,6 +55,7 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier>{
 		var player = tool.getOwner();
 		player.getAttribute(Attribute.SCALE).removeModifier(SCALE_ATTRIBUTE_KEY);
 		player.getAttribute(Attribute.SCALE).removeModifier(gravityAttributeKey);
+		player.getAttribute(Attribute.SCALE).removeModifier(healthAttributeKey);
 	}
 
 	@Override

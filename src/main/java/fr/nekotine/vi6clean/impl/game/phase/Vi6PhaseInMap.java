@@ -139,23 +139,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		// LOAD MAP
 		var mapModule = Ioc.resolve(IMapModule.class);
 		var mapName = game.getMapName();
-		if (mapName == null) {
-			var maps = mapModule.listMaps();
-			if (maps.size() <= 0) {
-				throw new IllegalStateException("Aucune map n'est disponible");
-			}
-			mapName = maps.stream().findAny().get().getName();
-		}
 		var metadata = mapModule.getMapMetadata(mapName);
 		map = mapModule.getContent(metadata, Vi6Map.class);
 		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
-		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getName().equals(map.getWorldName())).findFirst();
-		if (w.isEmpty()){
-			throw new RuntimeException("Le monde "+map.getWorldName()+" correspondant à la carte "+mapName+" n'existe pas");
-		}
-		var world = w.get();
+		var world = game.getWorld();
 		world.setTime(DayTime.MIDNIGHT);
-		game.setWorld(world);
 		world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
 		Ioc.getProvider().registerSingleton(map);
 		// LOAD MAP END
@@ -411,7 +399,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				3, 
 				FluidCollisionMode.NEVER, 
 				true, 
-				1, 
+				0, 
 				e -> player.canSee(e));
 		var hitE = result.getHitEntity();
 		if(hitE != null) {

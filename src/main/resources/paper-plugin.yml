@@ -19,3 +19,7 @@ dependencies:
       load: BEFORE
       required: true
       join-classpath: true
+    Multiverse-Core:
+      load: BEFORE
+      required: true
+      join-classpath: true

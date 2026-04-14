@@ -85,7 +85,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		if(pw.get().getTeam()==Vi6Team.THIEF) {
 			var effectModule = Ioc.resolve(StatusEffectModule.class);
 			effectModule.addEffect(wrapped, invisibleEffect);
-			pw.get().wrapped.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,-1,0,false));
+			pw.get().wrapped.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,-1,0,false,false,false));
 		}else {
 			defaultActionBar.addViewers(wrapped);
 		}
