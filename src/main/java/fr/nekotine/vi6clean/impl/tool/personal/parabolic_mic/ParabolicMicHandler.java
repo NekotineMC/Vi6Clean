@@ -77,7 +77,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 	@Override
 	protected void onAttachedToPlayer(ParabolicMic tool) {
 		var player = tool.getOwner();
-		var passenger = (ArmorStand)player.getWorld().spawnEntity(player.getLocation(), EntityType.TEXT_DISPLAY, SpawnReason.CUSTOM, e -> {
+		var passenger = (ArmorStand)player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
 			if (e instanceof ArmorStand stand) {
 				stand.setPersistent(false);
 				stand.setInvisible(true);
