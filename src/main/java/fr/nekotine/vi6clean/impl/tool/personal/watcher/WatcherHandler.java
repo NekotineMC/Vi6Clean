@@ -1,26 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.watcher;
 
-import java.time.Duration;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Silverfish;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
@@ -47,29 +26,48 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.util.Tick;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Silverfish;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
 @ToolCode("watcher")
-public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
-	
+public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
+
 	private final StatusEffect permanentGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
-	
+
 	private final StatusEffect lastingGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(),
-			Tick.tick().fromDuration(Duration.ofSeconds(getConfiguration().getLong("last_delay_second",1))));
-	
-	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range",5);
-	
+			Tick.tick().fromDuration(Duration.ofSeconds(getConfiguration().getLong("last_delay_second", 1))));
+
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 5);
+
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
-	
-	private final int NB_MAX_WATCHER = getConfiguration().getInt("nbmax",3);
+
+	private final int NB_MAX_WATCHER = getConfiguration().getInt("nbmax", 3);
 
 	public WatcherHandler() {
 		super(Watcher::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
-	
+
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
@@ -81,24 +79,25 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 		if (tool == null || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
 			return;
 		}
-		
+
 		// TRY PICKUP
-		
+
 		var ownerLoc = player.getLocation();
-		for (var sf : tool.watchers.stream().filter(sf -> sf.getLocation().distanceSquared(ownerLoc) <= DETECTION_RANGE_SQUARED)
+		for (var sf : tool.watchers.stream()
+				.filter(sf -> sf.getLocation().distanceSquared(ownerLoc) <= DETECTION_RANGE_SQUARED)
 				.collect(Collectors.toCollection(LinkedList::new))) {
 			tool.watchers.remove(sf);
 			sf.remove();
 			editItem(tool, item -> {
 				item.resetData(DataComponentTypes.ITEM_MODEL);
-				item.setAmount(NB_MAX_WATCHER-tool.watchers.size());
+				item.setAmount(NB_MAX_WATCHER - tool.watchers.size());
 			});
 			evt.setCancelled(true);
 			return;
 		}
-		
+
 		// TRY DROP
-		
+
 		if (tool.watchers.size() >= NB_MAX_WATCHER) {
 			return;
 		}
@@ -111,17 +110,17 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 			}
 		}));
 		editItem(tool, item -> {
-			var remaining = NB_MAX_WATCHER-tool.watchers.size();
+			var remaining = NB_MAX_WATCHER - tool.watchers.size();
 			if (remaining > 0) {
 				item.setAmount(remaining);
-			}else {
+			} else {
 				item.setData(DataComponentTypes.ITEM_MODEL, Material.ENDERMITE_SPAWN_EGG.key());
 				item.setAmount(1);
 			}
 		});
 		evt.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
@@ -131,10 +130,10 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 			if (owner == null) {
 				continue;
 			}
-			
+
 			// PARTICLE
-			
-			if (evt.timeStampReached(TickTimeStamp.QuartSecond)){
+
+			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
 				if (tool.watchers.size() < NB_MAX_WATCHER) {
 					if (!owner.isSneaking() || !itemMatch(tool, owner.getInventory().getItemInMainHand())) {
 						return;
@@ -143,34 +142,33 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 					var x = loc.getX();
 					var y = loc.getY();
 					var z = loc.getZ();
-					SpatialUtil.circle2DDensity(DETECTION_BLOCK_RANGE, 5, 0,
-							(offsetX, offsetZ) -> {
-								owner.spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
-							});
+					SpatialUtil.circle2DDensity(DETECTION_BLOCK_RANGE, 5, 0, (offsetX, offsetZ) -> {
+						owner.spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null);
+					});
 				}
 			}
-			
-			// GLOW EFFECT
-			
-			Supplier<Stream<Player>> enemiTeam =
-					Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class)::ennemiTeamInMap;
 
-			var toRemove = tool.watchers.stream().filter(sf ->enemiTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
-			.collect(Collectors.toCollection(LinkedList::new));
+			// GLOW EFFECT
+
+			Supplier<Stream<Player>> enemiTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner,
+					PlayerWrapper.class)::ennemiTeamInMap;
+
+			var toRemove = tool.watchers.stream()
+					.filter(sf -> enemiTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
+					.collect(Collectors.toCollection(LinkedList::new));
 			for (var sf : toRemove) {
 				sf.remove();
 				tool.watchers.remove(sf);
 				editItem(tool, item -> {
 					item.resetData(DataComponentTypes.ITEM_MODEL);
-					item.setAmount(NB_MAX_WATCHER-tool.watchers.size());
+					item.setAmount(NB_MAX_WATCHER - tool.watchers.size());
 				});
 			}
-			
-			Collection<Player> inRange = enemiTeam.get().filter(
-					ennemi -> tool.watchers.stream().anyMatch(
-							sf -> ennemi.getLocation().distanceSquared(sf.getLocation())<= DETECTION_RANGE_SQUARED)
-					)
-			.collect(Collectors.toCollection(LinkedList::new));
+
+			Collection<Player> inRange = enemiTeam.get()
+					.filter(ennemi -> tool.watchers.stream().anyMatch(
+							sf -> ennemi.getLocation().distanceSquared(sf.getLocation()) <= DETECTION_RANGE_SQUARED))
+					.collect(Collectors.toCollection(LinkedList::new));
 			var oldInRange = tool.ennemiesInRange;
 			if (inRange.size() <= 0 && oldInRange.size() <= 0) {
 				continue;
@@ -180,14 +178,14 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 				var p = ite.next();
 				if (inRange.contains(p)) {
 					inRange.remove(p);
-				}else {
+				} else {
 					statusEffectModule.addEffect(p, lastingGlowEffect);
 					statusEffectModule.removeEffect(p, permanentGlowEffect);
 					ite.remove();
 				}
 			}
 			for (var p : inRange) {
-				if(owner == null || !statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
+				if (owner == null || !statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
 					statusEffectModule.addEffect(p, permanentGlowEffect);
 					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 					if (owner != null) {
@@ -218,64 +216,57 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher>{
 
 	@Override
 	protected ItemStack makeItem(Watcher tool) {
-		return new ItemStackBuilder(
-				Material.SILVERFISH_SPAWN_EGG)
-				.amount(NB_MAX_WATCHER)
-				.name(getDisplayName())
-				.lore(getLore())
-				.unstackable()
-				.flags(ItemFlag.values())
-				.build();
+		return new ItemStackBuilder(Material.SILVERFISH_SPAWN_EGG).amount(NB_MAX_WATCHER).name(getDisplayName())
+				.lore(getLore()).unstackable().flags(ItemFlag.values()).build();
 	}
-	
+
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for(var victim : tool.ennemiesInRange) {
+				for (var victim : tool.ennemiesInRange) {
 					statusModule.removeEffect(victim, permanentGlowEffect);
 				}
-				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED))));
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
 		}
 	}
-	
+
 	@EventHandler
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for(var victim : tool.ennemiesInRange) {
+				for (var victim : tool.ennemiesInRange) {
 					statusModule.addEffect(victim, permanentGlowEffect);
 					Vi6Sound.OMNICAPTEUR_DETECT.play(victim);
 				}
-				if(tool.ennemiesInRange.size() > 0) {
+				if (tool.ennemiesInRange.size() > 0) {
 					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				}
 				item.editMeta(m -> m.displayName(getDisplayName()));
-				
+
 				if (NB_MAX_WATCHER - tool.watchers.size() > 0) {
 					item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
-				}else {
+				} else {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.ENDERMITE_SPAWN_EGG.key());
 				}
 			});
 		}
 	}
-	
-	public static class Watcher extends Tool{
-		
+
+	public static class Watcher extends Tool {
+
 		private List<Entity> watchers = new LinkedList<>();
-		
+
 		private Collection<Player> ennemiesInRange = new LinkedList<>();
-		
+
 		public Watcher(ToolHandler<?> handler) {
 			super(handler);
 		}
-		
 	}
-	
 }

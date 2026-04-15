@@ -1,35 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
@@ -47,45 +17,72 @@ import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Gestionnaire d'outil pour une partie de Vi6. Une instance par partie.
  * L'objectif de cette classe est de fournir le comportemant attendu à tous les
  * outils d'un même type.
- * 
- * @author XxGoldenbluexX
  *
+ * @author XxGoldenbluexX
  * @param <T>
  */
 public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	public static NamespacedKey TOOL_TYPE_KEY = new NamespacedKey(Ioc.resolve(JavaPlugin.class), "tool/type");
-	
+
 	public static NamespacedKey TOOL_ID_KEY = new NamespacedKey(Ioc.resolve(JavaPlugin.class), "tool/id");
-	
+
 	protected final ComponentLogger logger = NekotineLogger.make();
 
-	private final Function<ToolHandler<?>,T>  toolSupplier;
+	private final Function<ToolHandler<?>, T> toolSupplier;
 
-	private final Map<Integer,T> tools = new HashMap<>();
-	
+	private final Map<Integer, T> tools = new HashMap<>();
+
 	private boolean active;
 
 	private final String toolCode;
-	
+
 	// configuartion
-	
+
 	private Configuration configuration;
-	
+
 	private final Component displayName;
-	
+
 	private final List<Component> lore;
-	
+
 	private final int price;
 
 	private final int limite;
@@ -94,21 +91,22 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	private final Set<Vi6Team> forTeams = new HashSet<>(2);
 
-	public ToolHandler(Function<ToolHandler<?>,T> toolSupplier) {
+	public ToolHandler(Function<ToolHandler<?>, T> toolSupplier) {
 		this.toolSupplier = toolSupplier;
-		
+
 		// Fetch code on annotation
 		var an = getClass().getDeclaredAnnotation(ToolCode.class);
 		toolCode = an.value();
-		
+
 		// load configuration
 		try {
-			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + toolCode + ".yml", "/tools/" + toolCode + ".yml");
+			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + toolCode + ".yml",
+					"/tools/" + toolCode + ".yml");
 		} catch (IOException e) {
 			logger.error("Erreur lors du chargement du fichier de configuration de l'outil " + toolCode, e);
 			configuration = new YamlConfiguration();
 		}
-		
+
 		// fetch values from configuration
 		isRune = configuration.getBoolean("is_rune", false);
 		limite = configuration.getInt("amount_limit", -1);
@@ -165,7 +163,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		tools.values().stream().collect(Collectors.toList()).forEach(this::remove);
 		tools.clear();
 	}
-	
+
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent evt) {
 		var tool = getToolFromItem(evt.getItemDrop().getItemStack());
@@ -179,7 +177,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getEntity() instanceof Player player)) {
 			return;
 		}
-		
+
 		var tool = getToolFromItem(evt.getItem().getItemStack());
 		if (tool == null) {
 			return;
@@ -191,21 +189,17 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		}
 		attachToPlayer(tool, player);
 		/*
-		evt.setCancelled(true);
-		evt.getItem().remove();
-		*/
+		 * evt.setCancelled(true); evt.getItem().remove();
+		 */
 	}
-	
+
 	public final T makeNewTool() {
 		var tool = toolSupplier.apply(this);
 		tools.put(tool.getId(), tool);
 		return tool;
 	}
 
-	/**
-	 * Try to attach tool to player. remove previous attachment if existing
-	 * 
-	 */
+	/** Try to attach tool to player. remove previous attachment if existing */
 	public final void attachToPlayer(T tool, Player player) {
 		detachFromOwner(tool);
 		tool.setOwner(player);
@@ -214,7 +208,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			var item = makeItem(tool);
 			// Add some specification to item
 			AssertUtil.nonNull(item);
-			if (!item.getPersistentDataContainer().getKeys().containsAll(Set.of(ToolHandler.TOOL_TYPE_KEY, ToolHandler.TOOL_ID_KEY))) {
+			if (!item.getPersistentDataContainer().getKeys()
+					.containsAll(Set.of(ToolHandler.TOOL_TYPE_KEY, ToolHandler.TOOL_ID_KEY))) {
 				// Edit item's content
 				item.editPersistentDataContainer(pdc -> {
 					pdc.set(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING, toolCode);
@@ -237,7 +232,8 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		onDetachFromPlayer(tool);
 		InventoryUtil.removeIf(owner.getInventory(), item -> {
 			var pdc = item.getPersistentDataContainer();
-			return pdc.get(TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
+			return pdc.get(TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode
+					&& pdc.get(TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
 		});
 		tool.setOwner(null);
 	}
@@ -247,10 +243,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		onToolCleanup(tool);
 		tools.remove(tool.getId());
 	}
-	
+
 	private final void removeGeneric(Tool tool) {
 		@SuppressWarnings("unchecked")
-		var typed = (T)tool;
+		var typed = (T) tool;
 		detachFromOwner(typed);
 		onToolCleanup(typed);
 		tools.remove(typed.getId());
@@ -265,9 +261,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	protected abstract void onAttachedToPlayer(T tool);
 
 	protected abstract void onDetachFromPlayer(T tool);
-	
+
 	protected abstract void onToolCleanup(T tool);
-	
+
 	protected abstract ItemStack makeItem(T tool);
 
 	public Collection<T> getTools() {
@@ -284,10 +280,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
 		}
 		//
-		var menuItem = new ItemStackBuilder(iconMaterial)
-				.name(displayName)
-				.lore(shopLore)
-				.flags(ItemFlag.values())
+		var menuItem = new ItemStackBuilder(iconMaterial).name(displayName).lore(shopLore).flags(ItemFlag.values())
 				.build();
 		//
 		return new ActionMenuItem(menuItem, this::tryBuy);
@@ -300,7 +293,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public Component getDisplayName() {
 		return displayName;
 	}
-	
+
 	public int getPrice() {
 		return price;
 	}
@@ -308,7 +301,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public Set<Vi6Team> getTeamsAvailableFor() {
 		return forTeams;
 	}
-	
+
 	public T getToolFromItem(ItemStack item) {
 		if (item == null) {
 			return null;
@@ -344,7 +337,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 				var tool = makeNewTool();
 				attachToPlayer(tool, player);
 			}
-		}else {
+		} else {
 			var r = wrap.getRune();
 			if (r != null) {
 				r.getHandler().removeGeneric(r);
@@ -357,7 +350,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent evt) {
-		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction. PICKUP_HALF) {
+		if (!(evt.getWhoClicked() instanceof Player player) || evt.getAction() != InventoryAction.PICKUP_HALF) {
 			return;
 		}
 		var tool = getToolFromItem(evt.getCurrentItem());
@@ -375,7 +368,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			wrap.setMoney(wrap.getMoney() + price);
 		}
 	}
-	
+
 	@EventHandler
 	private void onPlayerDeath(PlayerDeathEvent evt) {
 		if (evt.isCancelled()) {
@@ -391,11 +384,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public boolean isRune() {
 		return isRune;
 	}
-	
+
 	public String getToolCode() {
 		return toolCode;
 	}
-	
+
 	public void editItem(Tool tool, Consumer<ItemStack> action) {
 		AssertUtil.nonNull(tool);
 		var owner = tool.getOwner();
@@ -404,12 +397,13 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		}
 		Arrays.stream(owner.getInventory().getContents()).filter(i -> i != null && itemMatch(tool, i)).forEach(action);
 	}
-	
-	public final boolean itemMatch(Tool tool,ItemStack item) {
+
+	public final boolean itemMatch(Tool tool, ItemStack item) {
 		if (item == null) {
 			return false;
 		}
 		var pdc = item.getPersistentDataContainer();
-		return pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode && pdc.get(ToolHandler.TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
+		return pdc.get(ToolHandler.TOOL_TYPE_KEY, PersistentDataType.STRING) == toolCode
+				&& pdc.get(ToolHandler.TOOL_ID_KEY, PersistentDataType.INTEGER) == tool.getId();
 	}
 }

@@ -1,10 +1,9 @@
 package fr.nekotine.vi6clean.impl.map;
 
-import org.bukkit.util.BoundingBox;
-
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
 import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
+import org.bukkit.util.BoundingBox;
 
 public class Entrance {
 
@@ -14,12 +13,12 @@ public class Entrance {
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private BoundingBox entranceTriggerBox = new BoundingBox();
-	
+
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private BoundingBox blockingBox = new BoundingBox();
 
-	public BoundingBox getEntranceTriggerBox() {																																																
+	public BoundingBox getEntranceTriggerBox() {
 		return entranceTriggerBox;
 	}
 
@@ -34,5 +33,4 @@ public class Entrance {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
 }

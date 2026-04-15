@@ -1,27 +1,25 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.bukkit.entity.Player;
-
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.status.flag.AsthmaStatusFlag;
+import java.util.LinkedList;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.Ticks;
+import org.bukkit.entity.Player;
 
 public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	private boolean dead;
-	
+
 	private List<Artefact> stolen = new LinkedList<>();
-	
+
 	public InfiltrationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
 	}
@@ -29,7 +27,7 @@ public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 	public List<Artefact> getStolenArtefacts() {
 		return stolen;
 	}
-	
+
 	public void capture(Artefact artefact) {
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
@@ -66,5 +64,4 @@ public class InfiltrationPhasePlayerWrapper extends WrapperBase<Player> {
 	public void setDead(boolean dead) {
 		this.dead = dead;
 	}
-	
 }

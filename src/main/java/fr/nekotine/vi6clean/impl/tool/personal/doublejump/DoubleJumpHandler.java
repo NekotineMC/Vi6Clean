@@ -1,21 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.doublejump;
 
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.EntityUtil;
@@ -32,18 +16,34 @@ import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 @ToolCode("double_jump")
-public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
-	
-	private final NamespacedKey bootNoArmorAttributeKey = NamespacedKey.fromString("double_jump/remove_armor", Ioc.resolve(JavaPlugin.class));
-	
+public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
+
+	private final NamespacedKey bootNoArmorAttributeKey = NamespacedKey.fromString("double_jump/remove_armor",
+			Ioc.resolve(JavaPlugin.class));
+
 	private final double POWER = getConfiguration().getDouble("power", 0.5);
-	
+
 	public DoubleJumpHandler() {
 		super(DoubleJump::new);
 	}
-	
+
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		for (var tool : getTools()) {
@@ -54,7 +54,7 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 			}
 		}
 	}
-	
+
 	@EventHandler
 	private void onPlayerToggleFlight(PlayerToggleFlightEvent evt) {
 		var player = evt.getPlayer();
@@ -68,21 +68,19 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 			evt.setCancelled(true);
 		}
 	}
-	
+
 	public boolean isOnGround(Player p) {
-		return !p.isFlying() && EntityUtil.IsOnGround((Entity)p) && p.getFallDistance() <= 0;
+		return !p.isFlying() && EntityUtil.IsOnGround((Entity) p) && p.getFallDistance() <= 0;
 	}
 
 	@Override
 	protected void onAttachedToPlayer(DoubleJump tool) {
 		var player = tool.getOwner();
-		var boots = ItemStackUtil.make(
-				Material.GOLDEN_BOOTS, 
-				getDisplayName(), 
-				getLore());
+		var boots = ItemStackUtil.make(Material.GOLDEN_BOOTS, getDisplayName(), getLore());
 		boots.addEnchantment(Enchantment.BINDING_CURSE, 1);
 		boots.addItemFlags(ItemFlag.values());
-		boots.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.itemAttributes().addModifier(Attribute.ARMOR, new AttributeModifier(bootNoArmorAttributeKey, -1, Operation.MULTIPLY_SCALAR_1)));
+		boots.setData(DataComponentTypes.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.itemAttributes().addModifier(
+				Attribute.ARMOR, new AttributeModifier(bootNoArmorAttributeKey, -1, Operation.MULTIPLY_SCALAR_1)));
 		boots.unsetData(DataComponentTypes.DAMAGE);
 		boots.unsetData(DataComponentTypes.MAX_DAMAGE);
 		player.getInventory().setBoots(boots);
@@ -105,12 +103,9 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 
 	@Override
 	protected ItemStack makeItem(DoubleJump tool) {
-		return ItemStackUtil.make(
-				Material.GOLDEN_BOOTS, 
-				getDisplayName(), 
-				getLore());
+		return ItemStackUtil.make(Material.GOLDEN_BOOTS, getDisplayName(), getLore());
 	}
-	
+
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
@@ -118,12 +113,14 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 				var boots = p.getInventory().getBoots();
 				item.setData(DataComponentTypes.ITEM_MODEL, Material.CHAINMAIL_BOOTS.key());
 				boots.setData(DataComponentTypes.ITEM_MODEL, Material.CHAINMAIL_BOOTS.key());
-				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED))));
-				boots.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH).append(Component.text(" - ")).append(Component.text("Brouillé" , NamedTextColor.RED))));
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+				boots.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
 		}
 	}
-	
+
 	@EventHandler
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
@@ -136,5 +133,4 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump>{
 			});
 		}
 	}
-	
 }

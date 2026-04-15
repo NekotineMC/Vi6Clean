@@ -1,40 +1,6 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import org.bukkit.Bukkit;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.GameMode;
-import org.bukkit.GameRules;
-import org.bukkit.Material;
-import org.bukkit.block.Container;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.RenderType;
-import org.bukkit.scoreboard.Team;
-
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
-
 import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
@@ -68,55 +34,85 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.GameMode;
+import org.bukkit.GameRules;
+import org.bukkit.Material;
+import org.bukkit.block.Container;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
+import org.bukkit.scoreboard.Team;
 
-public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implements Listener{
-	
+public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> implements Listener {
+
 	private final ComponentLogger logger = NekotineLogger.make();
-	
+
 	private Vi6Map map;
-	
+
 	private Objective guardScoreboard;
-	//private final Team guardCountTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardCount");
+	// private final Team guardCountTeam =
+	// Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardCount");
 	private final Team guardEscapedTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardEscaped");
 	private final Team guardStolenTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardStolen");
 	private final Team guardUnknownTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardUnknown");
 	private final Team guardSafeTeam = Ioc.resolve(Vi6Game.class).getScoreboard().registerNewTeam("guardSafe");
-	//private final String countString = "A trouver: ";
+	// private final String countString = "A trouver: ";
 	private final String guardObjectiveName = "guardArtefactListing";
 	private int unfoundStolenArtefacts = 0;
-	
+
 	private Objective thiefScoreboard;
 	private final String thiefObjectiveName = "thiefArtefactListing";
-	
+
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		
+
 		var scoreboard = Ioc.resolve(Vi6Game.class).getScoreboard();
 		guardScoreboard = scoreboard.getObjective(guardObjectiveName);
 		if (guardScoreboard == null) {
-			guardScoreboard = scoreboard.registerNewObjective(guardObjectiveName,
-					Criteria.DUMMY,
+			guardScoreboard = scoreboard.registerNewObjective(guardObjectiveName, Criteria.DUMMY,
 					Component.text("Check-list", NamedTextColor.GOLD).decorate(TextDecoration.UNDERLINED),
 					RenderType.INTEGER);
 		}
 		guardScoreboard.setDisplaySlot(DisplaySlot.SIDEBAR_TEAM_BLUE);
-		//guardCountTeam.color(NamedTextColor.AQUA);
+		// guardCountTeam.color(NamedTextColor.AQUA);
 		guardEscapedTeam.color(NamedTextColor.DARK_RED);
 		guardStolenTeam.color(NamedTextColor.RED);
 		guardUnknownTeam.color(NamedTextColor.YELLOW);
 		guardSafeTeam.color(NamedTextColor.GREEN);
-		//guardCountTeam.addEntry(countString);
-		//guardUpdateCount();
-		
+		// guardCountTeam.addEntry(countString);
+		// guardUpdateCount();
+
 		thiefScoreboard = scoreboard.getObjective(thiefObjectiveName);
 		if (thiefScoreboard == null) {
-			thiefScoreboard = scoreboard.registerNewObjective(thiefObjectiveName,
-					Criteria.DUMMY,
+			thiefScoreboard = scoreboard.registerNewObjective(thiefObjectiveName, Criteria.DUMMY,
 					Component.text("Check-list", NamedTextColor.GOLD).decorate(TextDecoration.UNDERLINED),
 					RenderType.INTEGER);
 		}
@@ -132,7 +128,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 	public ObservableCollection<Player> getItemCollection() {
 		return Ioc.resolve(Vi6Game.class).getPlayerList();
 	}
-	
+
 	@Override
 	public void globalSetup(Object inputData) {
 		var game = Ioc.resolve(Vi6Game.class);
@@ -158,8 +154,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			var entrance = entrances.get(entranceName);
 			entrance.setName(entranceName);
 			if (game.isDebug()) {
-				DebugUtil.debugBoundingBox(world, entrance.getBlockingBox(), Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS));
-				DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox(), Bukkit.createBlockData(Material.GREEN_STAINED_GLASS));
+				DebugUtil.debugBoundingBox(world, entrance.getBlockingBox(),
+						Bukkit.createBlockData(Material.ORANGE_STAINED_GLASS));
+				DebugUtil.debugBoundingBox(world, entrance.getEntranceTriggerBox(),
+						Bukkit.createBlockData(Material.GREEN_STAINED_GLASS));
 			}
 		}
 		if (game.isDebug()) {
@@ -167,14 +165,16 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				DebugUtil.debugBoundingBox(world, exit, Bukkit.createBlockData(Material.RED_STAINED_GLASS));
 			}
 			for (var roomCaptor : map.getRoomCaptors().values()) {
-				DebugUtil.debugBoundingBox(world, roomCaptor.getTriggerBox(), Bukkit.createBlockData(Material.YELLOW_STAINED_GLASS));
+				DebugUtil.debugBoundingBox(world, roomCaptor.getTriggerBox(),
+						Bukkit.createBlockData(Material.YELLOW_STAINED_GLASS));
 			}
 		}
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers()) {
 			tool.startHandling();
 		}
 		// KOTH
-		List<AbstractKothEffect> kothEffects = new LinkedList<>(Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
+		List<AbstractKothEffect> kothEffects = new LinkedList<>(
+				Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
 		List<Koth> koths = new LinkedList<>(map.getKoths().values());
 		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
 		Collections.shuffle(kothEffects);
@@ -182,27 +182,24 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var nbKothSpawned = 0;
 		var random = new Random();
 		var count = 0;
-		while(count < limit && kothEffects.size() > 0 && koths.size() > 0) {
+		while (count < limit && kothEffects.size() > 0 && koths.size() > 0) {
 			count++;
 			var effect = kothEffects.remove(0);
 			var probability = effect.getProbability();
-			if(random.nextDouble() > probability) {
+			if (random.nextDouble() > probability) {
 				continue;
 			}
 			nbKothSpawned++;
 			var koth = koths.remove(0);
 			koth.setup(effect, world);
-			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s",
-							koth.getName(),
-							koth.getDisplayLocation(),
-							effect.getCode()
-							)), NamedTextColor.GOLD);
+			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s", koth.getName(),
+					koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
 		}
-		game.getGuards().sendMessage(
-				Component.text("Koth", NamedTextColor.DARK_PURPLE)
-				.append(Component.text(" >> ", NamedTextColor.WHITE))
-				.append(Component.text(nbKothSpawned,NamedTextColor.AQUA))
-				.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
+		game.getGuards()
+				.sendMessage(Component.text("Koth", NamedTextColor.DARK_PURPLE)
+						.append(Component.text(" >> ", NamedTextColor.WHITE))
+						.append(Component.text(nbKothSpawned, NamedTextColor.AQUA))
+						.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
 		// WEATHER
 		var weatherRand = random.nextFloat();
 		if (weatherRand < 0.2) {
@@ -211,8 +208,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			if (weatherRand < 0.1) {
 				world.setThundering(true);
 				world.setThunderDuration(Integer.MAX_VALUE);
-			}else {
-				
+			} else {
+
 			}
 		}
 		Ioc.resolve(Majordom.class).enable();
@@ -228,7 +225,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		world.setWeatherDuration(Integer.MAX_VALUE);
 		world.setThundering(false);
 		world.setThunderDuration(Integer.MAX_VALUE);
-		
+
 		DebugUtil.clearDebugEntities();
 		for (var artefact : map.getArtefacts().values()) {
 			artefact.clean();
@@ -237,12 +234,12 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			tool.stopHandling();
 			tool.removeAll();
 		}
-		for(var koth : map.getKoths().values()) {
+		for (var koth : map.getKoths().values()) {
 			koth.clean();
 		}
 		map = null;
-		
-		//guardCountTeam.unregister();
+
+		// guardCountTeam.unregister();
 		guardEscapedTeam.unregister();
 		guardStolenTeam.unregister();
 		guardUnknownTeam.unregister();
@@ -251,7 +248,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 
 		thiefScoreboard.unregister();
 	}
-	
+
 	@Override
 	public void itemSetup(Player item) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
@@ -265,7 +262,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			// Check if the player is actually connected to the voice chat
 			if (vcplugin != null && vcplugin.getApi().getConnectionOf(item.getUniqueId()) != null) {
 				// On donne un talkie walkie
-				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR,Component.text("Talkie-walkie"),Component.text("Tenir en main pour parler"));
+				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR, Component.text("Talkie-walkie"),
+						Component.text("Tenir en main pour parler"));
 				item.give(tw);
 			}
 		}
@@ -281,28 +279,29 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 			wrap.updateMapLeaveBlocker();
 		}
 	}
-	
+
 	@Override
 	protected List<State> makeAppliedStates() {
 		var list = new LinkedList<State>();
 		list.add(new RegisteredEventListenerState(this));
 		return list;
 	}
-	
+
 	@Override
 	protected List<ItemState<Player>> makeAppliedItemStates() {
 		var list = new LinkedList<ItemState<Player>>();
 		list.add(new ItemWrappingState<>(InMapPhasePlayerWrapper::new));
-		list.add(new PotionEffectState<Player>(new PotionEffect(PotionEffectType.SATURATION, -1, 0, false, false, false)));
+		list.add(new PotionEffectState<Player>(
+				new PotionEffect(PotionEffectType.SATURATION, -1, 0, false, false, false)));
 		return list;
 	}
-	
+
 	public Vi6Map getMap() {
 		return map;
 	}
-	
+
 	// Event handlers
-	
+
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var player = evt.getPlayer();
@@ -314,15 +313,16 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		var destVect = evt.getTo().toVector();
 		if (wrapper.isInside()) {
 			if (!wrapper.canLeaveMap()) {
-				if (map.getEntrances().values().stream().map(e -> e.getBlockingBox()).anyMatch(bb -> bb.contains(destVect))){
+				if (map.getEntrances().values().stream().map(e -> e.getBlockingBox())
+						.anyMatch(bb -> bb.contains(destVect))) {
 					evt.setCancelled(true);
 					return;
 				}
-				if (map.getExits().values().stream().map(e -> e).anyMatch(bb -> bb.contains(destVect))){
+				if (map.getExits().values().stream().map(e -> e).anyMatch(bb -> bb.contains(destVect))) {
 					evt.setCancelled(true);
 					return;
 				}
-			}else {
+			} else {
 				var exit = map.getExits().values().stream().filter(e -> e.contains(destVect)).findFirst();
 				if (exit.isPresent()) {
 					wrapper.thiefLeaveMap();
@@ -334,7 +334,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				if (artefact.getBoundingBox().contains(destVect)) {
 					zone.add(player);
 					wrapper.showArtefactBar();
-				}else if(artefact.getInsideCaptureZone().contains(player)){
+				} else if (artefact.getInsideCaptureZone().contains(player)) {
 					zone.remove(player);
 					wrapper.showDefaultBar();
 				}
@@ -343,7 +343,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 				var zone = koth.getInsideCaptureZone();
 				if (koth.getBoundingBox().contains(destVect)) {
 					zone.add(player);
-				}else {
+				} else {
 					zone.remove(player);
 				}
 			});
@@ -352,21 +352,19 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 					var r = roomcaptor.getRoom();
 					if (!r.contentEquals(wrapper.getRoom())) {
 						wrapper.setRoom(r);
-						player.sendActionBar(Component.text("Salle: "+r,NamedTextColor.WHITE));
+						player.sendActionBar(Component.text("Salle: " + r, NamedTextColor.WHITE));
 					}
-					
 				}
 			});
-		}else if (wrapper.getState() == InMapState.ENTERING){
+		} else if (wrapper.getState() == InMapState.ENTERING) {
 			var entrance = map.getEntrances().values().stream()
-					.filter(e -> e.getEntranceTriggerBox().contains(destVect))
-					.findFirst();
+					.filter(e -> e.getEntranceTriggerBox().contains(destVect)).findFirst();
 			if (entrance.isPresent()) {
 				wrapper.thiefEnterInside(entrance.get());
 			}
 		}
 	}
-	
+
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		map.getArtefacts().values().stream().forEach(Artefact::tick);
@@ -380,146 +378,160 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal,Player> implem
 		}
 		var game = Ioc.resolve(Vi6Game.class);
 		var player = evt.getPlayer();
-		if (game.getThiefs().contains(evt.getPlayer())){
+		if (game.getThiefs().contains(evt.getPlayer())) {
 			var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrap.isPresent()) {
 				optWrap.get().thiefLeaveMap(true);
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void handleInBushDamage(PlayerInteractEvent evt) {
-		if(evt.getAction() != Action.LEFT_CLICK_BLOCK) return;
+		if (evt.getAction() != Action.LEFT_CLICK_BLOCK)
+			return;
 		var player = evt.getPlayer();
 		var eyeLoc = player.getEyeLocation();
-		var result = player.getWorld().rayTrace(
-				eyeLoc, 
-				eyeLoc.getDirection(), 
-				3, 
-				FluidCollisionMode.NEVER, 
-				true, 
-				0, 
+		var result = player.getWorld().rayTrace(eyeLoc, eyeLoc.getDirection(), 3, FluidCollisionMode.NEVER, true, 0,
 				e -> player.canSee(e));
 		var hitE = result.getHitEntity();
-		if(hitE != null) {
+		if (hitE != null) {
 			player.attack(hitE);
 		}
 	}
-	
-	//Map protection
+
+	// Map protection
 	@EventHandler
 	public void itemFrameBreak(HangingBreakEvent e) {
 		e.setCancelled(true);
 	}
+
 	@EventHandler
 	public void itemFrameChange(PlayerItemFrameChangeEvent e) {
 		e.setCancelled(true);
 	}
+
 	@EventHandler
 	public void entityDamageEvent(EntityDamageEvent e) {
-		if(e.getEntity() instanceof ArmorStand || e.getEntity() instanceof Minecart) 
+		if (e.getEntity() instanceof ArmorStand || e.getEntity() instanceof Minecart)
 			e.setCancelled(true);
 	}
+
 	@EventHandler
 	public void onLivingEntityDamage(EntityDamageEvent e) {
-		if(e.getEntity() instanceof Player player) {
+		if (e.getEntity() instanceof Player player) {
 			var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(player, InMapPhasePlayerWrapper.class);
-			if(wrapper==null) return;
-			if(wrapper.getParentWrapper().getTeam()==Vi6Team.GUARD) {
-				//epsilon value
+			if (wrapper == null)
+				return;
+			if (wrapper.getParentWrapper().getTeam() == Vi6Team.GUARD) {
+				// epsilon value
 				e.setDamage(0.01);
 			}
 		}
 	}
+
 	@EventHandler
 	public void interactEvent(PlayerInteractEvent e) {
-		if(e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType()==Material.RESPAWN_ANCHOR) {
+		if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType() == Material.RESPAWN_ANCHOR) {
 			e.setCancelled(true);
 		}
-		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getState() instanceof Container) {
+		if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getState() instanceof Container) {
 			e.setCancelled(true);
 		}
-		
 	}
+
 	@EventHandler
 	public void endGateway(EntityTeleportEndGatewayEvent e) {
-		if(!(e.getEntity() instanceof Player)) 
-			e.setCancelled(true);	
+		if (!(e.getEntity() instanceof Player))
+			e.setCancelled(true);
 	}
+
 	@EventHandler
 	public void vehicleDestroyEvent(VehicleDestroyEvent e) {
 		e.setCancelled(true);
 	}
-	
+
 	//
-	
+
 	public void guardObjectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
-		if(guardSafeTeam.hasEntry(name)) return;
+		if (guardSafeTeam.hasEntry(name))
+			return;
 		guardSafeTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(3);
 	}
+
 	public void guardObjectiveStolen(Artefact artefact) {
 		var name = artefact.getName();
-		if(guardStolenTeam.hasEntry(name)) return;
+		if (guardStolenTeam.hasEntry(name))
+			return;
 		guardStolenTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(1);
-		if(--unfoundStolenArtefacts == 0) {
+		if (--unfoundStolenArtefacts == 0) {
 			guardUnknownToSafe();
 		}
-		//guardUpdateCount();
+		// guardUpdateCount();
 	}
+
 	public void guardObjectiveEscaped(Artefact artefact) {
 		var name = artefact.getName();
-		if(guardEscapedTeam.hasEntry(name)) return;
+		if (guardEscapedTeam.hasEntry(name))
+			return;
 		guardEscapedTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(0);
 	}
+
 	public void guardSafeToUnknown() {
 		unfoundStolenArtefacts++;
-		//guardUpdateCount();
+		// guardUpdateCount();
 		for (var artefact : map.getArtefacts().values()) {
-			if(guardSafeTeam.hasEntry(artefact.getName())) {
+			if (guardSafeTeam.hasEntry(artefact.getName())) {
 				guardObjectiveUnknown(artefact);
 			}
 		}
 	}
+
 	private void guardUnknownToSafe() {
 		for (var artefact : map.getArtefacts().values()) {
-			if(guardUnknownTeam.hasEntry(artefact.getName())) {
+			if (guardUnknownTeam.hasEntry(artefact.getName())) {
 				guardObjectiveSafe(artefact);
 			}
 		}
 	}
+
 	private void guardObjectiveUnknown(Artefact artefact) {
 		var name = artefact.getName();
-		if(guardUnknownTeam.hasEntry(name)) return;
+		if (guardUnknownTeam.hasEntry(name))
+			return;
 		guardUnknownTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(2);
 	}
-	/*private void guardUpdateCount() {
-		guardScoreboard.getScore(countString).setScore(unfoundStolenArtefacts);
-	}*/
-	
+
+	/*
+	 * private void guardUpdateCount() {
+	 * guardScoreboard.getScore(countString).setScore(unfoundStolenArtefacts); }
+	 */
+
 	//
-	
+
 	private void thiefObjectiveSafe(Artefact artefact) {
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(3);
 		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.GREEN));
 	}
+
 	public void thiefObjectiveStolen(Artefact artefact) {
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(2);
 		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.YELLOW));
 	}
-	
+
 	public void thiefObjectiveEscaped(Artefact artefact) {
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(1);
 		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.AQUA));
 	}
+
 	public void thiefObjectiveLost(Artefact artefact) {
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(0);

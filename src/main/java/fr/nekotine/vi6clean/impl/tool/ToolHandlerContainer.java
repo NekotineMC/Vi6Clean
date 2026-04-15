@@ -1,20 +1,19 @@
 package fr.nekotine.vi6clean.impl.tool;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.stream.Collectors;
-
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.reflexion.ReflexionUtil;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class ToolHandlerContainer {
 
 	private final ComponentLogger logger = NekotineLogger.make();
-	
+
 	private Collection<ToolHandler<?>> toolHandlers = new LinkedList<>();
-	
+
 	public void discoverHandlers() {
 		for (var tool : toolHandlers) {
 			tool.stopHandling();
@@ -25,20 +24,20 @@ public class ToolHandlerContainer {
 		logger.info("Découverte et ajout des tools: ");
 		try {
 			for (var tool : ReflexionUtil.streamClassesFromPackage("fr.nekotine.vi6clean.impl.tool")
-					.filter(c -> ToolHandler.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class)).collect(Collectors.toSet())) {
+					.filter(c -> ToolHandler.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class))
+					.collect(Collectors.toSet())) {
 				var ctor = tool.getConstructor();
-				var handler = (ToolHandler<?>)ctor.newInstance();
+				var handler = (ToolHandler<?>) ctor.newInstance();
 				toolHandlers.add(handler);
 				Ioc.getProvider().registerSingleton(handler);
-				logger.info(String.format("Type: %s",tool.getSimpleName()));
+				logger.info(String.format("Type: %s", tool.getSimpleName()));
 			}
 		} catch (Exception e) {
 			logger.error("Une erreur est survenue lors de l'ajout des class ToolHandler au registre", e);
 		}
 	}
-	
-	public Collection<ToolHandler<?>> getHandlers(){
+
+	public Collection<ToolHandler<?>> getHandlers() {
 		return toolHandlers;
 	}
-	
 }

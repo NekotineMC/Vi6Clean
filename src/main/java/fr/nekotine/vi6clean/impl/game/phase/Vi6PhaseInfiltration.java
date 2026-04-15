@@ -1,16 +1,5 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import java.time.Duration;
-import java.util.Map;
-
-import org.bukkit.GameMode;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
@@ -21,13 +10,22 @@ import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import io.papermc.paper.util.Tick;
+import java.time.Duration;
+import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
+import org.bukkit.GameMode;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player> {
-	
+
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
 	}
@@ -81,31 +79,29 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	public void checkForCompletion() {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
-		if (game.getThiefs().stream().allMatch(
-				thief -> wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class).hasLeft())) {
+		if (game.getThiefs().stream()
+				.allMatch(thief -> wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class).hasLeft())) {
 			try {
-			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
-			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
-					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
-			var spectatorTimeSeconds = Duration
-					.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
-			var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
-			var map = inMapPhase.getMap();
-			var spawns = map.getGuardSpawns();
-			if (spawns.size() < 1) {
-				return;
-			}
-			new BukkitRunnable() {
-
-				@Override
-				public void run() {
-					complete();
+				game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
+				game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
+						Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
+				var spectatorTimeSeconds = Duration
+						.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
+				var inMapPhase = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInMap.class);
+				var map = inMapPhase.getMap();
+				var spawns = map.getGuardSpawns();
+				if (spawns.size() < 1) {
+					return;
 				}
+				new BukkitRunnable() {
 
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
-			}finally {
+					@Override
+					public void run() {
+						complete();
+					}
+				}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
+			} finally {
 			}
 		}
 	}
-
 }

@@ -1,22 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.scanner;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -25,7 +8,6 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -39,26 +21,38 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 @ToolCode("scanner")
-public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
-	private final int SCAN_DELAY_TICK = (int)(20*getConfiguration().getDouble("delay",30));
-	
-	private final int SCAN_LIFETIME_TICK = (int)(20*getConfiguration().getDouble("duration",30));
+public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
+	private final int SCAN_DELAY_TICK = (int) (20 * getConfiguration().getDouble("delay", 30));
+
+	private final int SCAN_LIFETIME_TICK = (int) (20 * getConfiguration().getDouble("duration", 30));
 
 	private @NotNull BukkitTask task;
-	
+
 	public ScannerHandler() {
 		super(Scanner::new);
 	}
-	
+
 	public void startScanning() {
-		task = Bukkit.getScheduler().runTaskTimer(
-				Ioc.resolve(JavaPlugin.class), 
-				this::performScan, 0, 
-				SCAN_DELAY_TICK);
+		task = Bukkit.getScheduler().runTaskTimer(Ioc.resolve(JavaPlugin.class), this::performScan, 0, SCAN_DELAY_TICK);
 	}
-	
+
 	public void stopScanning() {
 		if (task == null) {
 			return;
@@ -66,43 +60,35 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 		task.cancel();
 		task = null;
 	}
-	
+
 	@Override
 	protected void onStartHandling() {
 		startScanning();
 	}
-	
+
 	@Override
 	protected void onStopHandling() {
 		stopScanning();
 	}
-	
+
 	public void performScan() {
 		var pmanager = ProtocolLibrary.getProtocolManager();
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
-		var guardOwners = getTools().stream()
-				.filter(t -> t.getOwner() != null)
-				.map(Tool::getOwner)
-				.filter(p -> {
-					var flagModule = Ioc.resolve(StatusFlagModule.class);
-					return !flagModule.hasAny(p, EmpStatusFlag.get());
-				})
-				.filter(p -> {
-					var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
-					return w.isPresent() && w.get().getTeam() == Vi6Team.GUARD;
-				}).collect(Collectors.toCollection(LinkedList::new));
-		var thiefOwners = getTools().stream()
-				.filter(t -> t.getOwner() != null)
-				.map(Tool::getOwner)
-				.filter(p -> {
-					var flagModule = Ioc.resolve(StatusFlagModule.class);
-					return !flagModule.hasAny(p, EmpStatusFlag.get());
-				})
-				.filter(p -> {
-					var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
-					return w.isPresent() && w.get().getTeam() == Vi6Team.THIEF;
-				}).collect(Collectors.toCollection(LinkedList::new));
+		var guardOwners = getTools().stream().filter(t -> t.getOwner() != null).map(Tool::getOwner).filter(p -> {
+			var flagModule = Ioc.resolve(StatusFlagModule.class);
+			return !flagModule.hasAny(p, EmpStatusFlag.get());
+		}).filter(p -> {
+			var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
+			return w.isPresent() && w.get().getTeam() == Vi6Team.GUARD;
+		}).collect(Collectors.toCollection(LinkedList::new));
+		var thiefOwners = getTools().stream().filter(t -> t.getOwner() != null).map(Tool::getOwner).filter(p -> {
+			var flagModule = Ioc.resolve(StatusFlagModule.class);
+			return !flagModule.hasAny(p, EmpStatusFlag.get());
+		}).filter(p -> {
+			var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
+			return w.isPresent() && w.get().getTeam() == Vi6Team.THIEF;
+		}).collect(Collectors.toCollection(LinkedList::new));
 		if (guardOwners.size() > 0) {
 			var thiefScansIds = new LinkedList<Integer>();
 			for (var thief : game.getThiefs()) {
@@ -116,13 +102,13 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 				}
 			}
 			new BukkitRunnable() {
-				
+
 				@Override
 				public void run() {
-					
+
 					var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 					destroyPacket.getIntLists().write(0, thiefScansIds);
-					
+
 					for (var guard : guardOwners) {
 						pmanager.sendServerPacket(guard, destroyPacket);
 					}
@@ -143,13 +129,13 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 				}
 			}
 			new BukkitRunnable() {
-				
+
 				@Override
 				public void run() {
-					
+
 					var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
 					destroyPacket.getIntLists().write(0, guardScansIds);
-					
+
 					for (var thief : thiefOwners) {
 						pmanager.sendServerPacket(thief, destroyPacket);
 					}
@@ -157,32 +143,32 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), SCAN_LIFETIME_TICK);
 		}
 	}
-	
-	private Pair<Integer,PacketContainer[]> makeScanCreationPackets(ProtocolManager pmanager, Player player) {
+
+	private Pair<Integer, PacketContainer[]> makeScanCreationPackets(ProtocolManager pmanager, Player player) {
 		var scanLoc = player.getLocation();
 		@SuppressWarnings("deprecation")
 		var eid = Bukkit.getUnsafe().nextEntityId();
-		
+
 		var createPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 		var createInts = createPacket.getIntegers();
 		var createDoubles = createPacket.getDoubles();
-		createInts.write(0, eid);														// Entity id
-		createPacket.getUUIDs().write(0, UUID.randomUUID());							// UUID
-		createPacket.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);			// Entity type
-		createPacket.getBytes().write(0, (byte)(scanLoc.getPitch()*256.0F / 360.0F));	// Pitch
-		createPacket.getBytes().write(1, (byte)(scanLoc.getYaw()*256.0F / 360.0F));		// Yaw
-		createDoubles.write(0, scanLoc.getX());											// X
-		createDoubles.write(1, scanLoc.getY());											// Y
-		createDoubles.write(2, scanLoc.getZ());											// Z
-		
+		createInts.write(0, eid); // Entity id
+		createPacket.getUUIDs().write(0, UUID.randomUUID()); // UUID
+		createPacket.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND); // Entity type
+		createPacket.getBytes().write(0, (byte) (scanLoc.getPitch() * 256.0F / 360.0F)); // Pitch
+		createPacket.getBytes().write(1, (byte) (scanLoc.getYaw() * 256.0F / 360.0F)); // Yaw
+		createDoubles.write(0, scanLoc.getX()); // X
+		createDoubles.write(1, scanLoc.getY()); // Y
+		createDoubles.write(2, scanLoc.getZ()); // Z
+
 		var metadataPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-		metadataPacket.getIntegers().write(0, eid);										// Entity id
+		metadataPacket.getIntegers().write(0, eid); // Entity id
 		var dataValues = new ArrayList<WrappedDataValue>(2);
-		var serializer = WrappedDataWatcher.Registry.get((Type)Byte.class);
-		dataValues.add(new WrappedDataValue(0, serializer, (byte)(0x20 | 0x40))); 		// Invisible + Glowing effect
-		dataValues.add(new WrappedDataValue(15, serializer, (byte)(0x04 | 0x08))); 		// Has arm + no BasePlate
+		var serializer = WrappedDataWatcher.Registry.get((Type) Byte.class);
+		dataValues.add(new WrappedDataValue(0, serializer, (byte) (0x20 | 0x40))); // Invisible + Glowing effect
+		dataValues.add(new WrappedDataValue(15, serializer, (byte) (0x04 | 0x08))); // Has arm + no BasePlate
 		metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
-		
+
 		var equipPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
 		equipPacket.getIntegers().write(0, eid);
 		var pairList = new ArrayList<Pair<EnumWrappers.ItemSlot, ItemStack>>(4);
@@ -191,35 +177,32 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner>{
 		pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, new ItemStack(Material.NETHERITE_LEGGINGS)));
 		pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, new ItemStack(Material.NETHERITE_BOOTS)));
 		equipPacket.getSlotStackPairLists().write(0, pairList);
-		
-				
+
 		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket, equipPacket});
 	}
+
 	@Override
 	protected void onAttachedToPlayer(Scanner tool) {
 	}
+
 	@Override
 	protected void onDetachFromPlayer(Scanner tool) {
 	}
+
 	@Override
 	protected void onToolCleanup(Scanner tool) {
 	}
+
 	@Override
 	protected ItemStack makeItem(Scanner tool) {
-		return new ItemStackBuilder(Material.CLOCK)
-				.name(getDisplayName())
-				.lore(getLore())
-				.unstackable()
-				.flags(ItemFlag.values())
-				.build();
+		return new ItemStackBuilder(Material.CLOCK).name(getDisplayName()).lore(getLore()).unstackable()
+				.flags(ItemFlag.values()).build();
 	}
-	
-	public static class Scanner extends Tool{
+
+	public static class Scanner extends Tool {
 
 		public Scanner(ToolHandler<?> handler) {
 			super(handler);
 		}
-		
 	}
-	
 }

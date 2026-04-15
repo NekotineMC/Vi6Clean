@@ -3,13 +3,14 @@ package fr.nekotine.vi6clean.impl.tool.personal.invisneak;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 
-public class InviSneak extends Tool{
+public class InviSneak extends Tool {
 
 	public InviSneak(ToolHandler<?> handler) {
 		super(handler);
 	}
+
 	private boolean sneaking;
-	
+
 	private boolean revealed;
 
 	public boolean isSneaking() {

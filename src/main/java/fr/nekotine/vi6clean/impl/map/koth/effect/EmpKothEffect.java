@@ -1,9 +1,5 @@
 package fr.nekotine.vi6clean.impl.map.koth.effect;
 
-import java.util.List;
-
-import org.bukkit.Material;
-
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -20,79 +16,83 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
 import fr.nekotine.vi6clean.impl.status.effect.EmpStatusEffectType;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
+import org.bukkit.Material;
 
 @KothCode("emp")
-public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder{
+public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder {
 	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_other", 200);
 	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_guard", 400);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
 	private final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
-	
+
 	//
-	
+
 	@Override
 	public void tick() {
 		getKoth().setText(textDisplay.buildFirst(getKoth()));
 	}
+
 	@Override
 	public void capture(Vi6Team owning, Vi6Team losing) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
-		if(losing==Vi6Team.GUARD) {
-			game.getGuards().forEach(
-					p -> statusEffectModule.addEffect(p, effect));
+		if (losing == Vi6Team.GUARD) {
+			game.getGuards().forEach(p -> statusEffectModule.addEffect(p, effect));
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
-			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
-			game.getGuards().sendMessage(Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
-			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
+			game.getGuards().sendTitlePart(TitlePart.TITLE,
+					Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
+			game.getGuards()
+					.sendMessage(Component.text("Les voleurs ont activé le brouilleur", NamedTextColor.DARK_PURPLE));
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,
+					Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
 			game.getThiefs().sendMessage(Component.text("Votre équipe a activé le brouilleur", NamedTextColor.GREEN));
-		}else if(owning==Vi6Team.GUARD) {
-			game.getGuards().forEach(
-					p -> statusEffectModule.removeEffect(p, effect));
+		} else if (owning == Vi6Team.GUARD) {
+			game.getGuards().forEach(p -> statusEffectModule.removeEffect(p, effect));
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
-			game.getThiefs().sendTitlePart(TitlePart.TITLE,Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
+			game.getThiefs().sendTitlePart(TitlePart.TITLE,
+					Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
 			game.getThiefs().sendMessage(Component.text("Les gardes ont désactivé le brouilleur", NamedTextColor.RED));
-			game.getGuards().sendTitlePart(TitlePart.TITLE,Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
-			game.getGuards().sendMessage(Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
+			game.getGuards().sendTitlePart(TitlePart.TITLE,
+					Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
+			game.getGuards()
+					.sendMessage(Component.text("Votre équipe a désactivé le brouilleur", NamedTextColor.GREEN));
 		}
 	}
+
 	@Override
 	public void setup() {
 		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
 		setBlockDisplayData(Material.PURPLE_STAINED_GLASS.createBlockData());
 		getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 	}
+
 	@Override
 	public void clean() {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-		Ioc.resolve(Vi6Game.class).getGuards().forEach(
-				p -> statusEffectModule.removeEffect(p, effect));
+		Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> statusEffectModule.removeEffect(p, effect));
 	}
-	
+
 	//
-	
-	private final Builder textDisplay = Ioc.resolve(TextModule.class).message(Leaf.builder()
-			.addStyle(NekotineStyles.STANDART)
-			.addLine(DISPLAY_TEXT)
-			.addPlaceholder(this));
+
+	private final Builder textDisplay = Ioc.resolve(TextModule.class)
+			.message(Leaf.builder().addStyle(NekotineStyles.STANDART).addLine(DISPLAY_TEXT).addPlaceholder(this));
+
 	@Override
 	public <T> List<Pair<String, String>> resolve(T resolveData) {
-		var koth = (Koth)resolveData;
+		var koth = (Koth) resolveData;
 		var owningTeam = koth.getOwningTeam();
 		var tickAdvancement = koth.getTickAdvancement();
-		var percentage = (int)(((float)koth.getCaptureAdvancement() / koth.getCaptureAmountNeeded()) * 100);
+		var percentage = (int) (((float) koth.getCaptureAdvancement() / koth.getCaptureAmountNeeded()) * 100);
 		var status = (owningTeam == Vi6Team.GUARD) ? "<red>Désactivé</red>" : "<green>Actif</green>";
-		var power = (owningTeam == Vi6Team.GUARD) ? percentage+"%" : (100-percentage)+"%";
-		if(owningTeam == Vi6Team.GUARD)
+		var power = (owningTeam == Vi6Team.GUARD) ? percentage + "%" : (100 - percentage) + "%";
+		if (owningTeam == Vi6Team.GUARD)
 			tickAdvancement = -tickAdvancement;
 		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<red>↓</red>" : "<green>↑</green>");
 
-		return List.of(
-				Pair.from("status", status),
-				Pair.from("power", power),
-				Pair.from("evolution", evolution));
+		return List.of(Pair.from("status", status), Pair.from("power", power), Pair.from("evolution", evolution));
 	}
 }

@@ -17,17 +17,17 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
-public class Vi6Main extends NekotinePlugin{
-	
+public class Vi6Main extends NekotinePlugin {
+
 	private final ComponentLogger logger = NekotineLogger.make(this);
-	
+
 	@Override
 	public void onLoad() {
 		super.onLoad();
 		mapCommandsFor(Vi6Map.class);
 		gameCommands();
 	}
-	
+
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -41,7 +41,7 @@ public class Vi6Main extends NekotinePlugin{
 			} else {
 				logger.info("SimpleVoiceChat plugin not found");
 			}
-		}catch(NoClassDefFoundError e){
+		} catch (NoClassDefFoundError e) {
 			// ignore, ca arrive quand il n'y a pas SimpleVoiceChat
 		}
 		Vi6Styles.load();
@@ -55,14 +55,14 @@ public class Vi6Main extends NekotinePlugin{
 		Ioc.getProvider().registerSingleton(container);
 		game.start();
 	}
-	
+
 	@Override
 	public void onDisable() {
 		var game = Ioc.resolve(Vi6Game.class);
 		game.close();
 		super.onDisable();
 	}
-	
+
 	private void gameCommands() {
 		var gameC = new CommandAPICommand("game");
 		var sub = new CommandAPICommand("lobby").executes(_ -> {
@@ -70,5 +70,5 @@ public class Vi6Main extends NekotinePlugin{
 		}, ExecutorType.ALL);
 		gameC.withSubcommand(sub);
 		gameC.register();
-	} 
+	}
 }

@@ -1,21 +1,20 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
-import java.io.IOException;
-
-import org.bukkit.block.data.BlockData;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.vi6clean.constant.Vi6Team;
+import java.io.IOException;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public abstract class AbstractKothEffect {
 	private final ComponentLogger logger = NekotineLogger.make();
 	private final String code;
 	private Koth koth;
 	private Configuration configuration;
+
 	public AbstractKothEffect() {
 		var an = getClass().getDeclaredAnnotation(KothCode.class);
 		code = an.value();
@@ -26,32 +25,39 @@ public abstract class AbstractKothEffect {
 			configuration = new YamlConfiguration();
 		}
 	}
-	
+
 	//
-	
+
 	public abstract void tick();
+
 	public abstract void capture(Vi6Team owning, Vi6Team losing);
+
 	public abstract void setup();
+
 	public abstract void clean();
 
 	//
-	
+
 	public Configuration getConfiguration() {
 		return configuration;
 	}
+
 	public double getProbability() {
 		return getConfiguration().getDouble("probability", 0);
 	}
+
 	public Koth getKoth() {
 		return koth;
 	}
+
 	public void setKoth(Koth koth) {
 		this.koth = koth;
 	}
+
 	public void setBlockDisplayData(BlockData data) {
 		koth.setBlockDisplayData(data);
 	}
-	
+
 	public String getCode() {
 		return code;
 	}

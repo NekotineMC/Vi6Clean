@@ -1,8 +1,19 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.map.annotation.GenerateCommandFor;
+import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
+import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
+import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
+import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
+import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Team;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import java.util.HashSet;
 import java.util.Set;
-
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,31 +26,19 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
-import fr.nekotine.core.map.annotation.GenerateCommandFor;
-import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
-import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
-import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
-import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import net.kyori.adventure.text.Component;
-
-public class Koth{
+public class Koth {
 	@MapDictKey
 	private String name = "";
 	@GenerateCommandFor
 	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
-	
+
 	@GenerateSpecificCommandFor(LocationCommandGenerator.class)
 	@ComposingConfiguration
 	private BlockVector displayLocation = new BlockVector();
+
 	private Set<Player> inside = new HashSet<>(8);
-	
+
 	private boolean isEnabled = false;
 	private int captureAmountNeeded = 200;
 	private Vi6Team owningTeam = Vi6Team.GUARD;
@@ -49,84 +48,96 @@ public class Koth{
 	private int captureAdvancement;
 	private AbstractKothEffect effect;
 	private BlockDisplay rectangle;
-	
-	
+
 	//
-	
+
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
 	}
+
 	public Vi6Team getOwningTeam() {
 		return owningTeam;
 	}
+
 	public void setOwningTeam(Vi6Team team) {
 		owningTeam = team;
 	}
+
 	public int getCaptureAdvancement() {
 		return captureAdvancement;
 	}
+
 	public void setCaptureAdvancement(int advancement) {
 		captureAdvancement = advancement;
 	}
+
 	public int getCaptureAmountNeeded() {
 		return captureAmountNeeded;
 	}
+
 	public void setCaptureAmountNeeded(int needed) {
 		captureAmountNeeded = needed;
 	}
-	public Set<Player> getInsideCaptureZone(){
+
+	public Set<Player> getInsideCaptureZone() {
 		return inside;
 	}
+
 	public int getTickAdvancement() {
 		return tickAdvancement;
 	}
+
 	public void setText(Component text) {
 		this.text = text;
 	}
+
 	public void setBlockDisplayData(BlockData data) {
 		rectangle.setBlock(data);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public BlockVector getDisplayLocation() {
 		return displayLocation;
 	}
-	
+
 	//
-	
+
 	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
-		display = (TextDisplay)world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY, CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
-			if (display instanceof TextDisplay d){
-				d.setBillboard(Billboard.CENTER);
-				d.setShadowed(true);
-				d.setPersistent(false);
-			}
-		});
+		display = (TextDisplay) world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY,
+				CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
+					if (display instanceof TextDisplay d) {
+						d.setBillboard(Billboard.CENTER);
+						d.setShadowed(true);
+						d.setPersistent(false);
+					}
+				});
 		rectangle = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.BARRIER.createBlockData());
 		isEnabled = true;
 		effect.setKoth(this);
 		effect.setup();
 	}
+
 	public void clean() {
 		if (rectangle != null) {
 			rectangle.remove();
 		}
-		if(!isEnabled) {
+		if (!isEnabled) {
 			return;
 		}
 		effect.clean();
 		captureAdvancement = 0;
 		display.remove();
 	}
+
 	public void tick() {
-		if(!isEnabled)
+		if (!isEnabled)
 			return;
-		
-		//capture
+
+		// capture
 		var wrapping = Ioc.resolve(WrappingModule.class);
 		tickAdvancement = 0;
 		boolean owningTeamCancelling = false;
@@ -135,15 +146,15 @@ public class Koth{
 			var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrapper.isEmpty())
 				continue;
-	
+
 			if (optWrapper.get().getParentWrapper().getTeam() == owningTeam) {
 				owningTeamCancelling = true;
-			}else {
+			} else {
 				firstEnemy = player;
 				tickAdvancement++;
 			}
 		}
-		if (owningTeamCancelling) 
+		if (owningTeamCancelling)
 			return;
 		if (tickAdvancement == 0)
 			tickAdvancement--;
@@ -153,15 +164,15 @@ public class Koth{
 			tickAdvancement = 0;
 		}
 		if (captureAdvancement >= captureAmountNeeded) {
-			var newOwning = Ioc.resolve(WrappingModule.class).
-					getWrapperOptional(firstEnemy, PlayerWrapper.class).get().getTeam();
+			var newOwning = Ioc.resolve(WrappingModule.class).getWrapperOptional(firstEnemy, PlayerWrapper.class).get()
+					.getTeam();
 			effect.capture(newOwning, owningTeam);
 			owningTeam = newOwning;
 			captureAdvancement = 0;
 			tickAdvancement = 0;
 		}
-		
-		//effect & display
+
+		// effect & display
 		effect.tick();
 		display.text(text);
 	}

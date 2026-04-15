@@ -1,14 +1,5 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
-import fr.nekotine.vi6clean.constant.Vi6Team;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
@@ -20,86 +11,96 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
 public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	private int money = 1000;
-	
+
 	private MenuInventory menu;
-	
+
 	private MenuInventory runesMenu;
-	
+
 	private Tool rune;
-	
+
 	private boolean readyForNextPhase;
-	
+
 	private ThiefSpawn selectedSpawn;
-	
+
 	private ComponentDisplayMenuItem moneyIndicator;
-	
+
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
-		if (wrapped==null) {
+		if (wrapped == null) {
 			return;
 		}
 		// Menu page
 		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
-		var readyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
+		var readyItem = new BooleanInputMenuItem(
+				ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
-				this::isReadyForNextPhase,
-				this::setReadyForNextPhase);
-		var runesItem = new ActionMenuItem(ItemStackUtil.make(Material.TOTEM_OF_UNDYING, Component.text("Runes", NamedTextColor.BLUE)), (e)->{
-			var cli = e.getWhoClicked();
-			if (cli instanceof Player player) {
-				runesMenu.displayTo(player);
-			}
-		});
+				this::isReadyForNextPhase, this::setReadyForNextPhase);
+		var runesItem = new ActionMenuItem(
+				ItemStackUtil.make(Material.TOTEM_OF_UNDYING, Component.text("Runes", NamedTextColor.BLUE)), (e) -> {
+					var cli = e.getWhoClicked();
+					if (cli instanceof Player player) {
+						runesMenu.displayTo(player);
+					}
+				});
 		var wrapLayout = new WrapMenuLayout();
-		var team =  Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class).getTeam();
+		var team = Ioc.resolve(WrappingModule.class).getWrapper(wrapped, PlayerWrapper.class).getTeam();
 		var container = Ioc.resolve(ToolHandlerContainer.class);
 		for (var tool : container.getHandlers().stream()
-				.filter(t -> t.getTeamsAvailableFor().contains(team) && !t.isRune())
-				.sorted((a,b)->{return b.getPrice()-a.getPrice();})
-				.collect(Collectors.toCollection(ArrayList::new))){
+				.filter(t -> t.getTeamsAvailableFor().contains(team) && !t.isRune()).sorted((a, b) -> {
+					return b.getPrice() - a.getPrice();
+				}).collect(Collectors.toCollection(ArrayList::new))) {
 			wrapLayout.addElement(tool.makeShopMenuItem());
 		}
-		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE,Component.empty()), wrapLayout);
+		var toolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.ORANGE_STAINED_GLASS_PANE, Component.empty()),
+				wrapLayout);
 		toolbar.addTool(readyItem);
 		toolbar.addTool(moneyIndicator);
 		toolbar.addTool(runesItem);
-		menu = new MenuInventory(toolbar,6);
+		menu = new MenuInventory(toolbar, 6);
 		// Runes page
-		var runesReadyItem = new BooleanInputMenuItem(ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
+		var runesReadyItem = new BooleanInputMenuItem(
+				ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
-				this::isReadyForNextPhase,
-				this::setReadyForNextPhase);
+				this::isReadyForNextPhase, this::setReadyForNextPhase);
 		var backItem = new ActionMenuItem(new ItemStackBuilder(Material.PLAYER_HEAD)
-				.skull("76ebaa41d1d405eb6b60845bb9ac724af70e85eac8a96a5544b9e23ad6c96c62")
-				.flags(ItemFlag.values()).name(Component.text("Retour",NamedTextColor.RED)).build(), (e)->{
-			var cli = e.getWhoClicked();
-			if (cli instanceof Player player) {
-				menu.displayTo(player);
-			}
-		});
+				.skull("76ebaa41d1d405eb6b60845bb9ac724af70e85eac8a96a5544b9e23ad6c96c62").flags(ItemFlag.values())
+				.name(Component.text("Retour", NamedTextColor.RED)).build(), (e) -> {
+					var cli = e.getWhoClicked();
+					if (cli instanceof Player player) {
+						menu.displayTo(player);
+					}
+				});
 		var runesWrapLayout = new WrapMenuLayout();
 		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
-				.filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune())
-				.sorted((a,b)->{return b.getPrice()-a.getPrice();})
-				.collect(Collectors.toCollection(ArrayList::new))){
+				.filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune()).sorted((a, b) -> {
+					return b.getPrice() - a.getPrice();
+				}).collect(Collectors.toCollection(ArrayList::new))) {
 			runesWrapLayout.addElement(tool.makeShopMenuItem());
 		}
-		var runesToolbar = new ToolbarMenuLayout(ItemStackUtil.make(Material.BLUE_STAINED_GLASS_PANE,Component.empty()), runesWrapLayout);
+		var runesToolbar = new ToolbarMenuLayout(
+				ItemStackUtil.make(Material.BLUE_STAINED_GLASS_PANE, Component.empty()), runesWrapLayout);
 		runesToolbar.addTool(runesReadyItem);
 		runesToolbar.addTool(backItem);
-		runesMenu = new MenuInventory(runesToolbar,6);
-		if (team== Vi6Team.THIEF){
+		runesMenu = new MenuInventory(runesToolbar, 6);
+		if (team == Vi6Team.THIEF) {
 			wrapped.setAllowFlight(true);
 		}
 	}
@@ -133,9 +134,10 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setSelectedSpawn(ThiefSpawn selectedSpawn) {
 		this.selectedSpawn = selectedSpawn;
-		wrapped.sendMessage(Component.text("Entrée "+selectedSpawn.getName()+" sélectionnée", NamedTextColor.DARK_GREEN));
+		wrapped.sendMessage(
+				Component.text("Entrée " + selectedSpawn.getName() + " sélectionnée", NamedTextColor.DARK_GREEN));
 	}
-	
+
 	public InMapPhasePlayerWrapper getParentWrapper() {
 		return Ioc.resolve(WrappingModule.class).getWrapper(wrapped, InMapPhasePlayerWrapper.class);
 	}
@@ -143,9 +145,9 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	public int getMoney() {
 		return money;
 	}
-	
+
 	public Component getMoneyDisplay() {
-		return Component.text("Argent: "+money, NamedTextColor.GOLD);
+		return Component.text("Argent: " + money, NamedTextColor.GOLD);
 	}
 
 	public void setMoney(int money) {

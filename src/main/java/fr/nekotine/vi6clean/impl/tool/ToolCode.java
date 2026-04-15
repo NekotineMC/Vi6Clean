@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface ToolCode {
-	
+
 	String value() default "default";
-	
 }
