@@ -1,5 +1,24 @@
 package fr.nekotine.vi6clean.impl.game;
 
+import java.time.Duration;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.Team.Option;
+import org.bukkit.scoreboard.Team.OptionStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.game.phase.PhaseMachine;
 import fr.nekotine.core.glow.EntityGlowModule;
@@ -29,10 +48,6 @@ import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
-import java.time.Duration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.key.Key;
@@ -42,25 +57,12 @@ import net.kyori.adventure.text.event.ClickCallback;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
-import org.bukkit.scoreboard.Team.Option;
-import org.bukkit.scoreboard.Team.OptionStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 
 	private final ComponentLogger logger = NekotineLogger.make();
 
-	private String mapName;
+	private String mapName = "SolarIndustries";
 
 	private World world = Bukkit.getWorlds().getFirst();
 
@@ -335,43 +337,33 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	private void displayGameSettingsDialog(Player player) {
 		var mapModule = Ioc.resolve(MapModule.class);
 		var maps = mapModule.listMaps();
-		var dialog = Dialog
-				.create(builder -> builder
-						.empty().base(
-								DialogBase
-										.builder(MiniMessage.miniMessage().deserialize(
-												"<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
-										.canCloseWithEscape(true).pause(false)
-										.inputs(List.of(
-												DialogInput
-														.singleOption("map", Component.text("Carte"), maps.stream()
-																.map(mapMetadata -> SingleOptionDialogInput.OptionEntry
-																		.create(mapMetadata.getName(),
-																				mapMetadata.getDisplayName(),
-																				mapMetadata.getName() == this
-																						.getMapName()))
-																.toList())
-														.build(),
-												DialogInput
-														.bool("debug",
-																MiniMessage.miniMessage()
-																		.deserialize("Activer le mode debug <yellow>⚠"))
-														.initial(this.isDebug()).build()))
-										.build())
-						.type(DialogType
-								.confirmation(ActionButton.builder(Component.text("Enregistrer", NamedTextColor.GREEN))
-										.action(DialogAction.customClick((response, audiance) -> {
-											this.setDebug(response.getBoolean("debug"));
-											this.setMapName(response.getText("map"));
-											var mapMetadata = Ioc.resolve(MapModule.class)
-													.getMapMetadata(response.getText("map"));
-											audiance.sendMessage(Component.text("Carte selectionnée: ")
-													.append(mapMetadata.getDisplayName()));
-											audiance.sendMessage(Component.text("Mode débug: ").append(Component
-													.text(response.getBoolean("debug") ? "Activé" : "Désactivé")));
-										}, ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build()))
-										.build(),
-										ActionButton.builder(Component.text("Annuler", NamedTextColor.RED)).build())));
+		var dialog = Dialog.create(builder -> builder.empty().base(DialogBase
+				.builder(MiniMessage.miniMessage()
+						.deserialize("<red>V<dark_aqua>oleur <red>I<dark_aqua>ndustriel <red>6"))
+				.canCloseWithEscape(true).pause(false).inputs(List.of(
+						DialogInput
+								.singleOption("map", Component.text("Carte"),
+										maps.stream()
+												.map(mapMetadata -> SingleOptionDialogInput.OptionEntry.create(
+														mapMetadata.getName(), mapMetadata.getDisplayName(),
+														mapMetadata.getName().equals(this.getMapName())))
+												.toList())
+								.build(),
+						DialogInput
+								.bool("debug", MiniMessage.miniMessage().deserialize("Activer le mode debug <yellow>⚠"))
+								.initial(this.isDebug()).build()))
+				.build())
+				.type(DialogType.confirmation(ActionButton.builder(Component.text("Enregistrer", NamedTextColor.GREEN))
+						.action(DialogAction.customClick((response, audiance) -> {
+							this.setDebug(response.getBoolean("debug"));
+							this.setMapName(response.getText("map"));
+							var mapMetadata = Ioc.resolve(MapModule.class).getMapMetadata(response.getText("map"));
+							audiance.sendMessage(
+									Component.text("Carte selectionnée: ").append(mapMetadata.getDisplayName()));
+							audiance.sendMessage(Component.text("Mode débug: ")
+									.append(Component.text(response.getBoolean("debug") ? "Activé" : "Désactivé")));
+						}, ClickCallback.Options.builder().lifetime(Duration.ofMinutes(5)).build())).build(),
+						ActionButton.builder(Component.text("Annuler", NamedTextColor.RED)).build())));
 		player.showDialog(dialog);
 	}
 }
