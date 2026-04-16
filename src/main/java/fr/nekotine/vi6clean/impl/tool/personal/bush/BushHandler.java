@@ -21,8 +21,15 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +48,11 @@ public class BushHandler extends ToolHandler<Bush> {
 			NamespacedKey.fromString("bush_hideout", Ioc.resolve(JavaPlugin.class)), Material.PEONY,
 			Material.TALL_GRASS, Material.LARGE_FERN, Material.LILAC, Material.ROSE_BUSH, Material.SMALL_DRIPLEAF,
 			Material.KELP);
+	
+	private final MaterialSetTag tinyBushMaterials = new MaterialSetTag(
+			NamespacedKey.fromString("tiny_bush_hideout", Ioc.resolve(JavaPlugin.class)), Stream.concat(Set.of(Material.SHORT_GRASS,
+			Material.FERN, Material.BUSH, Material.FIREFLY_BUSH, Material.SUGAR_CANE, Material.TALL_DRY_GRASS,
+			Material.DEAD_BUSH, Material.SEAGRASS).stream(), Tag.SAPLINGS.getValues().stream()).collect(Collectors.toList()));
 
 	private final int FADE_OFF_DELAY = getConfiguration().getInt("fadeoff", 30);
 
@@ -79,7 +91,8 @@ public class BushHandler extends ToolHandler<Bush> {
 		if (owner == null) {
 			return;
 		}
-		var inBush = bushMaterials.isTagged(owner.getLocation().getBlock());
+		var scale = owner.getAttribute(Attribute.SCALE).getValue();
+		var inBush = bushMaterials.isTagged(owner.getLocation().getBlock()) || (scale <= 0.5 && owner.isSneaking() && tinyBushMaterials.isTagged(owner.getLocation().getBlock()));
 		var revealed = false;
 		var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
 		if (wrap.isPresent()) {
