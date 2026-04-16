@@ -61,6 +61,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	@Override
 	public void itemTearDown(Player item) {
 		item.spigot().respawn();
+		item.getInventory().clear();
 		Ioc.resolve(WrappingModule.class).removeWrapper(null, InfiltrationPhasePlayerWrapper.class);
 	}
 
