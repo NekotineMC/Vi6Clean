@@ -156,7 +156,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 				return;
 			}
 			var newpad = new PortableTeleporterHandler.PortableTeleporter.TeleportationPad();
-			var newloc = ploc.toVector().toLocation(ploc.getWorld(),player.getEyeLocation().getYaw(),0);
+			var newloc = ploc.toVector().toLocation(ploc.getWorld(), player.getEyeLocation().getYaw(), 0);
 			newpad.display = (BlockDisplay) newloc.getWorld().spawnEntity(newloc, EntityType.BLOCK_DISPLAY,
 					SpawnReason.CUSTOM, e -> {
 						if (e instanceof BlockDisplay dis) {
