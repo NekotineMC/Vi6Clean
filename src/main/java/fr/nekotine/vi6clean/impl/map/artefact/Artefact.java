@@ -24,6 +24,7 @@ import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockVector;
@@ -31,9 +32,9 @@ import org.bukkit.util.BoundingBox;
 
 public class Artefact {
 
-	private static final int CAPTURE_AMOUNT_NEEDED = 200;
+	private static final double CAPTURE_AMOUNT_NEEDED = 200;
 
-	private int capture_advancement;
+	private double capture_advancement;
 
 	@MapDictKey
 	private String name = "";
@@ -141,7 +142,7 @@ public class Artefact {
 					if (optWrapper.isEmpty() || !optWrapper.get().canCaptureArtefact()) {
 						continue;
 					}
-					tickAdvancement++;
+					tickAdvancement += player.getAttribute(Attribute.SCALE).getValue();
 					firstThief = player;
 					wrapping.getWrapper(player, InMapPhasePlayerWrapper.class).getArtefactComponent().setText(thiefMsg);
 				}
