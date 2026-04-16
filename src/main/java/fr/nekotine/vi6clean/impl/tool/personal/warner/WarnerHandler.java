@@ -1,29 +1,9 @@
 package fr.nekotine.vi6clean.impl.tool.personal.warner;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.module.ModuleManager;
-import fr.nekotine.core.text.TextModule;
-import fr.nekotine.core.text.style.NekotineStyles;
-import fr.nekotine.core.text.tree.Leaf;
-import fr.nekotine.core.ticking.TickTimeStamp;
-import fr.nekotine.core.ticking.TickingModule;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.CustomAction;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.impl.map.Vi6Map;
-import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
-import fr.nekotine.vi6clean.impl.tool.Tool;
-import fr.nekotine.vi6clean.impl.tool.ToolCode;
-import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
@@ -37,6 +17,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
+
+import fr.nekotine.core.inventory.ItemStackBuilder;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.text.TextModule;
+import fr.nekotine.core.text.style.NekotineStyles;
+import fr.nekotine.core.text.tree.Leaf;
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.map.Vi6Map;
+import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
+import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("warner")
 public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
@@ -126,8 +127,7 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
 						.message(Leaf.builder().addStyle(Placeholder.unparsed("name", tool.watched.getName()))
 								.addStyle(NekotineStyles.STANDART).addLine(WARN_MESSAGE))
 						.buildFirst();
-				var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(tool.getOwner(), PlayerWrapper.class);
-				for (var teammate : wrapper.ourTeam()) {
+				for (var teammate : Ioc.resolve(Vi6Game.class).getGuards()) {
 					Vi6Sound.WARNER_TRIGGER.play(teammate);
 					teammate.sendMessage(message);
 				}

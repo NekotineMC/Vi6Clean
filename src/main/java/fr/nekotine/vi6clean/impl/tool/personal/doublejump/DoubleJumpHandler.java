@@ -98,7 +98,6 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
 
 	@Override
 	protected void onToolCleanup(DoubleJump tool) {
-		tool.getOwner().getInventory().setBoots(null);
 	}
 
 	@Override
