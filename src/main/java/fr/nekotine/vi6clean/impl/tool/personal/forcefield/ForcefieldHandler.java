@@ -36,6 +36,7 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 	private Map<String, DoorData> fieldsDisplay = new HashMap<>();
 
 	private final int FORCEFIELD_NB_MAX = getConfiguration().getInt("nbmax", 2);
+	private final int FORCEFIELD_RANGE = getConfiguration().getInt("range", 100);
 
 	public ForcefieldHandler() {
 		super(Forcefield::new);
@@ -205,7 +206,7 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 		var start = eyeLoc.toVector();
 		var dir = eyeLoc.getDirection();
 		return Ioc.resolve(Vi6Map.class).getGates().entrySet().stream()
-				.filter(bb -> bb.getValue().rayTrace(start, dir, 100.0) != null)
+				.filter(bb -> bb.getValue().rayTrace(start, dir, FORCEFIELD_RANGE) != null)
 				.sorted((a,
 						b) -> (int) (start.distanceSquared(a.getValue().getCenter())
 								- start.distanceSquared(b.getValue().getCenter())))
