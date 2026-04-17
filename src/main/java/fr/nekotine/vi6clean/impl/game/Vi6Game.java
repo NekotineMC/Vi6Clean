@@ -62,7 +62,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 
 	private final ComponentLogger logger = NekotineLogger.make();
 
-	private String mapName = "SolarIndustries";
+	private String mapName;
 
 	private World world = Bukkit.getWorlds().getFirst();
 
@@ -115,7 +115,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 			if (maps.size() <= 0) {
 				throw new IllegalStateException("Aucune map n'est disponible");
 			}
-			setMapName(maps.stream().findAny().get().getName());
+			setMapName(maps.stream().sorted((mapA, mapB) -> {
+				System.out.println(mapA.getName());
+				System.out.println(mapB.getName());
+				return mapA.getName().equals("SolarIndustries") ? -1 : 1;
+			}).findFirst().get().getName());
 		}
 	}
 
