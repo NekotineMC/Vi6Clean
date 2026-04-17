@@ -31,6 +31,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,6 +54,7 @@ import org.joml.Vector3f;
 
 @ToolCode("radar")
 public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
+
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 20);
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 	private final int DELAY_TICK = (int) (20 * getConfiguration().getDouble("delay", 5));
@@ -79,7 +81,6 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 			// TICK CHARGE
 			if (tool.top != null) {
 				if (--tool.chargeTime <= 0) {
-
 					var opt = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
 					var ennemiNear = opt.get().ennemiTeamInMap().filter(
 							e -> tool.top.getLocation().distanceSquared(e.getLocation()) <= DETECTION_RANGE_SQUARED)
@@ -136,7 +137,6 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 					SpatialUtil.ball3DDensity(DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 							(offsetX, offsetY, offsetZ) -> loc.getWorld().spawnParticle(Particle.WITCH, x + offsetX,
 									y + offsetY, z + offsetZ, 1, 0, 0, 0, 0, null));
-
 				} else if (owner.isSneaking() && itemMatch(tool, owner.getInventory().getItemInMainHand())) {
 					Location loc = owner.getLocation();
 					var x = loc.getX();
@@ -196,8 +196,10 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 						dis.setRotation(rot, 0);
 						dis.setItemStack(ItemStack.of(Material.CALIBRATED_SCULK_SENSOR));
 						dis.setInterpolationDelay(0);
-						dis.setInterpolationDuration(DELAY_TICK - 10);
-						dis.setTransformation(RadarHandler.TOP_TRANSFORMATION);
+						dis.setInterpolationDuration(DELAY_TICK);
+						Bukkit.getScheduler().runTaskLater(Ioc.resolve(JavaPlugin.class), () -> {
+							dis.setTransformation(RadarHandler.TOP_TRANSFORMATION);
+						}, 1);
 					}
 				});
 
@@ -217,7 +219,6 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 
 	@Override
 	protected void onToolCleanup(Radar tool) {
-
 		if (tool.top != null) {
 			tool.top.remove();
 			tool.top = null;
