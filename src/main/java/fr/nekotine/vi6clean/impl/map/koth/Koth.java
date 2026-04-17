@@ -11,6 +11,8 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -47,7 +49,7 @@ public class Koth {
 	private TextDisplay display;
 	private int captureAdvancement;
 	private AbstractKothEffect effect;
-	private BlockDisplay rectangle;
+	private Collection<BlockDisplay> rectangleEdges;
 
 	//
 
@@ -92,7 +94,12 @@ public class Koth {
 	}
 
 	public void setBlockDisplayData(BlockData data) {
-		rectangle.setBlock(data);
+		if (rectangleEdges != null) {
+			for (var edge : rectangleEdges) {
+				edge.setBlock(data);
+			}
+			rectangleEdges.clear();
+		}
 	}
 
 	public String getName() {
@@ -115,15 +122,19 @@ public class Koth {
 						d.setPersistent(false);
 					}
 				});
-		rectangle = SpatialUtil.fillBoundingBox(world, getBoundingBox(), Material.BARRIER.createBlockData());
+		rectangleEdges = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
+				Material.BARRIER.createBlockData());
 		isEnabled = true;
 		effect.setKoth(this);
 		effect.setup();
 	}
 
 	public void clean() {
-		if (rectangle != null) {
-			rectangle.remove();
+		if (rectangleEdges != null) {
+			for (var edge : rectangleEdges) {
+				edge.remove();
+			}
+			rectangleEdges.clear();
 		}
 		if (!isEnabled) {
 			return;

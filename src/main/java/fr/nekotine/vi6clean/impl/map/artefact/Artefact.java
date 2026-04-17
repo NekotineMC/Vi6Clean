@@ -15,6 +15,8 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
@@ -53,7 +55,7 @@ public class Artefact {
 	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
 
-	private BlockDisplay boxDisplay;
+	private Collection<BlockDisplay> boxDisplays;
 
 	private boolean foundAfterCapture;
 
@@ -76,18 +78,31 @@ public class Artefact {
 	}
 
 	public void setup(World world) {
-		boxDisplay = SpatialUtil.fillBoundingBox(world, getBoundingBox(),
-				Material.ORANGE_STAINED_GLASS.createBlockData());
-		boxDisplay.setGlowing(true);
-		boxDisplay.setGlowColorOverride(Color.BLUE);
-		boxDisplay.setPersistent(false);
+		boxDisplays = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
+				Material.ORANGE_STAINED_GLASS.createBlockData(), 0.06f);
+		for (var display : boxDisplays) {
+			display.setGlowing(true);
+			display.setGlowColorOverride(Color.BLUE);
+			// boxDisplay.setPersistent(false); already done
+		}
+	}
+
+	public void unglow() {
+		for (var display : boxDisplays) {
+			display.setGlowing(false);
+		}
 	}
 
 	public void clean() {
 		blockPatch.unpatchAll();
 		isCaptured = false;
 		capture_advancement = 0;
-		boxDisplay.remove();
+		if (boxDisplays != null) {
+			for (var dis : boxDisplays) {
+				dis.remove();
+			}
+			boxDisplays.clear();
+		}
 	}
 
 	public boolean isCaptured() {
