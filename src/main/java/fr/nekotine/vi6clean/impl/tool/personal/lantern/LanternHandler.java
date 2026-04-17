@@ -1,6 +1,28 @@
 package fr.nekotine.vi6clean.impl.tool.personal.lantern;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Silverfish;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+
 import com.comphenix.protocol.wrappers.EnumWrappers;
+
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -9,6 +31,7 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
@@ -18,26 +41,8 @@ import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.LinkedList;
-import java.util.List;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 @ToolCode("lantern")
 public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
@@ -118,37 +123,35 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			// TRY PLACE
 			var owner = tool.getOwner();
-			if (tool.displayedLanterns.size() >= MAX_LANTERN || tool.fallingArmorStand != null || owner == null) {
+			if (tool.displayedLanterns.size() >= MAX_LANTERN || tool.fallingEntity != null || owner == null) {
 				Vi6Sound.LANTERNE_CANNOT_PLACE.play(player);
 				evt.getPlayer()
 						.playSound(Sound.sound(NamespacedKey.minecraft("entity.villager.no"), Source.MASTER, 1, 1));
 				return;
 			}
 			var loc = owner.getLocation();
-			loc.setYaw(0);
 			loc.setPitch(0);
 			var lantern = (BlockDisplay) owner.getWorld().spawnEntity(loc, EntityType.BLOCK_DISPLAY, SpawnReason.CUSTOM,
 					e -> {
 						if (e instanceof BlockDisplay display) {
 							var scale = (float) owner.getAttribute(Attribute.SCALE).getValue();
-							var transf = new Transformation(new Vector3f(-0.5f, -0.7405f, -0.5f), new AxisAngle4f(),
-									new Vector3f(scale, scale, scale), new AxisAngle4f());
+							var transf = new Transformation(new Vector3f(-0.5f, /*-0.7405f*/0, -0.5f),
+									new AxisAngle4f(), new Vector3f(scale, scale, scale), new AxisAngle4f());
 							display.setTransformation(transf);
 							display.setBlock(Bukkit.createBlockData(Material.LANTERN));
 							display.setPersistent(false);
 						}
 					});
 
-			tool.fallingArmorStand = (ArmorStand) owner.getWorld().spawnEntity(owner.getLocation(),
-					EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
-						if (e instanceof ArmorStand stand) {
-							stand.addPassenger(lantern);
-							stand.setInvisible(true);
-							stand.setSilent(true);
-							stand.setInvulnerable(true);
-							stand.setSmall(true);
-							stand.setPersistent(false);
-							stand.setBasePlate(false);
+			tool.fallingEntity = owner.getWorld().spawnEntity(owner.getLocation(), EntityType.SILVERFISH,
+					SpawnReason.CUSTOM, e -> {
+						if (e instanceof Silverfish ent) {
+							ent.addPassenger(lantern);
+							ent.setInvisible(true);
+							ent.setSilent(true);
+							ent.setInvulnerable(true);
+							ent.setPersistent(false);
+							MobAiUtil.clearBrain(ent);
 						}
 					});
 			tool.displayedLanterns.add(lantern);
@@ -172,10 +175,16 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 	private void onTick(TickElapsedEvent evt) {
 		for (var tool : getTools()) {
 
-			if (tool.fallingArmorStand != null && tool.fallingArmorStand.isOnGround()) {
-				Vi6Sound.LANTERNE_POSE.play(tool.fallingArmorStand.getWorld(), tool.fallingArmorStand.getLocation());
-				tool.fallingArmorStand.remove();
-				tool.fallingArmorStand = null;
+			if (tool.fallingEntity != null && tool.fallingEntity.isOnGround()) {
+				Vi6Sound.LANTERNE_POSE.play(tool.fallingEntity.getWorld(), tool.fallingEntity.getLocation());
+				var loc = tool.fallingEntity.getLocation();
+				loc.setPitch(0);
+				for (var passenger : tool.fallingEntity.getPassengers()) {
+					tool.fallingEntity.removePassenger(passenger);
+					passenger.teleport(loc);
+				}
+				tool.fallingEntity.remove();
+				tool.fallingEntity = null;
 			}
 
 			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
@@ -183,7 +192,7 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 					for (var lantern : tool.displayedLanterns) {
 						var loc = lantern.getLocation();
 						var x = loc.getX();
-						var y = loc.getY() - 0.74f;
+						var y = loc.getY();
 						var z = loc.getZ();
 						lantern.getWorld().spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 0, 0, 0, 0,
 								0f);
@@ -208,9 +217,9 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			lantern.remove();
 		}
 		tool.displayedLanterns.clear();
-		if (tool.fallingArmorStand != null) {
-			tool.fallingArmorStand.remove();
-			tool.fallingArmorStand = null;
+		if (tool.fallingEntity != null) {
+			tool.fallingEntity.remove();
+			tool.fallingEntity = null;
 		}
 	}
 
@@ -226,7 +235,7 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			super(handler);
 		}
 
-		private ArmorStand fallingArmorStand;
+		private Entity fallingEntity;
 
 		private List<BlockDisplay> displayedLanterns = new LinkedList<>();
 	}
