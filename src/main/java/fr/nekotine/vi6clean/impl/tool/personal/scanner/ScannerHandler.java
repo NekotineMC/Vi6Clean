@@ -89,6 +89,7 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 			var w = wrappingModule.getWrapperOptional(p, PlayerWrapper.class);
 			return w.isPresent() && w.get().getTeam() == Vi6Team.THIEF;
 		}).collect(Collectors.toCollection(LinkedList::new));
+		Vi6Sound.SCANNER_SCAN.play(game);
 		if (guardOwners.size() > 0) {
 			var thiefScansIds = new LinkedList<Integer>();
 			for (var thief : game.getThiefs()) {
@@ -98,7 +99,7 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 					for (var p : scanInfo.getSecond()) {
 						pmanager.sendServerPacket(guard, p);
 					}
-					Vi6Sound.SCANNER_SCAN.play(guard);
+					guard.setCooldown(Material.CLOCK, SCAN_DELAY_TICK);
 				}
 			}
 			new BukkitRunnable() {
@@ -125,7 +126,6 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 						pmanager.sendServerPacket(thief, p);
 					}
 					thief.setCooldown(Material.CLOCK, SCAN_DELAY_TICK);
-					Vi6Sound.SCANNER_SCAN.play(thief);
 				}
 			}
 			new BukkitRunnable() {
