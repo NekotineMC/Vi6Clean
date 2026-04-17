@@ -160,6 +160,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 			newpad.display = (BlockDisplay) newloc.getWorld().spawnEntity(newloc, EntityType.BLOCK_DISPLAY,
 					SpawnReason.CUSTOM, e -> {
 						if (e instanceof BlockDisplay dis) {
+							e.setPersistent(false);
 							var trans = dis.getTransformation();
 							var scale = trans.getScale();
 							scale.set(1, CARPET_SIZE, 1);
