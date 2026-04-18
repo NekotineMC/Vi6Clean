@@ -13,6 +13,7 @@ import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.PotionEffectState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
+import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.AssertUtil;
@@ -89,6 +90,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 
 	private Objective thiefScoreboard;
 	private final String thiefObjectiveName = "thiefArtefactListing";
+
+	private int phaseDurationTicks = 0;
 
 	public Vi6PhaseInMap(IPhaseMachine machine) {
 		super(machine);
@@ -213,6 +216,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			}
 		}
 		Ioc.resolve(Majordom.class).enable();
+		game.getPlayerList().forEach(p -> p.setLevel(0));
+		phaseDurationTicks = 0;
 	}
 
 	@Override
@@ -369,6 +374,17 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	private void onTick(TickElapsedEvent evt) {
 		map.getArtefacts().values().stream().forEach(Artefact::tick);
 		map.getKoths().values().stream().forEach(Koth::tick);
+		if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
+			phaseDurationTicks += 5;
+			int mod = phaseDurationTicks % (20 * 60);
+			float exp = (float) mod / (20 * 60);
+			Ioc.resolve(Vi6Game.class).getPlayerList().forEach(p -> {
+				p.setExp(exp);
+				if (mod == 0) {
+					p.setLevel(phaseDurationTicks / (20 * 60));
+				}
+			});
+		}
 	}
 
 	@EventHandler
