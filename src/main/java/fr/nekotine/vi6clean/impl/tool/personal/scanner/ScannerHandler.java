@@ -4,14 +4,12 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataValue;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -154,7 +152,7 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 		var createDoubles = createPacket.getDoubles();
 		createInts.write(0, eid); // Entity id
 		createPacket.getUUIDs().write(0, UUID.randomUUID()); // UUID
-		createPacket.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND); // Entity type
+		createPacket.getEntityTypeModifier().write(0, EntityType.MANNEQUIN); // Entity type
 		createPacket.getBytes().write(0, (byte) (scanLoc.getPitch() * 256.0F / 360.0F)); // Pitch
 		createPacket.getBytes().write(1, (byte) (scanLoc.getYaw() * 256.0F / 360.0F)); // Yaw
 		createDoubles.write(0, scanLoc.getX()); // X
@@ -163,22 +161,15 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 
 		var metadataPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		metadataPacket.getIntegers().write(0, eid); // Entity id
-		var dataValues = new ArrayList<WrappedDataValue>(2);
-		var serializer = WrappedDataWatcher.Registry.get((Type) Byte.class);
-		dataValues.add(new WrappedDataValue(0, serializer, (byte) (0x20 | 0x40))); // Invisible + Glowing effect
-		dataValues.add(new WrappedDataValue(15, serializer, (byte) (0x04 | 0x08))); // Has arm + no BasePlate
+		var dataValues = new ArrayList<WrappedDataValue>(1);
+		//var dataValues = new ArrayList<WrappedDataValue>(2);
+		var serializerByte = WrappedDataWatcher.Registry.get((Type) Byte.class);
+		//var serializerBool = WrappedDataWatcher.Registry.get((Type) Boolean.class);
+		dataValues.add(new WrappedDataValue(0, serializerByte, (byte) (0x20 | 0x40))); // Invisible + Glowing effect
+		//dataValues.add(new WrappedDataValue(8, serializerBool, true)); // Immovable
 		metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
 
-		var equipPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
-		equipPacket.getIntegers().write(0, eid);
-		var pairList = new ArrayList<Pair<EnumWrappers.ItemSlot, ItemStack>>(4);
-		pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, ItemStackUtil.skull(player)));
-		pairList.add(new Pair<>(EnumWrappers.ItemSlot.CHEST, new ItemStack(Material.NETHERITE_CHESTPLATE)));
-		pairList.add(new Pair<>(EnumWrappers.ItemSlot.LEGS, new ItemStack(Material.NETHERITE_LEGGINGS)));
-		pairList.add(new Pair<>(EnumWrappers.ItemSlot.FEET, new ItemStack(Material.NETHERITE_BOOTS)));
-		equipPacket.getSlotStackPairLists().write(0, pairList);
-
-		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket, equipPacket});
+		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket});
 	}
 
 	@Override
