@@ -37,6 +37,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mannequin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -62,9 +64,12 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 	private final ResolvableProfile JAMMED_PROFILE = ResolvableProfile
 			.resolvableProfile(PlayerProfileUtil.makeProfileFromSkinUrl(JAMMED_PROFILE_URL));
 
+	private final WrappingModule wrappingModule;
+
 	public ShadowHandler() {
 		super(Shadow::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
+		wrappingModule = Ioc.resolve(WrappingModule.class);
 	}
 
 	@EventHandler
@@ -119,11 +124,15 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 		}
 	}
 
+	private void shadow_found(Shadow tool, Player player) {
+		tool.getOwner().damage(1000, player);
+		Vi6Sound.SHADOW_KILL.play(player.getWorld());
+	}
+
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var player = evt.getPlayer();
 		var ite = getTools().iterator();
-		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		while (ite.hasNext()) {
 			var tool = ite.next();
 			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
@@ -132,8 +141,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 				continue;
 			}
 			if (tool.shadow.getLocation().distanceSquared(player.getLocation()) <= SHADOW_KILL_RANGE_BLOCK) {
-				tool.getOwner().damage(1000, evt.getPlayer());
-				Vi6Sound.SHADOW_KILL.play(player.getWorld());
+				shadow_found(tool, player);
 				remove(tool);
 			}
 		}
@@ -154,6 +162,35 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 								p -> p.spawnParticle(Particle.SMOKE, x + offsetX, y, z + offsetZ, 1, 0, 0, 0, 0, null));
 					});
 				}
+			}
+		}
+	}
+
+	@EventHandler
+	private void onDamageEvent(EntityDamageByEntityEvent evt) {
+		var it = getTools().iterator();
+		while (it.hasNext()) {
+			var tool = it.next();
+			if (evt.getEntity().equals(tool.shadow)) {
+				var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+				if (wrap.isEmpty()) {
+					return;
+				}
+				if (wrap.get().ennemiTeamInMap().anyMatch(e -> evt.getDamager().equals(e))) {
+					shadow_found(tool, (Player) evt.getDamager());
+					remove(tool);
+				}
+				return;
+			}
+		}
+	}
+
+	@EventHandler
+	private void onDamageEvent(EntityDamageEvent evt) {
+		for (var tool : getTools()) {
+			if (evt.getEntity().equals(tool.shadow)) {
+				evt.setCancelled(true);
+				return;
 			}
 		}
 	}
