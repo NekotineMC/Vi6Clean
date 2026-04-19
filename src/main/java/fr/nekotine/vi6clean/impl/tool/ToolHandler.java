@@ -1,5 +1,35 @@
 package fr.nekotine.vi6clean.impl.tool;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
@@ -17,39 +47,11 @@ import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Gestionnaire d'outil pour une partie de Vi6. Une instance par partie.
@@ -187,10 +189,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			evt.setCancelled(true);
 			return;
 		}
-		attachToPlayer(tool, player);
-		/*
-		 * evt.setCancelled(true); evt.getItem().remove();
-		 */
+		attachToPlayer(tool, player, false);
 	}
 
 	public final T makeNewTool() {
@@ -200,11 +199,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	/** Try to attach tool to player. remove previous attachment if existing */
-	public final void attachToPlayer(T tool, Player player) {
+	public final void attachToPlayer(T tool, Player player, boolean needToGiveItem) {
 		detachFromOwner(tool);
 		tool.setOwner(player);
 		var inventory = player.getInventory();
-		if (!InventoryUtil.anyMatch(inventory, i -> itemMatch(tool, i))) {
+		if (needToGiveItem) {
 			var item = makeItem(tool);
 			// Add some specification to item
 			AssertUtil.nonNull(item);
@@ -222,6 +221,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 			inventory.addItem(item);
 		}
 		onAttachedToPlayer(tool);
+	}
+
+	public final void attachToPlayer(T tool, Player player) {
+		var needToGive = !InventoryUtil.anyMatch(player.getInventory(), i -> itemMatch(tool, i));
+		attachToPlayer(tool, player, needToGive);
 	}
 
 	public final void detachFromOwner(T tool) {
