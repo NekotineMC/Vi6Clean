@@ -1,0 +1,10 @@
+display_name: <gold>Âme de vitesse
+price: 100
+amount_limit: -1
+shop_icon: GOLDEN_NAUTILUS_ARMOR
+speed_bonus: 0.02 # bonus de vitesse (0.1 de base)
+is_rune: false
+lore:
+   - <lore>Vous fait courir plus vite
+team:
+   - guard

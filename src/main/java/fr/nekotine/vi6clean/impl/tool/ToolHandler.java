@@ -102,8 +102,13 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 		// load configuration
 		try {
-			configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + toolCode + ".yml",
-					"/tools/" + toolCode + ".yml");
+			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("replace_tool_configs", false)) {
+				configuration = ConfigurationUtil.overrideAndLoadYaml("tools/" + toolCode + ".yml",
+						"/tools/" + toolCode + ".yml");
+			} else {
+				configuration = ConfigurationUtil.updateAndLoadYaml("tools/" + toolCode + ".yml",
+						"/tools/" + toolCode + ".yml");
+			}
 		} catch (IOException e) {
 			logger.error("Erreur lors du chargement du fichier de configuration de l'outil " + toolCode, e);
 			configuration = new YamlConfiguration();

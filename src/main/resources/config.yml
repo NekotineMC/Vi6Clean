@@ -10,6 +10,8 @@ game_end_spectator_time: 5 # délais en secondes
 game_preparation_duration_seconds: 300 # délais en secondes
 game_infitration_lost_seconds: 300 # délais en secondes
 
+replace_tool_configs: false # Remplace les fichiers config des tools par celles du plugin (utile pour les développers)
+
 invisibility:
    step_distance: 0.5
    particle_count: 3
