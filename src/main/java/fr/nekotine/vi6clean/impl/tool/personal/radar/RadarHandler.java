@@ -197,9 +197,9 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 						dis.setItemStack(ItemStack.of(Material.CALIBRATED_SCULK_SENSOR));
 						dis.setInterpolationDelay(0);
 						dis.setInterpolationDuration(DELAY_TICK);
-						Bukkit.getScheduler().runTaskLater(Ioc.resolve(JavaPlugin.class), () -> {
+						Bukkit.getScheduler().runTask(Ioc.resolve(JavaPlugin.class), () -> {
 							dis.setTransformation(RadarHandler.TOP_TRANSFORMATION);
-						}, 1);
+						});
 					}
 				});
 
