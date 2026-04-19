@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -216,8 +217,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			}
 		}
 		Ioc.resolve(Majordom.class).enable();
+
 		game.getPlayerList().forEach(p -> p.setLevel(0));
-		phaseDurationTicks = 0;
 	}
 
 	@Override

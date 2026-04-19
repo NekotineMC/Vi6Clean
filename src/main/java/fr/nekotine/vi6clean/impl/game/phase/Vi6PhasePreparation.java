@@ -4,10 +4,14 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.state.ItemState;
 import fr.nekotine.core.state.ItemWrappingState;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.usable.Usable;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
@@ -29,8 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -90,8 +97,17 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 
 	private Usable openMenuUsable;
 
+	private final BossBar bossbar = BossBar.bossBar(
+			Component.text("Préparation", NamedTextColor.AQUA).append(Component.text(" - "))
+					.append(Component.text("Mettez vous prêts").decorate(TextDecoration.ITALIC)),
+			0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
+
+	private final int PREPARATION_DURATION_MAX_TICKS = 20 * 60 * 1;
+	private int preparationDurationTicks = 0;
+
 	public Vi6PhasePreparation(IPhaseMachine machine) {
 		super(machine);
+		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 
 	@Override
@@ -147,6 +163,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 				e.setCancelled(true);
 			}
 		}.register();
+		game.getPlayerList().forEach(p -> p.showBossBar(bossbar));
 	}
 
 	@Override
@@ -155,7 +172,10 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			armorStand.remove();
 		}
 		var game = Ioc.resolve(Vi6Game.class);
-		game.getPlayerList().forEach(p -> p.closeInventory());
+		game.getPlayerList().forEach(p -> {
+			p.closeInventory();
+			p.hideBossBar(bossbar);
+		});
 		minimapSpawnIndicators.clear();
 		openMenuUsable.unregister();
 	}
@@ -228,6 +248,18 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(),
 					PreparationPhasePlayerWrapper.class);
 			wrapper.setSelectedSpawn(entrance);
+		}
+	}
+
+	@EventHandler
+	private void onTick(TickElapsedEvent evt) {
+		if (evt.timeStampReached(TickTimeStamp.Second)) {
+			preparationDurationTicks += 20;
+			if (preparationDurationTicks >= PREPARATION_DURATION_MAX_TICKS) {
+				complete();
+			} else {
+				bossbar.progress((float) preparationDurationTicks / PREPARATION_DURATION_MAX_TICKS);
+			}
 		}
 	}
 }
