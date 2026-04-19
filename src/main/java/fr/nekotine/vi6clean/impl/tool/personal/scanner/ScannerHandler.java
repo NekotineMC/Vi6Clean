@@ -161,12 +161,11 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 
 		var metadataPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		metadataPacket.getIntegers().write(0, eid); // Entity id
-		var dataValues = new ArrayList<WrappedDataValue>(1);
-		//var dataValues = new ArrayList<WrappedDataValue>(2);
+		var dataValues = new ArrayList<WrappedDataValue>(2);
 		var serializerByte = WrappedDataWatcher.Registry.get((Type) Byte.class);
-		//var serializerBool = WrappedDataWatcher.Registry.get((Type) Boolean.class);
+		var serializerBool = WrappedDataWatcher.Registry.get((Type) Boolean.class);
 		dataValues.add(new WrappedDataValue(0, serializerByte, (byte) (0x20 | 0x40))); // Invisible + Glowing effect
-		//dataValues.add(new WrappedDataValue(8, serializerBool, true)); // Immovable
+		dataValues.add(new WrappedDataValue(18, serializerBool, true)); // Immovable
 		metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
 
 		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket});
