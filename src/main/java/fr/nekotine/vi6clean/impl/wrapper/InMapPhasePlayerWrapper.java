@@ -44,6 +44,9 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	private final NamespacedKey noKnockbackAttributeModifierKey = NamespacedKey.fromString("no_knockback",
 			Ioc.resolve(JavaPlugin.class));
 
+	private final NamespacedKey stepHeightAttributeModifierKey = NamespacedKey.fromString("step_bonus",
+			Ioc.resolve(JavaPlugin.class));
+
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 	private final StatusEffect asthmaEffect = new StatusEffect(AsthmaStatusEffectType.get(), -1);
 
@@ -100,14 +103,19 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				.addModifier(new AttributeModifier(noF5AttributeModifierKey, -5, Operation.ADD_NUMBER)); // Avoid F5
 		wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE)
 				.addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid
-		// Knockback
+																													// Knockback
+		wrapped.getAttribute(Attribute.STEP_HEIGHT)
+				.addModifier(new AttributeModifier(stepHeightAttributeModifierKey, 0.5, Operation.ADD_NUMBER)); // step
+																												// bonus
 	}
 
 	public void tearDown() {
 		wrapped.getAttribute(Attribute.CAMERA_DISTANCE).removeModifier(noF5AttributeModifierKey); // Allow F5 again
 		wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE).removeModifier(noKnockbackAttributeModifierKey); // Allow
-		// knockback
-		// again
+																												// Knockback
+																												// again
+		wrapped.getAttribute(Attribute.STEP_HEIGHT).removeModifier(stepHeightAttributeModifierKey); // Revert step
+																									// height
 		if (scheduledCanLeaveMap != null && !scheduledCanLeaveMap.isCancelled()) {
 			scheduledCanLeaveMap.cancel();
 		}
