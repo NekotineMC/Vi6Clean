@@ -41,12 +41,12 @@ public final class Majordom implements Listener {
 		if (!(bdata instanceof Openable openable)) {
 			return false;
 		}
-		if (openable instanceof Door door && tryToggle(block.getLocation().add(0, -1, 0).getBlock())) {
+		if (openable instanceof Door && tryToggle(block.getLocation().add(0, -1, 0).getBlock())) {
 			return true;
 		}
 		// TOGGLE STATUS
 		if (toClose.containsKey(block)) {
-			toClose.computeIfPresent(block, (b, t) -> {
+			toClose.computeIfPresent(block, (_, t) -> {
 				t.cancel();
 				return null;
 			});
