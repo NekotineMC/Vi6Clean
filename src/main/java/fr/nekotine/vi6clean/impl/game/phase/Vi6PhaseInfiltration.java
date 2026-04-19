@@ -4,6 +4,7 @@ import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.EventUtil;
@@ -16,9 +17,11 @@ import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
 import fr.nekotine.vi6clean.impl.map.artefact.ArtefactStealEvent;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
 import io.papermc.paper.util.Tick;
 import java.time.Duration;
 import java.util.Map;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -38,14 +41,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player> implements Listener {
 
 	private final BossBar bossbarGuard = BossBar.bossBar(
-			Component.text("Infiltration", NamedTextColor.LIGHT_PURPLE).append(Component.text(" - "))
-					.append(Component.text("Défendez les artefacts").decorate(TextDecoration.ITALIC)),
+			Component.text("Infiltration", NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text(" - ", NamedTextColor.WHITE)).append(Component
+							.text("Défendez les artefacts", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS);
 	private final BossBar bossbarThief = BossBar.bossBar(
-			Component.text("Infiltration", NamedTextColor.LIGHT_PURPLE).append(Component.text(" - "))
-					.append(Component.text("Volez puis échappez vous").decorate(TextDecoration.ITALIC)),
+			Component.text("Infiltration", NamedTextColor.LIGHT_PURPLE)
+					.append(Component.text(" - ", NamedTextColor.WHITE)).append(Component
+							.text("Volez puis échappez vous", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
-	private final int STEAL_DURATION_MAX_TICKS = 20 * 60 * 1;
+	private final int GAME_INFILTRATION_LOST_SECONDS;
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
 
@@ -53,6 +58,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 		EventUtil.register(this);
+		GAME_INFILTRATION_LOST_SECONDS = 20
+				* Ioc.resolve(Configuration.class).getInt("game_infitration_lost_seconds", 5 * 60);
+
 	}
 
 	@Override
@@ -78,6 +86,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 	@Override
 	protected void globalTearDown() {
+		var game = Ioc.resolve(Vi6Game.class);
+		game.getThiefs().forEach(p -> p.hideBossBar(bossbarThief));
+		game.getGuards().forEach(p -> p.hideBossBar(bossbarGuard));
 	}
 
 	@Override
@@ -105,38 +116,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		return null;
 	}
 
-	private void runComplete() {
-		if (isHandlingCompletion) {
-			return;
-		}
-		isHandlingCompletion = true;
-		var game = Ioc.resolve(Vi6Game.class);
-		var wrappingModule = Ioc.resolve(WrappingModule.class);
-		for (var thief : game.getThiefs()) {
-			var inMapWrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
-			if (inMapWrap.isInside() || inMapWrap.getState() == InMapState.ENTERING) {
-				var infiltrationWrap = wrappingModule.getWrapper(thief, InfiltrationPhasePlayerWrapper.class);
-				var stolen = infiltrationWrap.getStolenArtefacts();
-				game.sendMessage(thief.displayName().color(NamedTextColor.AQUA)
-						.append(Component.text(" est resté à l'intérieur avec ", NamedTextColor.GOLD))
-						.append(Component.text(stolen.size(), NamedTextColor.AQUA))
-						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
-			}
-		}
-		game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
-		game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
-				Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
-		var spectatorTimeSeconds = Duration
-				.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
-		new BukkitRunnable() {
-
-			@Override
-			public void run() {
-				complete();
-			}
-		}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
-	}
-
 	public void checkForCompletion() {
 		if (isHandlingCompletion) {
 			return;
@@ -145,7 +124,22 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		if (game.getThiefs().stream()
 				.allMatch(thief -> wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class).hasLeft())) {
-			runComplete();
+			if (isHandlingCompletion) {
+				return;
+			}
+			isHandlingCompletion = true;
+			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
+			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
+					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
+			var spectatorTimeSeconds = Duration
+					.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
+			new BukkitRunnable() {
+
+				@Override
+				public void run() {
+					complete();
+				}
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
 		}
 	}
 
@@ -160,10 +154,18 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			return;
 		}
 		stealDurationTicks++;
-		if (stealDurationTicks >= STEAL_DURATION_MAX_TICKS) {
-			runComplete();
-		} else {
-			float progress = (float) stealDurationTicks / STEAL_DURATION_MAX_TICKS;
+		if (stealDurationTicks >= GAME_INFILTRATION_LOST_SECONDS) {
+			var game = Ioc.resolve(Vi6Game.class);
+			var wrappingModule = Ioc.resolve(WrappingModule.class);
+			for (var thief : game.getThiefs()) {
+				var inMapWrap = wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class);
+				if (inMapWrap.getState() == InMapState.ENTERING || inMapWrap.isInside()) {
+					inMapWrap.thiefLeaveMap(LeaveState.LOST);
+				}
+			}
+		}
+		if (evt.timeStampReached(TickTimeStamp.Second)) {
+			float progress = (float) stealDurationTicks / GAME_INFILTRATION_LOST_SECONDS;
 			bossbarGuard.progress(progress);
 			bossbarThief.progress(progress);
 		}

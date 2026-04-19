@@ -33,6 +33,7 @@ import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import java.util.Arrays;
@@ -331,7 +332,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			} else {
 				var exit = map.getExits().values().stream().filter(e -> e.contains(destVect)).findFirst();
 				if (exit.isPresent()) {
-					wrapper.thiefLeaveMap();
+					wrapper.thiefLeaveMap(LeaveState.ALIVE);
 					return;
 				}
 			}
@@ -375,14 +376,15 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	private void onTick(TickElapsedEvent evt) {
 		map.getArtefacts().values().stream().forEach(Artefact::tick);
 		map.getKoths().values().stream().forEach(Koth::tick);
+		phaseDurationTicks++;
 		if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
-			phaseDurationTicks += 5;
 			int mod = phaseDurationTicks % (20 * 60);
+			int div = phaseDurationTicks / (20 * 60);
 			float exp = (float) mod / (20 * 60);
 			Ioc.resolve(Vi6Game.class).getPlayerList().forEach(p -> {
 				p.setExp(exp);
-				if (mod == 0) {
-					p.setLevel(phaseDurationTicks / (20 * 60));
+				if (p.getLevel() != div) {
+					p.setLevel(div);
 				}
 			});
 		}
@@ -398,7 +400,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		if (game.getThiefs().contains(evt.getPlayer())) {
 			var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrap.isPresent()) {
-				optWrap.get().thiefLeaveMap(true);
+				optWrap.get().thiefLeaveMap(LeaveState.DEAD);
 			}
 		}
 	}

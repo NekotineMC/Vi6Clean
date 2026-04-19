@@ -44,6 +44,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -98,16 +99,18 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 	private Usable openMenuUsable;
 
 	private final BossBar bossbar = BossBar.bossBar(
-			Component.text("Préparation", NamedTextColor.AQUA).append(Component.text(" - "))
-					.append(Component.text("Mettez vous prêts").decorate(TextDecoration.ITALIC)),
+			Component.text("Préparation", NamedTextColor.AQUA).append(Component.text(" - ", NamedTextColor.WHITE))
+					.append(Component.text("Mettez vous prêts", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 
-	private final int PREPARATION_DURATION_MAX_TICKS = 20 * 60 * 1;
+	private final int PREPARATION_DURATION_MAX_TICKS;
 	private int preparationDurationTicks = 0;
 
 	public Vi6PhasePreparation(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
+		PREPARATION_DURATION_MAX_TICKS = 20
+				* Ioc.resolve(Configuration.class).getInt("game_preparation_duration_seconds", 5 * 60);
 	}
 
 	@Override
@@ -253,13 +256,12 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		preparationDurationTicks++;
+		if (preparationDurationTicks >= PREPARATION_DURATION_MAX_TICKS) {
+			complete();
+		}
 		if (evt.timeStampReached(TickTimeStamp.Second)) {
-			preparationDurationTicks += 20;
-			if (preparationDurationTicks >= PREPARATION_DURATION_MAX_TICKS) {
-				complete();
-			} else {
-				bossbar.progress((float) preparationDurationTicks / PREPARATION_DURATION_MAX_TICKS);
-			}
+			bossbar.progress((float) preparationDurationTicks / PREPARATION_DURATION_MAX_TICKS);
 		}
 	}
 }

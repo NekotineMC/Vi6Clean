@@ -7,6 +7,8 @@ koth.limit: 2
 preparation.duration: 4800 #durée de la phase de préparation en ticks
 
 game_end_spectator_time: 5 # délais en secondes
+game_preparation_duration_seconds: 300 # délais en secondes
+game_infitration_lost_seconds: 300 # délais en secondes
 
 invisibility:
    step_distance: 0.5

@@ -222,11 +222,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		effectModule.addEffect(wrapped, asthmaEffect);
 	}
 
-	public void thiefLeaveMap() {
-		thiefLeaveMap(false);
-	}
-
-	public void thiefLeaveMap(boolean dead) {
+	public void thiefLeaveMap(LeaveState leaveState) {
 		var game = Ioc.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
 		wrapped.setGameMode(GameMode.SPECTATOR);
@@ -244,19 +240,28 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			});
 
 			// Send message
-			infiltrationWrapper.get().setDead(dead);
-			if (dead) {
-				stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
-				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
-						.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
-						.append(Component.text(stolen.size(), NamedTextColor.AQUA))
-						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
-			} else {
-				stolen.forEach(a -> phaseInMap.thiefObjectiveEscaped(a));
-				game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
-						.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
-						.append(Component.text(stolen.size(), NamedTextColor.AQUA))
-						.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+			infiltrationWrapper.get().setDead(leaveState == LeaveState.DEAD);
+			switch (leaveState) {
+				case DEAD :
+					stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
+					game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+							.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
+							.append(Component.text(stolen.size(), NamedTextColor.AQUA))
+							.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+					break;
+				case ALIVE :
+					stolen.forEach(a -> phaseInMap.thiefObjectiveEscaped(a));
+					game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+							.append(Component.text(" s'est échappé avec ", NamedTextColor.GOLD))
+							.append(Component.text(stolen.size(), NamedTextColor.AQUA))
+							.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+					break;
+				case LOST :
+					stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
+					game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+							.append(Component.text(" s'est perdu avec ", NamedTextColor.GOLD))
+							.append(Component.text(stolen.size(), NamedTextColor.AQUA))
+							.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
 			}
 		} else {
 			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
@@ -338,5 +343,9 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public boolean hasLeft() {
 		return state == InMapState.LEFT;
+	}
+
+	public enum LeaveState {
+		ALIVE, DEAD, LOST
 	}
 }
