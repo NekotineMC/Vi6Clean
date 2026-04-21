@@ -14,6 +14,8 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -52,6 +54,10 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	@Override
 	protected void globalSetup(Object inputData) {
 		var game = Ioc.resolve(Vi6Game.class);
+		var lastGuards = game.getGuards().stream().collect(Collectors.toList());
+		var lastThieves = game.getThiefs().stream().collect(Collectors.toList());
+		lastThieves.forEach(game::addPlayerInGuards);
+		lastGuards.forEach(game::addPlayerInThiefs);
 		for (var p : Bukkit.getServer().getOnlinePlayers()) {
 			game.addPlayer(p);
 		}

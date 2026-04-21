@@ -152,6 +152,9 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	}
 
 	public void addPlayer(Player player) {
+		if (players.contains(player) || thiefs.contains(player) || guards.contains(player)) {
+			return;
+		}
 		if (guards.size() > thiefs.size()) {
 			addPlayerInThiefs(player);
 		} else {
