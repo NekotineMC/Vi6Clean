@@ -152,7 +152,12 @@ public enum Vi6Sound {
 																																																																															Key.key("block.note_block.chime"),
 																																																																															Sound.Source.VOICE,
 																																																																															1,
-																																																																															0),});
+																																																																															0),}),
+
+	DEAD_RINGER_UNCLOAK(
+			new Sound[]{Sound.sound(Key.key("vi6clean:tool.dead_ringer.uncloak"), Sound.Source.MASTER, 1, 1)}),
+
+	DEAD_RINGER_EQUIP(new Sound[]{Sound.sound(Key.key("vi6clean:tool.dead_ringer.equip"), Sound.Source.MASTER, 1, 1)});
 
 	private Sound[] sounds;
 
@@ -181,6 +186,13 @@ public enum Vi6Sound {
 	public void play(Audience audience, Location location) {
 		for (var s : sounds) {
 			audience.playSound(s, location.getX(), location.getY(), location.getZ());
+		}
+	}
+
+	public void play(Location location) {
+		var w = location.getWorld();
+		for (var s : sounds) {
+			w.playSound(s, location.getX(), location.getY(), location.getZ());
 		}
 	}
 

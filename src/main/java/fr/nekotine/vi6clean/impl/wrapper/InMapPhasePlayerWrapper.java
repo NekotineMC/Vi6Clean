@@ -19,6 +19,9 @@ import fr.nekotine.vi6clean.impl.map.Entrance;
 import fr.nekotine.vi6clean.impl.status.effect.AsthmaStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.flag.AsthmaStatusFlag.MovementMode;
+import io.papermc.paper.util.Tick;
+
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
@@ -231,6 +234,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public void thiefLeaveMap(LeaveState leaveState) {
+		var deathDelay = Duration.ofSeconds(3); // Deadringer's delay
 		var game = Ioc.resolve(Vi6Game.class);
 		state = InMapState.LEFT;
 		wrapped.setGameMode(GameMode.SPECTATOR);
@@ -251,12 +255,23 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			infiltrationWrapper.get().setDead(leaveState == LeaveState.DEAD);
 			switch (leaveState) {
 				case DEAD :
-					stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
-					game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
-							.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
-							.append(Component.text(stolen.size(), NamedTextColor.AQUA))
-							.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
-					break;
+					// Check for game end after deadringer delay
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
+							game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+									.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
+									.append(Component.text(stolen.size(), NamedTextColor.AQUA))
+									.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+							// Check for game end
+							var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+							if (infiltrationPhase != null) {
+								infiltrationPhase.checkForCompletion();
+							}
+						}
+					}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(deathDelay));
+					return;
 				case ALIVE :
 					stolen.forEach(a -> phaseInMap.thiefObjectiveEscaped(a));
 					game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
@@ -275,7 +290,6 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
 					.append(Component.text(" s'est échappé!", NamedTextColor.GOLD)));
 		}
-
 		// Check for game end
 		var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
 		if (infiltrationPhase != null) {

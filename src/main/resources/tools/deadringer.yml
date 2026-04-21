@@ -1,0 +1,11 @@
+display_name: Dead Ringer
+price: 200
+amount_limit: 1
+shop_icon: CLOCK
+is_rune: false
+exit_delay_seconds: 10
+invisibility_duration_seconds: 3
+lore:
+   - <lore>Feintez la mort
+team:
+   - thief
