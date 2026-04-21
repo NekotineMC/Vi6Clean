@@ -20,6 +20,7 @@ import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
@@ -114,12 +115,12 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 	}
 
 	@Override
-	protected ItemStack makeItem(DeadRinger tool) {
+	protected ItemStack makeBaseItem() {
 		return new ItemStackBuilder(Material.CLOCK).name(getDisplayName()).lore(getLore()).unstackable()
 				.flags(ItemFlag.values()).postApply(i -> {
 					i.setData(DataComponentTypes.EQUIPPABLE, Equippable.equippable(EquipmentSlot.HAND)
 							.equipSound(Key.key("vi6clean:tool.dead_ringer.equip")));
-					i.setData(DataComponentTypes.ITEM_MODEL, Key.key("vi6clean:dead_ringer"));
+					i.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.DEAD_RINGER_ITEM_MODEL));
 				}).build();
 	}
 

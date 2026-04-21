@@ -1,12 +1,17 @@
-package fr.nekotine.vi6clean.impl.tool.personal.invisneak;
+package fr.nekotine.vi6clean.impl.tool.personal.scout;
+
+import java.time.Duration;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -18,22 +23,26 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.util.Tick;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
-@ToolCode("invisneak")
-public class InviSneakHandler extends ToolHandler<InviSneak> {
+@ToolCode("scout")
+public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
 
@@ -41,24 +50,26 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 
-	public InviSneakHandler() {
-		super(InviSneak::new);
+	private final int STILL_TICK_NEEDED = Tick.tick().fromDuration(Duration.ofSeconds(4));
+
+	public ScoutHandler() {
+		super(Scout::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 
-	private void statusUpdate(InviSneak tool) {
+	private void statusUpdate(Scout tool) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-		if (tool.isSneaking()) {
-			if (tool.isRevealed()) {
+		var owner = tool.getOwner();
+		if (!owner.hasCooldown(Material.BUSH)) {
+			if (tool.revealed) {
 				editItem(tool, item -> {
-					item.setData(DataComponentTypes.ITEM_MODEL, Material.RED_STAINED_GLASS_PANE.key());
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 							.append(Component.text("Découvert", NamedTextColor.RED))));
 				});
 				statusEffectModule.removeEffect(tool.getOwner(), invisibleEffect);
+				tool.invisible = false;
 			} else {
 				editItem(tool, item -> {
-					item.resetData(DataComponentTypes.ITEM_MODEL);
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 							.append(Component.text("Invisible", NamedTextColor.GRAY))));
 				});
@@ -66,23 +77,11 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 			}
 		} else {
 			editItem(tool, item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.WHITE_STAINED_GLASS_PANE.key());
 				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 						.append(Component.text("Visible", NamedTextColor.WHITE))));
 			});
 			statusEffectModule.removeEffect(tool.getOwner(), invisibleEffect);
-		}
-	}
-
-	@EventHandler
-	private void onPlayerToggleSneak(PlayerToggleSneakEvent evt) {
-		for (var item : InventoryUtil.taggedItems(evt.getPlayer().getInventory(), TOOL_TYPE_KEY, getToolCode())) {
-			var tool = getToolFromItem(item);
-			if (tool.isSneaking() != evt.isSneaking()
-					&& !Ioc.resolve(StatusFlagModule.class).hasAny(evt.getPlayer(), EmpStatusFlag.get())) {
-				tool.setSneaking(evt.isSneaking());
-				statusUpdate(tool);
-			}
+			tool.invisible = false;
 		}
 	}
 
@@ -100,14 +99,18 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 			if (wrap.isEmpty()) {
 				continue;
 			}
-			var revealed = isEnnemiNear(wrap.get());
-			if (revealed != tool.isRevealed()) {
-				tool.setRevealed(revealed);
+			var owner = tool.getOwner();
+			var revealed = isEnnemiNear(wrap.get())
+					|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
+			if (revealed != tool.revealed) {
+				tool.revealed = revealed;
+				statusUpdate(tool);
+			} else if (!owner.hasCooldown(Material.BUSH) && !tool.invisible) {
 				statusUpdate(tool);
 			}
 			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
 				// LOW TICK
-				if (!tool.isSneaking() || tool.getOwner() == null) {
+				if (!tool.invisible || tool.getOwner() == null) {
 					return;
 				}
 				var player = tool.getOwner();
@@ -131,26 +134,46 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 		}
 	}
 
+	@EventHandler
+	public void onMove(PlayerMoveEvent e) {
+		for (var tool : getTools()) {
+			var owner = tool.getOwner();
+			if (e.getPlayer().equals(owner) && e.hasExplicitlyChangedPosition()) {
+				owner.setCooldown(Material.BUSH, STILL_TICK_NEEDED);
+				if (tool.invisible) {
+					statusUpdate(tool);
+				}
+			}
+		}
+	}
+
 	@Override
-	protected void onAttachedToPlayer(InviSneak tool) {
-		tool.setSneaking(tool.getOwner().isSneaking());
+	protected void onAttachedToPlayer(Scout tool) {
 		statusUpdate(tool);
 	}
 
 	@Override
-	protected void onDetachFromPlayer(InviSneak tool) {
+	protected void onDetachFromPlayer(Scout tool) {
 		Ioc.resolve(StatusEffectModule.class).removeEffect(tool.getOwner(), invisibleEffect);
 	}
 
 	@Override
-	protected void onToolCleanup(InviSneak tool) {
+	protected void onToolCleanup(Scout tool) {
+	}
+
+	@Override
+	protected ItemStack makeBaseItem() {
+		return new ItemStackBuilder(Material.BUSH).name(getDisplayName()).lore(getLore()).unstackable()
+				.flags(ItemFlag.values())
+				.postApply(item -> item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.SCOUT_ITEM_MODEL)))
+				.build();
 	}
 
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				getToolFromItem(item).setSneaking(false);
+				// item.setData(DataComponentTypes.ITEM_MODEL, Material.QUARTZ_PILLAR.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
@@ -161,14 +184,21 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				var tool = getToolFromItem(item);
-				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
-						.append(Component.text("Découvert", NamedTextColor.RED))));
-				if (tool.isSneaking() != p.isSneaking()) {
-					tool.setSneaking(p.isSneaking());
-					statusUpdate(tool);
-				}
+				// item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
+				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
 		}
+	}
+
+	public static class Scout extends Tool {
+
+		private boolean revealed;
+
+		private boolean invisible;
+
+		public Scout(ToolHandler<?> handler) {
+			super(handler);
+		}
+
 	}
 }

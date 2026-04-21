@@ -1,6 +1,27 @@
 package fr.nekotine.vi6clean.impl.tool.personal.radar;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import java.util.stream.Collectors;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -26,31 +47,10 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.UseCooldown;
-import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
-import org.bukkit.Particle.DustOptions;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
-import org.joml.Vector3f;
 
 @ToolCode("radar")
 public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
@@ -211,6 +211,12 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 
 	@Override
 	protected void onAttachedToPlayer(Radar tool) {
+		editItem(tool,
+				item -> item.setData(DataComponentTypes.USE_COOLDOWN,
+						UseCooldown
+								.useCooldown(COOLDOWN_TICK).cooldownGroup(NamespacedKey
+										.fromString(getToolCode() + '/' + tool.getId(), Ioc.resolve(JavaPlugin.class)))
+								.build()));
 	}
 
 	@Override
@@ -231,18 +237,6 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 			tool.bottom.remove();
 			tool.bottom = null;
 		}
-	}
-
-	@Override
-	protected ItemStack makeItem(Radar tool) {
-		return new ItemStackBuilder(Material.DAYLIGHT_DETECTOR).unstackable().name(getDisplayName()).lore(getLore())
-				.flags(ItemFlag.values())
-				.postApply(
-						item -> item.setData(DataComponentTypes.USE_COOLDOWN,
-								UseCooldown.useCooldown(COOLDOWN_TICK).cooldownGroup(NamespacedKey
-										.fromString(getToolCode() + '/' + tool.getId(), Ioc.resolve(JavaPlugin.class)))
-										.build()))
-				.build();
 	}
 
 	@EventHandler

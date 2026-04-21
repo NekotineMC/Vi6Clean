@@ -1,6 +1,24 @@
 package fr.nekotine.vi6clean.impl.tool.personal.watcher;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Silverfish;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -26,28 +44,9 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.util.Tick;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Silverfish;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("watcher")
 public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
@@ -199,6 +198,16 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 
 	@Override
 	protected void onAttachedToPlayer(Watcher tool) {
+		editItem(tool, item -> {
+			var remaining = NB_MAX_WATCHER - tool.watchers.size();
+			if (remaining > 0) {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.setAmount(remaining);
+			} else {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.ENDERMITE_SPAWN_EGG.key());
+				item.setAmount(1);
+			}
+		});
 	}
 
 	@Override
@@ -212,12 +221,6 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 			watcher.remove();
 		}
 		tool.watchers.clear();
-	}
-
-	@Override
-	protected ItemStack makeItem(Watcher tool) {
-		return new ItemStackBuilder(Material.SILVERFISH_SPAWN_EGG).amount(NB_MAX_WATCHER).name(getDisplayName())
-				.lore(getLore()).unstackable().flags(ItemFlag.values()).build();
 	}
 
 	@EventHandler

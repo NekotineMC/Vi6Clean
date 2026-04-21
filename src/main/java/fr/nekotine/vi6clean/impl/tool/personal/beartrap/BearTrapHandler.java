@@ -172,7 +172,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 	}
 
 	@Override
-	protected ItemStack makeItem(BearTrap tool) {
+	protected ItemStack makeBaseItem() {
 		return new ItemStackBuilder(Material.PLAYER_HEAD)
 				.name(getDisplayName()).lore(getLore()).unstackable().flags(ItemFlag.values()).postApply(i -> i
 						.setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile(ARMED_PLAYER_PROFILE)))

@@ -211,6 +211,12 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 
 	@Override
 	protected void onAttachedToPlayer(PortableTeleporter tool) {
+		editItem(tool,
+				item -> item.editMeta(meta -> meta.displayName(getDisplayName().append(Component
+						.text(" [", NamedTextColor.WHITE).append(Component.text(tool.pads.size(), NamedTextColor.GREEN))
+						.append(Component.text("/", NamedTextColor.WHITE))
+						.append(Component.text(CHARGES, NamedTextColor.GREEN))
+						.append(Component.text("]", NamedTextColor.WHITE))))));
 	}
 
 	@Override
@@ -223,17 +229,6 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 			pad.display.remove();
 		}
 		tool.pads.clear();
-	}
-
-	@Override
-	protected ItemStack makeItem(PortableTeleporter tool) {
-		return new ItemStackBuilder(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE).lore(getLore())
-				.name(getDisplayName().append(
-						Component.text(" [", NamedTextColor.WHITE).append(Component.text(CHARGES, NamedTextColor.GREEN))
-								.append(Component.text("/", NamedTextColor.WHITE))
-								.append(Component.text(CHARGES, NamedTextColor.GREEN))
-								.append(Component.text("]", NamedTextColor.WHITE))))
-				.flags(ItemFlag.values()).build();
 	}
 
 	@EventHandler

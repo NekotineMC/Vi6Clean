@@ -210,7 +210,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		tool.setOwner(player);
 		var inventory = player.getInventory();
 		if (needToGiveItem) {
-			var item = makeItem(tool);
+			var item = makeBaseItem();
 			// Add some specification to item
 			AssertUtil.nonNull(item);
 			if (!item.getPersistentDataContainer().getKeys()
@@ -225,6 +225,9 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 					if (!Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).contains(equippable.slot())) {
 						item.unsetData(DataComponentTypes.EQUIPPABLE);
 					}
+				}
+				if (item.hasData(DataComponentTypes.CONSUMABLE)) {
+					item.unsetData(DataComponentTypes.CONSUMABLE);
 				}
 			}
 			inventory.addItem(item);
@@ -277,7 +280,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	protected abstract void onToolCleanup(T tool);
 
-	protected abstract ItemStack makeItem(T tool);
+	protected ItemStack makeBaseItem() {
+		var mat = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
+		return new ItemStackBuilder(mat).name(getDisplayName()).lore(getLore()).unstackable().flags(ItemFlag.values())
+				.build();
+	}
 
 	public Collection<T> getTools() {
 		return tools.values();
@@ -285,18 +292,18 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 	public MenuElement makeShopMenuItem() {
 		// Shop item
-		var iconMaterial = Material.getMaterial(configuration.getString("shop_icon", Material.BARRIER.name()));
-		//
 		var shopLore = new LinkedList<Component>(getLore());
 		shopLore.add(Component.empty());
+		var madeItem = makeBaseItem();
 		if (!isRune) {
 			shopLore.add(Component.text("Prix: " + price, NamedTextColor.GOLD));
 		}
+		madeItem.editMeta(meta -> {
+			meta.lore(shopLore);
+			meta.displayName(getDisplayName());
+		});
 		//
-		var menuItem = new ItemStackBuilder(iconMaterial).name(displayName).lore(shopLore).flags(ItemFlag.values())
-				.build();
-		//
-		return new ActionMenuItem(menuItem, this::tryBuy);
+		return new ActionMenuItem(madeItem, this::tryBuy);
 	}
 
 	public List<Component> getLore() {

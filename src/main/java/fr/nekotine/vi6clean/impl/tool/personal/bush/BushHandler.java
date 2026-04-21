@@ -188,7 +188,7 @@ public class BushHandler extends ToolHandler<Bush> {
 	}
 
 	@Override
-	protected ItemStack makeItem(Bush tool) {
+	protected ItemStack makeBaseItem() {
 		return ItemStackUtil.make(Material.TALL_GRASS, getDisplayName(), // .append(Component.text(" -
 				// ")).append(Component.text("Visible",
 				// NamedTextColor.WHITE)),

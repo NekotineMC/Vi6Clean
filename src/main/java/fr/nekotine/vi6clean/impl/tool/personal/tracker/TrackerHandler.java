@@ -1,6 +1,15 @@
 package fr.nekotine.vi6clean.impl.tool.personal.tracker;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.RayTraceResult;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -29,17 +38,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.RayTraceResult;
 
 @ToolCode("tracker")
 public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker> {
@@ -137,6 +135,14 @@ public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker> {
 
 	@Override
 	protected void onAttachedToPlayer(Tracker tool) {
+		if (tool.tracked == null) {
+			editItem(tool, item -> item.editMeta(meta -> meta.displayName(getDisplayName()
+					.append(Component.text(" - ").append(Component.text("Armé", NamedTextColor.AQUA))))));
+		} else {
+			editItem(tool, item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.COMPASS.key());
+			});
+		}
 	}
 
 	@Override
@@ -145,14 +151,6 @@ public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker> {
 
 	@Override
 	protected void onToolCleanup(Tracker tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(Tracker tool) {
-		return new ItemStackBuilder(Material.CROSSBOW)
-				.name(getDisplayName()
-						.append(Component.text(" - ").append(Component.text("Armé", NamedTextColor.AQUA))))
-				.lore(getLore()).unstackable().flags(ItemFlag.values()).build();
 	}
 
 	@EventHandler

@@ -1,6 +1,11 @@
 package fr.nekotine.vi6clean.impl.tool.personal.regenerator;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -15,16 +20,11 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("regenerator")
 public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerator> {
@@ -46,13 +46,15 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		for (var tool : getTools()) {
-			if (!tool.isActive) {
+			var owner = tool.getOwner();
+			if (!tool.isActive || owner == null) {
 				continue;
 			}
-			var maxHealth = tool.getOwner().getAttribute(Attribute.MAX_HEALTH).getValue();
-			if (tool.regenTicked % DELAY_BETWEEN_HEALING_TICKS == 0 && tool.getOwner().getHealth() < maxHealth
-					&& !flagModule.hasAny(tool.getOwner(), EmpStatusFlag.get())) {
-				tool.getOwner().heal(REGENERATION_AMOUNT, RegainReason.MAGIC_REGEN);
+			var maxHealth = owner.getAttribute(Attribute.MAX_HEALTH).getValue();
+			if (tool.regenTicked % DELAY_BETWEEN_HEALING_TICKS == 0 && owner.getHealth() < maxHealth
+					&& !flagModule.hasAny(owner, EmpStatusFlag.get())) {
+				owner.heal(REGENERATION_AMOUNT, RegainReason.MAGIC_REGEN);
+				owner.playSound(Sound.sound(Key.key("vi6clean:game.regenerate"), Sound.Source.VOICE, 1, 1));
 			}
 			tool.regenTicked++;
 			if (tool.regenTicked >= REGEN_DURATION_TICKS) {
@@ -93,12 +95,6 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 				tool.regenTicked = 0;
 			}
 		}
-	}
-
-	@Override
-	protected ItemStack makeItem(Regenerator tool) {
-		return new ItemStackBuilder(Material.CAMPFIRE).name(Component.text("Régénérateur", NamedTextColor.GOLD))
-				.lore(getLore()).unstackable().flags(ItemFlag.values()).build();
 	}
 
 	@EventHandler

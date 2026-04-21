@@ -1,6 +1,15 @@
 package fr.nekotine.vi6clean.impl.tool.personal.recall;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import java.util.ArrayList;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -18,19 +27,9 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.ArrayList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("recall")
 public class RecallHandler extends ToolHandler<RecallHandler.Recall> {
@@ -127,12 +126,6 @@ public class RecallHandler extends ToolHandler<RecallHandler.Recall> {
 
 	@Override
 	protected void onToolCleanup(Recall tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(Recall tool) {
-		return new ItemStackBuilder(Material.CHORUS_FRUIT).name(getDisplayName()).lore(getLore()).unstackable()
-				.flags(ItemFlag.values()).postApply(item -> item.unsetData(DataComponentTypes.CONSUMABLE)).build();
 	}
 
 	@EventHandler

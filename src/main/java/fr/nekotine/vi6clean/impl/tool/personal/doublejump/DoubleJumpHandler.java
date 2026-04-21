@@ -29,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @ToolCode("double_jump")
@@ -98,11 +97,6 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
 
 	@Override
 	protected void onToolCleanup(DoubleJump tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(DoubleJump tool) {
-		return ItemStackUtil.make(Material.GOLDEN_BOOTS, getDisplayName(), getLore());
 	}
 
 	@EventHandler

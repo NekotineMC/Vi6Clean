@@ -35,6 +35,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -193,6 +194,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
 		}
+		item.playSound(Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.MUSIC, 1, 1));
 	}
 
 	@Override

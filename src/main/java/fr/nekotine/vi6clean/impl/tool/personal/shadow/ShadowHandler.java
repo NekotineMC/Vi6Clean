@@ -1,6 +1,25 @@
 package fr.nekotine.vi6clean.impl.tool.personal.shadow;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mannequin;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -28,26 +47,6 @@ import io.papermc.paper.datacomponent.item.ResolvableProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Mannequin;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @ToolCode("shadow")
 public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
@@ -197,6 +196,8 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 
 	@Override
 	protected void onAttachedToPlayer(Shadow tool) {
+		editItem(tool, item -> item.editMeta(meta -> meta.displayName(getDisplayName().append(Component.text(" - "))
+				.append(Component.text("Disponible", NamedTextColor.BLUE)))));
 	}
 
 	@Override
@@ -210,20 +211,12 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 	protected void onToolCleanup(Shadow tool) {
 	}
 
-	@Override
-	protected ItemStack makeItem(Shadow tool) {
-		return new ItemStackBuilder(Material.WITHER_SKELETON_SKULL)
-				.name(getDisplayName().append(Component.text(" - "))
-						.append(Component.text("Disponible", NamedTextColor.BLUE)))
-				.lore(getLore()).unstackable().flags(ItemFlag.values())
-				.postApply(item -> item.setData(DataComponentTypes.PROFILE, JAMMED_PROFILE)).build();
-	}
-
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				item.setData(DataComponentTypes.ITEM_MODEL, Material.PLAYER_HEAD.key());
+				item.setData(DataComponentTypes.PROFILE, JAMMED_PROFILE);
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});

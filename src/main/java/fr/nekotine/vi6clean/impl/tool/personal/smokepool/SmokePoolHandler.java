@@ -1,6 +1,19 @@
 package fr.nekotine.vi6clean.impl.tool.personal.smokepool;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Vector;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
@@ -19,20 +32,6 @@ import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 @ToolCode("smokepool")
 public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
@@ -148,12 +147,6 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 
 	@Override
 	protected void onToolCleanup(SmokePool tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(SmokePool tool) {
-		return new ItemStackBuilder(Material.FIREWORK_STAR).name(getDisplayName()).lore(getLore())
-				.flags(ItemFlag.values()).build();
 	}
 
 	public static class SmokePool extends Tool {

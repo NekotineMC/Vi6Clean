@@ -1,0 +1,9 @@
+display_name: Scout
+price: 150
+amount_limit: 1
+shop_icon: BUSH
+is_rune: false
+lore:
+   - <lore>Ne pas bouger pendant <invisibility_delay> secondes vous rend invisible
+team:
+   - thief

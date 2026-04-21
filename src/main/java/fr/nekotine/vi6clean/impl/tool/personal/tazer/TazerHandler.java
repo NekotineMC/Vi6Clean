@@ -112,7 +112,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 	}
 
 	@Override
-	protected ItemStack makeItem(Tazer tool) {
+	protected ItemStack makeBaseItem() {
 		return new ItemStackBuilder(Material.SHEARS).name(getDisplayName()).lore(getLore()).flags(ItemFlag.values())
 				.postApply(item -> item.setData(DataComponentTypes.SWING_ANIMATION,
 						SwingAnimation.swingAnimation().type(Animation.NONE)))

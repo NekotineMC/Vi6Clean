@@ -213,6 +213,19 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 
 	@Override
 	protected void onAttachedToPlayer(OmniCaptor tool) {
+		if (tool.placed == null) {
+			editItem(tool, item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
+				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
+						.append(Component.text("Disponible", NamedTextColor.BLUE))));
+			});
+		} else {
+			editItem(tool, item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
+				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
+						.append(Component.text("Placé", NamedTextColor.GRAY))));
+			});
+		}
 	}
 
 	@Override
@@ -228,11 +241,9 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 	}
 
 	@Override
-	protected ItemStack makeItem(OmniCaptor tool) {
-		return new ItemStackBuilder(Material.REPEATER)
-				.name(getDisplayName().append(Component.text(" - "))
-						.append(Component.text("Disponible", NamedTextColor.BLUE)))
-				.lore(getLore()).unstackable().flags(ItemFlag.values()).postApply(item -> {
+	protected ItemStack makeBaseItem() {
+		return new ItemStackBuilder(Material.REPEATER).name(getDisplayName()).lore(getLore()).unstackable()
+				.flags(ItemFlag.values()).postApply(item -> {
 					item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
 				}).build();
 	}

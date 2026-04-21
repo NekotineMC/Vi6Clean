@@ -1,25 +1,10 @@
 package fr.nekotine.vi6clean.impl.tool.personal.forcefield;
 
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.BukkitUtil;
-import fr.nekotine.core.util.CustomAction;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.InventoryUtil;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.core.util.SpatialUtil;
-import fr.nekotine.vi6clean.Vi6Main;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.map.Vi6Map;
-import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
-import fr.nekotine.vi6clean.impl.tool.Tool;
-import fr.nekotine.vi6clean.impl.tool.ToolCode;
-import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.Nullable;
-import net.kyori.adventure.text.Component;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -28,7 +13,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
+
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.BukkitUtil;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.vi6clean.Vi6Main;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.map.Vi6Map;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
+import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 
 @ToolCode("forcefield")
 public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield> {
@@ -250,11 +250,6 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 
 	@Override
 	protected void onToolCleanup(Forcefield tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(Forcefield tool) {
-		return ItemStackUtil.make(Material.IRON_DOOR, Component.text("Champ de force"));
 	}
 
 	public static class Forcefield extends Tool {

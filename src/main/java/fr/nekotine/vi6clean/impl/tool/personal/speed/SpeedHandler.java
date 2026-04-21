@@ -1,8 +1,16 @@
 package fr.nekotine.vi6clean.impl.tool.personal.speed;
 
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.InventoryUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.tool.Tool;
@@ -12,15 +20,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 @ToolCode("speed")
 public class SpeedHandler extends ToolHandler<SpeedHandler.SpeedBuff> {
@@ -50,11 +49,6 @@ public class SpeedHandler extends ToolHandler<SpeedHandler.SpeedBuff> {
 
 	@Override
 	protected void onToolCleanup(SpeedBuff tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(SpeedBuff tool) {
-		return ItemStackUtil.make(Material.GOLDEN_NAUTILUS_ARMOR, getDisplayName(), getLore());
 	}
 
 	@EventHandler

@@ -1,6 +1,10 @@
 package fr.nekotine.vi6clean.impl.tool.personal.sonar;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
@@ -21,12 +25,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("sonar")
 public class SonarHandler extends ToolHandler<SonarHandler.Sonar> {
@@ -92,12 +90,6 @@ public class SonarHandler extends ToolHandler<SonarHandler.Sonar> {
 
 	@Override
 	protected void onToolCleanup(Sonar tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(Sonar tool) {
-		return new ItemStackBuilder(Material.TARGET).name(getDisplayName()).lore(getLore()).unstackable()
-				.flags(ItemFlag.values()).build();
 	}
 
 	@EventHandler

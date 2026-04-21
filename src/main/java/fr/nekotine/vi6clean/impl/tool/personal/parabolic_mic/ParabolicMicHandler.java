@@ -1,11 +1,21 @@
 package fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic;
 
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Vibration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerMoveEvent;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.InventoryUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
@@ -18,17 +28,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Vibration;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("parabolic_mic")
 public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.ParabolicMic> {
@@ -96,11 +95,6 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 
 	@Override
 	protected void onToolCleanup(ParabolicMic tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(ParabolicMic tool) {
-		return ItemStackUtil.make(Material.CALIBRATED_SCULK_SENSOR, getDisplayName(), getLore());
 	}
 
 	@EventHandler

@@ -1,6 +1,9 @@
 package fr.nekotine.vi6clean.impl.tool.personal.emp;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
@@ -13,11 +16,6 @@ import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 
 @ToolCode("emp")
 public class EmpHandler extends ToolHandler<Emp> {
@@ -65,10 +63,5 @@ public class EmpHandler extends ToolHandler<Emp> {
 
 	@Override
 	protected void onToolCleanup(Emp tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(Emp tool) {
-		return new ItemStackBuilder(Material.BEACON).name(getDisplayName()).lore(getLore()).unstackable().build();
 	}
 }

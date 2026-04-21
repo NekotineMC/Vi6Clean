@@ -16,7 +16,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
@@ -30,7 +29,6 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -204,6 +202,11 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 
 	@Override
 	protected void onAttachedToPlayer(Lantern tool) {
+		var amount = MAX_LANTERN - tool.displayedLanterns.size();
+		editItem(tool, item -> {
+			item.resetData(DataComponentTypes.ITEM_MODEL);
+			item.setAmount(amount);
+		});
 	}
 
 	@Override
@@ -221,12 +224,6 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			tool.fallingEntity.remove();
 			tool.fallingEntity = null;
 		}
-	}
-
-	@Override
-	protected ItemStack makeItem(Lantern tool) {
-		return ItemStackUtil.make(Material.LANTERN, MAX_LANTERN - tool.displayedLanterns.size(), getDisplayName(),
-				getLore());
 	}
 
 	public static class Lantern extends Tool {

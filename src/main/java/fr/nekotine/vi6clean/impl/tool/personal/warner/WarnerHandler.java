@@ -12,13 +12,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.text.TextModule;
@@ -185,12 +183,6 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
 			tool.eye_item2 = null;
 		}
 		tool.watched = null;
-	}
-
-	@Override
-	protected ItemStack makeItem(Warner tool) {
-		return new ItemStackBuilder(Material.ENDER_EYE).name(getDisplayName()).lore(getLore()).unstackable()
-				.flags(ItemFlag.values()).build();
 	}
 
 	public static class Warner extends Tool {
