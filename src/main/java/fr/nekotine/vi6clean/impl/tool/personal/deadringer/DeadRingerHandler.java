@@ -96,6 +96,7 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 
 				}.runTaskLater(Ioc.resolve(JavaPlugin.class), EXIT_DELAY_TICK);
 				e.setDamage(0.0001);
+				player.getWorld().sendMessage(player.getCombatTracker().getDeathMessage());
 			});
 		}
 	}

@@ -25,6 +25,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
@@ -220,7 +221,10 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 					pdc.set(ToolHandler.TOOL_ID_KEY, PersistentDataType.INTEGER, tool.getId());
 				});
 				if (item.hasData(DataComponentTypes.EQUIPPABLE)) {
-					item.unsetData(DataComponentTypes.EQUIPPABLE);
+					var equippable = item.getData(DataComponentTypes.EQUIPPABLE);
+					if (!Set.of(EquipmentSlot.HAND, EquipmentSlot.OFF_HAND).contains(equippable.slot())) {
+						item.unsetData(DataComponentTypes.EQUIPPABLE);
+					}
 				}
 			}
 			inventory.addItem(item);
