@@ -140,7 +140,7 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 			var owner = tool.getOwner();
 			if (e.getPlayer().equals(owner) && e.hasExplicitlyChangedPosition()) {
 				owner.setCooldown(Material.BUSH, STILL_TICK_NEEDED);
-				if (tool.invisible) {
+				if (tool.invisible) { // TODO cette merde a fix
 					statusUpdate(tool);
 				}
 			}
