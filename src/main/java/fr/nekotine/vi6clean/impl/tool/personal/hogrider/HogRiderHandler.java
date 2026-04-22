@@ -1,18 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.hogrider;
 
-import fr.nekotine.core.ticking.TickTimeStamp;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.CustomAction;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.impl.tool.Tool;
-import fr.nekotine.vi6clean.impl.tool.ToolCode;
-import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.Sound.Source;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
 import java.util.Arrays;
 
 import org.bukkit.Bukkit;
@@ -20,13 +7,24 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mob;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Mob;
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.impl.tool.Tool;
+import fr.nekotine.vi6clean.impl.tool.ToolCode;
+import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 @ToolCode("hogrider")
 public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
@@ -37,6 +35,7 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 
 	@Override
 	protected void onAttachedToPlayer(HogRider tool) {
+		editItem(tool, item -> editRideItem(tool.mode, item));
 	}
 
 	@Override
@@ -48,13 +47,6 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 
 	@Override
 	protected void onToolCleanup(HogRider tool) {
-	}
-
-	@Override
-	protected ItemStack makeItem(HogRider tool) {
-		var item = ItemStackUtil.make(MATERIAL, Component.empty(), Component.empty());
-		editRideItem(tool.mode, item);
-		return item;
 	}
 
 	private void ride(HogRider tool) {
