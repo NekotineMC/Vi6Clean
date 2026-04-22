@@ -118,10 +118,12 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
-		if (readyForNextPhase && selectedSpawn == null && !getParentWrapper().isInside()) {
-			wrapped.sendMessage(Component.text("Vous devez sélectionner une entrée.", NamedTextColor.RED));
-			return;
-		}
+		/*
+		 * if (readyForNextPhase && selectedSpawn == null &&
+		 * !getParentWrapper().isInside()) {
+		 * wrapped.sendMessage(Component.text("Vous devez sélectionner une entrée.",
+		 * NamedTextColor.RED)); return; }
+		 */ // Plus besoin de sélectionner une entrée
 		this.readyForNextPhase = readyForNextPhase;
 		if (readyForNextPhase) {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();

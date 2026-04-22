@@ -412,7 +412,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		var player = evt.getPlayer();
 		var eyeLoc = player.getEyeLocation();
 		var result = player.getWorld().rayTrace(eyeLoc, eyeLoc.getDirection(), 3, FluidCollisionMode.NEVER, true, 0,
-				e -> player.canSee(e));
+				e -> player.canSee(e) && !player.equals(e));
+		if (result == null) {
+			return;
+		}
 		var hitE = result.getHitEntity();
 		if (hitE != null) {
 			player.attack(hitE);

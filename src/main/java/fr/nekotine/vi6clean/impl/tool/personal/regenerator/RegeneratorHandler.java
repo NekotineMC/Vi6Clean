@@ -101,13 +101,10 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 			}
 		}
 	}
-	
+
 	@Override
 	protected ItemStack makeBaseItem() {
-		return new ItemStackBuilder(Material.CAMPFIRE)
-				.name(getDisplayName())
-				.lore(getLore())
-				.unstackable()
+		return new ItemStackBuilder(Material.CAMPFIRE).name(getDisplayName()).lore(getLore()).unstackable()
 				.flags(ItemFlag.values())
 				.postApply(item -> item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.REGENERATOR_ITEM_MODEL)))
 				.build();
