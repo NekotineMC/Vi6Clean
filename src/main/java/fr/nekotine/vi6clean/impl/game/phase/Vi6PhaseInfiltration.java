@@ -166,7 +166,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			}
 		}
 		if (evt.timeStampReached(TickTimeStamp.Second)) {
-			float progress = Math.clamp(stealDurationTicks / GAME_INFILTRATION_LOST_SECONDS, 0f, 1f);
+			float progress = Math.clamp((float) stealDurationTicks / (float) GAME_INFILTRATION_LOST_SECONDS, 0f, 1f);
 			bossbarGuard.progress(progress);
 			bossbarThief.progress(progress);
 		}

@@ -29,9 +29,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("regenerator")
 public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerator> {
 
-	private final int DELAY_BETWEEN_HEALING_TICKS = (int) (20 * getConfiguration().getDouble("delay_between_heal", 1));
+	private final int DELAY_BETWEEN_HEALING_TICKS = (int) (20 * getConfiguration().getDouble("delay_between_heal", 3));
 
-	private final int REGEN_DURATION_TICKS = (int) (20 * getConfiguration().getDouble("regen_duration", 4.0));
+	private final int REGEN_DURATION_TICKS = (int) (20 * getConfiguration().getDouble("regen_duration", 12.0));
 
 	private final double REGENERATION_AMOUNT = getConfiguration().getDouble("heal_amount", 1);
 
@@ -54,7 +54,8 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 			if (tool.regenTicked % DELAY_BETWEEN_HEALING_TICKS == 0 && owner.getHealth() < maxHealth
 					&& !flagModule.hasAny(owner, EmpStatusFlag.get())) {
 				owner.heal(REGENERATION_AMOUNT, RegainReason.MAGIC_REGEN);
-				owner.playSound(Sound.sound(Key.key("vi6clean:game.regenerate"), Sound.Source.VOICE, 1, 1));
+				owner.playSound(Sound.sound(Key.key("vi6clean:game.regenerate"), Sound.Source.VOICE, 1, 1),
+						Sound.Emitter.self());
 			}
 			tool.regenTicked++;
 			if (tool.regenTicked >= REGEN_DURATION_TICKS) {

@@ -194,7 +194,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
 		}
-		item.playSound(Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.MUSIC, 1, 1));
+		item.playSound(Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.AMBIENT, 1, 1),
+				Sound.Emitter.self());
 	}
 
 	@Override
