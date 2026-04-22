@@ -5,13 +5,17 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 
+import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.impl.map.artefact.ArtefactStealEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
@@ -96,6 +100,17 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 				tool.regenTicked = 0;
 			}
 		}
+	}
+	
+	@Override
+	protected ItemStack makeBaseItem() {
+		return new ItemStackBuilder(Material.CAMPFIRE)
+				.name(getDisplayName())
+				.lore(getLore())
+				.unstackable()
+				.flags(ItemFlag.values())
+				.postApply(item -> item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.REGENERATOR_ITEM_MODEL)))
+				.build();
 	}
 
 	@EventHandler

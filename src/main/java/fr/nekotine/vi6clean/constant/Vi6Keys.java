@@ -11,4 +11,6 @@ public class Vi6Keys {
 	public static final String DEAD_RINGER_ITEM_MODEL = "vi6clean:dead_ringer";
 
 	public static final String SCOUT_ITEM_MODEL = "vi6clean:scout";
+	
+	public static final String REGENERATOR_ITEM_MODEL = "vi6clean:cozy_backpack";
 }
