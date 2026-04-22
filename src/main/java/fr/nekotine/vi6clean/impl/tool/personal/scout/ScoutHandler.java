@@ -23,7 +23,6 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
@@ -34,9 +33,7 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.util.Tick;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -165,7 +162,8 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 	protected ItemStack makeBaseItem() {
 		return new ItemStackBuilder(Material.BUSH).name(getDisplayName()).lore(getLore()).unstackable()
 				.flags(ItemFlag.values())
-				.postApply(item -> item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.SCOUT_ITEM_MODEL)))
+				// .postApply(item -> item.setData(DataComponentTypes.ITEM_MODEL,
+				// Key.key(Vi6Keys.SCOUT_ITEM_MODEL)))
 				.build();
 	}
 
