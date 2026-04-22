@@ -1,9 +1,16 @@
 package fr.nekotine.vi6clean;
 
+import java.nio.file.FileSystems;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchService;
+
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -28,6 +35,8 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 public class Vi6Main extends NekotinePlugin implements Listener {
 
 	private final ComponentLogger logger = NekotineLogger.make(this);
+
+	private WatchService ws;
 
 	@Override
 	public void onLoad() {
@@ -63,6 +72,32 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		Ioc.getProvider().registerSingleton(container);
 		game.start();
 		EventUtil.register(this);
+		try {
+			ws = FileSystems.getDefault().newWatchService();
+			var updateFolder = Bukkit.getUpdateFolderFile();
+			updateFolder.toPath().register(ws, StandardWatchEventKinds.ENTRY_CREATE,
+					StandardWatchEventKinds.ENTRY_MODIFY);
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					// Check for update
+					try {
+						var key = ws.take(); // This call is blocking until file changed
+						if (key.pollEvents().size() > 0) {
+							new BukkitRunnable() {
+								public void run() {
+									Bukkit.getServer().restart();
+								};
+							}.runTask(Ioc.resolve(JavaPlugin.class));
+						}
+					} catch (Exception e) {
+						logger.error("Erreur du system de restart automatique: ", e);
+					}
+				}
+			}.runTaskAsynchronously(this);
+		} catch (Exception e) {
+			logger.error("Erreur du system de restart automatique: ", e);
+		}
 	}
 
 	@Override
