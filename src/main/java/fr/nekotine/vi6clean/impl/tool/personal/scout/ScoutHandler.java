@@ -137,7 +137,6 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 	public void onMove(PlayerMoveEvent e) {
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
-			System.out.println("DIST SQUARED = " + e.getFrom().toVector().distanceSquared(e.getTo().toVector()));
 			if (e.getPlayer().equals(owner) && e.hasExplicitlyChangedPosition()
 					&& e.getFrom().toVector().distanceSquared(e.getTo().toVector()) > 0.001) {
 				owner.setCooldown(Material.BUSH, STILL_TICK_NEEDED);
