@@ -74,6 +74,7 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 							.append(Component.text("Invisible", NamedTextColor.GRAY))));
 				});
 				statusEffectModule.addEffect(tool.getOwner(), invisibleEffect);
+				tool.invisible = true;
 			}
 		} else {
 			editItem(tool, item -> {
@@ -85,22 +86,20 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 		}
 	}
 
-	private boolean isEnnemiNear(PlayerWrapper wrap) {
-		var player = wrap.GetWrapped();
-		return wrap.ennemiTeamInMap().anyMatch(
+	private boolean isEnnemiNear(Player player) {
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		return wrappingModule.getWrapper(player, PlayerWrapper.class).ennemiTeamInMap().anyMatch(
 				ennemi -> player.getLocation().distanceSquared(ennemi.getLocation()) <= DETECTION_RANGE_SQUARED);
 	}
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		for (var tool : getTools()) {
-			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
-			if (wrap.isEmpty()) {
+			var owner = tool.getOwner();
+			if (owner == null) {
 				continue;
 			}
-			var owner = tool.getOwner();
-			var revealed = isEnnemiNear(wrap.get())
+			var revealed = isEnnemiNear(owner)
 					|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
 			if (revealed != tool.revealed) {
 				tool.revealed = revealed;
@@ -138,9 +137,11 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 	public void onMove(PlayerMoveEvent e) {
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
-			if (e.getPlayer().equals(owner) && e.hasExplicitlyChangedPosition()) {
+			System.out.println("DIST SQUARED = " + e.getFrom().toVector().distanceSquared(e.getTo().toVector()));
+			if (e.getPlayer().equals(owner) && e.hasExplicitlyChangedPosition()
+					&& e.getFrom().toVector().distanceSquared(e.getTo().toVector()) > 0.001) {
 				owner.setCooldown(Material.BUSH, STILL_TICK_NEEDED);
-				if (tool.invisible) { // TODO cette merde a fix
+				if (tool.invisible) {
 					statusUpdate(tool);
 				}
 			}
