@@ -1,0 +1,11 @@
+display_name: <yellow>Fidèle destrier
+price: 0
+amount_limit: 1
+shop_icon: SADDLE
+is_rune: false
+lore:
+   - <lore>Chevauchez votre fidèle monture
+   - <lore>parmis <variable>2</variable> disponibles
+   - <yellow>Hog Rideeeeeeeer
+team:
+   - guard
