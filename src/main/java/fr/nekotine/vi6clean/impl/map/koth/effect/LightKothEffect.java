@@ -80,7 +80,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 	@Override
 	public void setup() {
 		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
-		setBlockDisplayData(Material.YELLOW_STAINED_GLASS.createBlockData());
+		setBlockDisplayData(Material.YELLOW_WOOL.createBlockData());
 		getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 	}
 

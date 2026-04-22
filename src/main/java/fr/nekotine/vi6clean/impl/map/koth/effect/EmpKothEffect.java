@@ -66,7 +66,7 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 	@Override
 	public void setup() {
 		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
-		setBlockDisplayData(Material.PURPLE_STAINED_GLASS.createBlockData());
+		setBlockDisplayData(Material.PURPLE_WOOL.createBlockData());
 		getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 	}
 

@@ -123,7 +123,7 @@ public class Koth {
 					}
 				});
 		rectangleEdges = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
-				Material.BARRIER.createBlockData());
+				Material.BARRIER.createBlockData(), 0.06f);
 		isEnabled = true;
 		effect.setKoth(this);
 		effect.setup();

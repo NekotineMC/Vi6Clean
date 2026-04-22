@@ -79,7 +79,7 @@ public class Artefact {
 
 	public void setup(World world) {
 		boxDisplays = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
-				Material.ORANGE_STAINED_GLASS.createBlockData(), 0.06f);
+				Material.ORANGE_WOOL.createBlockData(), 0.06f);
 		for (var display : boxDisplays) {
 			display.setGlowing(true);
 			display.setGlowColorOverride(Color.BLUE);
