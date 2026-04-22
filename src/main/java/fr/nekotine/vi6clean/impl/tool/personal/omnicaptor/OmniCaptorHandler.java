@@ -48,6 +48,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 @ToolCode("omnicaptor")
 public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor> {
@@ -100,7 +101,8 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 			// TRY PLACE
 			if (EntityUtil.IsOnGround(player)) {
 				tool.placed = (ItemDisplay) ploc.getWorld().spawnEntity(
-						ploc.toVector().toLocation(ploc.getWorld()) /* On retire la rotation */,
+						ploc.toVector().add(new Vector(0, 0.5, 0))
+								.toLocation(ploc.getWorld()) /* On retire la rotation */,
 						EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
 							if (e instanceof ItemDisplay display) {
 								display.setPersistent(false);
