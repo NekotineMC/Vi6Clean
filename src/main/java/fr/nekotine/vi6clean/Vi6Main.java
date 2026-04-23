@@ -88,7 +88,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 								public void run() {
 									Bukkit.getServer().restart();
 								};
-							}.runTaskLater(Ioc.resolve(JavaPlugin.class),10);
+							}.runTaskLater(Ioc.resolve(JavaPlugin.class), 10);
 						}
 					} catch (Exception e) {
 						logger.error("Erreur du system de restart automatique: ", e);

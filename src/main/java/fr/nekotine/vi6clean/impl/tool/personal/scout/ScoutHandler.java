@@ -47,7 +47,8 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 
-	private final int STILL_TICK_NEEDED = Tick.tick().fromDuration(Duration.ofSeconds(4));
+	private final int STILL_TICK_NEEDED = Tick.tick()
+			.fromDuration(Duration.ofSeconds(getConfiguration().getInt("stand_still_seconds", 4)));
 
 	public ScoutHandler() {
 		super(Scout::new);

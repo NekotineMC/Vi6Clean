@@ -2,6 +2,7 @@ display_name: Scout
 price: 150
 amount_limit: 1
 shop_icon: BUSH
+stand_still_seconds: 4
 is_rune: false
 lore:
    - <lore>Ne pas bouger pendant <invisibility_delay> secondes vous rend invisible
