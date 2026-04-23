@@ -1,0 +1,9 @@
+display_name: Capteur Sculk
+price: 100
+amount_limit: -1
+shop_icon: SCULK_SENSOR
+is_rune: false
+lore:
+   - <lore>Un capteur de son. 
+team:
+   - guard
