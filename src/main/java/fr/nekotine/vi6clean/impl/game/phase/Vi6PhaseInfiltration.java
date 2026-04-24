@@ -1,34 +1,11 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import fr.nekotine.core.game.phase.CollectionPhase;
-import fr.nekotine.core.game.phase.IPhaseMachine;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.module.ModuleManager;
-import fr.nekotine.core.ticking.TickTimeStamp;
-import fr.nekotine.core.ticking.TickingModule;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.collection.ObservableCollection;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.InMapState;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
-import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
-import fr.nekotine.vi6clean.impl.map.artefact.ArtefactStealEvent;
-import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
-import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
-import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
-import io.papermc.paper.util.Tick;
 import java.time.Duration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.title.Title;
-import net.kyori.adventure.title.Title.Times;
 import org.bukkit.GameMode;
-import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +14,33 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import fr.nekotine.core.game.phase.CollectionPhase;
+import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.state.RegisteredEventListenerState;
+import fr.nekotine.core.state.State;
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
+import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.map.artefact.ArtefactStealEvent;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
+import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
+import io.papermc.paper.util.Tick;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.title.Title.Times;
 
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player> implements Listener {
 
@@ -57,7 +61,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		EventUtil.register(this);
 		GAME_INFILTRATION_LOST_SECONDS = 20
 				* Ioc.resolve(Configuration.class).getInt("game_infitration_lost_seconds", 5 * 60);
 
@@ -89,6 +92,13 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().forEach(p -> p.hideBossBar(bossbarThief));
 		game.getGuards().forEach(p -> p.hideBossBar(bossbarGuard));
+	}
+
+	@Override
+	protected List<State> makeAppliedStates() {
+		var list = new LinkedList<State>();
+		list.add(new RegisteredEventListenerState(this));
+		return list;
 	}
 
 	@Override

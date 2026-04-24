@@ -1,19 +1,8 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import fr.nekotine.core.game.phase.CollectionPhase;
-import fr.nekotine.core.game.phase.IPhaseMachine;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.state.ItemState;
-import fr.nekotine.core.state.ItemWrappingState;
-import fr.nekotine.core.state.PlayerScoreboardState;
-import fr.nekotine.core.state.PlayerSnapshotState;
-import fr.nekotine.core.util.EntityUtil;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.collection.ObservableCollection;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +10,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import fr.nekotine.core.game.phase.CollectionPhase;
+import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.state.ItemState;
+import fr.nekotine.core.state.ItemWrappingState;
+import fr.nekotine.core.state.PlayerScoreboardState;
+import fr.nekotine.core.state.PlayerSnapshotState;
+import fr.nekotine.core.state.RegisteredEventListenerState;
+import fr.nekotine.core.state.State;
+import fr.nekotine.core.util.EntityUtil;
+import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 
 public class Vi6PhaseGlobal extends CollectionPhase<Void, Player> implements Listener {
 
@@ -42,12 +45,10 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player> implements Lis
 
 	@Override
 	protected void globalSetup(Object inputData) {
-		EventUtil.register(this);
 	}
 
 	@Override
 	protected void globalTearDown() {
-		EventUtil.unregister(this);
 	}
 
 	@Override
@@ -60,6 +61,13 @@ public class Vi6PhaseGlobal extends CollectionPhase<Void, Player> implements Lis
 
 	@Override
 	public void itemTearDown(Player item) {
+	}
+
+	@Override
+	protected List<State> makeAppliedStates() {
+		var list = new LinkedList<State>();
+		list.add(new RegisteredEventListenerState(this));
+		return list;
 	}
 
 	@Override

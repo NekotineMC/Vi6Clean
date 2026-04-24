@@ -1,23 +1,9 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import fr.nekotine.core.game.phase.CollectionPhase;
-import fr.nekotine.core.game.phase.IPhaseMachine;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.state.ItemState;
-import fr.nekotine.core.state.ItemWrappingState;
-import fr.nekotine.core.usable.Usable;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.core.util.collection.ObservableCollection;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -30,6 +16,22 @@ import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
+
+import fr.nekotine.core.game.phase.CollectionPhase;
+import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.state.ItemState;
+import fr.nekotine.core.state.ItemWrappingState;
+import fr.nekotine.core.state.RegisteredEventListenerState;
+import fr.nekotine.core.state.State;
+import fr.nekotine.core.usable.Usable;
+import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> implements Listener {
 
@@ -84,15 +86,20 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 				e.setCancelled(true);
 			}
 		}.register();
-		EventUtil.register(this);
 	}
 
 	@Override
 	protected void globalTearDown() {
-		EventUtil.unregister(this);
 		scoreboardPlayerListingObjective.unregister();
 		scoreboardPlayerListingObjective = null;
 		openMenuUsable.unregister();
+	}
+
+	@Override
+	protected List<State> makeAppliedStates() {
+		var list = new LinkedList<State>();
+		list.add(new RegisteredEventListenerState(this));
+		return list;
 	}
 
 	@Override
