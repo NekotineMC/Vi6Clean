@@ -1,0 +1,10 @@
+display_name: Sixième sens
+price: 50
+amount_limit: 1
+shop_icon: HEART_OF_THE_SEA
+range: 6.0
+is_rune: false
+lore:
+   - <lore>Vous permet voir les gardes a proximité
+team:
+   - thief
