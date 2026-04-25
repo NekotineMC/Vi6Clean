@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.paper.api)
+    compileOnly(paperweight.paperDevBundle("26.1.2.build.+"))
     compileOnly(libs.protocollib)
     compileOnly(libs.commandapi)
     implementation("fr.nekotine:NekotineCore:+")
@@ -37,6 +37,7 @@ dependencyLocking {
 plugins {
     java
     alias(libs.plugins.shadow)
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
     id("com.diffplug.spotless") version "8.4.0"
 }
 
@@ -54,7 +55,6 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
     java {
         eclipse("4.39")
-        removeUnusedImports()
         formatAnnotations()
         forbidWildcardImports()
     }
