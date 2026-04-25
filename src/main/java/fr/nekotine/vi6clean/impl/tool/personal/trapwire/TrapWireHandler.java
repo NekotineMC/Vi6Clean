@@ -78,9 +78,10 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 			var endBlock = end.getHitBlock();
 			var endFace = end.getHitBlockFace();
 			var packets = trapwireSpawnPacket(start.getHitPosition(), endVector);
-			// for (var pack : packs.b()) {
-			// pmanager.sendServerPacket(player, pack);
-			// }
+			var connection = ((CraftPlayer) player).getHandle().connection;
+			for (var packet : packets) {
+				connection.send(packet);
+			}
 		}
 	}
 
