@@ -36,6 +36,7 @@ dependencyLocking {
 
 plugins {
     java
+    eclipse
     alias(libs.plugins.shadow)
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
     id("com.diffplug.spotless") version "8.4.0"
