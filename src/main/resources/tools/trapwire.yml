@@ -1,0 +1,15 @@
+display_name: <gray>Fil-piège
+price: 100
+amount_limit: -1
+shop_icon: STRING
+is_rune: false
+damage: 5
+omni_duration: 5
+place_range: 10
+wire_length: 5
+lore:
+   - <lore>Tendez un fil de <variable><wire_length></variable> blocs entre deux murs.
+   - <lore>Les voleurs qui l'activent subissent <variable><damage></variable> dégâts
+   - <lore>et sont omni-captés <variable><omni_duration></variable> secondes.
+team:
+   - guard
