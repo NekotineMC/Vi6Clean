@@ -132,7 +132,7 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 
 			tool.getOwner().getWorld().spawnParticle(tool.ridingMode.getParticle(),
 					tool.getOwner().getLocation().add(0, .1, 0), 5, .25, 0, .25, 0);
-			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
+			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
 				tool.getOwner().getWorld().playSound(
 						Sound.sound(Registry.SOUNDS.getKey(tool.ridingMode.getSound()), Source.BLOCK, 1, 0),
 						Sound.Emitter.self());
@@ -167,8 +167,8 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 	}
 
 	public enum SteedMode {
-		NORMAL(EntityType.PIG, 0.5, 150, 100, Particle.HAPPY_VILLAGER, org.bukkit.Sound.BLOCK_GRASS_STEP), TURBO(
-				EntityType.SQUID, 1, 250, 50, Particle.GLOW, org.bukkit.Sound.BLOCK_WET_GRASS_STEP);
+		NORMAL(EntityType.PIG, 0.5, 150, 100, Particle.HAPPY_VILLAGER, org.bukkit.Sound.ENTITY_PIG_AMBIENT), TURBO(
+				EntityType.SQUID, 1, 250, 50, Particle.GLOW, org.bukkit.Sound.ENTITY_SQUID_AMBIENT);
 
 		private final EntityType entityType;
 		private final double speed;
