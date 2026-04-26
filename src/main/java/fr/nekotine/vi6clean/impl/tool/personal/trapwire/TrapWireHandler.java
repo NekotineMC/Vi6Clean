@@ -193,8 +193,8 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
-		//if (!evt.timeStampReached(TickTimeStamp.QuartSecond))
-		//	return;
+		// if (!evt.timeStampReached(TickTimeStamp.QuartSecond))
+		// return;
 
 		for (var tool : getTools()) {
 			if (tool.placed || !tool.previewActivated)
