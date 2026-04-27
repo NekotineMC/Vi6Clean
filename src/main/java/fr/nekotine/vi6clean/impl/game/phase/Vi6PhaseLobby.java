@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -74,6 +75,9 @@ public class Vi6PhaseLobby extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 				ItemStackUtil.make(Material.BEACON, Component.text("Menu Vi6", NamedTextColor.GOLD))) {
 			@Override
 			protected void OnInteract(PlayerInteractEvent e) {
+				if (e.getHand() != EquipmentSlot.HAND) {
+					return;
+				}
 				Ioc.resolve(WrappingModule.class).getWrapper(e.getPlayer(), LobbyPhasePlayerWrapper.class)
 						.displayMenu();
 				e.setCancelled(true);
