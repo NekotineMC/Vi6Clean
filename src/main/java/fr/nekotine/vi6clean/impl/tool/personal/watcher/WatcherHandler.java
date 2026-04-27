@@ -149,11 +149,11 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 
 			// GLOW EFFECT
 
-			Supplier<Stream<Player>> enemiTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner,
-					PlayerWrapper.class)::ennemiTeamInMap;
+			Supplier<Stream<Player>> enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner,
+					PlayerWrapper.class)::enemyTeamInMap;
 
 			var toRemove = tool.watchers.stream()
-					.filter(sf -> enemiTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
+					.filter(sf -> enemyTeam.get().anyMatch(p -> p.getLocation().distanceSquared(sf.getLocation()) <= 1))
 					.collect(Collectors.toCollection(LinkedList::new));
 			for (var sf : toRemove) {
 				sf.remove();
@@ -164,11 +164,11 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 				});
 			}
 
-			Collection<Player> inRange = enemiTeam.get()
-					.filter(ennemi -> tool.watchers.stream().anyMatch(
-							sf -> ennemi.getLocation().distanceSquared(sf.getLocation()) <= DETECTION_RANGE_SQUARED))
+			Collection<Player> inRange = enemyTeam.get()
+					.filter(enemy -> tool.watchers.stream().anyMatch(
+							sf -> enemy.getLocation().distanceSquared(sf.getLocation()) <= DETECTION_RANGE_SQUARED))
 					.collect(Collectors.toCollection(LinkedList::new));
-			var oldInRange = tool.ennemiesInRange;
+			var oldInRange = tool.enemyesInRange;
 			if (inRange.size() <= 0 && oldInRange.size() <= 0) {
 				continue;
 			}
@@ -229,7 +229,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.ennemiesInRange) {
+				for (var victim : tool.enemyesInRange) {
 					statusModule.removeEffect(victim, permanentGlowEffect);
 				}
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
@@ -244,11 +244,11 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.ennemiesInRange) {
+				for (var victim : tool.enemyesInRange) {
 					statusModule.addEffect(victim, permanentGlowEffect);
 					Vi6Sound.OMNICAPTEUR_DETECT.play(victim);
 				}
-				if (tool.ennemiesInRange.size() > 0) {
+				if (tool.enemyesInRange.size() > 0) {
 					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				}
 				item.editMeta(m -> m.displayName(getDisplayName()));
@@ -266,7 +266,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 
 		private List<Entity> watchers = new LinkedList<>();
 
-		private Collection<Player> ennemiesInRange = new LinkedList<>();
+		private Collection<Player> enemyesInRange = new LinkedList<>();
 
 		public Watcher(ToolHandler<?> handler) {
 			super(handler);

@@ -86,8 +86,8 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 
 				//
 				var team = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).ourTeam();
-				var inRange = team.stream()
-						.filter(ennemi -> ennemi.getLocation().toVector()
+				var inRange = team
+						.stream().filter(enemy -> enemy.getLocation().toVector()
 								.distanceSquared(tool.position) <= SQUARED_RADIUS * tool.scale)
 						.collect(Collectors.toCollection(LinkedList::new));
 

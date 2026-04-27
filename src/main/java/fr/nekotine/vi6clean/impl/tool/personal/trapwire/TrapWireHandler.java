@@ -162,7 +162,7 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 				continue;
 			}
 
-			var isEnemy = ownerWrapO.get().ennemiTeamInMap().anyMatch(e -> e.equals(player));
+			var isEnemy = ownerWrapO.get().enemyTeamInMap().anyMatch(e -> e.equals(player));
 			if (!isEnemy) {
 				continue;
 			}

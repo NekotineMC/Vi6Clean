@@ -83,7 +83,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 		var hite = trace.getHitEntity();
 		if (hite != null && hite instanceof LivingEntity hit) {
 			EntityUtil.fakeDamage(hit);
-			if (optWrap.get().ennemiTeamInMap().anyMatch(e -> e.equals(hit))) {
+			if (optWrap.get().enemyTeamInMap().anyMatch(e -> e.equals(hit))) {
 				Ioc.resolve(StatusEffectModule.class).addEffect(hit, tazedEffect);
 			}
 		}

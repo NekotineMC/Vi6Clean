@@ -36,7 +36,7 @@ public class SixthSenseHandler extends ToolHandler<SixthSenseHandler.SixthSense>
 			}
 			var wrap = wrappingModule.getWrapper(owner, PlayerWrapper.class);
 			var ownerloc = owner.getLocation();
-			wrap.ennemiTeamInMap().forEach(en -> {
+			wrap.enemyTeamInMap().forEach(en -> {
 				if (ownerloc.distanceSquared(en.getLocation()) <= DETECTION_RANGE_SQUARED) {
 					glowModule.glowEntityFor(en, owner);
 				} else {

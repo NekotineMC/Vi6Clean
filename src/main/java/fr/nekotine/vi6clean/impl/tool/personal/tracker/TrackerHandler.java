@@ -105,7 +105,7 @@ public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker> {
 		var eyeLoc = player.getEyeLocation();
 		RayTraceResult res = player.getWorld().rayTrace(eyeLoc, eyeLoc.getDirection(), TrackerHandler.RAY_DISTANCE,
 				FluidCollisionMode.NEVER, true, TrackerHandler.RAY_SIZE,
-				hit -> ownWrap.ennemiTeamInMap().anyMatch(ennemi -> ennemi.equals(hit)));
+				hit -> ownWrap.enemyTeamInMap().anyMatch(enemy -> enemy.equals(hit)));
 
 		var range = TrackerHandler.RAY_DISTANCE;
 		if (res != null) {

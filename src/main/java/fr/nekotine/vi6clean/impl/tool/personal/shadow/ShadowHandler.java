@@ -136,7 +136,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 			var tool = ite.next();
 			var wrap = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
 			if (tool.shadow == null || wrap.isEmpty()
-					|| !wrap.get().ennemiTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
+					|| !wrap.get().enemyTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
 				continue;
 			}
 			if (tool.shadow.getLocation().distanceSquared(player.getLocation()) <= SHADOW_KILL_RANGE_BLOCK) {
@@ -175,7 +175,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 				if (wrap.isEmpty()) {
 					return;
 				}
-				if (wrap.get().ennemiTeamInMap().anyMatch(e -> evt.getDamager().equals(e))) {
+				if (wrap.get().enemyTeamInMap().anyMatch(e -> evt.getDamager().equals(e))) {
 					shadow_found(tool, (Player) evt.getDamager());
 					remove(tool);
 				}

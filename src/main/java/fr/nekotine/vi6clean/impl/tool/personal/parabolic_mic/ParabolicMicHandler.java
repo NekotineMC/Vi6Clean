@@ -55,7 +55,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 			}
 			var ownerloc = owner.getLocation();
 			var destloc = evt.getTo();
-			var enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).ennemiTeamInMap();
+			var enemyTeam = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).enemyTeamInMap();
 			/*
 			 * if (evtPlayer.equals(owner)) { vibrationTarget.teleport(owner); continue; }
 			 */
