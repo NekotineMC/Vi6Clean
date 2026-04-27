@@ -14,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.executors.ExecutorType;
 import fr.nekotine.core.NekotinePlugin;
 import fr.nekotine.core.eventguard.PlayerDoubleEventGuard;
@@ -22,11 +23,13 @@ import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
+import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.sound.Sound;
@@ -110,10 +113,30 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 
 	private void gameCommands() {
 		var gameC = new CommandAPICommand("game");
-		var sub = new CommandAPICommand("lobby").executes(_ -> {
+		var lobby = new CommandAPICommand("lobby").executes(_ -> {
 			Ioc.resolve(Vi6Game.class).start();
 		}, ExecutorType.ALL);
-		gameC.withSubcommand(sub);
+		var team = new CommandAPICommand("team").withArguments(new MultiLiteralArgument("teamName", "guard", "thief"))
+				.executesPlayer((p, args) -> {
+					var game = Ioc.resolve(Vi6Game.class);
+					switch ((String) args.get("teamName")) {
+						case "guard" :
+							game.addPlayerInGuards(p);
+							break;
+						case "thief" :
+							game.addPlayerInThiefs(p);
+							break;
+					}
+				});
+		var ready = new CommandAPICommand("ready").executesPlayer(info -> {
+			var p = info.sender();
+			var wrapOpt = Ioc.resolve(WrappingModule.class).getWrapperOptional(p, LobbyPhasePlayerWrapper.class);
+			if (wrapOpt.isPresent()) {
+				var wrap = wrapOpt.get();
+				wrap.setReadyForNextPhase(!wrap.isReadyForNextPhase());
+			}
+		});
+		gameC.withSubcommands(lobby, team, ready);
 		gameC.register();
 	}
 
