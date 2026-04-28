@@ -66,8 +66,8 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 		if (optionalWrap.isEmpty()) {
 			return;
 		}
-		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			ennemi.hideEntity(Ioc.resolve(JavaPlugin.class), player);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			enemy.hideEntity(Ioc.resolve(JavaPlugin.class), player);
 		}
 	}
 
@@ -81,8 +81,8 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 		if (optionalWrap.isEmpty()) {
 			return;
 		}
-		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			ennemi.showEntity(Ioc.resolve(JavaPlugin.class), player);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			enemy.showEntity(Ioc.resolve(JavaPlugin.class), player);
 		}
 	}
 
@@ -137,7 +137,7 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 			distance = 0;
 			var pLoc = evt.getTo().clone().add(0, 0.2, 0);
 			var sound = InvisibilityStatusEffectType.get().equals(type);
-			for (Player enemy : wrapper.ennemiTeam()) {
+			for (Player enemy : wrapper.enemyTeam()) {
 				enemy.spawnParticle(Particle.BLOCK, pLoc, PARTICLE_COUNT, 0, 0, 0, 0, block_under.getBlockData());
 				if (sound) {
 					Vi6Sound.INVISIBILITY_WALK.play(enemy, pLoc);

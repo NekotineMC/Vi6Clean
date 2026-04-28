@@ -82,13 +82,13 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 			if (tool.top != null) {
 				if (--tool.chargeTime <= 0) {
 					var opt = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
-					var ennemiNear = opt.get().ennemiTeamInMap().filter(
+					var enemyNear = opt.get().enemyTeamInMap().filter(
 							e -> tool.top.getLocation().distanceSquared(e.getLocation()) <= DETECTION_RANGE_SQUARED)
 							.collect(Collectors.toList());
-					var ennemiNearCount = ennemiNear.size();
+					var enemyNearCount = enemyNear.size();
 
 					// Son
-					if (ennemiNearCount > 0) {
+					if (enemyNearCount > 0) {
 						Vi6Sound.RADAR_POSITIVE.play(tool.bottom.getWorld(), tool.bottom.getLocation());
 					} else {
 						Vi6Sound.RADAR_NEGATIVE.play(tool.bottom.getWorld(), tool.bottom.getLocation());
@@ -98,11 +98,11 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 					owner.sendMessage(
 							textModule
 									.message(Leaf.builder()
-											.addStyle(Placeholder.unparsed("number", String.valueOf(ennemiNearCount)))
+											.addStyle(Placeholder.unparsed("number", String.valueOf(enemyNearCount)))
 											.addStyle(NekotineStyles.STANDART)
-											.addLine(ennemiNearCount > 0 ? DETECTION_SUCCESS : DETECTION_FAIL))
+											.addLine(enemyNearCount > 0 ? DETECTION_SUCCESS : DETECTION_FAIL))
 									.buildFirst());
-					ennemiNear.forEach(p -> p.sendMessage(textModule
+					enemyNear.forEach(p -> p.sendMessage(textModule
 							.message(Leaf.builder().addStyle(NekotineStyles.STANDART).addLine(DETECTION_DETECTED))
 							.buildFirst()));
 
@@ -114,9 +114,9 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 
 					SpatialUtil.ball3DDensity(DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 							(offsetX, offsetY, offsetZ) -> {
-								loc.getWorld().spawnParticle((ennemiNearCount > 0 ? Particle.COMPOSTER : Particle.DUST),
+								loc.getWorld().spawnParticle((enemyNearCount > 0 ? Particle.COMPOSTER : Particle.DUST),
 										x + offsetX, y + offsetY, z + offsetZ, 1, 0, 0, 0, 0,
-										(ennemiNearCount > 0 ? null : new DustOptions(Color.RED, 2)));
+										(enemyNearCount > 0 ? null : new DustOptions(Color.RED, 2)));
 							});
 
 					editItem(tool, item -> {

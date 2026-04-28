@@ -63,7 +63,7 @@ public class SonarHandler extends ToolHandler<SonarHandler.Sonar> {
 				var x = loc.getX();
 				var y = loc.getY() + 0.1;
 				var z = loc.getZ();
-				if (opt.get().ennemiTeamInMap().anyMatch(
+				if (opt.get().enemyTeamInMap().anyMatch(
 						e -> player.getLocation().distanceSquared(e.getLocation()) <= DETECTION_RANGE_SQUARED)) {
 					Vi6Sound.SONAR_POSITIVE.play(player.getLocation().getWorld(), player.getLocation());
 					SpatialUtil.circle2DDensity(DETECTION_BLOCK_RANGE, 2, 0, (offsetX, offsetZ) -> {

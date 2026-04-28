@@ -86,10 +86,10 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 		}
 	}
 
-	private boolean isEnnemiNear(PlayerWrapper wrap) {
+	private boolean isenemyNear(PlayerWrapper wrap) {
 		var player = wrap.GetWrapped();
-		return wrap.ennemiTeamInMap().anyMatch(
-				ennemi -> player.getLocation().distanceSquared(ennemi.getLocation()) <= DETECTION_RANGE_SQUARED);
+		return wrap.enemyTeamInMap().anyMatch(
+				enemy -> player.getLocation().distanceSquared(enemy.getLocation()) <= DETECTION_RANGE_SQUARED);
 	}
 
 	@EventHandler
@@ -100,7 +100,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 			if (wrap.isEmpty()) {
 				continue;
 			}
-			var revealed = isEnnemiNear(wrap.get());
+			var revealed = isenemyNear(wrap.get());
 			if (revealed != tool.isRevealed()) {
 				tool.setRevealed(revealed);
 				statusUpdate(tool);

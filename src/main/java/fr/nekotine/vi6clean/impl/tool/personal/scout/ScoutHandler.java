@@ -84,10 +84,10 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 		}
 	}
 
-	private boolean isEnnemiNear(Player player) {
+	private boolean isenemyNear(Player player) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
-		return wrappingModule.getWrapper(player, PlayerWrapper.class).ennemiTeamInMap().anyMatch(
-				ennemi -> player.getLocation().distanceSquared(ennemi.getLocation()) <= DETECTION_RANGE_SQUARED);
+		return wrappingModule.getWrapper(player, PlayerWrapper.class).enemyTeamInMap().anyMatch(
+				enemy -> player.getLocation().distanceSquared(enemy.getLocation()) <= DETECTION_RANGE_SQUARED);
 	}
 
 	@EventHandler
@@ -97,8 +97,7 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 			if (owner == null) {
 				continue;
 			}
-			var revealed = isEnnemiNear(owner)
-					|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
+			var revealed = isenemyNear(owner) || Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
 			if (revealed != tool.revealed) {
 				tool.revealed = revealed;
 				statusUpdate(tool);

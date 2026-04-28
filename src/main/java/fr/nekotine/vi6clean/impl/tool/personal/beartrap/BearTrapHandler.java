@@ -127,7 +127,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 				continue;
 			}
 			var player = evt.getPlayer();
-			if (wrappingModule.getWrapper(tool.getOwner(), PlayerWrapper.class).ennemiTeamInMap()
+			if (wrappingModule.getWrapper(tool.getOwner(), PlayerWrapper.class).enemyTeamInMap()
 					.noneMatch(player::equals)) {
 				continue;
 			}

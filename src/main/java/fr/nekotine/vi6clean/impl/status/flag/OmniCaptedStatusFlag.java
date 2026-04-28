@@ -43,8 +43,8 @@ public class OmniCaptedStatusFlag implements StatusFlag {
 			return;
 		}
 		var glowModule = Ioc.resolve(EntityGlowModule.class);
-		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			glowModule.glowEntityFor(appliedTo, ennemi);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			glowModule.glowEntityFor(appliedTo, enemy);
 		}
 		player.showTitle(title);
 		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {
@@ -62,8 +62,8 @@ public class OmniCaptedStatusFlag implements StatusFlag {
 			return;
 		}
 		var glowModule = Ioc.resolve(EntityGlowModule.class);
-		for (var ennemi : optionalWrap.get().ennemiTeam()) {
-			glowModule.unglowEntityFor(appliedTo, ennemi);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			glowModule.unglowEntityFor(appliedTo, enemy);
 		}
 		player.clearTitle();
 		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {

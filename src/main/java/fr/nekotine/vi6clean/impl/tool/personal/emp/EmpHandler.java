@@ -47,7 +47,7 @@ public class EmpHandler extends ToolHandler<Emp> {
 
 			var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 			var opt = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
-			opt.get().ennemiTeamInMap().forEach(p -> statusEffectModule.addEffect(p, empEffect));
+			opt.get().enemyTeamInMap().forEach(p -> statusEffectModule.addEffect(p, empEffect));
 			remove(tool);
 			evt.setCancelled(true);
 		}

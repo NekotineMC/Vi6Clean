@@ -98,7 +98,7 @@ public class BushHandler extends ToolHandler<Bush> {
 		var revealed = false;
 		var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
 		if (wrap.isPresent()) {
-			revealed = wrap.get().ennemiTeamInMap()
+			revealed = wrap.get().enemyTeamInMap()
 					.anyMatch(e -> e.getLocation().distanceSquared(owner.getLocation()) <= DETECTION_RANGE_SQUARED)
 					|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
 		}

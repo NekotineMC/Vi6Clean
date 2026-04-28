@@ -39,7 +39,7 @@ public class PlayerWrapper extends WrapperBase<Player> {
 		this.team = team;
 	}
 
-	public Collection<Player> ennemiTeam() {
+	public Collection<Player> enemyTeam() {
 		var game = Ioc.resolve(Vi6Game.class);
 		switch (team) {
 			case GUARD :
@@ -51,9 +51,9 @@ public class PlayerWrapper extends WrapperBase<Player> {
 		}
 	}
 
-	public Stream<Player> ennemiTeamInMap() {
+	public Stream<Player> enemyTeamInMap() {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
-		return ennemiTeam().stream().filter(e -> {
+		return enemyTeam().stream().filter(e -> {
 			var opt = wrappingModule.getWrapperOptional(e, InMapPhasePlayerWrapper.class);
 			if (opt.isPresent()) {
 				return opt.get().isInside();
