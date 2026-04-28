@@ -130,6 +130,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		statusEffectModule.removeEffect(wrapped, asthmaEffect);
 		statusEffectModule.removeEffect(wrapped, invisibleEffect);
+		setCanLeaveMap(true); // Trait des maps blockers
 	}
 
 	public boolean canLeaveMap() {
