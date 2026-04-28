@@ -127,6 +127,9 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		artefactActionBar.tearDown();
 		defaultActionBar.tearDown();
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		statusEffectModule.removeEffect(wrapped, asthmaEffect);
+		statusEffectModule.removeEffect(wrapped, invisibleEffect);
 	}
 
 	public boolean canLeaveMap() {
