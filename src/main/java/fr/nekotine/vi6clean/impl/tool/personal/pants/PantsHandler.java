@@ -177,7 +177,7 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		});
 
 		var player = tool.getOwner();
-		player.setPose(Pose.STANDING, true);
+		player.setPose(Pose.STANDING);
 		if (tool.shulkerId != -1 || tool.displayId != -1) {
 			var pmanager = ProtocolLibrary.getProtocolManager();
 			var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
