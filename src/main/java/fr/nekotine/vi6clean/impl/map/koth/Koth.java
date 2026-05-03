@@ -98,7 +98,6 @@ public class Koth {
 			for (var edge : rectangleEdges) {
 				edge.setBlock(data);
 			}
-			rectangleEdges.clear();
 		}
 	}
 
