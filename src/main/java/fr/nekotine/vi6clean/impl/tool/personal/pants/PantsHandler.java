@@ -47,6 +47,7 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 			Ioc.resolve(JavaPlugin.class));
 
 	private final double SNEAK_MULTIPLIER = getConfiguration().getDouble("sneak_multiplier", 2);
+	private final double OFFSET = 0.65;
 
 	public PantsHandler() {
 		super(Pants::new);
@@ -112,39 +113,37 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		var loc = player.getLocation();
 		var pmanager = ProtocolLibrary.getProtocolManager();
 		@SuppressWarnings("deprecation")
-		var shulkerId = Bukkit.getUnsafe().nextEntityId();
-		@SuppressWarnings("deprecation")
 		var displayId = Bukkit.getUnsafe().nextEntityId();
+		@SuppressWarnings("deprecation")
+		var shulkerId = Bukkit.getUnsafe().nextEntityId();
 
-		tool.shulkerId = shulkerId;
 		tool.displayId = displayId;
+		tool.shulkerId = shulkerId;
 
 		// Spawn Display
 		var spawnDisplayPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 		spawnDisplayPacket.getIntegers().write(0, displayId);
 		spawnDisplayPacket.getUUIDs().write(0, UUID.randomUUID());
 		spawnDisplayPacket.getEntityTypeModifier().write(0, EntityType.ITEM_DISPLAY);
-		spawnDisplayPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY()).write(2, loc.getZ());
+		spawnDisplayPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY() + OFFSET).write(2, loc.getZ());
 
 		// Spawn Shulker
 		var spawnShulkerPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 		spawnShulkerPacket.getIntegers().write(0, shulkerId);
 		spawnShulkerPacket.getUUIDs().write(0, UUID.randomUUID());
 		spawnShulkerPacket.getEntityTypeModifier().write(0, EntityType.SHULKER);
-		spawnShulkerPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY()).write(2, loc.getZ());
+		spawnShulkerPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY() + OFFSET).write(2, loc.getZ());
 
 		var byteSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Byte.class);
 		var boolSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Boolean.class);
 		var intSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Integer.class);
 
-		// Metadata As
+		// Metadata Display
 		var metadataDisplayPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
 		metadataDisplayPacket.getIntegers().write(0, displayId);
 		var dataDisplayValues = new ArrayList<WrappedDataValue>();
 		dataDisplayValues.add(new WrappedDataValue(0, byteSerializer, (byte) 0x20)); // Invisible
-		dataDisplayValues.add(new WrappedDataValue(4, boolSerializer, true)); // Silent
-		dataDisplayValues.add(new WrappedDataValue(5, boolSerializer, true)); // No Gravity
-		dataDisplayValues.add(new WrappedDataValue(10, intSerializer, 0));
+		dataDisplayValues.add(new WrappedDataValue(10, intSerializer, 0)); // teleport_duration
 		metadataDisplayPacket.getDataValueCollectionModifier().write(0, dataDisplayValues);
 
 		// Metadata Shulker
@@ -157,6 +156,7 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		dataShulkerValues.add(new WrappedDataValue(15, byteSerializer, (byte) 0x01)); // No AI
 		metadataShulkerPacket.getDataValueCollectionModifier().write(0, dataShulkerValues);
 
+		// Mount Shulker to Display
 		var passengerPacket = pmanager.createPacket(PacketType.Play.Server.MOUNT);
 		passengerPacket.getIntegers().write(0, displayId);
 		passengerPacket.getIntegerArrays().write(0, new int[]{shulkerId});
@@ -199,7 +199,7 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 			}
 			var to = evt.getTo();
 			var nmsPlayer = ((CraftPlayer) player).getHandle();
-			PositionMoveRotation movement = new PositionMoveRotation(new Vec3(to.getX(), to.getY(), to.getZ()),
+			PositionMoveRotation movement = new PositionMoveRotation(new Vec3(to.getX(), to.getY() + OFFSET, to.getZ()),
 					Vec3.ZERO, 0f, 0f);
 			var teleportPacket = new ClientboundEntityPositionSyncPacket(tool.displayId, movement, false);
 			nmsPlayer.connection.send(teleportPacket);
