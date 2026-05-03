@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.impl.tool.personal.cactus;
 
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -31,6 +33,9 @@ public class CactusHandler extends ToolHandler<CactusHandler.Cactus> {
 		if (!(victimE instanceof Player victim)) {
 			return;
 		}
+		if (evt.getDamageSource().getDamageType() == DamageType.THORNS) {
+			return;
+		}
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var wrapO = wrappingModule.getWrapperOptional(victim, PlayerWrapper.class);
 		if (wrapO.isEmpty()) {
@@ -45,14 +50,15 @@ public class CactusHandler extends ToolHandler<CactusHandler.Cactus> {
 			if (wrap.getTeam() == Vi6Team.THIEF) {
 				for (var thief : Ioc.resolve(Vi6Game.class).getThiefs()) {
 					if (!victim.equals(thief) && !owner.equals(thief)) {
-						thief.damage(DAMAGE, owner);
+						thief.damage(DAMAGE, DamageSource.builder(DamageType.THORNS).withDirectEntity(owner).build());
+						// thief.damage(DAMAGE, owner);
 					}
 				}
 			} else if (wrap.getTeam() == Vi6Team.GUARD) {
 				// Probablement innutile, mais on sait jamais
 				for (var guard : Ioc.resolve(Vi6Game.class).getGuards()) {
 					if (!victim.equals(guard) && !owner.equals(guard)) {
-						guard.damage(DAMAGE, owner);
+						guard.damage(DAMAGE, DamageSource.builder(DamageType.THORNS).withDirectEntity(owner).build());
 					}
 				}
 			}
