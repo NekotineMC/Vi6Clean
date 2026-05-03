@@ -165,7 +165,7 @@ public class Koth {
 				tickAdvancement++;
 			}
 		}
-		if (owningTeamCancelling)
+		if (owningTeamCancelling && tickAdvancement > 0)
 			return;
 		if (tickAdvancement == 0)
 			tickAdvancement--;
