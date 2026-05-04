@@ -94,6 +94,13 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 						player.teleport(ownerLoc);
 						Vi6Sound.LANTERNE_POST_TELEPORT.play(w, ownerLoc);
 					}
+					var vehicle = lantern.getVehicle();
+					if (vehicle != null) {
+						if (vehicle.equals(tool.fallingEntity)) {
+							tool.fallingEntity = null;
+						}
+						vehicle.remove();
+					}
 					lantern.remove();
 					ite.remove();
 					break;
@@ -133,7 +140,7 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 					e -> {
 						if (e instanceof BlockDisplay display) {
 							var scale = (float) owner.getAttribute(Attribute.SCALE).getValue();
-							var transf = new Transformation(new Vector3f(-0.5f, /*-0.7405f*/0, -0.5f),
+							var transf = new Transformation(new Vector3f(-0.5f * scale, -0.25f, -0.5f * scale),
 									new AxisAngle4f(), new Vector3f(scale, scale, scale), new AxisAngle4f());
 							display.setTransformation(transf);
 							display.setBlock(Bukkit.createBlockData(Material.LANTERN));
@@ -149,6 +156,7 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 							ent.setSilent(true);
 							ent.setInvulnerable(true);
 							ent.setPersistent(false);
+							ent.setCollidable(false);
 							MobAiUtil.clearBrain(ent);
 						}
 					});
@@ -175,13 +183,6 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 
 			if (tool.fallingEntity != null && tool.fallingEntity.isOnGround()) {
 				Vi6Sound.LANTERNE_POSE.play(tool.fallingEntity.getWorld(), tool.fallingEntity.getLocation());
-				var loc = tool.fallingEntity.getLocation();
-				loc.setPitch(0);
-				for (var passenger : tool.fallingEntity.getPassengers()) {
-					tool.fallingEntity.removePassenger(passenger);
-					passenger.teleport(loc);
-				}
-				tool.fallingEntity.remove();
 				tool.fallingEntity = null;
 			}
 
@@ -217,6 +218,10 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 	@Override
 	protected void onToolCleanup(Lantern tool) {
 		for (var lantern : tool.displayedLanterns) {
+			var vehicle = lantern.getVehicle();
+			if (vehicle != null) {
+				vehicle.remove();
+			}
 			lantern.remove();
 		}
 		tool.displayedLanterns.clear();
