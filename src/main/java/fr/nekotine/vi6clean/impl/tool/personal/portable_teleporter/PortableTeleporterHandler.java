@@ -171,6 +171,10 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 
 		if (player.isSneaking()) {
 			if (tool.aimed != null) {
+				if (tool.teleporting && tool.aimed.equals(tool.teleportingTo)) {
+					// evt.setCancelled(true);
+					return;
+				}
 				// PICK UP
 				tool.pads.remove(tool.aimed);
 				tool.aimed.display.remove();
