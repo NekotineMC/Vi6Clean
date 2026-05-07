@@ -2,7 +2,7 @@ display_name: <dark_purple>Relique abyssale</dark_purple>
 price: 0
 amount_limit: 1
 shop_icon: WARDEN_SPAWN_EGG
-range: 15.0
+range: 5.0
 is_rune: false
 lore:
    - <lore>Émane une aura d'oppression.</lore>

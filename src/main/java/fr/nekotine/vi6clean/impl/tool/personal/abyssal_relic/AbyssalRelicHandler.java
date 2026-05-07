@@ -25,11 +25,10 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 @ToolCode("abyssal_relic")
 public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.AbyssalRelic> {
 
-	private final double range;
+	private final double RANGE = getConfiguration().getDouble("range", 5.0);
 
 	public AbyssalRelicHandler() {
 		super(AbyssalRelic::new);
-		range = getConfiguration().getDouble("range", 15.0);
 	}
 
 	@EventHandler
@@ -52,7 +51,7 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 				continue;
 
 			var enemies = opt.get().enemyTeamInMap().collect(Collectors.toSet());
-			owner.getNearbyEntities(range, range, range).stream().filter(e -> e instanceof Player).map(e -> (Player) e)
+			owner.getNearbyEntities(RANGE, RANGE, RANGE).stream().filter(e -> e instanceof Player).map(e -> (Player) e)
 					.filter(enemies::contains).forEach(newTargets::add);
 		}
 
@@ -84,10 +83,10 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 
 	@EventHandler
 	private void onPlayerInteract(PlayerInteractEvent evt) {
-	var tool = getToolFromItem(evt.getItem());
-	if(tool != null && EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
-	evt.setCancelled(true);
-	}
+		var tool = getToolFromItem(evt.getItem());
+		if (tool != null && EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
+			evt.setCancelled(true);
+		}
 	}
 
 	public static class AbyssalRelic extends Tool {

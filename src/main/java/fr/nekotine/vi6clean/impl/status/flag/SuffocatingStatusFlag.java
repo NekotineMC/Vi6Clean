@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -104,8 +106,7 @@ public class SuffocatingStatusFlag implements StatusFlag, Listener {
 
 			// Damage if out of air
 			if (newAir <= 0 && damageTickCount % damageInterval == 0) {
-				Ioc.resolve(DamageModule.class).Damage(player, null, null, DamageCause.DROWNING, damageAmount, true,
-						false, null);
+				player.damage(damageAmount, DamageSource.builder(DamageType.DROWN).build());
 			}
 		}
 	}
