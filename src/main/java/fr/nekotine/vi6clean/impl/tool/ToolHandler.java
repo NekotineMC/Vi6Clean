@@ -341,21 +341,24 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (!(evt.getWhoClicked() instanceof Player player)) {
 			return;
 		}
-		if (InventoryUtil.taggedItems(player.getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite && limite >= 0) {
-			evt.setCancelled(true);
-			return;
-		}
 		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player,
 				PreparationPhasePlayerWrapper.class);
 		if (optionalWrap.isEmpty()) {
 			return;
 		}
-		var wrap = optionalWrap.get();
+		tryBuy(optionalWrap.get());
+	}
+
+	public void tryBuy(PreparationPhasePlayerWrapper wrap) {
+		if (InventoryUtil.taggedItems(wrap.GetWrapped().getInventory(), TOOL_TYPE_KEY, toolCode).size() >= limite
+				&& limite >= 0) {
+			return;
+		}
 		if (!isRune) {
 			if (wrap.getMoney() >= price) {
 				wrap.setMoney(wrap.getMoney() - price);
 				var tool = makeNewTool();
-				attachToPlayer(tool, player);
+				attachToPlayer(tool, wrap.GetWrapped());
 			}
 		} else {
 			var r = wrap.getRune();
@@ -363,7 +366,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 				r.getHandler().removeGeneric(r);
 			}
 			var tool = makeNewTool();
-			attachToPlayer(tool, player);
+			attachToPlayer(tool, wrap.GetWrapped());
 			wrap.setRune(tool);
 		}
 	}

@@ -1,5 +1,13 @@
 package fr.nekotine.vi6clean.impl.wrapper;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
@@ -17,14 +25,8 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
@@ -89,10 +91,11 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 					}
 				});
 		var runesWrapLayout = new WrapMenuLayout();
-		for (var tool : Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
-				.filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune()).sorted((a, b) -> {
+		var runes = container.getHandlers().stream().filter(t -> t.getTeamsAvailableFor().contains(team) && t.isRune())
+				.sorted((a, b) -> {
 					return b.getPrice() - a.getPrice();
-				}).collect(Collectors.toCollection(ArrayList::new))) {
+				}).collect(Collectors.toCollection(ArrayList::new));
+		for (var tool : runes) {
 			runesWrapLayout.addElement(tool.makeShopMenuItem());
 		}
 		var runesToolbar = new ToolbarMenuLayout(
@@ -118,12 +121,6 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 	}
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
-		/*
-		 * if (readyForNextPhase && selectedSpawn == null &&
-		 * !getParentWrapper().isInside()) {
-		 * wrapped.sendMessage(Component.text("Vous devez sélectionner une entrée.",
-		 * NamedTextColor.RED)); return; }
-		 */ // Plus besoin de sélectionner une entrée
 		this.readyForNextPhase = readyForNextPhase;
 		if (readyForNextPhase) {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();

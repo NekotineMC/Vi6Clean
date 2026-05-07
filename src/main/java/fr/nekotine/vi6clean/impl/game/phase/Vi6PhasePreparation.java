@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,8 +48,10 @@ import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
+import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
+import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.AttackRange;
 import io.papermc.paper.datacomponent.item.Consumable;
@@ -187,13 +190,32 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 
 	@Override
 	public void itemSetup(Player item) {
-		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(item, PlayerWrapper.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var wrap = wrappingModule.getWrapper(item, PlayerWrapper.class);
 		var inv = item.getInventory();
-		inv.clear();
 		inv.setItem(8, openMenuUsable.getItemStack());
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
+			var vcplugin = Ioc.resolve(Vi6VoiceChatPlugin.class);
+			// Check if the player is actually connected to the voice chat
+			if (vcplugin != null && vcplugin.getApi().getConnectionOf(item.getUniqueId()) != null
+					&& vcplugin.getApi().getConnectionOf(item.getUniqueId()).isConnected()) {
+				// On donne un talkie walkie
+				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR, Component.text("Talkie-walkie"),
+						Component.text("Tenir en main pour parler"));
+				item.give(tw);
+			}
+		}
+		// Auto - select random rune
+		var runes = Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
+				.filter(t -> t.getTeamsAvailableFor().contains(wrap.getTeam()) && t.isRune()).sorted((a, b) -> {
+					return b.getPrice() - a.getPrice();
+				}).collect(Collectors.toCollection(ArrayList::new));
+		Collections.shuffle(runes);
+		if (runes.size() > 0) {
+			var firstRune = runes.getFirst();
+			firstRune.tryBuy(wrappingModule.getWrapper(item, PreparationPhasePlayerWrapper.class));
 		}
 		item.playSound(Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.AMBIENT, 1, 1),
 				Sound.Emitter.self());

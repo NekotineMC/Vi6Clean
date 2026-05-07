@@ -1,51 +1,11 @@
 package fr.nekotine.vi6clean.impl.game.phase;
 
-import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
-import fr.nekotine.core.constant.DayTime;
-import fr.nekotine.core.game.phase.CollectionPhase;
-import fr.nekotine.core.game.phase.IPhaseMachine;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.logging.NekotineLogger;
-import fr.nekotine.core.map.IMapModule;
-import fr.nekotine.core.module.ModuleManager;
-import fr.nekotine.core.state.ItemState;
-import fr.nekotine.core.state.ItemWrappingState;
-import fr.nekotine.core.state.PotionEffectState;
-import fr.nekotine.core.state.RegisteredEventListenerState;
-import fr.nekotine.core.state.State;
-import fr.nekotine.core.ticking.TickTimeStamp;
-import fr.nekotine.core.ticking.TickingModule;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.AssertUtil;
-import fr.nekotine.core.util.DebugUtil;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.core.util.collection.ObservableCollection;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.InMapState;
-import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import fr.nekotine.vi6clean.impl.majordom.Majordom;
-import fr.nekotine.vi6clean.impl.map.Vi6Map;
-import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
-import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.Koth;
-import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
-import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
-import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
-import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
-import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
-import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
-import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
@@ -72,6 +32,46 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Team;
+
+import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
+
+import fr.nekotine.core.constant.DayTime;
+import fr.nekotine.core.game.phase.CollectionPhase;
+import fr.nekotine.core.game.phase.IPhaseMachine;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.core.map.IMapModule;
+import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.state.ItemState;
+import fr.nekotine.core.state.ItemWrappingState;
+import fr.nekotine.core.state.PotionEffectState;
+import fr.nekotine.core.state.RegisteredEventListenerState;
+import fr.nekotine.core.state.State;
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.TickingModule;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.AssertUtil;
+import fr.nekotine.core.util.DebugUtil;
+import fr.nekotine.core.util.collection.ObservableCollection;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.constant.Vi6Team;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.impl.majordom.Majordom;
+import fr.nekotine.vi6clean.impl.map.Vi6Map;
+import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.Koth;
+import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
+import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
+import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
+import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> implements Listener {
 
@@ -264,15 +264,6 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		if (!wrap.getParentWrapper().isThief()) {
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();
-
-			var vcplugin = Ioc.resolve(Vi6VoiceChatPlugin.class);
-			// Check if the player is actually connected to the voice chat
-			if (vcplugin != null && vcplugin.getApi().getConnectionOf(item.getUniqueId()) != null) {
-				// On donne un talkie walkie
-				var tw = ItemStackUtil.make(Material.LEATHER_HORSE_ARMOR, Component.text("Talkie-walkie"),
-						Component.text("Tenir en main pour parler"));
-				item.give(tw);
-			}
 		}
 	}
 
