@@ -1,6 +1,26 @@
 package fr.nekotine.vi6clean.impl.tool.personal.portable_teleporter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.block.data.type.StructureBlock;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
 import com.comphenix.protocol.wrappers.EnumWrappers;
+
 import fr.nekotine.core.glow.EntityGlowModule;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.ioc.Ioc;
@@ -17,26 +37,9 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.block.data.type.StructureBlock;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 @ToolCode("portable_teleporter")
 public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHandler.PortableTeleporter> {
@@ -82,32 +85,27 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 				var start = eyeLoc.toVector();
 				var dir = eyeLoc.getDirection();
 
-				var bb = pad.display.getBoundingBox();
+				var bb = pad.display.getBoundingBox().clone();
 				var scale = pad.display.getTransformation().getScale();
 				var x1 = bb.getMinX();
 				var y1 = bb.getMinY();
 				var z1 = bb.getMinZ();
 
-				return bb.resize(x1 - 0.25, y1 - 0.5, z1 - 0.25, x1 + scale.x + 0.25, y1 + 0.5, z1 + scale.z + 0.25)
-						.rayTrace(start, dir, 100.0) != null;
+				var bba = bb.resize(x1 - 0.75, y1 - 0.5, z1 - 0.75, x1 + scale.x - 0.25, y1 + 0.5, z1 + scale.z - 0.25); // scale
+																															// and
+																															// translate
+
+				return bba.rayTrace(start, dir, 100.0) != null;
 			}).min((o1, o2) -> (int) (o1.display.getLocation().distanceSquared(owner.getLocation())
 					- o2.display.getLocation().distanceSquared(owner.getLocation()))).orElse(null) : null;
 
-			if (tool.teleporting && tool.aimed != null && owner != null) {
-				if (--tool.teleportationDelayTick <= 0) {
-					tool.teleporting = false;
-					owner.teleport(tool.aimed.display.getLocation().add(0.5, 0, 0.5));
-					owner.setCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, COOLDOWN_TICK);
-					owner.setAllowFlight(false);
-					owner.setFlying(false);
-					owner.setFlySpeed(0.1F);
-				}
+			if (tool.teleporting && tool.teleportingTo != null && owner != null) {
 				if (--tool.vfxDelayTick == 0) {
 
 					var vfxMin = Math.min(PLAYER_VFX_1.size(), PAD_VFX_1.size());
 					var vfxCount = Math
 							.ceil(((double) (DELAY_TICK - tool.teleportationDelayTick) / DELAY_TICK) * vfxMin);
-					var disLoc = tool.aimed.display.getLocation().add(0.5, 0, 0.5);
+					var disLoc = tool.teleportingTo.display.getLocation().add(0.5, 0, 0.5);
 					for (int i = 0; i < vfxCount; i++) {
 
 						var otherEndIndex = vfxMin - i - 1;
@@ -119,6 +117,15 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 						PLAYER_VFX_2.get(i).accept(ownLoc);
 					}
 					tool.vfxDelayTick = VFX_DELAY_TICK;
+				}
+				if (--tool.teleportationDelayTick <= 0) {
+					tool.teleporting = false;
+					owner.teleport(tool.teleportingTo.display.getLocation().add(0.5, 0, 0.5));
+					owner.setCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, COOLDOWN_TICK);
+					owner.setAllowFlight(false);
+					owner.setFlying(false);
+					owner.setFlySpeed(0.1F);
+					tool.teleportingTo = null;
 				}
 			}
 
@@ -156,12 +163,14 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 				return;
 			}
 			var newpad = new PortableTeleporterHandler.PortableTeleporter.TeleportationPad();
-			var newloc = ploc.toVector().toLocation(ploc.getWorld(), player.getEyeLocation().getYaw(), 0);
+			var newloc = ploc.toVector().toLocation(ploc.getWorld(), 0, 0);
 			newpad.display = (BlockDisplay) newloc.getWorld().spawnEntity(newloc, EntityType.BLOCK_DISPLAY,
 					SpawnReason.CUSTOM, e -> {
 						if (e instanceof BlockDisplay dis) {
 							e.setPersistent(false);
 							var trans = dis.getTransformation();
+							var slation = trans.getTranslation();
+							slation.add(-0.5f, 0.0f, -0.5f); // Center it
 							var scale = trans.getScale();
 							scale.set(1, CARPET_SIZE, 1);
 							dis.setTransformation(trans);
@@ -185,6 +194,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 			}
 
 			tool.teleporting = true;
+			tool.teleportingTo = tool.aimed;
 			tool.teleportationDelayTick = DELAY_TICK;
 			tool.vfxDelayTick = VFX_DELAY_TICK;
 
@@ -266,6 +276,8 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 		private final ArrayList<TeleportationPad> pads = new ArrayList<>();
 
 		private TeleportationPad aimed;
+
+		private TeleportationPad teleportingTo;
 
 		private boolean teleporting;
 
