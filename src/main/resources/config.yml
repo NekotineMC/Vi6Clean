@@ -26,3 +26,8 @@ asthma:
 infiltration:
    delay_between_capture: 30.0 #délai entre 2 captures d'artéfacts en secondes
    delay_before_escape: 30.0 #délai avant de pouvoir s'enfuir en secondes
+
+suffocation:
+   depletion_speed: 3
+   damage_interval: 20
+   damage_amount: 1.0

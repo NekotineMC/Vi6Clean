@@ -1,0 +1,12 @@
+display_name: <dark_purple>Relique abyssale</dark_purple>
+price: 0
+amount_limit: 1
+shop_icon: WARDEN_SPAWN_EGG
+range: 15.0
+is_rune: false
+lore:
+   - <lore>Émane une aura d'oppression.</lore>
+   - <lore>Les ennemis à moins de <variable><range>m</variable> s'asphyxient lentement.</lore>
+   - <lore>Leur vision s'assombrit et leur souffle s'épuise.</lore>
+team:
+   - guard
