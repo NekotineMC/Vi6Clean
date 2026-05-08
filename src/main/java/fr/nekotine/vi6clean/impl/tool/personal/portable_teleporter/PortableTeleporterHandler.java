@@ -6,7 +6,11 @@ import java.util.function.Consumer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.data.type.StructureBlock;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.EntityType;
@@ -14,9 +18,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -44,13 +50,22 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("portable_teleporter")
 public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHandler.PortableTeleporter> {
 
+	private final NamespacedKey GRAVITY_MODIFIER_KEY = NamespacedKey.fromString("portable_teleporter/gravity",
+			Ioc.resolve(JavaPlugin.class));
+
+	private final NamespacedKey SPEED_MODIFIER_KEY = NamespacedKey.fromString("portable_teleporter/speed",
+			Ioc.resolve(JavaPlugin.class));
+
+	private final NamespacedKey JUMP_MODIFIER_KEY = NamespacedKey.fromString("portable_teleporter/jump",
+			Ioc.resolve(JavaPlugin.class));
+
 	private static final float CARPET_SIZE = 0.06f;
 
 	private final int CHARGES = getConfiguration().getInt("teleportation_charges", 3);
 
-	private final int DELAY_TICK = (int) (20 * getConfiguration().getDouble("teleportation_delay", 4));
+	private final int DELAY_TICK = (int) (20 * getConfiguration().getDouble("teleportation_delay", 3));
 
-	private final int COOLDOWN_TICK = (int) (20 * getConfiguration().getDouble("teleportation_cooldown", 10));
+	private final int COOLDOWN_TICK = (int) (20 * getConfiguration().getDouble("teleportation_cooldown", 8));
 
 	private final int VFX_DELAY_TICK = getConfiguration().getInt("vfx_delay", 5);
 
@@ -91,21 +106,28 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 				var y1 = bb.getMinY();
 				var z1 = bb.getMinZ();
 
-				var bba = bb.resize(x1 - 0.75, y1 - 0.5, z1 - 0.75, x1 + scale.x - 0.25, y1 + 0.5, z1 + scale.z - 0.25); // scale
-																															// and
-																															// translate
+				var bba = bb.resize(x1 - 0.75, y1 - 0.5, z1 - 0.75, x1 + scale.x - 0.25, y1 + 0.5, z1 + scale.z - 0.25);
 
 				return bba.rayTrace(start, dir, 100.0) != null;
 			}).min((o1, o2) -> (int) (o1.display.getLocation().distanceSquared(owner.getLocation())
 					- o2.display.getLocation().distanceSquared(owner.getLocation()))).orElse(null) : null;
 
 			if (tool.teleporting && tool.teleportingTo != null && owner != null) {
-				if (--tool.vfxDelayTick == 0) {
+				owner.setVelocity(new Vector(0, 0, 0));
+				if (--tool.teleportationDelayTick <= 0) {
+					tool.teleporting = false;
+					owner.teleport(tool.teleportingTo.display.getLocation());
+					owner.setCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, COOLDOWN_TICK);
+					owner.getAttribute(Attribute.GRAVITY).removeModifier(GRAVITY_MODIFIER_KEY);
+					owner.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(SPEED_MODIFIER_KEY);
+					owner.getAttribute(Attribute.JUMP_STRENGTH).removeModifier(JUMP_MODIFIER_KEY);
+					tool.teleportingTo = null;
+				} else if (--tool.vfxDelayTick == 0) {
 
 					var vfxMin = Math.min(PLAYER_VFX_1.size(), PAD_VFX_1.size());
 					var vfxCount = Math
 							.ceil(((double) (DELAY_TICK - tool.teleportationDelayTick) / DELAY_TICK) * vfxMin);
-					var disLoc = tool.teleportingTo.display.getLocation().add(0.5, 0, 0.5);
+					var disLoc = tool.teleportingTo.display.getLocation();
 					for (int i = 0; i < vfxCount; i++) {
 
 						var otherEndIndex = vfxMin - i - 1;
@@ -117,15 +139,6 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 						PLAYER_VFX_2.get(i).accept(ownLoc);
 					}
 					tool.vfxDelayTick = VFX_DELAY_TICK;
-				}
-				if (--tool.teleportationDelayTick <= 0) {
-					tool.teleporting = false;
-					owner.teleport(tool.teleportingTo.display.getLocation().add(0.5, 0, 0.5));
-					owner.setCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, COOLDOWN_TICK);
-					owner.setAllowFlight(false);
-					owner.setFlying(false);
-					owner.setFlySpeed(0.1F);
-					tool.teleportingTo = null;
 				}
 			}
 
@@ -157,34 +170,52 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 		}
 
 		if (player.isSneaking()) {
-			// TRY PLACE
-			var ploc = player.getLocation();
-			if (tool.pads.size() >= CHARGES || !ploc.clone().subtract(0, 0.1, 0).getBlock().isSolid()) {
-				return;
+			if (tool.aimed != null) {
+				if (tool.teleporting && tool.aimed.equals(tool.teleportingTo)) {
+					// evt.setCancelled(true);
+					return;
+				}
+				// PICK UP
+				tool.pads.remove(tool.aimed);
+				tool.aimed.display.remove();
+				tool.aimed = null;
+				editItem(tool, item -> item.editMeta(
+						meta -> meta.displayName(getDisplayName().append(Component.text(" [", NamedTextColor.WHITE)
+								.append(Component.text(CHARGES - tool.pads.size(), NamedTextColor.GREEN))
+								.append(Component.text("/", NamedTextColor.WHITE))
+								.append(Component.text(CHARGES, NamedTextColor.GREEN))
+								.append(Component.text("]", NamedTextColor.WHITE))))));
+			} else {
+				// TRY PLACE
+				var ploc = player.getLocation();
+				if (tool.pads.size() >= CHARGES || !ploc.clone().subtract(0, 0.1, 0).getBlock().isSolid()) {
+					return;
+				}
+				var newpad = new PortableTeleporterHandler.PortableTeleporter.TeleportationPad();
+				var newloc = ploc.toVector().toLocation(ploc.getWorld(), 0, 0);
+				newpad.display = (BlockDisplay) newloc.getWorld().spawnEntity(newloc, EntityType.BLOCK_DISPLAY,
+						SpawnReason.CUSTOM, e -> {
+							if (e instanceof BlockDisplay dis) {
+								e.setPersistent(false);
+								var trans = dis.getTransformation();
+								var slation = trans.getTranslation();
+								slation.add(-0.5f, 0.0f, -0.5f); // Center it
+								var scale = trans.getScale();
+								scale.set(1, CARPET_SIZE, 1);
+								dis.setTransformation(trans);
+								var bd = (StructureBlock) Material.STRUCTURE_BLOCK.createBlockData();
+								bd.setMode(StructureBlock.Mode.CORNER);
+								dis.setBlock(bd);
+							}
+						});
+				tool.pads.add(newpad);
+				editItem(tool, item -> item.editMeta(
+						meta -> meta.displayName(getDisplayName().append(Component.text(" [", NamedTextColor.WHITE)
+								.append(Component.text(CHARGES - tool.pads.size(), NamedTextColor.GREEN))
+								.append(Component.text("/", NamedTextColor.WHITE))
+								.append(Component.text(CHARGES, NamedTextColor.GREEN))
+								.append(Component.text("]", NamedTextColor.WHITE))))));
 			}
-			var newpad = new PortableTeleporterHandler.PortableTeleporter.TeleportationPad();
-			var newloc = ploc.toVector().toLocation(ploc.getWorld(), 0, 0);
-			newpad.display = (BlockDisplay) newloc.getWorld().spawnEntity(newloc, EntityType.BLOCK_DISPLAY,
-					SpawnReason.CUSTOM, e -> {
-						if (e instanceof BlockDisplay dis) {
-							e.setPersistent(false);
-							var trans = dis.getTransformation();
-							var slation = trans.getTranslation();
-							slation.add(-0.5f, 0.0f, -0.5f); // Center it
-							var scale = trans.getScale();
-							scale.set(1, CARPET_SIZE, 1);
-							dis.setTransformation(trans);
-							var bd = (StructureBlock) Material.STRUCTURE_BLOCK.createBlockData();
-							bd.setMode(StructureBlock.Mode.CORNER);
-							dis.setBlock(bd);
-						}
-					});
-			tool.pads.add(newpad);
-			editItem(tool, item -> item.editMeta(meta -> meta.displayName(getDisplayName().append(Component
-					.text(" [", NamedTextColor.WHITE).append(Component.text(tool.pads.size(), NamedTextColor.GREEN))
-					.append(Component.text("/", NamedTextColor.WHITE))
-					.append(Component.text(CHARGES, NamedTextColor.GREEN))
-					.append(Component.text("]", NamedTextColor.WHITE))))));
 			evt.setCancelled(true);
 		} else if (!tool.getOwner().hasCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE)) {
 			// TRY TELEPORT
@@ -198,10 +229,12 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 			tool.teleportationDelayTick = DELAY_TICK;
 			tool.vfxDelayTick = VFX_DELAY_TICK;
 
-			player.setAllowFlight(true);
-			player.teleport(player.getLocation().add(0, 0.1, 0));
-			player.setFlying(true);
-			player.setFlySpeed(0);
+			player.getAttribute(Attribute.GRAVITY)
+					.addModifier(new AttributeModifier(GRAVITY_MODIFIER_KEY, -1.0, Operation.MULTIPLY_SCALAR_1));
+			player.getAttribute(Attribute.MOVEMENT_SPEED)
+					.addModifier(new AttributeModifier(SPEED_MODIFIER_KEY, -1.0, Operation.MULTIPLY_SCALAR_1));
+			player.getAttribute(Attribute.JUMP_STRENGTH)
+					.addModifier(new AttributeModifier(JUMP_MODIFIER_KEY, -1.0, Operation.MULTIPLY_SCALAR_1));
 			player.setVelocity(new Vector(0, 0, 0));
 
 			player.setCooldown(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, DELAY_TICK);
@@ -221,16 +254,25 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 
 	@Override
 	protected void onAttachedToPlayer(PortableTeleporter tool) {
-		editItem(tool,
-				item -> item.editMeta(meta -> meta.displayName(getDisplayName().append(Component
-						.text(" [", NamedTextColor.WHITE).append(Component.text(tool.pads.size(), NamedTextColor.GREEN))
-						.append(Component.text("/", NamedTextColor.WHITE))
-						.append(Component.text(CHARGES, NamedTextColor.GREEN))
-						.append(Component.text("]", NamedTextColor.WHITE))))));
+		editItem(tool, item -> item.editMeta(meta -> meta.displayName(getDisplayName().append(Component
+				.text(" [", NamedTextColor.WHITE)
+				.append(Component.text(CHARGES - tool.pads.size(), NamedTextColor.GREEN))
+				.append(Component.text("/", NamedTextColor.WHITE)).append(Component.text(CHARGES, NamedTextColor.GREEN))
+				.append(Component.text("]", NamedTextColor.WHITE))))));
 	}
 
 	@Override
 	protected void onDetachFromPlayer(PortableTeleporter tool) {
+		if (tool.teleporting) {
+			var owner = tool.getOwner();
+			if (owner != null) {
+				owner.getAttribute(Attribute.GRAVITY).removeModifier(GRAVITY_MODIFIER_KEY);
+				owner.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(SPEED_MODIFIER_KEY);
+				owner.getAttribute(Attribute.JUMP_STRENGTH).removeModifier(JUMP_MODIFIER_KEY);
+			}
+			tool.teleporting = false;
+			tool.teleportingTo = null;
+		}
 	}
 
 	@Override
@@ -264,6 +306,19 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 						.append(Component.text(CHARGES, NamedTextColor.GREEN))
 						.append(Component.text("]", NamedTextColor.WHITE)))));
 			});
+		}
+	}
+
+	@EventHandler
+	private void onPlayerMove(PlayerMoveEvent evt) {
+		for (var tool : getTools()) {
+			if (evt.getPlayer().equals(tool.getOwner())) {
+				var from = evt.getFrom();
+				if (tool.teleporting && from.distanceSquared(evt.getTo()) > 1e-5) {
+					evt.setTo(evt.getTo().set(from.x(), from.y(), from.z()));
+				}
+				break;
+			}
 		}
 	}
 
