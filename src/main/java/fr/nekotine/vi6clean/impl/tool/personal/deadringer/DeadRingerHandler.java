@@ -116,7 +116,7 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 
 	@Override
 	protected ItemStack makeBaseItem() {
-		return new ItemStackBuilder(Material.CLOCK).name(getDisplayName()).lore(getLore()).unstackable()
+		return new ItemStackBuilder(Material.RESPAWN_ANCHOR).name(getDisplayName()).lore(getLore()).unstackable()
 				.flags(ItemFlag.values()).postApply(i -> {
 					i.setData(DataComponentTypes.EQUIPPABLE, Equippable.equippable(EquipmentSlot.HAND)
 							.equipSound(Key.key("vi6clean:tool.dead_ringer.equip")));
