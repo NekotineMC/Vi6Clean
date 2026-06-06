@@ -1,0 +1,12 @@
+display_name: <red>Souffle au coeur
+price: 100
+amount_limit: -1
+shop_icon: HEARTBREAK_POTTERY_SHERD
+duration: 25.0
+is_rune: false
+lore:
+   - <lore>Déclenche au souffle au coeur aux voleurs.
+   - <lore>Pendant <variable><duration>s</variable>, ceux-ci ne peuvent ni
+   - <lore>gagner de stamina, ni remonter leur oxygène
+team:
+   - guard
