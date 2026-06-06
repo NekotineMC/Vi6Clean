@@ -1,0 +1,16 @@
+display_name: <gray>Cage
+price: 400
+amount_limit: 1
+shop_icon: TRIAL_SPAWNER
+cooldown: 10.0
+duration: 10.0
+diameter: 16.0
+is_rune: true
+team:
+   - guard
+lore:
+   - <lore>Crée une <important>cage</important> pendant <variable><duration>s</variable> au point d'impact.
+   - <lore>Choisissez entre les modes <important>Barrière</important> et <important>Miasma</important>.
+   - <lore>Utilisez <important><key:key.attack></important> pour tirer.
+   - <lore>Utilisez <important><key:key.use></important> pour changer de mode.
+   - "<lore>Temps de recharge: <variable><cooldown>s</variable>."

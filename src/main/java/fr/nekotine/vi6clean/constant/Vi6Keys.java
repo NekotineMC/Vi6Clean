@@ -13,4 +13,8 @@ public class Vi6Keys {
 	public static final String SCOUT_ITEM_MODEL = "vi6clean:scout";
 
 	public static final String REGENERATOR_ITEM_MODEL = "vi6clean:cozy_backpack";
+
+	public static final String DELIMITER_MIASMA_ITEM_MODEL = "vi6clean:delimiter_miasma";
+	public static final String DELIMITER_BORDER_ITEM_MODEL = "vi6clean:delimiter_border";
+
 }
