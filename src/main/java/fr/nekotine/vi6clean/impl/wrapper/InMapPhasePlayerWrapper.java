@@ -26,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -351,19 +353,29 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		return artefactComponent;
 	}
 
-	public void updateStaminaComponent(MovementMode mode) {
-		var text = Component.text("Stamina ", NamedTextColor.YELLOW);
+	public void updateStaminaComponent(MovementMode mode, boolean isMurmuring) {
+		Component direction;
 		switch (mode) {
 			case SPRINTING :
-				text = text.append(Component.text("↓", NamedTextColor.RED));
+				direction = Component.text(" ↓", NamedTextColor.RED);
 				break;
 			case WALKING :
-				text = text.append(Component.text("↑", NamedTextColor.GREEN));
+				direction = Component.text(" ↑", NamedTextColor.GREEN);
 				break;
 			default :
-				text = text.append(Component.text("↑↑", NamedTextColor.DARK_GREEN));
+				direction = Component.text(" ↑↑", NamedTextColor.DARK_GREEN);
 				break;
 		}
+
+		var text = Component.text("Stamina", NamedTextColor.YELLOW);
+		text = text.append(direction);
+		if (isMurmuring) {
+			text = Component.text("Stamina", NamedTextColor.RED, TextDecoration.STRIKETHROUGH);
+			var strikethrough = Component.text().decoration(TextDecoration.STRIKETHROUGH, false);
+			strikethrough = strikethrough.append(direction);
+			text = text.append(strikethrough);
+		}
+
 		staminaComponent.setText(text);
 	}
 
