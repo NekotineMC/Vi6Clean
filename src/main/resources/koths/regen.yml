@@ -1,0 +1,6 @@
+probability: 0.8
+capture_amount_guard: 400
+capture_amount_other: 200
+display_text: "<light_purple><u>Régénérateur</u></light_purple>\n <aqua><power></aqua> <evolution>\n <status>"
+delay_between_heal: 10.0
+heal_amount: 1.0

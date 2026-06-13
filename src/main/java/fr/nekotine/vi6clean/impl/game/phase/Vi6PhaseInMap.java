@@ -64,6 +64,7 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.effect.EmpKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.effect.LightKothEffect;
+import fr.nekotine.vi6clean.impl.map.koth.effect.RegenKothEffect;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper.LeaveState;
@@ -179,7 +180,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		}
 		// KOTH
 		List<AbstractKothEffect> kothEffects = new LinkedList<>(
-				Arrays.asList(new EmpKothEffect(), new LightKothEffect()));
+				Arrays.asList(new EmpKothEffect(), new LightKothEffect(), new RegenKothEffect()));
 		List<Koth> koths = new LinkedList<>(map.getKoths().values());
 		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
 		Collections.shuffle(kothEffects);
