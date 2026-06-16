@@ -18,20 +18,22 @@ on:
 jobs:
   list-resourcepacks:
     runs-on: ubuntu-slim
+    outputs:
+      packnames: ${{ steps.list.outputs.folders }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
-    - name: List resource packs
+    - name: list
       run: |
         folders=$(find ResourcePack -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
         echo "folders=[$folders]"
-        echo "folders=[$folders]" >> $GITHUB_OUTPUT
+        echo "folders=[$folders]" >> "$GITHUB_OUTPUT"
   build:
     runs-on: ubuntu-slim
     needs: list-resourcepacks
     strategy:
       matrix:
-        packname: ${{ fromJson(needs.list-resourcepacks.outputs.folders) }}
+        packname: ${{ fromJSON(needs.list-resourcepacks.outputs.packnames) }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
