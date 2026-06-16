@@ -38,7 +38,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
-    - name: zip Vi6Clean files
+    - name: zip files
       uses: vimtor/action-zip@v1.3
       with:
         files: "ResourcePack/${{ matrix.packname }}/"
@@ -49,3 +49,24 @@ jobs:
         name: "resourcepack-${{ matrix.packname }}"
         path: "${{ matrix.packname }}.zip"
         archive: false
+  build2:
+    runs-on: ubuntu-slim
+    needs: list-resourcepacks
+    strategy:
+      matrix:
+        packname: ${{ fromJSON(needs.list-resourcepacks.outputs.packnames) }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: "resourcepack-${{ matrix.packname }}"
+        path: "${{ matrix.packname }}.zip"
+        archive: false
+    - name: upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: "resourcepack-test-${{ matrix.packname }}"
+        path: "ResourcePack/${{ matrix.packname }}/**"
+        archive: true
