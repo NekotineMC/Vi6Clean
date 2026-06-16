@@ -24,6 +24,7 @@ jobs:
     - name: List resource packs
       run: |
         folders=$(find ResourcePack -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
+        echo "folders=[$folders]"
         echo "folders=[$folders]" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-slim
