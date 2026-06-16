@@ -43,30 +43,19 @@ jobs:
       with:
         files: "ResourcePack/${{ matrix.packname }}/"
         dest: "${{ matrix.packname }}.zip"
-    - name: upload artifact
+    - name: generate sha1 files
+      run: |
+        echo -n "${{ matrix.packname }}" | sha1sum | awk '{print $1}' > "${{ matrix.packname }}.zip.sha1"
+        echo "sha1 is $(cat "${{ matrix.packname }}.zip.sha1") for ${{ matrix.packname }}.zip"
+    - name: upload resourcepack zip artifact
       uses: actions/upload-artifact@v7
       with:
         name: "resourcepack-${{ matrix.packname }}"
         path: "${{ matrix.packname }}.zip"
         archive: false
-  build2:
-    runs-on: ubuntu-slim
-    needs: list-resourcepacks
-    strategy:
-      matrix:
-        packname: ${{ fromJSON(needs.list-resourcepacks.outputs.packnames) }}
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-    - name: upload artifact
+    - name: upload sha1 artifact
       uses: actions/upload-artifact@v7
       with:
-        name: "resourcepack-${{ matrix.packname }}"
-        path: "${{ matrix.packname }}.zip"
+        name: "resourcepack-sha1-${{ matrix.packname }}"
+        path: "${{ matrix.packname }}.zip.sha1"
         archive: false
-    - name: upload artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: "resourcepack-test-${{ matrix.packname }}"
-        path: "ResourcePack/${{ matrix.packname }}/**"
-        archive: true
