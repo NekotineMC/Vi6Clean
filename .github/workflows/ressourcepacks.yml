@@ -41,10 +41,11 @@ jobs:
     - name: zip Vi6Clean files
       uses: vimtor/action-zip@v1.3
       with:
-        files: "ResourcePack/${{ matrix.packname }}/assets/ ResourcePack/${{ matrix.packname }}/pack.mcmeta ResourcePack/${{ matrix.packname }}/pack.png"
+        files: "ResourcePack/${{ matrix.packname }}/assets ResourcePack/${{ matrix.packname }}/pack.mcmeta ResourcePack/${{ matrix.packname }}/pack.png"
         dest: "${{ matrix.packname }}.zip"
     - name: upload artifact
       uses: actions/upload-artifact@v7
       with:
         name: "resourcepack-${{ matrix.packname }}"
         path: "${{ matrix.packname }}.zip"
+        archive: false
