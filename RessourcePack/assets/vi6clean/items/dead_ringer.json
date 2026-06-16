@@ -1,0 +1,22 @@
+{
+    "model": {
+        "type": "minecraft:select",
+        "cases": [
+            {
+                "model": {
+                    "type": "minecraft:model",
+                    "model": "vi6clean:tool/dead_ringer_open"
+                },
+                "when": [
+                    "firstperson_lefthand",
+                    "firstperson_righthand"
+                ]
+            }
+        ],
+        "fallback": {
+            "type": "minecraft:model",
+            "model": "vi6clean:tool/dead_ringer"
+        },
+        "property": "minecraft:display_context"
+    }
+}
