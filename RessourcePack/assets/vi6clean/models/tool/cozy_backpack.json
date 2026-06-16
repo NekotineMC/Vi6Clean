@@ -1,0 +1,17 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "vi6clean:item/cozy_backpack_320x320"
+  },
+  "elements": [
+		{
+			"from": [0, 0, 8],
+			"to": [16, 16, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 0]},
+			"faces": {
+				"north": {"texture": "layer0"},
+				"south": {"texture": "layer0"}
+			}
+		}
+	]
+}

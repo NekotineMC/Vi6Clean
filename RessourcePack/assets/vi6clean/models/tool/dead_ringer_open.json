@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "vi6clean:item/dead_ringer_open_256x256"
+  }
+}

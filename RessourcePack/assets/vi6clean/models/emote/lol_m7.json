@@ -1,0 +1,18 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "vi6clean:item/lol_m7_curated_strip_256"
+  },
+  "elements": [
+		{
+			"from": [-8, 0, 8],
+			"to": [24, 32, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 0]},
+			"faces": {
+				"north": {"uv": [16, 0, 0, 16], "texture": "layer0"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "layer0"}
+			},
+			"light_emission": 15
+		}
+	]
+}

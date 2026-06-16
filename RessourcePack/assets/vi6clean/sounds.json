@@ -1,0 +1,76 @@
+{
+	"tool.dead_ringer.equip": {
+		"sounds": [
+		  {
+			"name": "vi6clean:tool/dead_ringer/equip",
+			"volume": 0.3
+		  }
+		]
+	},
+	"tool.dead_ringer.uncloak": {
+		"sounds": [
+		  {
+			"name": "vi6clean:tool/dead_ringer/uncloak",
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.lost": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/lost",
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.won": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/won",
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.lost_music": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/lost_music",
+			"stream": true,
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.won_music": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/won_music",
+			"stream": true,
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.start_music": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/start_music",
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.scored": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/scored",
+			"volume": 0.3
+		  }
+		]
+	},
+	"game.regenerate": {
+		"sounds": [
+		  {
+			"name": "vi6clean:game/regenerate",
+			"volume": 0.5
+		  }
+		]
+	}
+}
