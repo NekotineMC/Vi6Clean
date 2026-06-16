@@ -214,6 +214,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 					"Le monde " + map.getWorldName() + " correspondant à la carte " + mapName + " n'existe pas");
 		}
 		world = w.get();
+		Ioc.getProvider().registerSingletonInstanceAs(world, World.class);
 		var loc = world.getSpawnLocation();
 		for (var p : players) {
 			p.teleport(loc);
@@ -234,6 +235,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 
 	public void setWorld(World world) {
 		this.world = world;
+		Ioc.getProvider().registerSingletonInstanceAs(world, World.class);
 	}
 
 	public IPhaseMachine getPhaseMachine() {

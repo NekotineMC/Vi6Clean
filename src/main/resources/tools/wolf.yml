@@ -1,0 +1,11 @@
+display_name: <gold>Chien de garde
+price: 500
+amount_limit: -1
+shop_icon: WOLF_SPAWN_EGG
+is_rune: false
+lore:
+   - <lore>Le meilleur amis des gardes!
+   - <lore> - Patrouille les différents artefacts.
+   - <lore> - Attaque les ennemis à vue.
+team:
+   - guard

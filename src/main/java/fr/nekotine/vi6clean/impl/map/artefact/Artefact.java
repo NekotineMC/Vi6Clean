@@ -12,6 +12,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
+import fr.nekotine.vi6clean.impl.tool.personal.wolf.WolfHandler;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
@@ -58,6 +59,10 @@ public class Artefact {
 	private Collection<BlockDisplay> boxDisplays;
 
 	private boolean foundAfterCapture;
+
+	public boolean isFoundAfterCapture() {
+		return foundAfterCapture;
+	}
 
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
@@ -121,7 +126,8 @@ public class Artefact {
 
 			if (!foundAfterCapture) {
 				setFoundAfterCapture(inside.stream()
-						.anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam() == Vi6Team.GUARD));
+						.anyMatch(p -> wrapping.getWrapper(p, PlayerWrapper.class).getTeam() == Vi6Team.GUARD)
+						|| Ioc.resolve(WolfHandler.class).boundingBoxContainsAWolf(boundingBox));
 			}
 
 			game.getWorld().spawnParticle(Particle.WITCH, blockPosition.getX() + 0.5d, blockPosition.getY() + 0.5d,
