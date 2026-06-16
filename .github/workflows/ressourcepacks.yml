@@ -45,7 +45,8 @@ jobs:
         dest: "${{ matrix.packname }}.zip"
     - name: generate sha1 files
       run: |
-        echo -n "${{ matrix.packname }}" | sha1sum | awk '{print $1}' > "${{ matrix.packname }}.zip.sha1"
+        sha=$(sha1sum "${{ matrix.packname }}.zip" | awk '{print $1}')
+        echo "$sha" > "${{ matrix.packname }}.zip.sha1"
         echo "sha1 is $(cat "${{ matrix.packname }}.zip.sha1") for ${{ matrix.packname }}.zip"
     - name: upload resourcepack zip artifact
       uses: actions/upload-artifact@v7
