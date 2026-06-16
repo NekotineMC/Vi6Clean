@@ -23,7 +23,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
-    - name: list
+    - name: List pack folders
+      id: list
       run: |
         folders=$(find ResourcePack -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
         echo "folders=[$folders]"
