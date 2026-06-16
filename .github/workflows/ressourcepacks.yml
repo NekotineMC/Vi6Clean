@@ -1,0 +1,46 @@
+name: Build ressource packs zips
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ResourcePack/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ResourcePack/**'
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  list-resourcepacks:
+    runs-on: ubuntu-slim
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: List resource packs
+      run: |
+        folders=$(find ResourcePack -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
+        echo "folders=[$folders]" >> $GITHUB_OUTPUT
+  build:
+    runs-on: ubuntu-slim
+    needs: list-resourcepacks
+    strategy:
+      matrix:
+        packname: ${{ fromJson(needs.list-resourcepacks.outputs.folders) }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: zip Vi6Clean files
+      uses: vimtor/action-zip@v1.3
+      with:
+        files: ["ResourcePack/${{ matrix.packname }}/assets/", "ResourcePack/${{ matrix.packname }}/pack.mcmeta", "ResourcePack/${{ matrix.packname }}/pack.png"]
+        dest: "${{ matrix.packname }}.zip"
+    - name: upload artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: "resourcepack-${{ matrix.packname }}"
+        path: "${{ matrix.packname }}.zip"
