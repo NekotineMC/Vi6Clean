@@ -121,15 +121,8 @@ public class Koth {
 
 	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
+
 		var displayloc = displayLocation.toLocation(world);
-		display = (TextDisplay) world.spawnEntity(displayloc, EntityType.TEXT_DISPLAY,
-				CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
-					if (display instanceof TextDisplay d) {
-						d.setBillboard(Billboard.CENTER);
-						d.setShadowed(true);
-						d.setPersistent(false);
-					}
-				});
 		rectangleEdges = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
 				Material.BARRIER.createBlockData(), 0.06f);
 		isEnabled = true;
@@ -140,7 +133,11 @@ public class Koth {
 		if (modelKey != null) {
 			var traceResult = world.rayTraceBlocks(displayloc, new Vector(0, -1, 0), 3, FluidCollisionMode.NEVER, true);
 			if (traceResult != null) {
-				model = (ItemDisplay) world.spawnEntity(traceResult.getHitPosition().toLocation(world),
+				// on déplace le text pour éviter qu'il rentre dans le model
+				displayloc = traceResult.getHitPosition().toLocation(world).add(new Vector(0, 2.5, 0));
+				// Ajouter 0.5 pour pas que le modèle rentre dans le sol
+				model = (ItemDisplay) world.spawnEntity(
+						traceResult.getHitPosition().toLocation(world).add(new Vector(0, 0.5, 0)),
 						EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
 							if (e instanceof ItemDisplay display) {
 								display.setPersistent(false);
@@ -151,6 +148,15 @@ public class Koth {
 						});
 			}
 		}
+
+		display = (TextDisplay) world.spawnEntity(displayloc, EntityType.TEXT_DISPLAY,
+				CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
+					if (display instanceof TextDisplay d) {
+						d.setBillboard(Billboard.CENTER);
+						d.setShadowed(true);
+						d.setPersistent(false);
+					}
+				});
 
 	}
 

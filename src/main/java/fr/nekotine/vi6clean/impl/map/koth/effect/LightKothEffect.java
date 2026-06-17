@@ -1,5 +1,12 @@
 package fr.nekotine.vi6clean.impl.map.koth.effect;
 
+import java.util.List;
+
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -10,23 +17,16 @@ import fr.nekotine.core.text.placeholder.TextPlaceholder;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.tuple.Pair;
-import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
 import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
-import java.util.List;
-
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 @KothCode("light")
 public class LightKothEffect extends AbstractKothEffect implements TextPlaceholder {
