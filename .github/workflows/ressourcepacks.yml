@@ -76,6 +76,7 @@ jobs:
     - uses: actions/download-artifact@v8
       with:
         path: artifactsfolder
+        skip-decompress: true
     - run: |
         ls -la artifactsfolder
         ls -la
@@ -83,4 +84,4 @@ jobs:
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.tagbump.outputs.new_tag }}
-        files: artifactsfolder/
+        files: artifactsfolder/**/*
