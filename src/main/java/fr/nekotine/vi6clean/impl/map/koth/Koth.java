@@ -1,5 +1,26 @@
 package fr.nekotine.vi6clean.impl.map.koth;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Display.Billboard;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
 import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
@@ -11,22 +32,8 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Display.Billboard;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.util.BlockVector;
-import org.bukkit.util.BoundingBox;
 
 public class Koth {
 	@MapDictKey
@@ -50,6 +57,7 @@ public class Koth {
 	private int captureAdvancement;
 	private AbstractKothEffect effect;
 	private Collection<BlockDisplay> rectangleEdges;
+	private ItemDisplay model;
 
 	//
 
@@ -113,7 +121,8 @@ public class Koth {
 
 	public void setup(AbstractKothEffect effect, World world) {
 		this.effect = effect;
-		display = (TextDisplay) world.spawnEntity(displayLocation.toLocation(world), EntityType.TEXT_DISPLAY,
+		var displayloc = displayLocation.toLocation(world);
+		display = (TextDisplay) world.spawnEntity(displayloc, EntityType.TEXT_DISPLAY,
 				CreatureSpawnEvent.SpawnReason.CUSTOM, display -> {
 					if (display instanceof TextDisplay d) {
 						d.setBillboard(Billboard.CENTER);
@@ -126,6 +135,23 @@ public class Koth {
 		isEnabled = true;
 		effect.setKoth(this);
 		effect.setup();
+
+		var modelKey = effect.getModelKey();
+		if (modelKey != null) {
+			var traceResult = world.rayTraceBlocks(displayloc, new Vector(0, -1, 0), 3, FluidCollisionMode.NEVER, true);
+			if (traceResult != null) {
+				model = (ItemDisplay) world.spawnEntity(traceResult.getHitPosition().toLocation(world),
+						EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
+							if (e instanceof ItemDisplay display) {
+								display.setPersistent(false);
+								var stack = new ItemStack(Material.IRON_BLOCK);
+								stack.setData(DataComponentTypes.ITEM_MODEL, modelKey);
+								display.setItemStack(stack);
+							}
+						});
+			}
+		}
+
 	}
 
 	public void clean() {
@@ -141,6 +167,9 @@ public class Koth {
 		effect.clean();
 		captureAdvancement = 0;
 		display.remove();
+		if (model != null) {
+			model.remove();
+		}
 	}
 
 	public void tick() {
