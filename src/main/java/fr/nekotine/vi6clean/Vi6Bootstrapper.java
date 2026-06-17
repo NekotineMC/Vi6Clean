@@ -25,6 +25,10 @@ public class Vi6Bootstrapper extends NekotineCoreBootstrapper {
 
 	@Override
 	public void bootstrap(BootstrapContext context) {
+		super.bootstrap(context);
+
+		withEmbedDatapack(context, "/datapack", "provided"); // Ne pas changer l'ID
+
 		var lifecycle = context.getLifecycleManager();
 
 		var menuDialogKey = DialogKeys.create(Key.key(Vi6Keys.DIALOG_SETTINGS));
