@@ -77,10 +77,10 @@ jobs:
       with:
         path: artifactsfolder
     - run: |
-        ls -la artifactsfolder/*
+        ls -la artifactsfolder
         ls -la
     - name: Create resourcepack release
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.tagbump.outputs.new_tag }}
-        files: 'artifactsfolder/*.*'
+        files: './artifactsfolder/*.{zip,sha1}'
