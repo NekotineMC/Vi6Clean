@@ -1,0 +1,19 @@
+{
+	"display": {
+		"icon": {
+			"id": "minecraft:player_head"
+		},
+		"title": {"translate":"Sale merde"},
+		"description": {"color":"red","translate":"T'est une sale merde"},
+		"announce_to_chat": true,
+		"frame": "goal",
+		"background": "minecraft:textures/block/dirt.png",
+		"show_toast": true,
+		"hidden": true
+	},		
+	"criteria": {
+		"big_cheater": {
+			"trigger": "minecraft:impossible"
+		}
+	}
+}
