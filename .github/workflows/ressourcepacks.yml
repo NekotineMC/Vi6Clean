@@ -67,6 +67,8 @@ jobs:
     - uses: actions/download-artifact@v8
       with:
         path: artifactsfolder
+    - name: Checkout code
+      uses: actions/checkout@v6
     - name: Bump version and push tag
       id: tagbump
       uses: anothrNick/github-tag-action@v1
