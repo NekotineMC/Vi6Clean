@@ -67,7 +67,15 @@ jobs:
     - uses: actions/download-artifact@v8
       with:
         path: artifactsfolder
+    - name: Bump version and push tag
+      id: tagbump
+      uses: anothrNick/github-tag-action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+        TAG_PREFIX: v
+        DEFAULT_BUMP: patch
     - name: Create resourcepack release
       uses: softprops/action-gh-release@v3
       with:
+        tag_name: ${{ steps.tagbump.outputs.new_tag }}
         files: artifactsfolder/*
