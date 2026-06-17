@@ -80,4 +80,4 @@ jobs:
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.tagbump.outputs.new_tag }}
-        files: artifactsfolder/*
+        files: artifactsfolder/**
