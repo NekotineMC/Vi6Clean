@@ -75,9 +75,9 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/download-artifact@v8
       with:
-        path: artifactsfolder
+        path: /artifactsfolder
     - name: Create resourcepack release
       uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ steps.tagbump.outputs.new_tag }}
-        files: artifactsfolder/*
+        files: /artifactsfolder/*
