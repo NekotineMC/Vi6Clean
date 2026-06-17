@@ -63,6 +63,8 @@ jobs:
   release:
     runs-on: ubuntu-slim
     needs: build
+    permissions:
+      contents: write
     steps:
     - uses: actions/download-artifact@v8
       with:
