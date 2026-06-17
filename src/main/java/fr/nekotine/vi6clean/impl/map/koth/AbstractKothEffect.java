@@ -4,6 +4,8 @@ import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import java.io.IOException;
+
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.Configuration;
@@ -60,5 +62,9 @@ public abstract class AbstractKothEffect {
 
 	public String getCode() {
 		return code;
+	}
+
+	public Key getModelKey() {
+		return null;
 	}
 }
