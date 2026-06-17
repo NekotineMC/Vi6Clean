@@ -60,3 +60,14 @@ jobs:
         name: "resourcepack-sha1-${{ matrix.packname }}"
         path: "${{ matrix.packname }}.zip.sha1"
         archive: false
+  release:
+    runs-on: ubuntu-slim
+    needs: build
+    steps:
+    - uses: actions/download-artifact@v8
+      with:
+        path: artifactsfolder
+    - name: Create resourcepack release
+      uses: softprops/action-gh-release@v3
+      with:
+        files: artifactsfolder/*
