@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,7 +36,6 @@ import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
 import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.event.connection.configuration.PlayerConnectionInitialConfigureEvent;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.sound.Sound;
@@ -183,13 +183,11 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerInitialConfigure(PlayerConnectionInitialConfigureEvent evt) {
-		var aud = evt.getConnection().getAudience();
-		aud.sendMessage(Component.text("Bonjour " + evt.getConnection().getAddress()));
+	public void onPlayerInitialConfigure(PlayerJoinEvent evt) {
 		var request = ResourcePackRequest.resourcePackRequest();
 		request.packs(vi6CleanResourcePack);
 		request.required(true)
 				.prompt(Component.text("Le pack de resource du Vi6 est nécessaire pour éviter les erreurs visuelles"));
-		aud.sendResourcePacks(request);
+		evt.getPlayer().sendResourcePacks(request.build());
 	}
 }
