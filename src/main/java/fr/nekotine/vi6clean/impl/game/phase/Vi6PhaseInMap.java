@@ -201,6 +201,11 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s", koth.getName(),
 					koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
 		}
+
+		for (var k : koths) {
+			k.setup(new LightKothEffect(), world);
+		}
+
 		game.getGuards()
 				.sendMessage(Component.text("Koth", NamedTextColor.DARK_PURPLE)
 						.append(Component.text(" >> ", NamedTextColor.WHITE))

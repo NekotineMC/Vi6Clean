@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -27,6 +28,7 @@ import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
 import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
 import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
 import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
+import fr.nekotine.core.util.BukkitUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -42,9 +44,9 @@ public class Koth {
 	@ComposingConfiguration
 	private BoundingBox boundingBox = new BoundingBox();
 
-	@GenerateSpecificCommandFor(LocationCommandGenerator.class)
+	@GenerateCommandFor
 	@ComposingConfiguration
-	private BlockVector displayLocation = new BlockVector();
+	private Location displayLocation = BukkitUtil.defaultLocation();
 
 	private Set<Player> inside = new HashSet<>(8);
 
@@ -113,7 +115,7 @@ public class Koth {
 		return name;
 	}
 
-	public BlockVector getDisplayLocation() {
+	public Location getDisplayLocation() {
 		return displayLocation;
 	}
 
@@ -134,18 +136,18 @@ public class Koth {
 			var traceResult = world.rayTraceBlocks(displayloc, new Vector(0, -1, 0), 3, FluidCollisionMode.NEVER, true);
 			if (traceResult != null) {
 				// on déplace le text pour éviter qu'il rentre dans le model
-				displayloc = traceResult.getHitPosition().toLocation(world).add(new Vector(0, 2.5, 0));
+				displayloc = traceResult.getHitPosition().toLocation(world).add(new Vector(0, 2, 0));
 				// Ajouter 0.5 pour pas que le modèle rentre dans le sol
-				model = (ItemDisplay) world.spawnEntity(
-						traceResult.getHitPosition().toLocation(world).add(new Vector(0, 0.5, 0)),
-						EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
-							if (e instanceof ItemDisplay display) {
-								display.setPersistent(false);
-								var stack = new ItemStack(Material.IRON_BLOCK);
-								stack.setData(DataComponentTypes.ITEM_MODEL, modelKey);
-								display.setItemStack(stack);
-							}
-						});
+				var modelloc = traceResult.getHitPosition().toLocation(world).add(new Vector(0, 0.5, 0));
+				modelloc.setYaw(displayLocation.getYaw());
+				model = (ItemDisplay) world.spawnEntity(modelloc, EntityType.ITEM_DISPLAY, SpawnReason.CUSTOM, e -> {
+					if (e instanceof ItemDisplay display) {
+						display.setPersistent(false);
+						var stack = new ItemStack(Material.IRON_BLOCK);
+						stack.setData(DataComponentTypes.ITEM_MODEL, modelKey);
+						display.setItemStack(stack);
+					}
+				});
 			}
 		}
 
