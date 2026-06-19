@@ -18,14 +18,11 @@ import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
-import fr.nekotine.core.map.annotation.GenerateSpecificCommandFor;
-import fr.nekotine.core.map.command.generator.LocationCommandGenerator;
 import fr.nekotine.core.serialization.configurationserializable.annotation.ComposingConfiguration;
 import fr.nekotine.core.serialization.configurationserializable.annotation.MapDictKey;
 import fr.nekotine.core.util.BukkitUtil;
