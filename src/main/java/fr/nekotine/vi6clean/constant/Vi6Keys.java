@@ -19,5 +19,4 @@ public class Vi6Keys {
 	public static final String DELIMITER_MIASMA_ZONE_MODEL = "vi6clean:delimiter_miasma_zone";
 	public static final String DELIMITER_BORDER_ZONE_MODEL = "vi6clean:delimiter_border_zone";
 
-
 }
