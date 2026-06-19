@@ -2,7 +2,7 @@ display_name: <gray>Cage
 price: 400
 amount_limit: 1
 shop_icon: TRIAL_SPAWNER
-cooldown: 10.0
+cooldown: 60.0
 duration: 10.0
 diameter: 16.0
 is_rune: true

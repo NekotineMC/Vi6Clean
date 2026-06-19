@@ -14,16 +14,13 @@ import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Display.Brightness;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.AxisAngle4f;
@@ -31,7 +28,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.CustomAction;
@@ -221,10 +217,10 @@ public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
 					var model_key = Material.BARRIER.key();
 					switch (tool.cageMode) {
 						case BORDER :
-							model_key = Key.key(Vi6Keys.DELIMITER_BORDER_ITEM_MODEL);
+							model_key = Key.key(Vi6Keys.DELIMITER_BORDER_ZONE_MODEL);
 							break;
 						case SUFFOCATING :
-							model_key = Key.key(Vi6Keys.DELIMITER_MIASMA_ITEM_MODEL);
+							model_key = Key.key(Vi6Keys.DELIMITER_MIASMA_ZONE_MODEL);
 							break;
 					}
 					im.setItemModel(new NamespacedKey(model_key.namespace(), model_key.value()));
