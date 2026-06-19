@@ -15,6 +15,8 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
 import java.util.List;
+
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
@@ -102,5 +104,14 @@ public class RegenKothEffect extends AbstractKothEffect implements TextPlacehold
 		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<red>↓</red>" : "<green>↑</green>");
 
 		return List.of(Pair.from("status", status), Pair.from("power", power), Pair.from("evolution", evolution));
+	}
+
+	@Override
+	public Key getModelKey() {
+		var keystring = getConfiguration().getString("koth.regen.model", "vi6clean:regenerator");
+		if (keystring == null) {
+			return null;
+		}
+		return Key.key(keystring);
 	}
 }
