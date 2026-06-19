@@ -168,7 +168,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 					.filter(enemy -> tool.watchers.stream().anyMatch(
 							sf -> enemy.getLocation().distanceSquared(sf.getLocation()) <= DETECTION_RANGE_SQUARED))
 					.collect(Collectors.toCollection(LinkedList::new));
-			var oldInRange = tool.enemyesInRange;
+			var oldInRange = tool.enemiesInRange;
 			if (inRange.size() <= 0 && oldInRange.size() <= 0) {
 				continue;
 			}
@@ -229,7 +229,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.enemyesInRange) {
+				for (var victim : tool.enemiesInRange) {
 					statusModule.removeEffect(victim, permanentGlowEffect);
 				}
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
@@ -244,11 +244,11 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var tool = getToolFromItem(item);
 				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.enemyesInRange) {
+				for (var victim : tool.enemiesInRange) {
 					statusModule.addEffect(victim, permanentGlowEffect);
 					Vi6Sound.OMNICAPTEUR_DETECT.play(victim);
 				}
-				if (tool.enemyesInRange.size() > 0) {
+				if (tool.enemiesInRange.size() > 0) {
 					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				}
 				item.editMeta(m -> m.displayName(getDisplayName()));
@@ -266,7 +266,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 
 		private List<Entity> watchers = new LinkedList<>();
 
-		private Collection<Player> enemyesInRange = new LinkedList<>();
+		private Collection<Player> enemiesInRange = new LinkedList<>();
 
 		public Watcher(ToolHandler<?> handler) {
 			super(handler);

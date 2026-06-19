@@ -1,22 +1,21 @@
 package fr.nekotine.vi6clean.impl.tool.personal.abyssal_relic;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.ticking.TickTimeStamp;
-import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.status.flag.SuffocatingStatusFlag;
+import fr.nekotine.vi6clean.impl.status.effect.SuffocatingStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
@@ -26,46 +25,39 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.AbyssalRelic> {
 
 	private final double RANGE = getConfiguration().getDouble("range", 5.0);
+	private final StatusEffectModule EFFECT_MODULE;
+	private final StatusEffect EFFECT = new StatusEffect(SuffocatingStatusEffectType.get(), -1);
 
 	public AbyssalRelicHandler() {
 		super(AbyssalRelic::new);
+		Ioc.resolve(ModuleManager.class).tryLoad(StatusEffectModule.class);
+		EFFECT_MODULE = Ioc.resolve(StatusEffectModule.class);
 	}
 
 	@EventHandler
-	private void onTick(TickElapsedEvent evt) {
-		if (!evt.timeStampReached(TickTimeStamp.QuartSecond)) {
-			return;
-		}
-		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+	private void onPlayerMove(PlayerMoveEvent evt) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
-
-		Set<Player> newTargets = new HashSet<>();
-
 		for (var tool : getTools()) {
-			var owner = tool.getOwner();
-			if (owner == null)
+			var opt = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+			if (opt.isEmpty()) {
 				continue;
-
-			var opt = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
-			if (opt.isEmpty())
+			}
+			var wrapper = opt.get();
+			if (!wrapper.enemyTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
 				continue;
-
-			var enemies = opt.get().enemyTeamInMap().collect(Collectors.toSet());
-			owner.getNearbyEntities(RANGE, RANGE, RANGE).stream().filter(e -> e instanceof Player).map(e -> (Player) e)
-					.filter(enemies::contains).forEach(newTargets::add);
-		}
-
-		// Add flag to new targets (idempotent)
-		for (var target : newTargets) {
-			statusFlagModule.addFlag(target, SuffocatingStatusFlag.get());
-		}
-
-		// Remove flag from players no longer in range
-		var toRemove = SuffocatingStatusFlag.get().getSuffocatingPlayers().stream().filter(p -> !newTargets.contains(p))
-				.collect(Collectors.toList());
-
-		for (var p : toRemove) {
-			statusFlagModule.removeFlag(p, SuffocatingStatusFlag.get());
+			}
+			var inside = tool.getOwner().getLocation().distanceSquared(evt.getTo()) <= RANGE * RANGE;
+			if (tool.enemiesInRange.contains(evt.getPlayer())) {
+				if (!inside) {
+					EFFECT_MODULE.removeEffect(evt.getPlayer(), EFFECT);
+					tool.enemiesInRange.remove(evt.getPlayer());
+				}
+			} else {
+				if (inside) {
+					EFFECT_MODULE.addEffect(evt.getPlayer(), EFFECT);
+					tool.enemiesInRange.add(evt.getPlayer());
+				}
+			}
 		}
 	}
 
@@ -90,6 +82,7 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 	}
 
 	public static class AbyssalRelic extends Tool {
+		private final Set<Player> enemiesInRange = new HashSet<>();
 		public AbyssalRelic(ToolHandler<?> handler) {
 			super(handler);
 		}

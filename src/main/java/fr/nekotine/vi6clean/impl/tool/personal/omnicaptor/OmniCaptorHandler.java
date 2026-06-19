@@ -91,10 +91,10 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 							.append(Component.text("Disponible", NamedTextColor.BLUE))));
 				});
 				var flagModule = Ioc.resolve(StatusFlagModule.class);
-				for (var p : tool.enemyesInRange) {
+				for (var p : tool.enemiesInRange) {
 					flagModule.removeFlag(p, OmniCaptedStatusFlag.get());
 				}
-				tool.enemyesInRange.clear();
+				tool.enemiesInRange.clear();
 				evt.setCancelled(true);
 			}
 		} else {
@@ -173,10 +173,10 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 				continue;
 			}
 			var inRange = inRange(tool.placed, tool);
-			if (inRange.size() <= 0 && tool.enemyesInRange.size() <= 0) {
+			if (inRange.size() <= 0 && tool.enemiesInRange.size() <= 0) {
 				continue;
 			}
-			var ite = tool.enemyesInRange.iterator();
+			var ite = tool.enemiesInRange.iterator();
 			while (ite.hasNext()) {
 				var p = ite.next();
 				if (inRange.contains(p)) {
@@ -192,12 +192,12 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 			}
 			for (var p : inRange) {
 				effectModule.addEffect(p, unlimitedEffect);
-				tool.enemyesInRange.add(p);
+				tool.enemiesInRange.add(p);
 				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
 				Vi6Sound.OMNICAPTEUR_DETECT.play(owner);
 			}
 
-			if (tool.enemyesInRange.size() > 0) {
+			if (tool.enemiesInRange.size() > 0) {
 				editItem(tool, item -> {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.REDSTONE_TORCH.key());
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
@@ -258,7 +258,7 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				var tool = getToolFromItem(item);
-				var ite = tool.enemyesInRange.iterator();
+				var ite = tool.enemiesInRange.iterator();
 				while (ite.hasNext()) {
 					var target = ite.next();
 					effectModule.removeEffect(target, temporaryEffect);
@@ -297,6 +297,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 
 		private ItemDisplay placed;
 
-		private Collection<Player> enemyesInRange = new LinkedList<>();
+		private Collection<Player> enemiesInRange = new LinkedList<>();
 	}
 }
