@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [128, 128],
 	"textures": {
-		"0": "texture",
-		"particle": "texture"
+		"0": "vi6clean:block/regenerator",
+		"particle": "vi6clean:block/regenerator"
 	},
 	"elements": [
 		{
