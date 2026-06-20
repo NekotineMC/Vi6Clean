@@ -13,10 +13,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -257,15 +259,16 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public final void remove(T tool) {
 		detachFromOwner(tool);
 		onToolCleanup(tool);
+		Bukkit.getOnlinePlayers().stream().map(p -> p.getWorld()).distinct().map(w -> w.getEntitiesByClass(Item.class))
+				.flatMap(Collection::stream).filter(item -> tool.equals(getToolFromItem(item.getItemStack())))
+				.forEach(item -> item.remove());
 		tools.remove(tool.getId());
 	}
 
 	private final void removeGeneric(Tool tool) {
 		@SuppressWarnings("unchecked")
 		var typed = (T) tool;
-		detachFromOwner(typed);
-		onToolCleanup(typed);
-		tools.remove(typed.getId());
+		remove(typed);
 	}
 
 	protected void onStartHandling() {
