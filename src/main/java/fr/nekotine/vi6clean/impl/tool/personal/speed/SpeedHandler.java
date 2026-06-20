@@ -24,7 +24,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("speed")
 public class SpeedHandler extends ToolHandler<SpeedHandler.SpeedBuff> {
 
-	private final double SPEED_BONUS = getConfiguration().getDouble("speed_bonus", 0.02); // 0.1 is the default
+	private final double SPEED_BONUS = getConfiguration().getDouble("speed_bonus", 0.01); // 0.1 is the default
 																							// mouvement speed
 
 	public SpeedHandler() {
