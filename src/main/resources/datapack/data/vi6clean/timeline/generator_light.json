@@ -1,0 +1,59 @@
+{
+  "period_ticks": 24000,
+  "tracks": {
+    "minecraft:visual/fog_end_distance": {
+	  "ease": "constant",
+      "keyframes": [
+        {
+          "ticks": 0,
+          "value": 1024.0
+        },
+        {
+          "ticks": 18001,
+          "value": 16.0
+        },
+		{
+          "ticks": 18002,
+          "value": 1024.0
+        }
+      ],
+      "modifier": "minimum"
+    },
+	"minecraft:visual/sky_light_factor": {
+	  "ease": "constant",
+      "keyframes": [
+        {
+          "ticks": 0,
+          "value": 0.0
+        },
+		{
+          "ticks": 18001,
+          "value": 1.0
+        },
+		{
+          "ticks": 18002,
+          "value": 0.0
+        }
+      ],
+      "modifier": "maximum"
+    },
+    "minecraft:visual/fog_color": {
+	  "ease": "constant",
+      "keyframes": [
+        {
+          "ticks": 0,
+          "value": "#ffffff"
+        },
+        {
+          "ticks": 18001,
+          "value": "#000000"
+        },
+		{
+          "ticks": 18002,
+          "value": "#ffffff"
+        }
+      ],
+      "modifier": "multiply"
+    }
+  }
+}

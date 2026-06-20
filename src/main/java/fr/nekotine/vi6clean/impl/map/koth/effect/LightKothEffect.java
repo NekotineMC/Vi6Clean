@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.nekotine.core.constant.DayTime;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -47,12 +48,14 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 
 	@Override
 	public void capture(Vi6Team owning, Vi6Team losing) {
-		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		// var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		var game = Ioc.resolve(Vi6Game.class);
 		if (losing == Vi6Team.GUARD) {
+			game.getWorld().setTime(DayTime.MIDNIGHT + 1); // Light env attribute set to 18001
+
 			for (Player guard : game.getGuards()) {
-				statusEffectModule.addEffect(guard, unlimitedDarkened);
-				guard.addPotionEffect(unlimitedNightVision);
+				// statusEffectModule.addEffect(guard, unlimitedDarkened);
+				// guard.addPotionEffect(unlimitedNightVision);
 				guard.setWalkSpeed(guard.getWalkSpeed() * SLOW_MULTIPLIER);
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
@@ -64,9 +67,10 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 					Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
 			game.getThiefs().sendMessage(Component.text("Votre équipe a déactivé le générateur", NamedTextColor.GREEN));
 		} else if (owning == Vi6Team.GUARD) {
+			game.getWorld().setTime(DayTime.MIDNIGHT);
 			for (Player guard : game.getGuards()) {
-				statusEffectModule.removeEffect(guard, unlimitedDarkened);
-				guard.removePotionEffect(PotionEffectType.NIGHT_VISION);
+				// statusEffectModule.removeEffect(guard, unlimitedDarkened);
+				// guard.removePotionEffect(PotionEffectType.NIGHT_VISION);
 				guard.setWalkSpeed(guard.getWalkSpeed() / SLOW_MULTIPLIER);
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
@@ -91,6 +95,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 	public void clean() {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 		Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> statusEffectModule.removeEffect(p, unlimitedDarkened));
+		Ioc.resolve(Vi6Game.class).getGuards().forEach(p -> p.removePotionEffect(unlimitedNightVision.getType()));
 	}
 
 	//

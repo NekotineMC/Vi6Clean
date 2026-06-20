@@ -188,6 +188,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		var nbKothSpawned = 0;
 		var random = new Random();
 		var count = 0;
+		var lightKothInMap = false;
 		while (count < limit && kothEffects.size() > 0 && koths.size() > 0) {
 			count++;
 			var effect = kothEffects.remove(0);
@@ -200,6 +201,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			koth.setup(effect, world);
 			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s", koth.getName(),
 					koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
+			if (effect.getCode() == "light") {
+				lightKothInMap = true;
+			}
 		}
 
 		game.getGuards()
@@ -208,15 +212,17 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 						.append(Component.text(nbKothSpawned, NamedTextColor.AQUA))
 						.append(Component.text(" zones à capturer sont apparues !", NamedTextColor.GOLD)));
 		// WEATHER
-		var weatherRand = random.nextFloat();
-		if (weatherRand < 0.2) {
-			world.setStorm(true);
-			world.setWeatherDuration(Integer.MAX_VALUE);
-			if (weatherRand < 0.1) {
-				world.setThundering(true);
-				world.setThunderDuration(Integer.MAX_VALUE);
-			} else {
+		if (!lightKothInMap) {// Workaround bug visuel avec la lumière et le weather
+			var weatherRand = random.nextFloat();
+			if (weatherRand < 0.2) {
+				world.setStorm(true);
+				world.setWeatherDuration(Integer.MAX_VALUE);
+				if (weatherRand < 0.1) {
+					world.setThundering(true);
+					world.setThunderDuration(Integer.MAX_VALUE);
+				} else {
 
+				}
 			}
 		}
 		Ioc.resolve(Majordom.class).enable();
