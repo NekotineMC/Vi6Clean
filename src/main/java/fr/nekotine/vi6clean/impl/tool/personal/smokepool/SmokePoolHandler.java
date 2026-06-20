@@ -41,7 +41,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 
 	private final double SQUARED_RADIUS = RADIUS * RADIUS;
 
-	private final double PARTICLE_DENSITY = getConfiguration().getDouble("particle_density", 5);
+	private final double PARTICLE_DENSITY = getConfiguration().getDouble("particle_density", 2);
 
 	private final int DURATION_TICK = (int) (20 * getConfiguration().getDouble("duration", 8));
 
