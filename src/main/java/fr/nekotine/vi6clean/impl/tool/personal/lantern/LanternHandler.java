@@ -189,12 +189,14 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
 				SpatialUtil.circle2DDensity(1.5, 3, Math.random() * 6, (offsetX, offsetZ) -> {
 					for (var lantern : tool.displayedLanterns) {
+						var lanternScale = lantern.getTransformation().getScale();
+						var meanScale = (lanternScale.x() + lanternScale.y() + lanternScale.z()) / 3;
 						var loc = lantern.getLocation();
 						var x = loc.getX();
 						var y = loc.getY();
 						var z = loc.getZ();
-						lantern.getWorld().spawnParticle(Particle.FIREWORK, x + offsetX, y, z + offsetZ, 0, 0, 0, 0,
-								0f);
+						lantern.getWorld().spawnParticle(Particle.FIREWORK, x + offsetX * meanScale, y,
+								z + offsetZ * meanScale, 0, 0, 0, 0, 0f);
 					}
 				});
 			}

@@ -41,7 +41,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 
 	private final double SQUARED_RADIUS = RADIUS * RADIUS;
 
-	private final double PARTICLE_DENSITY = getConfiguration().getDouble("particle_density", 78.5398);
+	private final double PARTICLE_DENSITY = getConfiguration().getDouble("particle_density", 5);
 
 	private final int DURATION_TICK = (int) (20 * getConfiguration().getDouble("duration", 8));
 
@@ -64,7 +64,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 			// PARTICLE
 			if (tool.position != null) {
 				var l = tool.position.toLocation(owner.getWorld());
-				SpatialUtil.disk2DDensity(RADIUS, PARTICLE_DENSITY, (x, y) -> {
+				SpatialUtil.disk2DDensity(RADIUS * tool.scale, PARTICLE_DENSITY, (x, y) -> {
 					l.set(tool.position.getX() + x, tool.position.getY() - 1, tool.position.getZ() + y);
 					double maxy = l.getY() + 2.5;
 					while (l.getY() < maxy) {
@@ -88,7 +88,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 				var team = Ioc.resolve(WrappingModule.class).getWrapper(owner, PlayerWrapper.class).ourTeam();
 				var inRange = team
 						.stream().filter(enemy -> enemy.getLocation().toVector()
-								.distanceSquared(tool.position) <= SQUARED_RADIUS * tool.scale)
+								.distanceSquared(tool.position) <= SQUARED_RADIUS * tool.scale * tool.scale)
 						.collect(Collectors.toCollection(LinkedList::new));
 
 				var oldInRange = tool.inside;
@@ -124,7 +124,7 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 		var player = evt.getPlayer();
 		var item = evt.getItem();
 		var tool = getToolFromItem(item);
-		if (tool == null || statusModule.hasAny(player, EmpStatusFlag.get()) || player.getCooldown(item) <= 0) {
+		if (tool == null || statusModule.hasAny(player, EmpStatusFlag.get()) || player.hasCooldown(item)) {
 			return;
 		}
 
