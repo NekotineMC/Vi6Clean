@@ -100,7 +100,7 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 
 	@Override
 	public Key getModelKey() {
-		var keystring = getConfiguration().getString("koth.emp.model", "vi6clean:regenerator");
+		var keystring = getConfiguration().getString("koth.emp.model", "vi6clean:emp");
 		if (keystring == null) {
 			return null;
 		}
