@@ -34,6 +34,11 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 		EFFECT_MODULE = Ioc.resolve(StatusEffectModule.class);
 	}
 
+	private void leaveRange(Player player, AbyssalRelic tool) {
+		EFFECT_MODULE.removeEffect(player, EFFECT);
+		tool.enemiesInRange.remove(player);
+	}
+
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
@@ -49,8 +54,7 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 			var inside = tool.getOwner().getLocation().distanceSquared(evt.getTo()) <= RANGE * RANGE;
 			if (tool.enemiesInRange.contains(evt.getPlayer())) {
 				if (!inside) {
-					EFFECT_MODULE.removeEffect(evt.getPlayer(), EFFECT);
-					tool.enemiesInRange.remove(evt.getPlayer());
+					leaveRange(evt.getPlayer(), tool);
 				}
 			} else {
 				if (inside) {
@@ -67,6 +71,11 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 
 	@Override
 	protected void onDetachFromPlayer(AbyssalRelic tool) {
+		var it = tool.enemiesInRange.iterator();
+		while (it.hasNext()) {
+			var player = it.next();
+			leaveRange(player, tool);
+		}
 	}
 
 	@Override

@@ -67,6 +67,14 @@ public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
 
 	@Override
 	protected void onToolCleanup(Delimiter tool) {
+		if (!tool.placed) {
+			return;
+		}
+		var it = tool.cagePlayersInside.iterator();
+		while (it.hasNext()) {
+			var player = it.next();
+			leaveCageEffect(player, tool);
+		}
 	}
 
 	@EventHandler
