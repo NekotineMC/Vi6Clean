@@ -134,7 +134,7 @@ public class Artefact {
 		} else {
 			game.getWorld().spawnParticle(Particle.COMPOSTER, blockPosition.getX() + 0.5d, blockPosition.getY() + 0.5d,
 					blockPosition.getZ() + 0.5d, 2, 0.5, 0.5, 0.5);
-			int tickAdvancement = 0;
+			double tickAdvancement = 0;
 			boolean guardCanceling = false;
 			Player firstThief = null;
 			var guardMsg = Component.text(name, NamedTextColor.GOLD)
