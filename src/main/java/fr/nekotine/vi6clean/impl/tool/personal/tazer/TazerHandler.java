@@ -59,10 +59,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 		var player = evt.getPlayer();
 		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		var tool = getToolFromItem(evt.getItem());
-		if (tool == null
-				|| player.getCooldown(
-						NamespacedKey.fromString(getToolCode() + '/' + tool.getId(), Ioc.resolve(JavaPlugin.class))) > 0
-				|| statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
+		if (tool == null || player.hasCooldown(evt.getItem()) || statusFlagModule.hasAny(player, EmpStatusFlag.get())) {
 			return;
 		}
 		// SHOT
@@ -93,8 +90,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 		}
 		SpatialUtil.line3DFromDir(eyeLoc.toVector(), eyeLoc.getDirection(), range, 4,
 				(vec) -> world.spawnParticle(Particle.FIREWORK, vec.getX(), vec.getY(), vec.getZ(), 0, 0, 0, 0, 0f));
-		player.setCooldown(NamespacedKey.fromString(getToolCode() + '/' + tool.getId(), Ioc.resolve(JavaPlugin.class)),
-				COOLDOWN_TICK);
+		player.setCooldown(evt.getItem(), COOLDOWN_TICK);
 
 		evt.setCancelled(true);
 	}

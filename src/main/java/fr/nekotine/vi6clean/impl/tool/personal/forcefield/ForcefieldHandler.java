@@ -246,11 +246,11 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 
 	@Override
 	protected void onDetachFromPlayer(Forcefield tool) {
-	if(tool.getOwner() != null) {
-	for (var door : fieldsDisplay.keySet()) {
-		hideDoor(door, tool.getOwner());
-	}
-	}
+		if (tool.getOwner() != null) {
+			for (var door : fieldsDisplay.keySet()) {
+				hideDoor(door, tool.getOwner());
+			}
+		}
 	}
 
 	@Override
