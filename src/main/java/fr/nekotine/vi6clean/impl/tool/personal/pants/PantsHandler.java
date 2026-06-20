@@ -46,7 +46,7 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 	private final NamespacedKey ARMOR_REMOVE_ATTRIBUTE_KEY = NamespacedKey.fromString("pants/remove_armor",
 			Ioc.resolve(JavaPlugin.class));
 
-	private final double SNEAK_MULTIPLIER = getConfiguration().getDouble("sneak_multiplier", 2);
+	private final double SNEAK_MULTIPLIER = getConfiguration().getDouble("sneak_multiplier", 1.5);
 	private final double OFFSET = 0.65;
 
 	public PantsHandler() {

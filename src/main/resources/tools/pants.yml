@@ -2,7 +2,7 @@ display_name: <red>Sarouel
 price: 100
 amount_limit: 1
 shop_icon: LEATHER_LEGGINGS
-sneak_multiplier: 2
+sneak_multiplier: 1.5
 is_rune: false
 lore:
    - <lore>Vous vous déplacez <variable><sneak_multiplier></variable> fois plus vite
