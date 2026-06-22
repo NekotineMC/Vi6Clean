@@ -1,5 +1,9 @@
 package fr.nekotine.vi6clean.impl.map.koth.effect;
 
+import java.util.List;
+
+import org.bukkit.Material;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -16,18 +20,14 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
 import fr.nekotine.vi6clean.impl.status.effect.EmpStatusEffectType;
-import java.util.List;
-
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
-import org.bukkit.Material;
 
 @KothCode("emp")
 public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder {
-	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_other", 200);
-	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.emp.capture_amount_guard", 400);
+	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("capture_amount_other", 200);
+	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("capture_amount_guard", 400);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
 	private final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
 
@@ -96,14 +96,5 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<red>↓</red>" : "<green>↑</green>");
 
 		return List.of(Pair.from("status", status), Pair.from("power", power), Pair.from("evolution", evolution));
-	}
-
-	@Override
-	public Key getModelKey() {
-		var keystring = getConfiguration().getString("koth.emp.model", "vi6clean:emp");
-		if (keystring == null) {
-			return null;
-		}
-		return Key.key(keystring);
 	}
 }

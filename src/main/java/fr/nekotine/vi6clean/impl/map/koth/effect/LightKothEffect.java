@@ -24,7 +24,6 @@ import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
 import fr.nekotine.vi6clean.impl.status.effect.DarkenedStatusEffectType;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
@@ -34,8 +33,8 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 	private final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
 	private final PotionEffect unlimitedNightVision = new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 0, false,
 			false, false);
-	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.light.capture_amount_other", 200);
-	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.light.capture_amount_guard", 400);
+	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("capture_amount_other", 200);
+	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("capture_amount_guard", 400);
 	private final float SLOW_MULTIPLIER = (float) getConfiguration().getDouble("slowness", 0.8);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
 
@@ -116,14 +115,5 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<green>↑</green>" : "<red>↓</red>");
 
 		return List.of(Pair.from("status", status), Pair.from("power", power), Pair.from("evolution", evolution));
-	}
-
-	@Override
-	public Key getModelKey() {
-		var keystring = getConfiguration().getString("koth.light.model", "vi6clean:generator");
-		if (keystring == null) {
-			return null;
-		}
-		return Key.key(keystring);
 	}
 }

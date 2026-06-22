@@ -1,5 +1,10 @@
 package fr.nekotine.vi6clean.impl.map.koth.effect;
 
+import java.util.List;
+
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffectModule;
@@ -14,19 +19,14 @@ import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.impl.map.koth.Koth;
 import fr.nekotine.vi6clean.impl.map.koth.KothCode;
-import java.util.List;
-
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 
 @KothCode("regen")
 public class RegenKothEffect extends AbstractKothEffect implements TextPlaceholder {
-	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("koth.regen.capture_amount_other", 200);
-	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("koth.regen.capture_amount_guard", 400);
+	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("capture_amount_other", 200);
+	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("capture_amount_guard", 400);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
 	private final int REGEN_DELAY_TICKS = (int) (20 * getConfiguration().getDouble("delay_between_heal", 3.0));
 	private final double REGEN_AMOUNT = getConfiguration().getDouble("heal_amount", 1);
@@ -104,14 +104,5 @@ public class RegenKothEffect extends AbstractKothEffect implements TextPlacehold
 		var evolution = tickAdvancement == 0 ? "-" : (tickAdvancement > 0 ? "<red>↓</red>" : "<green>↑</green>");
 
 		return List.of(Pair.from("status", status), Pair.from("power", power), Pair.from("evolution", evolution));
-	}
-
-	@Override
-	public Key getModelKey() {
-		var keystring = getConfiguration().getString("koth.regen.model", "vi6clean:regenerator");
-		if (keystring == null) {
-			return null;
-		}
-		return Key.key(keystring);
 	}
 }
