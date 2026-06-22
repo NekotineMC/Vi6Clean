@@ -105,7 +105,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 		// load configuration
 		try {
-			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("replace_tool_configs", false)) {
+			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("override_config", false)) {
 				configuration = ConfigurationUtil.overrideAndLoadYaml("tools/" + toolCode + ".yml",
 						"/tools/" + toolCode + ".yml");
 			} else {

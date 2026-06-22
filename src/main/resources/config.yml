@@ -1,5 +1,3 @@
-update_url: 'https://github.com/XxGoldenbluexX/Vi6Clean/raw/master/build/Vi6Clean.jar'
-
 majordom.delay: 40 # Delai en tick
 
 koth.limit: 2
@@ -10,7 +8,7 @@ game_end_spectator_time: 5 # délais en secondes
 game_preparation_duration_seconds: 300 # délais en secondes
 game_infitration_lost_seconds: 300 # délais en secondes
 
-replace_tool_configs: false # Remplace les fichiers config des tools par celles du plugin (utile pour les développers)
+override_config: false # Remplace les fichiers config par celles du plugin (utile pour les développers)
 
 invisibility:
    step_distance: 0.5
