@@ -1,20 +1,10 @@
 package fr.nekotine.vi6clean.impl.tool.teamwide;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.Pair;
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.util.ItemStackUtil;
-import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
-import io.papermc.paper.util.Tick;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -23,6 +13,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.Pair;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import io.papermc.paper.util.Tick;
 
 public class GuardScanner {
 
@@ -45,6 +48,7 @@ public class GuardScanner {
 
 	public void scan() {
 		var pmanager = ProtocolLibrary.getProtocolManager();
+
 		var game = Ioc.resolve(Vi6Game.class);
 		var idList = new ArrayList<Integer>(game.getGuards().size());
 		for (var guard : game.getGuards()) {
