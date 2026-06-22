@@ -217,7 +217,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			var firstRune = runes.getFirst();
 			firstRune.tryBuy(wrappingModule.getWrapper(item, PreparationPhasePlayerWrapper.class));
 		}
-		item.playSound(Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.AMBIENT, 0.25f, 1),
+		item.playSound(
+				Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.AMBIENT, 0.25f, 1),
 				Sound.Emitter.self());
 	}
 
