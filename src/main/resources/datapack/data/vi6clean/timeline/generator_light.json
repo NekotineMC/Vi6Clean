@@ -19,24 +19,6 @@
       ],
       "modifier": "minimum"
     },
-	"minecraft:visual/sky_light_factor": {
-	  "ease": "constant",
-      "keyframes": [
-        {
-          "ticks": 0,
-          "value": 0.0
-        },
-		{
-          "ticks": 18001,
-          "value": 1.0
-        },
-		{
-          "ticks": 18002,
-          "value": 0.0
-        }
-      ],
-      "modifier": "maximum"
-    },
     "minecraft:visual/fog_color": {
 	  "ease": "constant",
       "keyframes": [
@@ -49,6 +31,24 @@
           "value": "#000000"
         },
 		{
+          "ticks": 18002,
+          "value": "#ffffff"
+        }
+      ],
+      "modifier": "multiply"
+    },
+    "minecraft:visual/sky_light_color": {
+      "ease": "constant",
+      "keyframes": [
+        {
+          "ticks": 0,
+          "value": "#ffffff"
+        },
+        {
+          "ticks": 18001,
+          "value": "#ff0000"
+        },
+        {
           "ticks": 18002,
           "value": "#ffffff"
         }
