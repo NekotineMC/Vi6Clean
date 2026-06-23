@@ -54,7 +54,7 @@ public class GuardScanner {
 		for (var guard : game.getGuards()) {
 			var ploc = guard.getLocation();
 			@SuppressWarnings("deprecation")
-			var eid = Bukkit.getUnsafe().nextEntityId();
+			var eid = Bukkit.getUnsafe().nextEntityId(game.getWorld());
 			idList.add(eid);
 
 			var createPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);

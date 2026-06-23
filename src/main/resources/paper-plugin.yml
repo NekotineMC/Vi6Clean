@@ -1,6 +1,6 @@
 name: Vi6Clean
 version: 1.0
-api-version: '1.21.11'
+api-version: '26.2'
 author: XxGoldenbluexX
 load: POSTWORLD
 main: fr.nekotine.vi6clean.Vi6Main
@@ -17,9 +17,9 @@ dependencies:
       join-classpath: true
     voicechat:
       load: BEFORE
-      required: true
+      required: false
       join-classpath: true
     Multiverse-Core:
       load: BEFORE
-      required: true
+      required: false
       join-classpath: true

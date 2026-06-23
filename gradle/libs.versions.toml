@@ -1,9 +1,9 @@
 [versions]
-paper = "1.21.11-rc3-R0.1-SNAPSHOT"
+paper = "26.2.build.+"
 protocollib = "5.4.0"
-commandapi = "11.1.1-SNAPSHOT"
+commandapi = "11.2.+"
 voicechat = "2.6.13"
-shadow = "9.4.1"
+shadow = "9.4.+"
 
 [libraries]
 paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }

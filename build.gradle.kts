@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(paperweight.paperDevBundle("26.1.2.build.+"))
+    compileOnly(paperweight.paperDevBundle("26.2.build.+"))
     compileOnly(libs.protocollib)
     compileOnly(libs.commandapi)
     implementation("fr.nekotine:NekotineCore:+")

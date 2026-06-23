@@ -113,9 +113,9 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		var loc = player.getLocation();
 		var pmanager = ProtocolLibrary.getProtocolManager();
 		@SuppressWarnings("deprecation")
-		var displayId = Bukkit.getUnsafe().nextEntityId();
+		var displayId = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 		@SuppressWarnings("deprecation")
-		var shulkerId = Bukkit.getUnsafe().nextEntityId();
+		var shulkerId = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 
 		tool.displayId = displayId;
 		tool.shulkerId = shulkerId;

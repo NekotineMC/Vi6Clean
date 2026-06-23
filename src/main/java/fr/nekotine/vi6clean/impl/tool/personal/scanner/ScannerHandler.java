@@ -145,7 +145,7 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 	private Pair<Integer, PacketContainer[]> makeScanCreationPackets(ProtocolManager pmanager, Player player) {
 		var scanLoc = player.getLocation();
 		@SuppressWarnings("deprecation")
-		var eid = Bukkit.getUnsafe().nextEntityId();
+		var eid = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 
 		var createPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 		var createInts = createPacket.getIntegers();

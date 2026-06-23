@@ -1,56 +1,51 @@
 package fr.nekotine.vi6clean.impl.tool.personal.trapwire;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Transformation;
+import org.bukkit.util.Vector;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffect;
+import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.effect.OmniCaptedStatusEffectType;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
-
-import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.FluidCollisionMode;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.util.Vector;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
+import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.phys.Vec3;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
-
 import net.minecraft.world.level.block.Blocks;
-
-import java.util.Set;
-
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.util.Transformation;
-import fr.nekotine.core.util.CustomAction;
-import fr.nekotine.core.util.EventUtil;
-
-import org.bukkit.event.player.PlayerMoveEvent;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.effect.StatusEffect;
-import fr.nekotine.core.status.effect.StatusEffectModule;
+import net.minecraft.world.phys.Vec3;
 
 @ToolCode("trapwire")
 public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
@@ -304,9 +299,10 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 
 	private void sendSpawnPackets(Player player, TrapWire tool, Vector p1, float yaw, float pitch, float distance) {
 		var connection = ((CraftPlayer) player).getHandle().connection;
-		var eid = Bukkit.getUnsafe().nextEntityId();
+		@SuppressWarnings("deprecation")
+		var eid = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 		var spawnPacket = new ClientboundAddEntityPacket(eid, UUID.randomUUID(), p1.getX(), p1.getY(), p1.getZ(), pitch,
-				yaw, EntityType.BLOCK_DISPLAY, 0, Vec3.ZERO, yaw);
+				yaw, EntityTypes.BLOCK_DISPLAY, 0, Vec3.ZERO, yaw);
 		var dataValues = List.of(
 				new SynchedEntityData.DataValue<>(11, EntityDataSerializers.VECTOR3,
 						new Vector3f(-0.025f, -0.025f, 0f)),
