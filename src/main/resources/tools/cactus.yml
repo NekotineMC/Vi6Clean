@@ -5,6 +5,7 @@ shop_icon: CACTUS
 damage: 2.0
 is_rune: false
 lore:
-   - <lore>Vous permet voir les gardes a proximité
+   - <lore>Lorsqu'un ennemi subit des dégâts, tous
+   - <lore>les autres en recoivent aussi <variable><damage></variable>
 team:
    - guard
