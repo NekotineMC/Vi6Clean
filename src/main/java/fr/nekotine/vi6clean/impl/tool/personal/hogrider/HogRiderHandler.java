@@ -130,21 +130,22 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 			if (!tool.riding)
 				continue;
 
-			tool.getOwner().getWorld().spawnParticle(tool.ridingMode.getParticle(),
-					tool.getOwner().getLocation().add(0, .1, 0), 5, .25, 0, .25, 0);
-			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
-				tool.getOwner().getWorld().playSound(
-						Sound.sound(Registry.SOUNDS.getKey(tool.ridingMode.getSound()), Source.BLOCK, 1, 0),
-						Sound.Emitter.self());
-
-			}
-
 			var steed = tool.steed;
 			if (!steed.isValid() || !steed.getPassengers().contains(tool.getOwner())
 					|| !tool.getOwner().hasCooldown(MATERIAL)) {
 				unride(tool);
 				continue;
 			}
+
+			tool.getOwner().getWorld().spawnParticle(tool.ridingMode.getParticle(),
+					tool.getOwner().getLocation().add(0, .1, 0), 5, .25, 0, .25, 0);
+			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
+				tool.getOwner().getWorld().playSound(
+						Sound.sound(Registry.SOUNDS.getKey(tool.ridingMode.getSound()), Source.NEUTRAL, 1, 1),
+						tool.steed);
+
+			}
+
 			var direction = tool.getOwner().getLocation().getDirection().setY(0);
 			if (direction.lengthSquared() > 0) {
 				direction.normalize();
