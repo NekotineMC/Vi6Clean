@@ -57,8 +57,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 			if (tool.regenTicked % DELAY_BETWEEN_HEALING_TICKS == 0 && owner.getHealth() < maxHealth
 					&& !flagModule.hasAny(owner, EmpStatusFlag.get())) {
 				owner.heal(REGENERATION_AMOUNT, RegainReason.MAGIC_REGEN);
-				owner.playSound(Sound.sound(Key.key("vi6clean:game.regenerate"), Sound.Source.VOICE, 1, 1),
-						Sound.Emitter.self());
+				owner.playSound(Sound.sound(Key.key("vi6clean:game.regenerate"), Sound.Source.VOICE, 1, 1), owner);
 			}
 			tool.regenTicked++;
 			if (tool.regenTicked >= REGEN_DURATION_TICKS) {

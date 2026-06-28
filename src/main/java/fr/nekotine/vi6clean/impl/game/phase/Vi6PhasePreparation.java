@@ -219,7 +219,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 		}
 		item.playSound(
 				Sound.sound(NamespacedKey.fromString("vi6clean:game.start_music"), Sound.Source.AMBIENT, 0.25f, 1),
-				Sound.Emitter.self());
+				item);
 	}
 
 	@Override

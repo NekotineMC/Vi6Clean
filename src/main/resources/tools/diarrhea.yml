@@ -2,12 +2,13 @@ display_name: <green>Diarrhée 5G
 price: 150
 amount_limit: 1
 shop_icon: SUSPICIOUS_STEW
-duration: 10
-cooldown: 130
+duration_use: 5
+duration_hit: 5
+cooldown: 125
 is_rune: false
 lore:
    - "<lore>Déclenchez une diarrhée explosive pendant"
-   - "<lore><variable><duration>s</variable> (<variable><cooldown>s</variable> cooldown)"
+   - "<lore><variable><duration_use>s</variable> (<variable><cooldown>s</variable> cooldown)"
    - "<lore><important>(Passif)</important> Frapper un voleur déclenche aussi une diarrhée"
    - "<lore>Sous diarhée, les voleurs laissent une trace"
    - "<lore>derrière eux quand ils se déplacent"

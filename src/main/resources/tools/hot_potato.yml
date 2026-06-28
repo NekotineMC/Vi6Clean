@@ -5,9 +5,11 @@ shop_icon: BAKED_POTATO
 damage: 2
 taz_duration: 2.0
 pickup_delay: 3.0
+velocity_multiplier: 4.0
 is_rune: false
 lore:
   - <lore>Obtenez une patate chaude à jeter au sol
+  - <lore>Vous lancez les patates <variable><velocity_multiplier>x</variable> plus loin
   - <lore>Si un voleur la récupère, il subit <variable><damage></variable> dégâts
   - <lore>Si un garde la récupère, il est tazé pendant <variable><taz_duration>s</variable>
   - <lore>Une fois ramassée, elle peut-être re-jetée par un ennemi !
