@@ -22,7 +22,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public class HotPotatoHandler extends ToolHandler<HotPotatoHandler.HotPotato> {
 	private final double DAMAGE = getConfiguration().getDouble("damage", 4);
 	private final double TAZ_DURATION = getConfiguration().getDouble("taz_duration", 4);
-	private final int PICKUP_DELAY_TICKS = (int) (20 * (getConfiguration().getDouble("pickup_delay", 3)));
+	// private final int PICKUP_DELAY_TICKS = (int) (20 *
+	// (getConfiguration().getDouble("pickup_delay", 3)));
+	private final double VELOCITY_MULTIPLIER = getConfiguration().getDouble("velocity_multiplier", 4);
 	private final StatusEffect TAZ_EFFECT = new StatusEffect(TazedStatusEffectType.get(), (int) (20 * TAZ_DURATION));
 	private final String MESSAGE_START = "<red>Vous avez récupéré la patate chaude d'un adversaire !";
 	private final String MESSAGE_END = "<aqua>Jetez-la pour infliger un sort similaire aux ennemis";
@@ -77,7 +79,9 @@ public class HotPotatoHandler extends ToolHandler<HotPotatoHandler.HotPotato> {
 	private void onItemDrop(PlayerDropItemEvent evt) {
 		var tool = getToolFromItem(evt.getItemDrop().getItemStack());
 		if (tool != null) {
-			evt.getItemDrop().setPickupDelay(PICKUP_DELAY_TICKS);
+			evt.getItemDrop().setVelocity(evt.getItemDrop().getVelocity().multiply(VELOCITY_MULTIPLIER));
+			evt.getItemDrop().setPickupDelay(20);
+			// evt.getItemDrop().setPickupDelay(PICKUP_DELAY_TICKS);
 		}
 	}
 
