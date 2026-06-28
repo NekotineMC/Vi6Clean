@@ -20,12 +20,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 
 @ToolCode("diarrhea")
 public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
-	private final double DURATION = getConfiguration().getDouble("duration", 10);
-	private final int DURATION_TICKS = (int) (20 * DURATION);
-	private final int COOLDOWN_TICKS = (int) (20 * getConfiguration().getDouble("cooldown", 10));
-	private final StatusEffect EFFECT = new StatusEffect(DiarrheaStatusEffectType.get(), DURATION_TICKS);
+	private final double DURATION_USE = getConfiguration().getDouble("duration_use", 5);
+	private final double DURATION_HIT = getConfiguration().getDouble("duration_hit", 5);
+	private final int DURATION_USE_TICKS = (int) (20 * DURATION_USE);
+	private final int DURATION_HIT_TICKS = (int) (20 * DURATION_HIT);
+	private final int COOLDOWN_TICKS = (int) (20 * getConfiguration().getDouble("cooldown", 120));
+	private final StatusEffect EFFECT_USE = new StatusEffect(DiarrheaStatusEffectType.get(), DURATION_USE_TICKS);
+	private final StatusEffect EFFECT_HIT = new StatusEffect(DiarrheaStatusEffectType.get(), DURATION_HIT_TICKS);
 	private final String MESSAGE = "<red>Le gouvernement contrôle votre corps grâce à la 5G<br>"
-			+ "Les ondes déclenchent une <b>diarhée fulgurante</b> pendant <aqua>" + DURATION + "s</aqua>";
+			+ "Les ondes déclenchent une <b>diarhée fulgurante</b> pendant <aqua>" + DURATION_USE + "s</aqua>";
 
 	public DiarrheaHandler() {
 		super(Diarrhea::new);
@@ -58,7 +61,7 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 			}
 			if (wrapO.get().enemyTeamInMap().anyMatch(p -> p.equals(evt.getEntity()))) {
 				var effectModule = Ioc.resolve(StatusEffectModule.class);
-				effectModule.addEffect((Player) evt.getEntity(), EFFECT);
+				effectModule.addEffect((Player) evt.getEntity(), EFFECT_HIT);
 			}
 		}
 	}
@@ -81,7 +84,7 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 			evt.setCancelled(true);
 			var effectModule = Ioc.resolve(StatusEffectModule.class);
 			wrapO.get().enemyTeamInMap().forEach(p -> {
-				effectModule.addEffect(p, EFFECT);
+				effectModule.addEffect(p, EFFECT_USE);
 				p.sendMessage(MiniMessage.miniMessage().deserialize(MESSAGE));
 			});
 			tool.getOwner().setCooldown(evt.getItem(), COOLDOWN_TICKS);
