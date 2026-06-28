@@ -377,11 +377,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		map.getKoths().values().stream().forEach(Koth::tick);
 		phaseDurationTicks++;
 		if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
-			int mod = phaseDurationTicks % (20 * 60);
 			int div = phaseDurationTicks / (20 * 60);
-			float exp = (float) mod / (20 * 60);
 			Ioc.resolve(Vi6Game.class).getPlayerList().forEach(p -> {
-				p.setExp(exp);
 				if (p.getLevel() != div) {
 					p.setLevel(div);
 				}
