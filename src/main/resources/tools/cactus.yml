@@ -2,7 +2,7 @@ display_name: Cactus
 price: 50
 amount_limit: 1
 shop_icon: CACTUS
-damage: 2.0
+damage: 1.0
 is_rune: false
 lore:
    - <lore>Lorsqu'un ennemi subit des dégâts, tous
