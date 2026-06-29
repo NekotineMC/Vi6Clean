@@ -284,6 +284,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			wrap.setCanLeaveMap(true);
 			wrap.updateMapLeaveBlocker();
 		}
+		item.resetPlayerTime();
 	}
 
 	@Override
