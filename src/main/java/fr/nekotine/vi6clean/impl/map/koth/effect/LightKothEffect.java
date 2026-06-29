@@ -56,6 +56,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 				// statusEffectModule.addEffect(guard, unlimitedDarkened);
 				// guard.addPotionEffect(unlimitedNightVision);
 				guard.setWalkSpeed(guard.getWalkSpeed() * SLOW_MULTIPLIER);
+				guard.setPlayerTime(DayTime.MIDNIGHT + 2, false);
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_GUARD_CAPTURE);
 			game.getGuards().sendTitlePart(TitlePart.TITLE,
@@ -71,6 +72,7 @@ public class LightKothEffect extends AbstractKothEffect implements TextPlacehold
 				// statusEffectModule.removeEffect(guard, unlimitedDarkened);
 				// guard.removePotionEffect(PotionEffectType.NIGHT_VISION);
 				guard.setWalkSpeed(guard.getWalkSpeed() / SLOW_MULTIPLIER);
+				guard.resetPlayerTime();
 			}
 			getKoth().setCaptureAmountNeeded(AMOUNT_FOR_OTHER_CAPTURE);
 			game.getThiefs().sendTitlePart(TitlePart.TITLE,

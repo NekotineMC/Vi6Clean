@@ -1,6 +1,16 @@
 {
   "period_ticks": 24000,
   "clock": "minecraft:overworld",
+  "time_markers": {
+      "vi6clean:generator_off_thief": {
+        "show_in_commands": true,
+        "ticks": 18001
+      },
+      "vi6clean:generator_off_guard": {
+        "show_in_commands": true,
+        "ticks": 18002
+      }
+    },
   "tracks": {
     "minecraft:visual/fog_end_distance": {
 	  "ease": "constant",
@@ -10,11 +20,11 @@
           "value": 1024.0
         },
         {
-          "ticks": 18001,
+          "ticks": 18002,
           "value": 16.0
         },
 		{
-          "ticks": 18002,
+          "ticks": 18003,
           "value": 1024.0
         }
       ],
@@ -32,7 +42,7 @@
           "value": "#000000"
         },
 		{
-          "ticks": 18002,
+          "ticks": 18003,
           "value": "#ffffff"
         }
       ],
@@ -50,7 +60,7 @@
           "value": "#000000"
         },
         {
-          "ticks": 18002,
+          "ticks": 18003,
           "value": "#ffffff"
         }
       ],
