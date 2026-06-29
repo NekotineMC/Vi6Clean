@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - 'ResourcePack/**'
+      - 'resourcepacks/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'ResourcePack/**'
+      - 'resourcepacks/**'
   workflow_dispatch:
     branches:
       - main
@@ -26,7 +26,7 @@ jobs:
     - name: List pack folders
       id: list
       run: |
-        folders=$(find ResourcePack -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
+        folders=$(find resourcepacks -mindepth 1 -maxdepth 1 -type d -printf '"%f",' | sed 's/,$//')
         echo "folders=[$folders]"
         echo "folders=[$folders]" >> "$GITHUB_OUTPUT"
   build:
@@ -41,7 +41,7 @@ jobs:
     - name: zip files
       uses: vimtor/action-zip@v1.3
       with:
-        files: "ResourcePack/${{ matrix.packname }}/"
+        files: "resourcepacks/${{ matrix.packname }}/"
         dest: "${{ matrix.packname }}.zip"
     - name: generate sha1 files
       run: |
