@@ -101,6 +101,7 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 				e.remove();
 			}
 		}
+		emitters.clear();
 	}
 
 	@Override
