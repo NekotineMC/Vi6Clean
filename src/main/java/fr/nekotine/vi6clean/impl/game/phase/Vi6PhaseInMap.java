@@ -11,6 +11,10 @@ import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.GameRules;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.block.Container;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Minecart;
@@ -79,6 +83,9 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	private final ComponentLogger logger = NekotineLogger.make();
 
 	private Vi6Map map;
+
+	private final NamespacedKey receptionAttributeKey = NamespacedKey.fromString("reception_range",
+			Ioc.resolve(JavaPlugin.class));
 
 	private Objective guardScoreboard;
 	// private final Team guardCountTeam =
@@ -273,6 +280,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();
 		}
+		item.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE)
+				.addModifier(new AttributeModifier(receptionAttributeKey, 1000, Operation.ADD_NUMBER));
 	}
 
 	@Override
@@ -285,6 +294,8 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			wrap.updateMapLeaveBlocker();
 		}
 		item.resetPlayerTime();
+		var attr = item.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE);
+		attr.removeModifier(receptionAttributeKey);
 	}
 
 	@Override

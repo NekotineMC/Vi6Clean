@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.parabolic_mic;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -13,13 +14,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
@@ -37,20 +38,28 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("parabolic_mic")
 public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.ParabolicMic> {
 
-	private final NamespacedKey receptionTrackingRangeAttributeKey = NamespacedKey
-			.fromString("parabolic_mic/reception_range", Ioc.resolve(JavaPlugin.class));
-
 	private final NamespacedKey transmitTrackingRangeAttributeKey = NamespacedKey
 			.fromString("parabolic_mic/transmit_range", Ioc.resolve(JavaPlugin.class));
+
+	private final NamespacedKey guardWaypointStyleKey = NamespacedKey.fromString("guard",
+			Ioc.resolve(JavaPlugin.class));
 
 	public ParabolicMicHandler() {
 		super(ParabolicMic::new);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 	}
 
-	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 20d);
+	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range");
 
 	private final Map<Player, ArmorStand> emitters = new HashMap<>();
+
+	private final Map<Player, Double> playerSpeedCache = new HashMap<>();
+
+	@EventHandler
+	private void onPlayerMove(PlayerMoveEvent evt) {
+		var player = evt.getPlayer();
+		playerSpeedCache.put(player, evt.getTo().distance(evt.getFrom()));
+	}
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
@@ -62,6 +71,8 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 						if (e instanceof ArmorStand stand) {
 							stand.setMarker(true);
 							stand.setInvisible(true);
+							stand.setWaypointStyle(guardWaypointStyleKey);
+							stand.setWaypointColor(Color.NAVY);
 						}
 						Ioc.resolve(WrappingModule.class).getWrapper(p, PlayerWrapper.class).enemyTeam().forEach(en -> {
 							en.showEntity(Ioc.resolve(JavaPlugin.class), e);
@@ -71,13 +82,11 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 			var attribute = emi.getAttribute(Attribute.WAYPOINT_TRANSMIT_RANGE);
 			attribute.removeModifier(transmitTrackingRangeAttributeKey);
 
-			var spd = player.getVelocity().length();
-			var range = DETECTION_BLOCK_RANGE;
+			var spd = playerSpeedCache.getOrDefault(player, 0d);
+			playerSpeedCache.put(player, 0d);
+			var range = spd > 0 ? DETECTION_BLOCK_RANGE : 0;
 			if (player.isSneaking()) {
 				range /= 2;
-			}
-			if (!EntityUtil.IsOnGround(player)) {
-				range = 0;
 			}
 
 			attribute
@@ -96,15 +105,10 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 
 	@Override
 	protected void onAttachedToPlayer(ParabolicMic tool) {
-		var player = tool.getOwner();
-		player.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE).addModifier(
-				new AttributeModifier(receptionTrackingRangeAttributeKey, DETECTION_BLOCK_RANGE, Operation.ADD_NUMBER));
 	}
 
 	@Override
 	protected void onDetachFromPlayer(ParabolicMic tool) {
-		var player = tool.getOwner();
-		player.getAttribute(Attribute.SCALE).removeModifier(receptionTrackingRangeAttributeKey);
 	}
 
 	@Override
@@ -118,7 +122,6 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 				item.setData(DataComponentTypes.ITEM_MODEL, Material.SCULK_SENSOR.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
-				p.getAttribute(Attribute.SCALE).removeModifier(receptionTrackingRangeAttributeKey);
 			});
 		}
 	}
@@ -129,8 +132,6 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName()));
-				p.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE).addModifier(new AttributeModifier(
-						receptionTrackingRangeAttributeKey, DETECTION_BLOCK_RANGE, Operation.ADD_NUMBER));
 			});
 		}
 	}
