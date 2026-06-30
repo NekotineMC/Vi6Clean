@@ -27,7 +27,7 @@ public class Vi6Bootstrapper extends NekotineCoreBootstrapper {
 	public void bootstrap(BootstrapContext context) {
 		super.bootstrap(context);
 
-		withEmbedDatapack(context, "/datapack", "provided"); // Ne pas changer l'ID
+		withEmbedDatapack(context, "/datapacks/vi6clean", "vi6clean"); // Ne pas changer l'ID
 
 		var lifecycle = context.getLifecycleManager();
 

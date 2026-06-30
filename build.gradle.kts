@@ -48,6 +48,12 @@ java {
     }
 }
 
+tasks.shadowJar {
+    from("./datapacks") {
+        into("datapacks")
+    }
+}
+
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     format("misc") {
         target("src/**/*.java", "*.gradle.kts")
