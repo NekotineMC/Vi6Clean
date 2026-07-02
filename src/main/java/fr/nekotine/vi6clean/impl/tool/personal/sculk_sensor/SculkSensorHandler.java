@@ -19,18 +19,27 @@ import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.block.tempblock.AppliedTempBlockPatch;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EntityUtil;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("sculk_sensor")
 public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSensor> {
@@ -55,11 +64,14 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
+		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
 		var tool = getToolFromItem(evt.getItem());
 		if (tool == null) {
 			return;
 		}
-		var player = evt.getPlayer();
 		var ploc = player.getLocation();
 		// TRY PLACE
 		if (EntityUtil.IsOnGround(player) && REPLACABLES.isTagged(ploc.getBlock().getType())) {
@@ -130,6 +142,27 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 		if (tool.patch != null) {
 			tool.patch.unpatch(false);
 			tool.patch = null;
+		}
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.CALIBRATED_SCULK_SENSOR.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
 		}
 	}
 

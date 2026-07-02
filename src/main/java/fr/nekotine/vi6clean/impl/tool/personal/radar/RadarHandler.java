@@ -128,7 +128,7 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 				}
 			}
 
-			if (evt.timeStampReached(TickTimeStamp.QuartSecond))
+			if (evt.timeStampReached(TickTimeStamp.QuartSecond)) {
 				if (tool.top != null) {
 					Location loc = tool.bottom.getLocation();
 					var x = loc.getX();
@@ -137,7 +137,8 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 					SpatialUtil.ball3DDensity(DETECTION_BLOCK_RANGE, 0.1f, SpatialUtil.SphereAlgorithm.FIBONACCI,
 							(offsetX, offsetY, offsetZ) -> loc.getWorld().spawnParticle(Particle.WITCH, x + offsetX,
 									y + offsetY, z + offsetZ, 1, 0, 0, 0, 0, null));
-				} else if (owner.isSneaking() && itemMatch(tool, owner.getInventory().getItemInMainHand())) {
+				} else if (owner != null && owner.isSneaking()
+						&& itemMatch(tool, owner.getInventory().getItemInMainHand())) {
 					Location loc = owner.getLocation();
 					var x = loc.getX();
 					var y = loc.getY();
@@ -146,11 +147,11 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 							(offsetX, offsetY, offsetZ) -> owner.spawnParticle(Particle.WITCH, x + offsetX, y + offsetY,
 									z + offsetZ, 1, 0, 0, 0, 0, null));
 				}
-			if (evt.timeStampReached(TickTimeStamp.Second)) {
-				if (tool.top != null) {
-					// Faire un son custom
-					Vi6Sound.RADAR_SCAN.play(tool.bottom.getWorld(), tool.bottom.getLocation());
-				}
+			}
+			if (evt.timeStampReached(TickTimeStamp.Second) && tool.top != null) {
+				// Faire un son custom
+				Vi6Sound.RADAR_SCAN.play(tool.bottom.getWorld(), tool.bottom.getLocation());
+
 			}
 		}
 	}
@@ -243,11 +244,11 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.REDSTONE_LAMP.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				p.setCooldown(item, COOLDOWN_TICK);
 				item.unsetData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
-				onToolCleanup(getToolFromItem(item));
 			});
 		}
 	}
@@ -256,6 +257,7 @@ public class RadarHandler extends ToolHandler<RadarHandler.Radar> {
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
 				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
 		}

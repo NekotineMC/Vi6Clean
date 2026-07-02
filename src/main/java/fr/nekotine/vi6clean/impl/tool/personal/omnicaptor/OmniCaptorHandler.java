@@ -73,11 +73,14 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
+		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
 		var tool = getToolFromItem(evt.getItem());
 		if (tool == null) {
 			return;
 		}
-		var player = evt.getPlayer();
 		// TRY PICKUP
 		var ploc = player.getLocation();
 		if (tool.placed != null) {
@@ -152,7 +155,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		var effectModule = Ioc.resolve(StatusEffectModule.class);
-		var flagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
 			if (owner == null) {
@@ -186,9 +188,6 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 					effectModule.removeEffect(p, unlimitedEffect);
 					ite.remove();
 				}
-			}
-			if (flagModule.hasAny(owner, EmpStatusFlag.get())) {
-				return;
 			}
 			for (var p : inRange) {
 				effectModule.addEffect(p, unlimitedEffect);
@@ -253,18 +252,10 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
-			var effectModule = Ioc.resolve(StatusEffectModule.class);
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
-				var tool = getToolFromItem(item);
-				var ite = tool.enemiesInRange.iterator();
-				while (ite.hasNext()) {
-					var target = ite.next();
-					effectModule.removeEffect(target, temporaryEffect);
-					effectModule.removeEffect(target, unlimitedEffect);
-					ite.remove();
-				}
 			});
 		}
 	}
@@ -273,12 +264,15 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
 				var tool = getToolFromItem(item);
 				if (tool.placed != null) {
+					// If placed, revert to the 'placed' model
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.LEVER.key());
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 							.append(Component.text("Placé", NamedTextColor.GRAY))));
 				} else {
+					// Otherwise, revert to the 'available' model
 					item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.OMNICAPTOR_ITEM_MODEL));
 					item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 							.append(Component.text("Disponible", NamedTextColor.BLUE))));

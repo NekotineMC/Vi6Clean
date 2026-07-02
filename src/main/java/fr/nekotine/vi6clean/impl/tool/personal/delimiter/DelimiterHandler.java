@@ -30,19 +30,26 @@ import org.joml.Vector3f;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.SpatialUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.impl.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("delimiter")
 public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
@@ -86,13 +93,14 @@ public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
 		if (tool == null) {
 			return;
 		}
+		var player = evt.getPlayer();
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
 			tool.mode = tool.mode.next();
 			updateItem(tool.mode, evt.getItem());
 			evt.setCancelled(true);
 		} else if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
-			var player = evt.getPlayer();
-			if (!tool.placed && !player.hasCooldown(evt.getItem())) {
+			if (!tool.placed && !player.hasCooldown(evt.getItem())
+					&& !Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
 				shoot(player, tool);
 				evt.setCancelled(true);
 			}
@@ -268,6 +276,27 @@ public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
 			tool.cagePlayersInside.clear();
 			tool.placed = false;
 		}, DURATION_TICKS);
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.SPAWNER.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				var tool = getToolFromItem(item);
+				updateItem(tool.mode, item);
+			});
+		}
 	}
 
 	private void updateItem(DelimiterMode mode, ItemStack item) {

@@ -123,7 +123,6 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
 			if (owner == null) {
@@ -184,13 +183,9 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 				}
 			}
 			for (var p : inRange) {
-				if (owner == null || !statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
-					statusEffectModule.addEffect(p, permanentGlowEffect);
-					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
-					if (owner != null) {
-						Vi6Sound.OMNICAPTEUR_DETECT.play(owner);
-					}
-				}
+				statusEffectModule.addEffect(p, permanentGlowEffect);
+				Vi6Sound.OMNICAPTEUR_DETECT.play(p);
+				Vi6Sound.OMNICAPTEUR_DETECT.play(owner);
 				oldInRange.add(p);
 			}
 		}
@@ -227,11 +222,7 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				var tool = getToolFromItem(item);
-				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.enemiesInRange) {
-					statusModule.removeEffect(victim, permanentGlowEffect);
-				}
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.GRAY_DYE.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
@@ -242,18 +233,10 @@ public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				var tool = getToolFromItem(item);
-				var statusModule = Ioc.resolve(StatusEffectModule.class);
-				for (var victim : tool.enemiesInRange) {
-					statusModule.addEffect(victim, permanentGlowEffect);
-					Vi6Sound.OMNICAPTEUR_DETECT.play(victim);
-				}
-				if (tool.enemiesInRange.size() > 0) {
-					Vi6Sound.OMNICAPTEUR_DETECT.play(p);
-				}
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName()));
-
-				if (NB_MAX_WATCHER - tool.watchers.size() > 0) {
+				var tool = getToolFromItem(item);
+				if (tool != null && NB_MAX_WATCHER - tool.watchers.size() > 0) {
 					item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				} else {
 					item.setData(DataComponentTypes.ITEM_MODEL, Material.ENDERMITE_SPAWN_EGG.key());

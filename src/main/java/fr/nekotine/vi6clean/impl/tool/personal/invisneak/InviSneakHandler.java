@@ -150,6 +150,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.GRAY_STAINED_GLASS_PANE.key());
 				getToolFromItem(item).setSneaking(false);
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
@@ -161,6 +162,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
 				var tool = getToolFromItem(item);
 				item.editMeta(m -> m.displayName(getDisplayName().append(Component.text(" - "))
 						.append(Component.text("Découvert", NamedTextColor.RED))));

@@ -52,7 +52,7 @@ public class DiarrheaStatusFlag implements StatusFlag, Listener {
 			if (!statusModule.hasAny(player, this)) {
 				continue;
 			}
-			player.getWorld().spawnParticle(Particle.DRAGON_BREATH, player.getLocation(), 2, .1, 0, .1);
+			player.getWorld().spawnParticle(Particle.DRAGON_BREATH, player.getLocation(), 2, .1, 0, .1, 0, 0f);
 		}
 	}
 }

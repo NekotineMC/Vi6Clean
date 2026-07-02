@@ -117,7 +117,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.IRON_INGOT.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.FLINT_AND_STEEL.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});

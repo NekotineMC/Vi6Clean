@@ -8,14 +8,24 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.DiarrheaStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import org.bukkit.Material;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 @ToolCode("diarrhea")
@@ -50,12 +60,14 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 
 	@EventHandler
 	private void onDamageEvent(EntityDamageByEntityEvent evt) {
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
-			if (!evt.getDamager().equals(tool.getOwner())) {
+			var owner = tool.getOwner();
+			if (!evt.getDamager().equals(owner) || statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
 				continue;
 			}
 			var wrappingModule = Ioc.resolve(WrappingModule.class);
-			var wrapO = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+			var wrapO = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
 			if (wrapO.isEmpty()) {
 				return;
 			}
@@ -72,12 +84,14 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 		if (tool == null) {
 			return;
 		}
-		if (tool.getOwner().hasCooldown(evt.getItem())) {
+		var owner = tool.getOwner();
+		if (owner.hasCooldown(evt.getItem())
+				|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get())) {
 			return;
 		}
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			var wrappingModule = Ioc.resolve(WrappingModule.class);
-			var wrapO = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+			var wrapO = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
 			if (wrapO.isEmpty()) {
 				return;
 			}
@@ -87,7 +101,28 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 				effectModule.addEffect(p, EFFECT_USE);
 				p.sendMessage(MiniMessage.miniMessage().deserialize(MESSAGE));
 			});
-			tool.getOwner().setCooldown(evt.getItem(), COOLDOWN_TICKS);
+			owner.setCooldown(evt.getItem(), COOLDOWN_TICKS);
+		}
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.MUSHROOM_STEW.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
 		}
 	}
 

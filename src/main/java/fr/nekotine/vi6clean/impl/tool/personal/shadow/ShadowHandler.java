@@ -215,7 +215,7 @@ public class ShadowHandler extends ToolHandler<ShadowHandler.Shadow> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.PLAYER_HEAD.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.SKELETON_SKULL.key());
 				item.setData(DataComponentTypes.PROFILE, JAMMED_PROFILE);
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));

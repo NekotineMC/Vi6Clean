@@ -55,7 +55,7 @@ public class SpeedHandler extends ToolHandler<SpeedHandler.SpeedBuff> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.NETHERITE_NAUTILUS_ARMOR.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.NAUTILUS_SHELL.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				onDetachFromPlayer(getToolFromItem(item));

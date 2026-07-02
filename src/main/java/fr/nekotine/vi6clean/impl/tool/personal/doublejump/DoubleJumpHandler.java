@@ -45,9 +45,13 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
 
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
+		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
-			if (evt.getPlayer().equals(owner) && !owner.getAllowFlight() && isOnGround(tool.getOwner())) {
+			if (player.equals(owner) && !owner.getAllowFlight() && isOnGround(tool.getOwner())) {
 				owner.setAllowFlight(true);
 				return;
 			}
@@ -58,6 +62,9 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
 	private void onPlayerToggleFlight(PlayerToggleFlightEvent evt) {
 		var player = evt.getPlayer();
 		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			player.setAllowFlight(false);
+			player.setFlying(false);
+			evt.setCancelled(true);
 			return;
 		}
 		if (InventoryUtil.containTaggedItem(player.getInventory(), TOOL_TYPE_KEY, getToolCode())) {
@@ -102,10 +109,12 @@ public class DoubleJumpHandler extends ToolHandler<DoubleJump> {
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
+			p.setAllowFlight(false);
+			p.setFlying(false);
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
 				var boots = p.getInventory().getBoots();
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.CHAINMAIL_BOOTS.key());
-				boots.setData(DataComponentTypes.ITEM_MODEL, Material.CHAINMAIL_BOOTS.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.LEATHER_BOOTS.key());
+				boots.setData(DataComponentTypes.ITEM_MODEL, Material.LEATHER_BOOTS.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				boots.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)

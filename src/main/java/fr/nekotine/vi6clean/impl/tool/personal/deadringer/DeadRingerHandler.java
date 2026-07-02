@@ -128,6 +128,7 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.COMPASS.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
@@ -138,6 +139,7 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Key.key(Vi6Keys.DEAD_RINGER_ITEM_MODEL));
 				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
 		}

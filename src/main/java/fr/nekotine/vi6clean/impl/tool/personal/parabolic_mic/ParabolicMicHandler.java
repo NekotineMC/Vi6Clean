@@ -19,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.InventoryUtil;
@@ -26,6 +27,7 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
@@ -63,6 +65,10 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		var statusModule = Ioc.resolve(StatusFlagModule.class);
+		var empFlag = EmpStatusFlag.get();
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var plugin = Ioc.resolve(JavaPlugin.class);
 		for (var player : Ioc.resolve(Vi6Game.class).getPlayerList()) {
 			var emi = emitters.computeIfAbsent(player, (p) -> (ArmorStand) p.getWorld().spawnEntity(p.getLocation(),
 					EntityType.ARMOR_STAND, SpawnReason.CUSTOM, e -> {
@@ -74,8 +80,10 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 							stand.setWaypointStyle(guardWaypointStyleKey);
 							stand.setWaypointColor(Color.NAVY);
 						}
-						Ioc.resolve(WrappingModule.class).getWrapper(p, PlayerWrapper.class).enemyTeam().forEach(en -> {
-							en.showEntity(Ioc.resolve(JavaPlugin.class), e);
+						wrappingModule.getWrapper(p, PlayerWrapper.class).enemyTeam().forEach(en -> {
+							if (!statusModule.hasAny(en, empFlag)) {
+								en.showEntity(plugin, e);
+							}
 						});
 					}));
 			emi.teleport(player);
@@ -120,10 +128,14 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.SCULK_SENSOR.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.SCULK.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
+			var plugin = Ioc.resolve(JavaPlugin.class);
+			for (var emi : emitters.values()) {
+				p.hideEntity(plugin, emi);
+			}
 		}
 	}
 
@@ -134,6 +146,15 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
+			var plugin = Ioc.resolve(JavaPlugin.class);
+			var wrappingModule = Ioc.resolve(WrappingModule.class);
+			for (var entry : emitters.entrySet()) {
+				var source = entry.getKey();
+				var emi = entry.getValue();
+				if (wrappingModule.getWrapper(source, PlayerWrapper.class).enemyTeam().contains(p)) {
+					p.showEntity(plugin, emi);
+				}
+			}
 		}
 	}
 

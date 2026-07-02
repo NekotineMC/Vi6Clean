@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -19,6 +20,7 @@ import org.joml.Vector3f;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
@@ -27,14 +29,22 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.map.artefact.Artefact;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 @ToolCode("warner")
@@ -71,6 +81,9 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
 		}
 
 		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
 		var tool = getToolFromItem(evt.getItem());
 		if (tool == null) {
 			return;
@@ -183,6 +196,27 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
 			tool.eye_item2 = null;
 		}
 		tool.watched = null;
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.FERMENTED_SPIDER_EYE.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
+		}
 	}
 
 	public static class Warner extends Tool {

@@ -287,7 +287,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.COAST_ARMOR_TRIM_SMITHING_TEMPLATE.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});

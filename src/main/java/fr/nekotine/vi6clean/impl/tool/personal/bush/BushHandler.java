@@ -14,6 +14,8 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.InvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
@@ -21,6 +23,7 @@ import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -99,8 +102,19 @@ public class BushHandler extends ToolHandler<Bush> {
 		var wrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(owner, PlayerWrapper.class);
 		if (wrap.isPresent()) {
 			revealed = wrap.get().enemyTeamInMap()
-					.anyMatch(e -> e.getLocation().distanceSquared(owner.getLocation()) <= DETECTION_RANGE_SQUARED)
-					|| Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
+					.anyMatch(e -> e.getLocation().distanceSquared(owner.getLocation()) <= DETECTION_RANGE_SQUARED);
+			var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+			var isEmped = Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get());
+			if (isEmped) {
+				editItem(tool, item -> {
+					item.setData(DataComponentTypes.ITEM_MODEL, Material.FERN.key());
+					item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+							.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+				});
+				statusEffectModule.removeEffect(owner, unlimitedInvisibility);
+				statusEffectModule.removeEffect(owner, fadeoffInvisibility);
+				return;
+			}
 		}
 		if (inBush != tool.isInBush() || revealed != tool.isRevealed()) {
 			// APPLY THE MATHCING STATEs
@@ -187,9 +201,30 @@ public class BushHandler extends ToolHandler<Bush> {
 		statusEffectModule.removeEffect(owner, fadeoffInvisibility);
 	}
 
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.FERN.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
+		}
+	}
+
 	@Override
 	protected ItemStack makeBaseItem() {
-		return ItemStackUtil.make(Material.TALL_GRASS, getDisplayName(), // .append(Component.text(" -
+		return ItemStackUtil.make(Material.TALL_GRASS, getDisplayName(), // .append(Component.text(" - ")
 				// ")).append(Component.text("Visible",
 				// NamedTextColor.WHITE)),
 				getLore());

@@ -8,20 +8,27 @@ import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.PlayerProfileUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ResolvableProfile;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.EvokerFangs;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -77,6 +84,9 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
 		var player = evt.getPlayer();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
 		if (!EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
@@ -88,6 +98,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 		if (tool.isPlaced()) {
 			if (player.getLocation().distanceSquared(tool.getLocation()) <= SQUARED_PICKUP_RANGE) {
 				tool.setLocation(null);
+				tool.setArmed(false);
 				onToolCleanup(tool);
 				editItem(tool, i -> {
 					i.setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile(ARMED_PLAYER_PROFILE));
@@ -121,9 +132,8 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
-		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		for (BearTrap tool : getTools()) {
-			if (!tool.isArmed() || statusFlagModule.hasAny(tool.getOwner(), EmpStatusFlag.get())) {
+			if (!tool.isArmed()) {
 				continue;
 			}
 			var player = evt.getPlayer();
@@ -152,6 +162,27 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 			if (dmg != null) {
 				evt.setDamage(dmg); // Fang damage is hardcoded in NMS
 			}
+		}
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.WITHER_SKELETON_SKULL.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
 		}
 	}
 

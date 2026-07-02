@@ -9,6 +9,7 @@ import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -18,13 +19,21 @@ import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("hogrider")
 public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
@@ -94,6 +103,10 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 		if (tool == null) {
 			return;
 		}
+		var owner = tool.getOwner();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get())) {
+			return;
+		}
 		evt.setCancelled(true);
 		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
 			switch (tool.mode) {
@@ -110,7 +123,7 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 		}
 
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
-			if (tool.getOwner().hasCooldown(evt.getItem())) {
+			if (owner.hasCooldown(evt.getItem())) {
 				if (tool.riding) {
 					unride(tool);
 				}
@@ -126,34 +139,61 @@ public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
 		for (var tool : getTools()) {
 			if (!tool.riding)
 				continue;
 
-			var steed = tool.steed;
-			if (!steed.isValid() || !steed.getPassengers().contains(tool.getOwner())
-					|| !tool.getOwner().hasCooldown(MATERIAL)) {
+			var owner = tool.getOwner();
+			if (owner == null || statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
 				unride(tool);
 				continue;
 			}
 
-			tool.getOwner().getWorld().spawnParticle(tool.ridingMode.getParticle(),
-					tool.getOwner().getLocation().add(0, .1, 0), 5, .25, 0, .25, 0);
+			var steed = tool.steed;
+			if (!steed.isValid() || !steed.getPassengers().contains(owner) || !owner.hasCooldown(MATERIAL)) {
+				unride(tool);
+				continue;
+			}
+
+			owner.getWorld().spawnParticle(tool.ridingMode.getParticle(), owner.getLocation().add(0, .1, 0), 5, .25, 0,
+					.25, 0);
 			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
-				tool.getOwner().getWorld().playSound(
+				owner.getWorld().playSound(
 						Sound.sound(Registry.SOUNDS.getKey(tool.ridingMode.getSound()), Source.NEUTRAL, 1, 1),
 						tool.steed);
 
 			}
 
-			var direction = tool.getOwner().getLocation().getDirection().setY(0);
+			var direction = owner.getLocation().getDirection().setY(0);
 			if (direction.lengthSquared() > 0) {
 				direction.normalize();
 			}
 			var velocity = direction.multiply(steed.getAttribute(Attribute.MOVEMENT_SPEED).getBaseValue())
 					.setY(steed.getVelocity().getY());
 			steed.setVelocity(velocity);
-			steed.setRotation(tool.getOwner().getLocation().getYaw(), tool.getOwner().getLocation().getPitch());
+			steed.setRotation(owner.getLocation().getYaw(), owner.getLocation().getPitch());
+		}
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.LEATHER.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				var tool = getToolFromItem(item);
+				editRideItem(tool.mode, item);
+			});
 		}
 	}
 

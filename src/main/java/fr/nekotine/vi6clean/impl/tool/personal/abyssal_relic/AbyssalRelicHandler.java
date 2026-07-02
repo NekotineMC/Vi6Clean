@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.tool.personal.abyssal_relic;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -12,14 +13,23 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.impl.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("abyssal_relic")
 public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.AbyssalRelic> {
@@ -42,24 +52,45 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 	@EventHandler
 	private void onPlayerMove(PlayerMoveEvent evt) {
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		var movingPlayer = evt.getPlayer();
 		for (var tool : getTools()) {
-			var opt = wrappingModule.getWrapperOptional(tool.getOwner(), PlayerWrapper.class);
+			var owner = tool.getOwner();
+			if (owner == null || statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
+				continue;
+			}
+			var opt = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
 			if (opt.isEmpty()) {
 				continue;
 			}
 			var wrapper = opt.get();
-			if (!wrapper.enemyTeamInMap().anyMatch(p -> p.equals(evt.getPlayer()))) {
-				continue;
-			}
-			var inside = tool.getOwner().getLocation().distanceSquared(evt.getTo()) <= RANGE * RANGE;
-			if (tool.enemiesInRange.contains(evt.getPlayer())) {
-				if (!inside) {
-					leaveRange(evt.getPlayer(), tool);
-				}
-			} else {
-				if (inside) {
-					EFFECT_MODULE.addEffect(evt.getPlayer(), EFFECT);
-					tool.enemiesInRange.add(evt.getPlayer());
+
+			if (movingPlayer.equals(owner)) {
+				var ownerLoc = evt.getTo();
+				wrapper.enemyTeamInMap().forEach(enemy -> {
+					var inside = ownerLoc.distanceSquared(enemy.getLocation()) <= RANGE * RANGE;
+					if (tool.enemiesInRange.contains(enemy)) {
+						if (!inside) {
+							leaveRange(enemy, tool);
+						}
+					} else {
+						if (inside) {
+							EFFECT_MODULE.addEffect(enemy, EFFECT);
+							tool.enemiesInRange.add(enemy);
+						}
+					}
+				});
+			} else if (wrapper.enemyTeamInMap().anyMatch(p -> p.equals(movingPlayer))) {
+				var inside = owner.getLocation().distanceSquared(evt.getTo()) <= RANGE * RANGE;
+				if (tool.enemiesInRange.contains(movingPlayer)) {
+					if (!inside) {
+						leaveRange(movingPlayer, tool);
+					}
+				} else {
+					if (inside) {
+						EFFECT_MODULE.addEffect(movingPlayer, EFFECT);
+						tool.enemiesInRange.add(movingPlayer);
+					}
 				}
 			}
 		}
@@ -74,12 +105,67 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 		var it = tool.enemiesInRange.iterator();
 		while (it.hasNext()) {
 			var player = it.next();
-			leaveRange(player, tool);
+			EFFECT_MODULE.removeEffect(player, EFFECT);
 		}
+		tool.enemiesInRange.clear();
 	}
 
 	@Override
 	protected void onToolCleanup(AbyssalRelic tool) {
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.ALLAY_SPAWN_EGG.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+		for (var tool : getTools()) {
+			if (evt.getEntity().equals(tool.getOwner())) {
+				var it = tool.enemiesInRange.iterator();
+				while (it.hasNext()) {
+					var player = it.next();
+					EFFECT_MODULE.removeEffect(player, EFFECT);
+				}
+				tool.enemiesInRange.clear();
+			}
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
+		}
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		for (var tool : getTools()) {
+			var owner = tool.getOwner();
+			if (evt.getEntity().equals(owner)) {
+				if (statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
+					continue;
+				}
+				var opt = wrappingModule.getWrapperOptional(owner, PlayerWrapper.class);
+				if (opt.isEmpty()) {
+					continue;
+				}
+				var wrapper = opt.get();
+				var ownerLoc = owner.getLocation();
+				wrapper.enemyTeamInMap().forEach(enemy -> {
+					var inside = ownerLoc.distanceSquared(enemy.getLocation()) <= RANGE * RANGE;
+					if (inside) {
+						EFFECT_MODULE.addEffect(enemy, EFFECT);
+						tool.enemiesInRange.add(enemy);
+					}
+				});
+			}
+		}
 	}
 
 	@EventHandler

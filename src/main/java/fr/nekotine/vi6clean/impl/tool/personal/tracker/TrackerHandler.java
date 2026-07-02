@@ -157,7 +157,7 @@ public class TrackerHandler extends ToolHandler<TrackerHandler.Tracker> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.RECOVERY_COMPASS.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.BOW.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				item.unsetData(DataComponentTypes.LODESTONE_TRACKER);

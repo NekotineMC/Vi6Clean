@@ -33,6 +33,7 @@ import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.util.Tick;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -171,7 +172,7 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				// item.setData(DataComponentTypes.ITEM_MODEL, Material.QUARTZ_PILLAR.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.FLOWERING_AZALEA_LEAVES.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 			});
@@ -182,7 +183,7 @@ public class ScoutHandler extends ToolHandler<ScoutHandler.Scout> {
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				// item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				item.editMeta(m -> m.displayName(getDisplayName()));
 			});
 		}

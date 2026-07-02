@@ -15,11 +15,16 @@ import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.TimeUtil;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.InvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.util.Tick;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("dephaser")
 public class DephaserHandler extends ToolHandler<Dephaser> {
@@ -31,8 +36,6 @@ public class DephaserHandler extends ToolHandler<Dephaser> {
 			.fromDuration(TimeUtil.fromSeconds(getConfiguration().getDouble("inv_duration", 2)));
 
 	private final int DELAY_BETWEEN_WARNING_SOUND = Tick.tick().fromDuration(TimeUtil.fromSeconds(0.5));
-
-	private int count = DELAY_BETWEEN_INVISIBILITY_TICKS;
 
 	private final StatusEffect effect = new StatusEffect(InvisibilityStatusEffectType.get(),
 			INVISIBILITY_DURATION_TICKS);
@@ -46,60 +49,77 @@ public class DephaserHandler extends ToolHandler<Dephaser> {
 
 	@EventHandler
 	public void onTick(TickElapsedEvent evt) {
-		count--;
-		if (count == DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS + DELAY_BETWEEN_WARNING_SOUND * 2) {
-			getTools().stream().filter(t -> t.isActive())
-					.forEach(t -> Vi6Sound.DEPHASER_WARNING_HIGH.play(t.getOwner()));
-			return;
-		}
-		if (count == DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS + DELAY_BETWEEN_WARNING_SOUND) {
-			getTools().stream().filter(t -> t.isActive())
-					.forEach(t -> Vi6Sound.DEPHASER_WARNING_MID.play(t.getOwner()));
-			return;
-		}
-		if (count == DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS) {
-			getTools().stream().filter(t -> t.isActive()).forEach(t -> deactivate(t));
-			return;
-		}
-		if (count == DELAY_BETWEEN_WARNING_SOUND * 2) {
-			getTools().forEach(t -> Vi6Sound.DEPHASER_WARNING_LOW.play(t.getOwner()));
-			return;
-		}
-		if (count == DELAY_BETWEEN_WARNING_SOUND) {
-			getTools().forEach(t -> Vi6Sound.DEPHASER_WARNING_MID.play(t.getOwner()));
-			return;
-		}
-		if (count == 0) {
-			getTools().forEach(t -> activate(t));
-			count = DELAY_BETWEEN_INVISIBILITY_TICKS;
-			return;
+		var flagModule = Ioc.resolve(StatusFlagModule.class);
+		var empFlag = EmpStatusFlag.get();
+		for (var tool : getTools()) {
+			var player = tool.getOwner();
+			if (player == null) {
+				continue;
+			}
+			int cd = player.getCooldown(Material.IRON_NUGGET);
+			if (tool.isActive()) {
+				if (flagModule.hasAny(player, empFlag)) {
+					deactivate(tool, false);
+					player.setCooldown(Material.IRON_NUGGET,
+							DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS);
+					continue;
+				}
+				if (cd == DELAY_BETWEEN_WARNING_SOUND * 2) {
+					Vi6Sound.DEPHASER_WARNING_HIGH.play(player);
+				} else if (cd == DELAY_BETWEEN_WARNING_SOUND) {
+					Vi6Sound.DEPHASER_WARNING_MID.play(player);
+				} else if (cd == 0) {
+					deactivate(tool, true);
+				}
+			} else {
+				if (cd == DELAY_BETWEEN_WARNING_SOUND * 2) {
+					if (!flagModule.hasAny(player, empFlag)) {
+						Vi6Sound.DEPHASER_WARNING_LOW.play(player);
+					}
+				} else if (cd == DELAY_BETWEEN_WARNING_SOUND) {
+					if (!flagModule.hasAny(player, empFlag)) {
+						Vi6Sound.DEPHASER_WARNING_MID.play(player);
+					}
+				} else if (cd == 0) {
+					activate(tool);
+				}
+			}
 		}
 	}
 
 	private void activate(Dephaser tool) {
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(tool.getOwner(), EmpStatusFlag.get())) {
+		var player = tool.getOwner();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			player.setCooldown(Material.IRON_NUGGET, DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS);
 			return;
 		}
-		Ioc.resolve(StatusEffectModule.class).addEffect(tool.getOwner(), effect);
-		Vi6Sound.DEPHASER_ACTIVATE.play(tool.getOwner());
-		tool.getOwner().setCooldown(Material.IRON_NUGGET, INVISIBILITY_DURATION_TICKS);
+		Ioc.resolve(StatusEffectModule.class).addEffect(player, effect);
+		Vi6Sound.DEPHASER_ACTIVATE.play(player);
+		player.setCooldown(Material.IRON_NUGGET, INVISIBILITY_DURATION_TICKS);
 		tool.setActive(true);
 	}
 
-	private void deactivate(Dephaser tool) {
-		Ioc.resolve(StatusEffectModule.class).removeEffect(tool.getOwner(), effect);
-		Vi6Sound.DEPHASER_DEACTIVATE.play(tool.getOwner());
-		tool.getOwner().setCooldown(Material.IRON_NUGGET, count);
+	private void deactivate(Dephaser tool, boolean playSoundAndCooldown) {
+		var player = tool.getOwner();
+		Ioc.resolve(StatusEffectModule.class).removeEffect(player, effect);
+		if (playSoundAndCooldown) {
+			Vi6Sound.DEPHASER_DEACTIVATE.play(player);
+			player.setCooldown(Material.IRON_NUGGET, DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS);
+		}
 		tool.setActive(false);
 	}
 
 	@Override
 	protected void onAttachedToPlayer(Dephaser tool) {
+		if (tool.getOwner().getCooldown(Material.IRON_NUGGET) <= 0) {
+			tool.getOwner().setCooldown(Material.IRON_NUGGET,
+					DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS);
+		}
 	}
 
 	@Override
 	protected void onDetachFromPlayer(Dephaser tool) {
-		deactivate(tool);
+		deactivate(tool, false);
 	}
 
 	@Override
@@ -109,9 +129,26 @@ public class DephaserHandler extends ToolHandler<Dephaser> {
 	@EventHandler
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
-			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).stream()
-					.map(this::getToolFromItem).filter(t -> t != null && t.getOwner() != null)
-					.forEach(this::deactivate);
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.GOLD_NUGGET.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+				var tool = getToolFromItem(item);
+				if (tool != null && tool.isActive()) {
+					deactivate(tool, false);
+					p.setCooldown(Material.IRON_NUGGET, DELAY_BETWEEN_INVISIBILITY_TICKS - INVISIBILITY_DURATION_TICKS);
+				}
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
 		}
 	}
 }

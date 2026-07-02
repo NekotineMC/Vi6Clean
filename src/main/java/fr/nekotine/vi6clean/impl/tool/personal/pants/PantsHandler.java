@@ -1,6 +1,5 @@
 package fr.nekotine.vi6clean.impl.tool.personal.pants;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +11,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Pose;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -20,23 +19,36 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.wrappers.WrappedDataValue;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.phys.Vec3;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
 import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.ItemStackUtil;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
-import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.phys.Vec3;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("pants")
 public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
@@ -90,6 +102,10 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		if (tool == null) {
 			return;
 		}
+		var owner = tool.getOwner();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get())) {
+			return;
+		}
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			if (tool.crawling) {
 				stand(tool);
@@ -99,19 +115,48 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		}
 	}
 
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.CHAINMAIL_LEGGINGS.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+				var tool = getToolFromItem(item);
+				if (tool.crawling) {
+					stand(tool);
+				}
+				p.getAttribute(Attribute.SNEAKING_SPEED).removeModifier(SNEAK_ATTRIBUTE_KEY);
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+				p.getAttribute(Attribute.SNEAKING_SPEED).addModifier(
+						new AttributeModifier(SNEAK_ATTRIBUTE_KEY, SNEAK_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+			});
+		}
+	}
+
 	private void crawl(Pants tool) {
 		tool.crawling = true;
-		tool.getOwner().setSprinting(false);
-		tool.getOwner().setPose(Pose.SWIMMING, true);
+		var player = tool.getOwner();
+		player.setSprinting(false);
+		player.setPose(Pose.SWIMMING, true);
 
 		editItem(tool, item -> {
 			item.setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
-			tool.getOwner().getInventory().getLeggings().setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+			player.getInventory().getLeggings().setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
 		});
 
-		var player = tool.getOwner();
 		var loc = player.getLocation();
-		var pmanager = ProtocolLibrary.getProtocolManager();
+		var nmsPlayer = ((CraftPlayer) player).getHandle();
+		var connection = nmsPlayer.connection;
 		@SuppressWarnings("deprecation")
 		var displayId = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 		@SuppressWarnings("deprecation")
@@ -121,51 +166,47 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		tool.shulkerId = shulkerId;
 
 		// Spawn Display
-		var spawnDisplayPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-		spawnDisplayPacket.getIntegers().write(0, displayId);
-		spawnDisplayPacket.getUUIDs().write(0, UUID.randomUUID());
-		spawnDisplayPacket.getEntityTypeModifier().write(0, EntityType.ITEM_DISPLAY);
-		spawnDisplayPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY() + OFFSET).write(2, loc.getZ());
+		var spawnDisplayPacket = new ClientboundAddEntityPacket(displayId, UUID.randomUUID(), loc.getX(),
+				loc.getY() + OFFSET, loc.getZ(), 0, 0, EntityTypes.ITEM_DISPLAY, 0, Vec3.ZERO, 0);
 
 		// Spawn Shulker
-		var spawnShulkerPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-		spawnShulkerPacket.getIntegers().write(0, shulkerId);
-		spawnShulkerPacket.getUUIDs().write(0, UUID.randomUUID());
-		spawnShulkerPacket.getEntityTypeModifier().write(0, EntityType.SHULKER);
-		spawnShulkerPacket.getDoubles().write(0, loc.getX()).write(1, loc.getY() + OFFSET).write(2, loc.getZ());
-
-		var byteSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Byte.class);
-		var boolSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Boolean.class);
-		var intSerializer = WrappedDataWatcher.Registry.get((java.lang.reflect.Type) Integer.class);
+		var spawnShulkerPacket = new ClientboundAddEntityPacket(shulkerId, UUID.randomUUID(), loc.getX(),
+				loc.getY() + OFFSET, loc.getZ(), 0, 0, EntityTypes.SHULKER, 0, Vec3.ZERO, 0);
 
 		// Metadata Display
-		var metadataDisplayPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-		metadataDisplayPacket.getIntegers().write(0, displayId);
-		var dataDisplayValues = new ArrayList<WrappedDataValue>();
-		dataDisplayValues.add(new WrappedDataValue(0, byteSerializer, (byte) 0x20)); // Invisible
-		dataDisplayValues.add(new WrappedDataValue(10, intSerializer, 0)); // teleport_duration
-		metadataDisplayPacket.getDataValueCollectionModifier().write(0, dataDisplayValues);
+		List<SynchedEntityData.DataValue<?>> dataDisplayValues = List.of(
+				new SynchedEntityData.DataValue<>(0, EntityDataSerializers.BYTE, (byte) 0x20), // Invisible
+				new SynchedEntityData.DataValue<>(10, EntityDataSerializers.INT, 0) // teleport_duration
+		);
+		var metadataDisplayPacket = new ClientboundSetEntityDataPacket(displayId, dataDisplayValues);
 
 		// Metadata Shulker
-		var metadataShulkerPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
-		metadataShulkerPacket.getIntegers().write(0, shulkerId);
-		var dataShulkerValues = new ArrayList<WrappedDataValue>();
-		dataShulkerValues.add(new WrappedDataValue(0, byteSerializer, (byte) 0x20)); // Invisible
-		dataShulkerValues.add(new WrappedDataValue(4, boolSerializer, true)); // Silent
-		dataShulkerValues.add(new WrappedDataValue(5, boolSerializer, true)); // No Gravity
-		dataShulkerValues.add(new WrappedDataValue(15, byteSerializer, (byte) 0x01)); // No AI
-		metadataShulkerPacket.getDataValueCollectionModifier().write(0, dataShulkerValues);
+		List<SynchedEntityData.DataValue<?>> dataShulkerValues = List.of(
+				new SynchedEntityData.DataValue<>(0, EntityDataSerializers.BYTE, (byte) 0x20), // Invisible
+				new SynchedEntityData.DataValue<>(4, EntityDataSerializers.BOOLEAN, true), // Silent
+				new SynchedEntityData.DataValue<>(5, EntityDataSerializers.BOOLEAN, true), // No Gravity
+				new SynchedEntityData.DataValue<>(15, EntityDataSerializers.BYTE, (byte) 0x01) // No AI
+		);
+		var metadataShulkerPacket = new ClientboundSetEntityDataPacket(shulkerId, dataShulkerValues);
 
 		// Mount Shulker to Display
-		var passengerPacket = pmanager.createPacket(PacketType.Play.Server.MOUNT);
-		passengerPacket.getIntegers().write(0, displayId);
-		passengerPacket.getIntegerArrays().write(0, new int[]{shulkerId});
+		ClientboundSetPassengersPacket passengerPacket;
+		try {
+			var constructor = ClientboundSetPassengersPacket.class.getDeclaredConstructor(FriendlyByteBuf.class);
+			constructor.setAccessible(true);
+			var buf = new FriendlyByteBuf(Unpooled.buffer());
+			buf.writeVarInt(displayId);
+			buf.writeVarIntArray(new int[]{shulkerId});
+			passengerPacket = constructor.newInstance(buf);
+		} catch (Exception e) {
+			throw new RuntimeException("Could not create ClientboundSetPassengersPacket", e);
+		}
 
-		pmanager.sendServerPacket(player, spawnDisplayPacket);
-		pmanager.sendServerPacket(player, spawnShulkerPacket);
-		pmanager.sendServerPacket(player, metadataDisplayPacket);
-		pmanager.sendServerPacket(player, metadataShulkerPacket);
-		pmanager.sendServerPacket(player, passengerPacket);
+		connection.send(spawnDisplayPacket);
+		connection.send(spawnShulkerPacket);
+		connection.send(metadataDisplayPacket);
+		connection.send(metadataShulkerPacket);
+		connection.send(passengerPacket);
 	}
 
 	private void stand(Pants tool) {
@@ -179,10 +220,10 @@ public class PantsHandler extends ToolHandler<PantsHandler.Pants> {
 		var player = tool.getOwner();
 		player.setPose(Pose.STANDING);
 		if (tool.shulkerId != -1 || tool.displayId != -1) {
-			var pmanager = ProtocolLibrary.getProtocolManager();
-			var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-			destroyPacket.getIntLists().write(0, List.of(tool.shulkerId, tool.displayId));
-			pmanager.sendServerPacket(player, destroyPacket);
+			var nmsPlayer = ((CraftPlayer) player).getHandle();
+			var connection = nmsPlayer.connection;
+			var destroyPacket = new ClientboundRemoveEntitiesPacket(tool.shulkerId, tool.displayId);
+			connection.send(destroyPacket);
 			tool.shulkerId = -1;
 			tool.displayId = -1;
 		}

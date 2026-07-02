@@ -25,10 +25,18 @@ import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.vi6clean.Vi6Main;
 import fr.nekotine.vi6clean.impl.game.Vi6Game;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.impl.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.impl.tool.Tool;
 import fr.nekotine.vi6clean.impl.tool.ToolCode;
 import fr.nekotine.vi6clean.impl.tool.ToolHandler;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 @ToolCode("forcefield")
 public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield> {
@@ -79,6 +87,9 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(evt.getPlayer(), EmpStatusFlag.get())) {
+			return;
+		}
 		var tool = getToolFromItem(evt.getItem());
 		if (tool == null) {
 			return;
@@ -105,7 +116,8 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 			}
 			var inv = owner.getInventory();
 
-			if (itemMatch(tool, inv.getItemInMainHand()) || itemMatch(tool, inv.getItemInOffHand())) {
+			if (!Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get())
+					&& (itemMatch(tool, inv.getItemInMainHand()) || itemMatch(tool, inv.getItemInOffHand()))) {
 				for (var door : fieldsDisplay.keySet()) {
 					displayDoor(door, owner);
 				}
@@ -116,18 +128,6 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 			}
 		}
 
-		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
-		if (Ioc.resolve(Vi6Game.class).getGuards().stream()
-				.filter(guard -> InventoryUtil.containTaggedItem(guard.getInventory(), TOOL_TYPE_KEY, getToolCode()))
-				.allMatch(guard -> statusFlagModule.hasAny(guard, EmpStatusFlag.get()))) {
-			for (var doorKey : fieldsDisplay.keySet()) {
-				var door = fieldsDisplay.get(doorKey);
-				if (door.activated && !door.playerOpened) {
-					openField(doorKey);
-				}
-			}
-			return;
-		}
 		var gates = Ioc.resolve(Vi6Map.class).getGates();
 		for (var doorKey : fieldsDisplay.keySet()) {
 			var door = fieldsDisplay.get(doorKey);
@@ -255,6 +255,27 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 
 	@Override
 	protected void onToolCleanup(Forcefield tool) {
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.WHITE_STAINED_GLASS.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpStop(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL);
+				item.editMeta(m -> m.displayName(getDisplayName()));
+			});
+		}
 	}
 
 	public static class Forcefield extends Tool {

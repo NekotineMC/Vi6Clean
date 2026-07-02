@@ -113,6 +113,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.SOUL_CAMPFIRE.key());
 				var tool = getToolFromItem(item);
 				editItem(tool, i -> {
 					i.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
@@ -126,6 +127,7 @@ public class RegeneratorHandler extends ToolHandler<RegeneratorHandler.Regenerat
 	private void onEmpStop(EntityEmpEndEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.resetData(DataComponentTypes.ITEM_MODEL); // back to default model
 				var tool = getToolFromItem(item);
 				editItem(tool, i -> {
 					i.editMeta(m -> m.displayName(getDisplayName()));

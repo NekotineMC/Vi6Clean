@@ -70,7 +70,7 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier> {
 	private void onEmpStart(EntityEmpStartEvent evt) {
 		if (evt.getEntity() instanceof Player p) {
 			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
-				item.setData(DataComponentTypes.ITEM_MODEL, Material.COPPER_GOLEM_STATUE.key());
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.WEATHERED_COPPER_GOLEM_STATUE.key());
 				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
 						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
 				onDetachFromPlayer(getToolFromItem(item));
