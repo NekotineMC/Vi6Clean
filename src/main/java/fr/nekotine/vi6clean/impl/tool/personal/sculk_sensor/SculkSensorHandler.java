@@ -116,7 +116,7 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 		}
 		for (var tool : getTools()) {
 			var owner = tool.getOwner();
-			if (owner != null && owner.isSneaking()) {
+			if (owner != null && owner.isSneaking() && itemMatch(tool, owner.getInventory().getItemInMainHand())) {
 				// Low tick
 				var loc = owner.getLocation();
 				var x = loc.getX();
