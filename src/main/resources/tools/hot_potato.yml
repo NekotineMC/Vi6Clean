@@ -4,8 +4,7 @@ amount_limit: -1
 shop_icon: BAKED_POTATO
 damage: 2
 taz_duration: 2.0
-pickup_delay: 3.0
-velocity_multiplier: 4.0
+velocity_multiplier: 1.5
 is_rune: false
 lore:
   - <lore>Obtenez une patate chaude à jeter au sol
