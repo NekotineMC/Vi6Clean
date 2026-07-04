@@ -63,7 +63,7 @@ public class PortableTeleporterHandler extends ToolHandler<PortableTeleporterHan
 
 	private final int CHARGES = getConfiguration().getInt("teleportation_charges", 3);
 
-	private final int DELAY_TICK = (int) (20 * getConfiguration().getDouble("teleportation_delay", 3));
+	private final int DELAY_TICK = (int) (20 * getConfiguration().getDouble("teleportation_delay", 2));
 
 	private final int COOLDOWN_TICK = (int) (20 * getConfiguration().getDouble("teleportation_cooldown", 8));
 
