@@ -1,13 +1,13 @@
 package fr.nekotine.vi6clean.impl.tool.personal.scanner;
 
-import java.util.List;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,9 +16,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.Pair;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.tuple.Pair;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
@@ -35,14 +42,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.phys.Vec3;
 
 @ToolCode("scanner")
 public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
@@ -79,6 +78,7 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 	}
 
 	public void performScan() {
+		var pmanager = ProtocolLibrary.getProtocolManager();
 		var game = Ioc.resolve(Vi6Game.class);
 		var wrappingModule = Ioc.resolve(WrappingModule.class);
 		var guardOwners = getTools().stream().filter(t -> t.getOwner() != null).map(Tool::getOwner).filter(p -> {
@@ -99,12 +99,11 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 		if (guardOwners.size() > 0) {
 			var thiefScansIds = new LinkedList<Integer>();
 			for (var thief : game.getThiefs()) {
-				var scanInfo = makeScanCreationPackets(thief);
-				thiefScansIds.add(scanInfo.a());
+				var scanInfo = makeScanCreationPackets(pmanager, thief);
+				thiefScansIds.add(scanInfo.getFirst());
 				for (var guard : guardOwners) {
-					var connection = ((CraftPlayer) guard).getHandle().connection;
-					for (var p : scanInfo.b()) {
-						connection.send(p);
+					for (var p : scanInfo.getSecond()) {
+						pmanager.sendServerPacket(guard, p);
 					}
 					guard.setCooldown(Material.CLOCK, SCAN_DELAY_TICK);
 				}
@@ -114,11 +113,11 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 				@Override
 				public void run() {
 
-					var destroyPacket = new ClientboundRemoveEntitiesPacket(
-							thiefScansIds.stream().mapToInt(Integer::intValue).toArray());
+					var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+					destroyPacket.getIntLists().write(0, thiefScansIds);
 
 					for (var guard : guardOwners) {
-						((CraftPlayer) guard).getHandle().connection.send(destroyPacket);
+						pmanager.sendServerPacket(guard, destroyPacket);
 					}
 				}
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), SCAN_LIFETIME_TICK);
@@ -126,12 +125,11 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 		if (thiefOwners.size() > 0) {
 			var guardScansIds = new LinkedList<Integer>();
 			for (var guard : game.getGuards()) {
-				var scanInfo = makeScanCreationPackets(guard);
-				guardScansIds.add(scanInfo.a());
+				var scanInfo = makeScanCreationPackets(pmanager, guard);
+				guardScansIds.add(scanInfo.getFirst());
 				for (var thief : thiefOwners) {
-					var connection = ((CraftPlayer) thief).getHandle().connection;
-					for (var p : scanInfo.b()) {
-						connection.send(p);
+					for (var p : scanInfo.getSecond()) {
+						pmanager.sendServerPacket(thief, p);
 					}
 					thief.setCooldown(Material.CLOCK, SCAN_DELAY_TICK);
 				}
@@ -141,35 +139,44 @@ public class ScannerHandler extends ToolHandler<ScannerHandler.Scanner> {
 				@Override
 				public void run() {
 
-					var destroyPacket = new ClientboundRemoveEntitiesPacket(
-							guardScansIds.stream().mapToInt(Integer::intValue).toArray());
+					var destroyPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+					destroyPacket.getIntLists().write(0, guardScansIds);
 
 					for (var thief : thiefOwners) {
-						((CraftPlayer) thief).getHandle().connection.send(destroyPacket);
+						pmanager.sendServerPacket(thief, destroyPacket);
 					}
 				}
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), SCAN_LIFETIME_TICK);
 		}
 	}
 
-	private Pair<Integer, List<Packet<?>>> makeScanCreationPackets(Player player) {
+	private Pair<Integer, PacketContainer[]> makeScanCreationPackets(ProtocolManager pmanager, Player player) {
 		var scanLoc = player.getLocation();
 		@SuppressWarnings("deprecation")
 		var eid = Bukkit.getUnsafe().nextEntityId(player.getWorld());
 
-		var createPacket = new ClientboundAddEntityPacket(eid, UUID.randomUUID(), scanLoc.getX(), scanLoc.getY(),
-				scanLoc.getZ(), scanLoc.getPitch(), scanLoc.getYaw(), EntityTypes.MANNEQUIN, 0, Vec3.ZERO,
-				scanLoc.getYaw());
+		var createPacket = pmanager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
+		var createInts = createPacket.getIntegers();
+		var createDoubles = createPacket.getDoubles();
+		createInts.write(0, eid); // Entity id
+		createPacket.getUUIDs().write(0, UUID.randomUUID()); // UUID
+		createPacket.getEntityTypeModifier().write(0, EntityType.MANNEQUIN); // Entity type
+		createPacket.getBytes().write(0, (byte) (scanLoc.getPitch() * 256.0F / 360.0F)); // Pitch
+		createPacket.getBytes().write(1, (byte) (scanLoc.getYaw() * 256.0F / 360.0F)); // Yaw
+		createDoubles.write(0, scanLoc.getX()); // X
+		createDoubles.write(1, scanLoc.getY()); // Y
+		createDoubles.write(2, scanLoc.getZ()); // Z
 
-		List<SynchedEntityData.DataValue<?>> dataValues = List.of(
-				new SynchedEntityData.DataValue<>(0, EntityDataSerializers.BYTE, (byte) (0x20 | 0x40)), // Invisible +
-																										// Glowing
-																										// effect
-				new SynchedEntityData.DataValue<>(18, EntityDataSerializers.BOOLEAN, true) // Immovable
-		);
-		var metadataPacket = new ClientboundSetEntityDataPacket(eid, dataValues);
+		var metadataPacket = pmanager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+		metadataPacket.getIntegers().write(0, eid); // Entity id
+		var dataValues = new ArrayList<WrappedDataValue>(2);
+		var serializerByte = WrappedDataWatcher.Registry.get((Type) Byte.class);
+		var serializerBool = WrappedDataWatcher.Registry.get((Type) Boolean.class);
+		dataValues.add(new WrappedDataValue(0, serializerByte, (byte) (0x20 | 0x40))); // Invisible + Glowing effect
+		dataValues.add(new WrappedDataValue(18, serializerBool, true)); // Immovable
+		metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
 
-		return new Pair<>(eid, List.of(createPacket, metadataPacket));
+		return new Pair<>(eid, new PacketContainer[]{createPacket, metadataPacket});
 	}
 
 	@Override
