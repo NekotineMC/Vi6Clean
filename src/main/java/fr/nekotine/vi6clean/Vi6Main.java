@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -47,6 +48,8 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	private final ComponentLogger logger = NekotineLogger.make(this);
 
 	private WatchService ws;
+	
+	private BukkitTask watchServiceTask;
 
 	private ResourcePackInfo vi6CleanResourcePack;
 
@@ -90,7 +93,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			var updateFolder = Bukkit.getUpdateFolderFile();
 			updateFolder.toPath().register(ws, StandardWatchEventKinds.ENTRY_CREATE,
 					StandardWatchEventKinds.ENTRY_MODIFY);
-			new BukkitRunnable() {
+			watchServiceTask = new BukkitRunnable() {
 				@Override
 				public void run() {
 					// Check for update
@@ -119,6 +122,9 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		game.close();
 		super.onDisable();
 		EventUtil.unregister(this);
+		if (watchServiceTask != null && !watchServiceTask.isCancelled()) {
+			watchServiceTask.cancel();
+		}
 	}
 
 	private void gameCommands() {
@@ -148,6 +154,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		});
 		gameC.withSubcommands(lobby, team, ready);
 		gameC.register();
+		Bukkit.getServer().getScheduler().getActiveWorkers().forEach(w -> System.out.println(w));
 	}
 
 	// WORKAROUND https://bugs.mojang.com/browse/MC/issues/MC-277422
