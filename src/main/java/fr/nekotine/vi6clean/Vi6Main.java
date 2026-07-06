@@ -17,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.executors.ExecutorType;
@@ -35,7 +34,6 @@ import fr.nekotine.vi6clean.impl.majordom.Majordom;
 import fr.nekotine.vi6clean.impl.map.Vi6Map;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.LobbyPhasePlayerWrapper;
-import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.resource.ResourcePackInfo;
 import net.kyori.adventure.resource.ResourcePackRequest;
@@ -48,7 +46,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	private final ComponentLogger logger = NekotineLogger.make(this);
 
 	private WatchService ws;
-	
+
 	private BukkitTask watchServiceTask;
 
 	private ResourcePackInfo vi6CleanResourcePack;
@@ -64,6 +62,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		/*-
 		try {
 			var vc_service = getServer().getServicesManager().load(BukkitVoicechatService.class);
 			if (vc_service != null) {
@@ -77,6 +76,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		} catch (NoClassDefFoundError e) {
 			// ignore, ca arrive quand il n'y a pas SimpleVoiceChat
 		}
+		*/
 		Vi6Styles.load();
 		var game = new Vi6Game();
 		Ioc.getProvider().registerSingleton(game);

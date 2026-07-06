@@ -213,7 +213,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 				.findFirst();
 		if (w.isEmpty()) {
 			throw new RuntimeException("Le monde " + map.getWorldName() + " correspondant à la carte " + mapName
-					+ " n'existe pas.\nSeul ont été trouvé:" + String.join(", ", Bukkit.getWorlds().stream()
+					+ " n'existe pas.\nSeul ont été trouvé: " + String.join(", ", Bukkit.getWorlds().stream()
 							.map(ww -> ww.getKey().asMinimalString()).collect(Collectors.toList())));
 		}
 		world = w.get();
