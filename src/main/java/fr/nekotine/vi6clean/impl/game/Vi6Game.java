@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -208,10 +209,12 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		var metadata = mapModule.getMapMetadata(mapName);
 		var map = mapModule.getContent(metadata, Vi6Map.class);
 		AssertUtil.nonNull(map, String.format("La map %s n'a pas pus etre chargee", name));
-		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getName().equals(map.getWorldName())).findFirst();
+		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getKey().asMinimalString().equals(map.getWorldName()))
+				.findFirst();
 		if (w.isEmpty()) {
-			throw new RuntimeException(
-					"Le monde " + map.getWorldName() + " correspondant à la carte " + mapName + " n'existe pas");
+			throw new RuntimeException("Le monde " + map.getWorldName() + " correspondant à la carte " + mapName
+					+ " n'existe pas.\nSeul ont été trouvé:" + String.join(", ", Bukkit.getWorlds().stream()
+							.map(ww -> ww.getKey().asMinimalString()).collect(Collectors.toList())));
 		}
 		world = w.get();
 		var loc = world.getSpawnLocation();
