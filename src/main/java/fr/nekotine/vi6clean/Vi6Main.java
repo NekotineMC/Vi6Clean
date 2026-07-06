@@ -166,7 +166,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 
 	private void makeResourcePackInfo() {
 		var uuid = UUID.fromString("34ec4879-e002-413b-9fab-4a4dc7949b11");
-		var baseurl = "https://github.com/NekotineMC/Vi6Clean/releases/tag/dev/download/";
+		var baseurl = "https://github.com/NekotineMC/Vi6Clean/releases/download/dev/";
 		var packurl = baseurl + "Vi6CleanPack.zip";
 		var checksumurl = packurl + ".sha1";
 		String sha;
