@@ -68,11 +68,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
-    - name: Bump version and push tag
-      id: tagbump
-      uses: mathieudutour/github-tag-action@v6.2
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+#    - name: Bump version and push tag
+#      id: tagbump
+#      uses: mathieudutour/github-tag-action@v6.2
+#      with:
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: actions/download-artifact@v8
       with:
         path: artifactsfolder
@@ -80,8 +80,8 @@ jobs:
     - run: |
         ls -la artifactsfolder/*
         ls -la
-    - name: Create resourcepack release
+    - name: Update development build release
       uses: softprops/action-gh-release@v3
       with:
-        tag_name: ${{ steps.tagbump.outputs.new_tag }}
+        tag_name: dev
         files: artifactsfolder/**/*
