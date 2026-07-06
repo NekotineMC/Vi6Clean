@@ -104,14 +104,21 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		} else {
 			defaultActionBar.addViewers(wrapped);
 		}
-		wrapped.getAttribute(Attribute.CAMERA_DISTANCE)
-				.addModifier(new AttributeModifier(noF5AttributeModifierKey, -5, Operation.ADD_NUMBER)); // Avoid F5
-		wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE)
-				.addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid
-																													// Knockback
-		wrapped.getAttribute(Attribute.STEP_HEIGHT)
-				.addModifier(new AttributeModifier(stepHeightAttributeModifierKey, 0.5, Operation.ADD_NUMBER)); // step
-																												// bonus
+		
+		var camdist = wrapped.getAttribute(Attribute.CAMERA_DISTANCE);
+		if (camdist.getModifier(noF5AttributeModifierKey) == null) {
+			camdist.addModifier(new AttributeModifier(noF5AttributeModifierKey, -5, Operation.ADD_NUMBER)); // Avoid F5
+		}
+		
+		var kb = wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
+		if (kb.getModifier(noKnockbackAttributeModifierKey) == null) {
+			kb.addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid Knockback
+		}
+		
+		var stepHeight = wrapped.getAttribute(Attribute.STEP_HEIGHT);
+		if (stepHeight.getModifier(stepHeightAttributeModifierKey) == null) {
+			stepHeight.addModifier(new AttributeModifier(stepHeightAttributeModifierKey, 0.5, Operation.ADD_NUMBER)); // step bonus
+		}
 	}
 
 	public void tearDown() {
