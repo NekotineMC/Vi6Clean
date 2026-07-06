@@ -154,7 +154,6 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		});
 		gameC.withSubcommands(lobby, team, ready);
 		gameC.register();
-		Bukkit.getServer().getScheduler().getActiveWorkers().forEach(w -> System.out.println(w));
 	}
 
 	// WORKAROUND https://bugs.mojang.com/browse/MC/issues/MC-277422
