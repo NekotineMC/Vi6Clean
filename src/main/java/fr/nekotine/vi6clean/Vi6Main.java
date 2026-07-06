@@ -166,8 +166,8 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 
 	private void makeResourcePackInfo() {
 		var uuid = UUID.fromString("34ec4879-e002-413b-9fab-4a4dc7949b11");
-		var baseurl = "https://github.com/NekotineMC/Vi6Clean/releases/latest/download/";
-		var packurl = baseurl + "Vi6Clean.zip";
+		var baseurl = "https://github.com/NekotineMC/Vi6Clean/releases/tag/dev/download/";
+		var packurl = baseurl + "Vi6CleanPack.zip";
 		var checksumurl = packurl + ".sha1";
 		String sha;
 		logger.info("Lecture du sha1 du resourcepack depuis l'url suivante: " + checksumurl);
@@ -183,7 +183,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerInitialConfigure(PlayerJoinEvent evt) {
+	public void onPlayerJoined(PlayerJoinEvent evt) {
 		var request = ResourcePackRequest.resourcePackRequest();
 		request.packs(vi6CleanResourcePack);
 		request.required(true)
