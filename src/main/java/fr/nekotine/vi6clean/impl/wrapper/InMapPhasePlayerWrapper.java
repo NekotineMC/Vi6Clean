@@ -104,20 +104,22 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 		} else {
 			defaultActionBar.addViewers(wrapped);
 		}
-		
+
 		var camdist = wrapped.getAttribute(Attribute.CAMERA_DISTANCE);
 		if (camdist.getModifier(noF5AttributeModifierKey) == null) {
 			camdist.addModifier(new AttributeModifier(noF5AttributeModifierKey, -5, Operation.ADD_NUMBER)); // Avoid F5
 		}
-		
+
 		var kb = wrapped.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
 		if (kb.getModifier(noKnockbackAttributeModifierKey) == null) {
-			kb.addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid Knockback
+			kb.addModifier(new AttributeModifier(noKnockbackAttributeModifierKey, -10, Operation.ADD_NUMBER)); // Avoid
+																												// Knockback
 		}
-		
+
 		var stepHeight = wrapped.getAttribute(Attribute.STEP_HEIGHT);
 		if (stepHeight.getModifier(stepHeightAttributeModifierKey) == null) {
-			stepHeight.addModifier(new AttributeModifier(stepHeightAttributeModifierKey, 0.5, Operation.ADD_NUMBER)); // step bonus
+			stepHeight.addModifier(new AttributeModifier(stepHeightAttributeModifierKey, 0.5, Operation.ADD_NUMBER)); // step
+																														// bonus
 		}
 	}
 
