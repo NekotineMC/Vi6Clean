@@ -1,6 +1,21 @@
 package fr.nekotine.vi6clean.impl.tool.personal.bush;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import com.destroystokyo.paper.MaterialSetTag;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -24,20 +39,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Tag;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 @ToolCode("bush")
 public class BushHandler extends ToolHandler<Bush> {
@@ -152,7 +153,7 @@ public class BushHandler extends ToolHandler<Bush> {
 				});
 				statusEffectModule.removeEffect(owner, unlimitedInvisibility);
 				statusEffectModule.addEffect(owner, fadeoffInvisibility);
-				if (tool.isInBush()) {
+				if (tool.isInBush() && !revealed) {
 					// if we where previously in bush, apply fadeoff invisibility
 					if (tool.getFadeOffTask() != null) {
 						tool.getFadeOffTask().cancel();
