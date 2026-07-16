@@ -51,7 +51,7 @@ import fr.nekotine.vi6clean.impl.map.ThiefSpawn;
 import fr.nekotine.vi6clean.impl.tool.ToolHandlerContainer;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PreparationPhasePlayerWrapper;
-import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
+//import fr.nekotine.vi6clean.voicechat.Vi6VoiceChatPlugin;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.AttackRange;
 import io.papermc.paper.datacomponent.item.Consumable;
@@ -197,6 +197,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
+			/*-
 			var vcplugin = Ioc.resolve(Vi6VoiceChatPlugin.class);
 			// Check if the player is actually connected to the voice chat
 			if (vcplugin != null && vcplugin.getApi().getConnectionOf(item.getUniqueId()) != null
@@ -206,6 +207,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 						Component.text("Tenir en main pour parler"));
 				item.give(tw);
 			}
+			*/
 		}
 		// Auto - select random rune
 		var runes = Ioc.resolve(ToolHandlerContainer.class).getHandlers().stream()
