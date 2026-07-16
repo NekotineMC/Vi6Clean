@@ -280,8 +280,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			wrap.setCanLeaveMap(false);
 			wrap.updateMapLeaveBlocker();
 		}
-		item.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE)
-				.addModifier(new AttributeModifier(receptionAttributeKey, 1000, Operation.ADD_NUMBER));
+		var receiveRangeAttribute = item.getAttribute(Attribute.WAYPOINT_RECEIVE_RANGE);
+		if (receiveRangeAttribute.getModifier(receptionAttributeKey) == null) {
+			receiveRangeAttribute.addModifier(new AttributeModifier(receptionAttributeKey, 1000, Operation.ADD_NUMBER));
+		}
 	}
 
 	@Override
