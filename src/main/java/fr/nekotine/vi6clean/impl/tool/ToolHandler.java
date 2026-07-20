@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,7 +43,6 @@ import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.text.TextModule;
 import fr.nekotine.core.text.style.NekotineStyles;
 import fr.nekotine.core.text.tree.Leaf;
-import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -214,7 +214,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 		if (needToGiveItem) {
 			var item = makeBaseItem();
 			// Add some specification to item
-			AssertUtil.nonNull(item);
+			Objects.requireNonNull(item);
 			if (!item.getPersistentDataContainer().getKeys()
 					.containsAll(Set.of(ToolHandler.TOOL_TYPE_KEY, ToolHandler.TOOL_ID_KEY))) {
 				// Edit item's content
@@ -416,7 +416,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	}
 
 	public void editItem(Tool tool, Consumer<ItemStack> action) {
-		AssertUtil.nonNull(tool);
+		Objects.requireNonNull(tool);
 		var owner = tool.getOwner();
 		if (owner == null) {
 			return;

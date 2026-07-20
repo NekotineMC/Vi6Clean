@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.impl.game;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,6 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.map.IMapModule;
 import fr.nekotine.core.map.MapModule;
-import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -212,9 +212,9 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	public void setMapName(String name) {
 		var mapModule = Ioc.resolve(IMapModule.class);
 		var metadata = mapModule.getMapMetadata(name);
-		AssertUtil.nonNull(metadata, String.format("La map %s n'a pas de fichier metadata, elle ne peux pas être chargée", name));
+		Objects.requireNonNull(metadata, String.format("La map %s n'a pas de fichier metadata, elle ne peux pas être chargée", name));
 		var map = mapModule.getContent(metadata, Vi6Map.class);
-		AssertUtil.nonNull(map, String.format("La map %s n'a pas pus etre chargee", name));
+		Objects.requireNonNull(map, String.format("La map %s n'a pas pus etre chargee", name));
 		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getKey().asMinimalString().equals(map.getWorldName()))
 				.findFirst();
 		if (w.isEmpty()) {

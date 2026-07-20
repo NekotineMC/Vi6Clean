@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -54,7 +55,6 @@ import fr.nekotine.core.state.State;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
-import fr.nekotine.core.util.AssertUtil;
 import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
@@ -150,7 +150,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		var mapName = game.getMapName();
 		var metadata = mapModule.getMapMetadata(mapName);
 		map = mapModule.getContent(metadata, Vi6Map.class);
-		AssertUtil.nonNull(map, "La map n'a pas pus etre chargee");
+		Objects.requireNonNull(map, "La map n'a pas pus etre chargee");
 		var world = game.getWorld();
 		world.setTime(DayTime.MIDNIGHT);
 		world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
