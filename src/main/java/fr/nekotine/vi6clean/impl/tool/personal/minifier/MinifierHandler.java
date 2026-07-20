@@ -7,6 +7,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.ioc.Ioc;
@@ -59,7 +60,10 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier> {
 		var player = tool.getOwner();
 		player.getAttribute(Attribute.SCALE).removeModifier(SCALE_ATTRIBUTE_KEY);
 		player.getAttribute(Attribute.GRAVITY).removeModifier(gravityAttributeKey);
-		player.getAttribute(Attribute.MAX_HEALTH).removeModifier(healthAttributeKey);
+		var maxHealthAttribute = player.getAttribute(Attribute.MAX_HEALTH);
+		var maxhealth = maxHealthAttribute.getValue();
+		maxHealthAttribute.removeModifier(healthAttributeKey);
+		player.setHealth((player.getHealth() / maxhealth) * maxHealthAttribute.getValue());
 	}
 
 	@Override
