@@ -146,7 +146,7 @@ public class WarnerHandler extends ToolHandler<WarnerHandler.Warner> {
 				remove(tool);
 			}
 
-			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
+			if (evt.timeStampReached(TickTimeStamp.HalfSecond) && tool.getOwner() != null) {
 				var owner = tool.getOwner();
 				// Display
 				if (tool.watched != null) {
