@@ -5,6 +5,7 @@ shop_icon: OXIDIZED_COPPER_GOLEM_STATUE
 scale_multiplier: 0.5 # multiplicateur de taille
 gravity_multiplier: 0.5 # multiplicateur de gravité
 max_health_multiplier: 0.5 # multiplicateur de vie
+step_height_multiplier: 0.5 # multiplicateur de hauteur de franchissement automatique
 is_rune: true
 lore:
    - <lore>Vous permet de <important>rétrécir</important>

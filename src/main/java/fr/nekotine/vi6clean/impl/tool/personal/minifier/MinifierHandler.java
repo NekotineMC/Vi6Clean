@@ -33,11 +33,16 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier> {
 	private final NamespacedKey healthAttributeKey = NamespacedKey.fromString("minifier/health",
 			Ioc.resolve(JavaPlugin.class));
 
+	private final NamespacedKey stepAttributeKey = NamespacedKey.fromString("minifier/step",
+			Ioc.resolve(JavaPlugin.class));
+
 	private final double SCALE_MULTIPLIER = getConfiguration().getDouble("scale_multiplier", 0.5);
 
 	private final double GRAVITY_MULTIPLIER = getConfiguration().getDouble("gravity_multiplier", 0.5);
 
 	private final double HEALTH_MULTIPLIER = getConfiguration().getDouble("max_health_multiplier", 0.5);
+
+	private final double STEP_MULTIPLIER = getConfiguration().getDouble("step_height_multiplier", 0.5);
 
 	public MinifierHandler() {
 		super(Minifier::new);
@@ -46,17 +51,32 @@ public class MinifierHandler extends ToolHandler<MinifierHandler.Minifier> {
 	@Override
 	protected void onAttachedToPlayer(Minifier tool) {
 		var player = tool.getOwner();
-		player.getAttribute(Attribute.SCALE).addModifier(
-				new AttributeModifier(SCALE_ATTRIBUTE_KEY, SCALE_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
-		player.getAttribute(Attribute.GRAVITY).addModifier(
-				new AttributeModifier(gravityAttributeKey, GRAVITY_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
-		player.getAttribute(Attribute.MAX_HEALTH).addModifier(
-				new AttributeModifier(healthAttributeKey, HEALTH_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+		var scaleAttr = player.getAttribute(Attribute.SCALE);
+		if (scaleAttr.getModifier(SCALE_ATTRIBUTE_KEY) == null) {
+			scaleAttr.addModifier(
+					new AttributeModifier(SCALE_ATTRIBUTE_KEY, SCALE_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+		}
+		var gravityAttr = player.getAttribute(Attribute.GRAVITY);
+		if (gravityAttr.getModifier(gravityAttributeKey) == null) {
+			gravityAttr.addModifier(
+					new AttributeModifier(gravityAttributeKey, GRAVITY_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+		}
+		var maxHealthAttr = player.getAttribute(Attribute.MAX_HEALTH);
+		if (maxHealthAttr.getModifier(healthAttributeKey) == null) {
+			maxHealthAttr.addModifier(
+					new AttributeModifier(healthAttributeKey, HEALTH_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+		}
+		var stepAttr = player.getAttribute(Attribute.STEP_HEIGHT);
+		if (stepAttr.getModifier(stepAttributeKey) == null) {
+			stepAttr.addModifier(
+					new AttributeModifier(stepAttributeKey, STEP_MULTIPLIER - 1, Operation.MULTIPLY_SCALAR_1));
+		}
 	}
 
 	@Override
 	protected void onDetachFromPlayer(Minifier tool) {
 		var player = tool.getOwner();
+		player.getAttribute(Attribute.STEP_HEIGHT).removeModifier(stepAttributeKey);
 		player.getAttribute(Attribute.SCALE).removeModifier(SCALE_ATTRIBUTE_KEY);
 		player.getAttribute(Attribute.GRAVITY).removeModifier(gravityAttributeKey);
 		var maxHealthAttribute = player.getAttribute(Attribute.MAX_HEALTH);
