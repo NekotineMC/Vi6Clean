@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardWatchEventKinds;
@@ -124,6 +125,11 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		EventUtil.unregister(this);
 		if (watchServiceTask != null && !watchServiceTask.isCancelled()) {
 			watchServiceTask.cancel();
+		}
+		try {
+			ws.close();
+		} catch (IOException e) {
+			logger.error("Erreur lors de l'extinction du watchservice pour le restart automatique",e);
 		}
 	}
 
