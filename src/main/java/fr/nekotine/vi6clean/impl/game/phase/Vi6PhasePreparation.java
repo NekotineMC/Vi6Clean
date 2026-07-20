@@ -195,6 +195,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 		var inv = item.getInventory();
 		inv.setItem(8, openMenuUsable.getItemStack());
 		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0, false, false, false));
+		item.setHealth(item.getAttribute(Attribute.MAX_HEALTH).getValue());
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
