@@ -1,5 +1,20 @@
 package fr.nekotine.vi6clean.impl.map.artefact;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.Player;
+import org.bukkit.util.BlockVector;
+import org.bukkit.util.BoundingBox;
+
 import fr.nekotine.core.block.BlockPatch;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
@@ -15,22 +30,8 @@ import fr.nekotine.vi6clean.impl.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.impl.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.InfiltrationPhasePlayerWrapper;
 import fr.nekotine.vi6clean.impl.wrapper.PlayerWrapper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.Player;
-import org.bukkit.util.BlockVector;
-import org.bukkit.util.BoundingBox;
 
 public class Artefact {
 
@@ -144,7 +145,8 @@ public class Artefact {
 					.append(Component.text(" >> ", NamedTextColor.WHITE))
 					.append(Component.text("Vole", NamedTextColor.GREEN))
 					.append(Component.text(" (", NamedTextColor.WHITE))
-					.append(Component.text(capture_advancement * 100 / CAPTURE_AMOUNT_NEEDED, NamedTextColor.AQUA))
+					.append(Component.text((int) (capture_advancement * 100 / CAPTURE_AMOUNT_NEEDED),
+							NamedTextColor.AQUA))
 					.append(Component.text("%", NamedTextColor.GOLD)).append(Component.text(")", NamedTextColor.WHITE));
 			for (var player : inside) {
 				if (game.getGuards().contains(player)) {
