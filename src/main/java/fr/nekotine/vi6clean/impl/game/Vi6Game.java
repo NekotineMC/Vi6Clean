@@ -316,11 +316,11 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		var previous = evt.getPlayer().getInventory().getItem(evt.getPreviousSlot());
 		var next = evt.getPlayer().getInventory().getItem(evt.getNewSlot());
 		if (previous != null && previous.getType() == Material.LEATHER_HORSE_ARMOR) {
-			Ioc.resolve(Vi6Game.class).getGuards()
+			getGuards()
 					.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 1.5f));
 		}
 		if (next != null && next.getType() == Material.LEATHER_HORSE_ARMOR) {
-			Ioc.resolve(Vi6Game.class).getGuards()
+			getGuards()
 					.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 2f));
 		}
 	}
