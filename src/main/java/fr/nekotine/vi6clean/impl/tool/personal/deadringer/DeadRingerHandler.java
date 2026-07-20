@@ -22,6 +22,9 @@ import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.status.effect.DiarrheaStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
@@ -77,6 +80,9 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 				var tool = getToolFromItem(item);
 				var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 				statusEffectModule.addEffect(player, invisibleEffect);
+				statusEffectModule.removeAllEffectsOfType(player, SuffocatingStatusEffectType.get());
+				statusEffectModule.removeAllEffectsOfType(player, TazedStatusEffectType.get());
+				statusEffectModule.removeAllEffectsOfType(player, DiarrheaStatusEffectType.get());
 				new BukkitRunnable() {
 
 					@Override
@@ -97,6 +103,8 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 
 				}.runTaskLater(Ioc.resolve(JavaPlugin.class), EXIT_DELAY_TICK);
 				e.setDamage(0.0001);
+				//statusEffectModule
+				statusEffectModule.removeEffect(player, invisibleEffect);
 				player.getWorld().sendMessage(player.getCombatTracker().getDeathMessage());
 			});
 		}
