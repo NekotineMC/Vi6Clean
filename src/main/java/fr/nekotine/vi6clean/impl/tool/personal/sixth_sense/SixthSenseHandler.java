@@ -50,7 +50,7 @@ public class SixthSenseHandler extends ToolHandler<SixthSenseHandler.SixthSense>
 			var ownerloc = owner.getLocation();
 			var isEmped = statusFlagModule.hasAny(owner, EmpStatusFlag.get());
 			wrap.enemyTeamInMap().forEach(en -> {
-				if (!isEmped && ownerloc.distanceSquared(en.getLocation()) <= DETECTION_RANGE_SQUARED) {
+				if (!isEmped && ownerloc.getWorld().equals(en.getWorld()) && ownerloc.distanceSquared(en.getLocation()) <= DETECTION_RANGE_SQUARED) {
 					glowModule.glowEntityFor(en, owner);
 				} else {
 					glowModule.unglowEntityFor(en, owner);
