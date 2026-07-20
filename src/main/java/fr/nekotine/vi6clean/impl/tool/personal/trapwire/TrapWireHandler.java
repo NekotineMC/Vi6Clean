@@ -139,7 +139,7 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 		loc.setPitch(transform.pitch);
 		var display = world.spawn(loc, BlockDisplay.class);
 		display.setPersistent(false);
-		display.setBlock(Material.REDSTONE_BLOCK.createBlockData());
+		display.setBlock(Material.RED_STAINED_GLASS.createBlockData());
 		display.setTransformation(new Transformation(new Vector3f(-0.025f, -0.025f, 0f), new Quaternionf(),
 				new Vector3f(0.05f, 0.05f, transform.distance), new Quaternionf()));
 		tool.placedEntity = display;
