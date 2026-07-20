@@ -223,6 +223,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 					+ " n'existe pas.\nSeul ont été trouvé: " + String.join(", ", Bukkit.getWorlds().stream()
 							.map(ww -> ww.getKey().asMinimalString()).collect(Collectors.toList())));
 		}
+		mapName = name;
 		world = w.get();
 		var loc = world.getSpawnLocation();
 		for (var p : players) {
