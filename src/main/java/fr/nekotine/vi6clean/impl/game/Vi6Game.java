@@ -136,11 +136,16 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		EventUtil.unregister(this);
 		try {
 			phaseMachine.end();
+		} catch (Exception e) {
+			logger.error("Un erreur est survenur lors du déchargement de la game", e);
+		}
+		try {
 			scoreboardGuard.unregister();
 			scoreboardThief.unregister();
 		} catch (Exception e) {
 			logger.error("Un erreur est survenur lors du déchargement de la game", e);
 		}
+	
 	}
 
 	public ObservableCollection<Player> getPlayerList() {
