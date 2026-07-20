@@ -26,6 +26,9 @@ import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.impl.status.effect.DiarrheaStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.impl.status.effect.TazedStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.impl.status.event.EntityEmpStartEvent;
@@ -140,6 +143,10 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 		tool.position = ploc.toVector();
 		Vi6Sound.SMOKEPOOL.play(ploc.getWorld(), ploc);
 		item.setData(DataComponentTypes.ITEM_MODEL, Material.GRAY_DYE.key());
+		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+		statusEffectModule.removeAllEffectsOfType(player, SuffocatingStatusEffectType.get());
+		statusEffectModule.removeAllEffectsOfType(player, TazedStatusEffectType.get());
+		statusEffectModule.removeAllEffectsOfType(player, DiarrheaStatusEffectType.get());
 		evt.setCancelled(true);
 	}
 
