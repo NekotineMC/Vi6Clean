@@ -146,7 +146,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		} catch (Exception e) {
 			logger.error("Un erreur est survenur lors du déchargement de la game", e);
 		}
-	
+
 	}
 
 	public ObservableCollection<Player> getPlayerList() {
@@ -212,7 +212,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 	public void setMapName(String name) {
 		var mapModule = Ioc.resolve(IMapModule.class);
 		var metadata = mapModule.getMapMetadata(name);
-		Objects.requireNonNull(metadata, String.format("La map %s n'a pas de fichier metadata, elle ne peux pas être chargée", name));
+		Objects.requireNonNull(metadata,
+				String.format("La map %s n'a pas de fichier metadata, elle ne peux pas être chargée", name));
 		var map = mapModule.getContent(metadata, Vi6Map.class);
 		Objects.requireNonNull(map, String.format("La map %s n'a pas pus etre chargee", name));
 		var w = Bukkit.getWorlds().stream().filter(wo -> wo.getKey().asMinimalString().equals(map.getWorldName()))
@@ -322,12 +323,10 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		var previous = evt.getPlayer().getInventory().getItem(evt.getPreviousSlot());
 		var next = evt.getPlayer().getInventory().getItem(evt.getNewSlot());
 		if (previous != null && previous.getType() == Material.LEATHER_HORSE_ARMOR) {
-			getGuards()
-					.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 1.5f));
+			getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 1.5f));
 		}
 		if (next != null && next.getType() == Material.LEATHER_HORSE_ARMOR) {
-			getGuards()
-					.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 2f));
+			getGuards().playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.VOICE, 1.0f, 2f));
 		}
 	}
 

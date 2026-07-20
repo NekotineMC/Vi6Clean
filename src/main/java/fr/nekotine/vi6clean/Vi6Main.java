@@ -129,7 +129,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 		try {
 			ws.close();
 		} catch (IOException e) {
-			logger.error("Erreur lors de l'extinction du watchservice pour le restart automatique",e);
+			logger.error("Erreur lors de l'extinction du watchservice pour le restart automatique", e);
 		}
 	}
 
