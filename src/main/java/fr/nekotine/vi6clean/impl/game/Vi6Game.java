@@ -127,6 +127,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 			phaseMachine.goTo(Vi6PhaseLobby.class, null);
 		} catch (Exception e) {
 			logger.error("Une erreur est survenue lors du chargement de la game", e);
+			this.close();
 		}
 		EventUtil.register(this);
 	}
