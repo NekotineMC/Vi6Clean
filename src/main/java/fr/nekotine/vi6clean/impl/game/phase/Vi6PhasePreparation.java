@@ -194,6 +194,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 		var wrap = wrappingModule.getWrapper(item, PlayerWrapper.class);
 		var inv = item.getInventory();
 		inv.setItem(8, openMenuUsable.getItemStack());
+		item.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0, false, false, false));
 		if (wrap.isGuard()) {
 			inv.addItem(guardSword);
 			inv.addItem(guardGun);
@@ -229,6 +230,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 		item.getInventory().remove(openMenuUsable.getItemStack());
 		item.setAllowFlight(false);
 		item.setFlying(false);
+		item.removePotionEffect(PotionEffectType.REGENERATION);
 	}
 
 	@Override
