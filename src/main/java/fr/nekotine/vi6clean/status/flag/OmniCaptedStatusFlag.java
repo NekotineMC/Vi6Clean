@@ -1,0 +1,73 @@
+package fr.nekotine.vi6clean.status.flag;
+
+import fr.nekotine.core.glow.EntityGlowModule;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlag;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
+import io.papermc.paper.util.Tick;
+import java.time.Duration;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+public class OmniCaptedStatusFlag implements StatusFlag {
+
+	private static final Title title = Title.title(Component.empty(),
+			Component.text(getStatusName(), NamedTextColor.RED),
+			Title.Times.times(Tick.of(2), Duration.ofDays(1000), Tick.of(2)));
+
+	public static final String getStatusName() {
+		return "omni-capté";
+	}
+
+	private static OmniCaptedStatusFlag instance;
+
+	public static final OmniCaptedStatusFlag get() {
+		if (instance == null) {
+			instance = new OmniCaptedStatusFlag();
+		}
+		return instance;
+	}
+
+	@Override
+	public void applyStatus(LivingEntity appliedTo) {
+		if (!(appliedTo instanceof Player player)) {
+			return;
+		}
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		if (optionalWrap.isEmpty()) {
+			return;
+		}
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			glowModule.glowEntityFor(appliedTo, enemy);
+		}
+		player.showTitle(title);
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {
+			InvisibilityStatusFlag.get().removeStatus(appliedTo); // Remove status without removing flag
+		}
+	}
+
+	@Override
+	public void removeStatus(LivingEntity appliedTo) {
+		if (!(appliedTo instanceof Player player)) {
+			return;
+		}
+		var optionalWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		if (optionalWrap.isEmpty()) {
+			return;
+		}
+		var glowModule = Ioc.resolve(EntityGlowModule.class);
+		for (var enemy : optionalWrap.get().enemyTeam()) {
+			glowModule.unglowEntityFor(appliedTo, enemy);
+		}
+		player.clearTitle();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, InvisibilityStatusFlag.get())) {
+			InvisibilityStatusFlag.get().applyStatus(appliedTo); // Add status without reset flag
+		}
+	}
+}

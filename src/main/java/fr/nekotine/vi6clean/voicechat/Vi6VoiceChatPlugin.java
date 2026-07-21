@@ -8,7 +8,8 @@ import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.vi6clean.impl.game.Vi6Game;
+import fr.nekotine.vi6clean.game.Vi6Game;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

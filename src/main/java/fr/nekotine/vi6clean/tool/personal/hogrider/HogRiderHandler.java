@@ -1,0 +1,250 @@
+package fr.nekotine.vi6clean.tool.personal.hogrider;
+
+import java.util.Arrays;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Registry;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+
+import fr.nekotine.core.ticking.TickTimeStamp;
+import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.CustomAction;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.util.InventoryUtil;
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
+import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
+import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
+import fr.nekotine.vi6clean.tool.Tool;
+import fr.nekotine.vi6clean.tool.ToolCode;
+import fr.nekotine.vi6clean.tool.ToolHandler;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+
+@ToolCode("hogrider")
+public class HogRiderHandler extends ToolHandler<HogRiderHandler.HogRider> {
+	private final Material MATERIAL = Material.SADDLE;
+	public HogRiderHandler() {
+		super(HogRider::new);
+	}
+
+	@Override
+	protected void onAttachedToPlayer(HogRider tool) {
+		editItem(tool, item -> editRideItem(tool.mode, item));
+	}
+
+	@Override
+	protected void onDetachFromPlayer(HogRider tool) {
+		if (tool.riding) {
+			unride(tool);
+		}
+	}
+
+	@Override
+	protected void onToolCleanup(HogRider tool) {
+	}
+
+	private void ride(HogRider tool) {
+		var ploc = tool.getOwner().getLocation();
+		var mg = Bukkit.getMobGoals();
+		tool.riding = true;
+		tool.ridingMode = tool.mode;
+		tool.getOwner().setCooldown(MATERIAL, tool.mode.getDuration());
+		tool.steed = (Mob) ploc.getWorld().spawnEntity(ploc, tool.mode.getEntityType(), SpawnReason.CUSTOM, e -> {
+			if (e instanceof Mob mob) {
+				mg.removeAllGoals(mob);
+				mob.setInvulnerable(true);
+				mob.addPassenger(tool.getOwner());
+				mob.getAttribute(Attribute.STEP_HEIGHT).setBaseValue(1.1);
+				mob.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(tool.mode.getSpeed());
+			}
+		});
+	}
+
+	private void unride(HogRider tool) {
+		tool.riding = false;
+		tool.getOwner().setCooldown(MATERIAL, tool.ridingMode.getCooldown());
+		tool.steed.remove();
+	}
+
+	private void editRideItem(SteedMode mode, ItemStack item) {
+		var im = item.getItemMeta();
+		if (mode == SteedMode.NORMAL) {
+			im.setItemModel(Material.PORKCHOP.getKey());
+			im.displayName(Component.text("Fidèle Cochon", NamedTextColor.LIGHT_PURPLE));
+			im.lore(Arrays.asList(Component.text("Chevauchez un cochon lent mais endurant", NamedTextColor.AQUA)));
+			im.setEnchantmentGlintOverride(false);
+		} else if (mode == SteedMode.TURBO) {
+			im.setItemModel(Material.INK_SAC.getKey());
+			im.displayName(Component.text("Fidèle Poulpe", NamedTextColor.GRAY));
+			im.lore(Arrays.asList(Component.text("Chevauchez rapidement un poule rapide", NamedTextColor.AQUA)));
+			im.setEnchantmentGlintOverride(true);
+		}
+		item.setItemMeta(im);
+	}
+
+	@EventHandler
+	private void onPlayerInterract(PlayerInteractEvent evt) {
+		var tool = getToolFromItem(evt.getItem());
+		if (tool == null) {
+			return;
+		}
+		var owner = tool.getOwner();
+		if (Ioc.resolve(StatusFlagModule.class).hasAny(owner, EmpStatusFlag.get())) {
+			return;
+		}
+		evt.setCancelled(true);
+		if (EventUtil.isCustomAction(evt, CustomAction.INTERACT_ANY)) {
+			switch (tool.mode) {
+				case NORMAL :
+					tool.mode = SteedMode.TURBO;
+					break;
+				case TURBO :
+					tool.mode = SteedMode.NORMAL;
+			}
+			editItem(tool, item -> {
+				editRideItem(tool.mode, item);
+			});
+			return;
+		}
+
+		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
+			if (owner.hasCooldown(evt.getItem())) {
+				if (tool.riding) {
+					unride(tool);
+				}
+				return;
+			}
+			if (tool.riding) {
+				unride(tool);
+			} else {
+				ride(tool);
+			}
+		}
+	}
+
+	@EventHandler
+	private void onTick(TickElapsedEvent evt) {
+		var statusFlagModule = Ioc.resolve(StatusFlagModule.class);
+		for (var tool : getTools()) {
+			if (!tool.riding)
+				continue;
+
+			var owner = tool.getOwner();
+			if (owner == null || statusFlagModule.hasAny(owner, EmpStatusFlag.get())) {
+				unride(tool);
+				continue;
+			}
+
+			var steed = tool.steed;
+			if (!steed.isValid() || !steed.getPassengers().contains(owner) || !owner.hasCooldown(MATERIAL)) {
+				unride(tool);
+				continue;
+			}
+
+			owner.getWorld().spawnParticle(tool.ridingMode.getParticle(), owner.getLocation().add(0, .1, 0), 5, .25, 0,
+					.25, 0);
+			if (evt.timeStampReached(TickTimeStamp.HalfSecond)) {
+				owner.getWorld().playSound(
+						Sound.sound(Registry.SOUNDS.getKey(tool.ridingMode.getSound()), Source.NEUTRAL, 1, 1),
+						tool.steed);
+
+			}
+
+			var direction = owner.getLocation().getDirection().setY(0);
+			if (direction.lengthSquared() > 0) {
+				direction.normalize();
+			}
+			var velocity = direction.multiply(steed.getAttribute(Attribute.MOVEMENT_SPEED).getBaseValue())
+					.setY(steed.getVelocity().getY());
+			steed.setVelocity(velocity);
+			steed.setRotation(owner.getLocation().getYaw(), owner.getLocation().getPitch());
+		}
+	}
+
+	@EventHandler
+	private void onEmpStart(EntityEmpStartEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				item.setData(DataComponentTypes.ITEM_MODEL, Material.LEATHER.key());
+				item.editMeta(m -> m.displayName(getDisplayName().decorate(TextDecoration.STRIKETHROUGH)
+						.append(Component.text(" - ")).append(Component.text("Brouillé", NamedTextColor.RED))));
+			});
+		}
+	}
+
+	@EventHandler
+	private void onEmpEnd(EntityEmpEndEvent evt) {
+		if (evt.getEntity() instanceof Player p) {
+			InventoryUtil.taggedItems(p.getInventory(), TOOL_TYPE_KEY, getToolCode()).forEach(item -> {
+				var tool = getToolFromItem(item);
+				editRideItem(tool.mode, item);
+			});
+		}
+	}
+
+	public static class HogRider extends Tool {
+		private boolean riding = false;
+		private SteedMode mode = SteedMode.NORMAL;
+		private SteedMode ridingMode = SteedMode.NORMAL;
+		private Mob steed;
+		public HogRider(ToolHandler<?> handler) {
+			super(handler);
+		}
+	}
+
+	public enum SteedMode {
+		NORMAL(EntityType.PIG, 0.5, 150, 100, Particle.HAPPY_VILLAGER, org.bukkit.Sound.ENTITY_PIG_AMBIENT), TURBO(
+				EntityType.SQUID, 1, 250, 50, Particle.GLOW, org.bukkit.Sound.ENTITY_SQUID_AMBIENT);
+
+		private final EntityType entityType;
+		private final double speed;
+		private final int cooldown;
+		private final int duration;
+		private final Particle particle;
+		private final org.bukkit.Sound sound;
+
+		SteedMode(EntityType entityType, double speed, int cooldown, int duration, Particle particle,
+				org.bukkit.Sound sound) {
+			this.entityType = entityType;
+			this.speed = speed;
+			this.cooldown = cooldown;
+			this.duration = duration;
+			this.particle = particle;
+			this.sound = sound;
+		}
+
+		public EntityType getEntityType() {
+			return entityType;
+		}
+		public double getSpeed() {
+			return speed;
+		}
+		public int getCooldown() {
+			return cooldown;
+		}
+		public int getDuration() {
+			return duration;
+		}
+		public Particle getParticle() {
+			return particle;
+		}
+		public org.bukkit.Sound getSound() {
+			return sound;
+		}
+	}
+}
