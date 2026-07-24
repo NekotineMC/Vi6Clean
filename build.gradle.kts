@@ -26,7 +26,7 @@ dependencies {
     compileOnly(paperweight.paperDevBundle("26.2.build.+"))
     compileOnly(libs.protocollib)
     compileOnly(libs.commandapi)
-    implementation("fr.nekotine:NekotineCore:+")
+    implementation(project(":NekotineCore"))
     compileOnly(libs.voicechat.api)
 }
 
