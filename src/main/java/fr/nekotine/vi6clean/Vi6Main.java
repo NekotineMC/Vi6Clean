@@ -34,8 +34,8 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			super.onLoad();
 			mapCommandsFor(Vi6Map.class);
 			Vi6Commands.registerCommands();
-		}catch(Exception e) {
-			logger.error("Une erreur est survenue lors du chargement du plugin",e);
+		} catch (Exception e) {
+			logger.error("Une erreur est survenue lors du chargement du plugin", e);
 		}
 	}
 
@@ -72,8 +72,8 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			Ioc.getProvider().registerSingleton(container);
 			game.start();
 			EventUtil.register(this);
-		}catch(Exception e) {
-			logger.error("Une erreur est survenue lors de l'activation du plugin",e);
+		} catch (Exception e) {
+			logger.error("Une erreur est survenue lors de l'activation du plugin", e);
 		}
 	}
 
