@@ -23,7 +23,7 @@ public class ToolHandlerContainer {
 		toolHandlers.clear();
 		logger.info("Découverte et ajout des tools: ");
 		try {
-			for (var tool : ReflexionUtil.streamClassesFromPackage("fr.nekotine.vi6clean.impl.tool")
+			for (var tool : ReflexionUtil.streamClassesFromPackage("fr.nekotine.vi6clean.tool")
 					.filter(c -> ToolHandler.class.isAssignableFrom(c) && c.isAnnotationPresent(ToolCode.class))
 					.collect(Collectors.toSet())) {
 				var ctor = tool.getConstructor();
