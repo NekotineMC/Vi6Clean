@@ -1,7 +1,10 @@
 package fr.nekotine.vi6clean.majordom;
 
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.IPluginModule;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,7 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public final class Majordom implements Listener {
+public final class Majordom implements IPluginModule, Listener {
 
 	private final Map<Block, BukkitTask> toClose = new HashMap<>();
 
@@ -58,7 +61,8 @@ public final class Majordom implements Listener {
 				public void run() {
 					tryToggle(block);
 				}
-			}.runTaskLater(plugin, plugin.getConfig().getInt("majordom.delay", 40));
+			}.runTaskLater(plugin,
+					Ioc.resolve(ConfigManager.class).getConfig().game().mechanics().majordom().delayTicks());
 			toClose.put(block, task);
 		}
 		openable.setOpen(!openable.isOpen());
@@ -76,5 +80,10 @@ public final class Majordom implements Listener {
 			return;
 		}
 		evt.setCancelled(tryToggle(block));
+	}
+
+	@Override
+	public void unload() {
+		revertThenDisable();
 	}
 }

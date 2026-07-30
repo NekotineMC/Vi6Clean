@@ -13,7 +13,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -46,6 +45,7 @@ import fr.nekotine.core.usable.Usable;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
 import fr.nekotine.vi6clean.tool.ToolHandlerContainer;
@@ -59,6 +59,7 @@ import io.papermc.paper.datacomponent.item.PiercingWeapon;
 import io.papermc.paper.datacomponent.item.SwingAnimation;
 import io.papermc.paper.datacomponent.item.SwingAnimation.Animation;
 import io.papermc.paper.datacomponent.item.consumable.ConsumeEffect;
+import io.papermc.paper.util.Tick;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -108,14 +109,13 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 					.append(Component.text("Mettez vous prêts", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 
-	private final int PREPARATION_DURATION_MAX_TICKS;
+	private final int PREPARATION_DURATION_MAX_TICKS = Tick.tick()
+			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().preparation().duration());
 	private int preparationDurationTicks = 0;
 
 	public Vi6PhasePreparation(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		PREPARATION_DURATION_MAX_TICKS = 20
-				* Ioc.resolve(Configuration.class).getInt("game_preparation_duration_seconds", 5 * 60);
 	}
 
 	@Override

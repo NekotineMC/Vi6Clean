@@ -30,6 +30,7 @@ public class Vi6Bootstrapper extends NekotineCoreBootstrapper {
 		withEmbedDatapack(context, "/datapacks/vi6clean", "vi6clean"); // Ne pas changer l'ID
 		withEmbedDatapack(context, "/datapacks/solar_industries", "solar_industries"); // Ne pas changer l'ID
 		withEmbedDatapack(context, "/datapacks/market", "market"); // Ne pas changer l'ID
+		withEmbedDatapack(context, "/datapacks/slime_factory", "slime_factory"); // Ne pas changer l'ID
 
 		var lifecycle = context.getLifecycleManager();
 

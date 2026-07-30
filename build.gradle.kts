@@ -20,12 +20,16 @@ repositories {
     maven("https://maven.maxhenkel.de/repository/public") {
         name = "simplevoicechat"
     }
+    maven("https://repo.spongepowered.org/repository/maven-public/") {
+        name = "sponge"
+    }
 }
 
 dependencies {
     compileOnly(paperweight.paperDevBundle("26.2.build.+"))
     compileOnly(libs.protocollib)
     compileOnly(libs.commandapi)
+    compileOnly(libs.configurate)
     implementation(project(":NekotineCore"))
     compileOnly(libs.voicechat.api)
 }

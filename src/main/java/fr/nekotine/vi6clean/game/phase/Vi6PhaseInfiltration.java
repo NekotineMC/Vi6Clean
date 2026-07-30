@@ -26,6 +26,7 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
@@ -54,16 +55,14 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 					.append(Component.text(" - ", NamedTextColor.WHITE)).append(Component
 							.text("Volez puis échappez vous", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
-	private final int GAME_INFILTRATION_LOST_SECONDS;
+	private final int infiltration_lost_duration_ticks = Tick.tick()
+			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().lostDuration());
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
 
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
-		GAME_INFILTRATION_LOST_SECONDS = 20
-				* Ioc.resolve(Configuration.class).getInt("game_infitration_lost_seconds", 5 * 60);
-
 	}
 
 	@Override
@@ -135,7 +134,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		if (game.getThiefs().stream()
 				.allMatch(thief -> wrappingModule.getWrapper(thief, InMapPhasePlayerWrapper.class).hasLeft())
-				|| stealDurationTicks >= GAME_INFILTRATION_LOST_SECONDS) {
+				|| stealDurationTicks >= infiltration_lost_duration_ticks) {
 			if (isHandlingCompletion) {
 				return;
 			}
@@ -166,7 +165,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			return;
 		}
 		stealDurationTicks++;
-		if (stealDurationTicks >= GAME_INFILTRATION_LOST_SECONDS) {
+		if (stealDurationTicks >= infiltration_lost_duration_ticks) {
 			var game = Ioc.resolve(Vi6Game.class);
 			var wrappingModule = Ioc.resolve(WrappingModule.class);
 			for (var thief : game.getThiefs()) {
@@ -177,7 +176,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			}
 		}
 		if (evt.timeStampReached(TickTimeStamp.Second)) {
-			float progress = Math.clamp((float) stealDurationTicks / (float) GAME_INFILTRATION_LOST_SECONDS, 0f, 1f);
+			float progress = Math.clamp((float) stealDurationTicks / (float) infiltration_lost_duration_ticks, 0f, 1f);
 			bossbarGuard.progress(progress);
 			bossbarThief.progress(progress);
 		}

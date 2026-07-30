@@ -58,6 +58,7 @@ import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.DebugUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.game.Vi6Game;
@@ -189,7 +190,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		List<AbstractKothEffect> kothEffects = new LinkedList<>(
 				Arrays.asList(new EmpKothEffect(), new LightKothEffect(), new RegenKothEffect()));
 		List<Koth> koths = new LinkedList<>(map.getKoths().values());
-		var limit = Ioc.resolve(JavaPlugin.class).getConfig().getInt("koth.limit", 0);
+		var limit = Ioc.resolve(ConfigManager.class).getConfig().game().map().koth().limit();
 		Collections.shuffle(kothEffects);
 		Collections.shuffle(koths);
 		var nbKothSpawned = 0;

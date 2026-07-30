@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "description": "Datapack additionnel pour la carte Slime Factory du Vi6clean",
+    "min_format": [107,1],
+    "max_format": 107
+  }
+}

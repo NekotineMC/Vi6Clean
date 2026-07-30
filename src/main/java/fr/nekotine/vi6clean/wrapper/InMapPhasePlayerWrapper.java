@@ -9,6 +9,7 @@ import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -57,12 +58,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
 
-	private final double DELAY_BETWEEN_CAPTURE = Ioc.resolve(JavaPlugin.class).getConfig()
-			.getDouble("infiltration.delay_between_capture", 30);
-	private final int DELAY_BETWEEN_CAPTURE_TICKS = (int) (20 * DELAY_BETWEEN_CAPTURE);
-	private final double DELAY_BEFORE_ESCAPE = Ioc.resolve(JavaPlugin.class).getConfig()
-			.getDouble("infiltration.delay_before_escape", 30);
-	private final int DELAY_BEFORE_ESCAPE_TICKS = (int) (20 * DELAY_BEFORE_ESCAPE);
+	private final Duration DELAY_BETWEEN_CAPTURE = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration()
+			.delayBetweenCapture();
+
+	private final Duration DELAY_BEFORE_ESCAPE = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration()
+			.delayBeforeEscape();
 
 	private List<AppliedFakeBlockPatch> mapLeaveBlockers = new LinkedList<>();
 
@@ -158,10 +158,10 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			mapLeaveBlockers.clear();
 		} else {
 			for (var entrance : map.getEntrances().values()) {
-				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, entrance.getBlockingBox()));
+				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, entrance.getBlockingBox(), b -> b.getType() == Material.AIR));
 			}
 			for (var exit : map.getExits().values()) {
-				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, exit));
+				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, exit, b -> b.getType() == Material.AIR));
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 	public void thiefScheduleCanLeaveMap() {
 		setCanLeaveMap(false);
 		wrapped.sendMessage(Component.text("Vous pouvez pas vous enfuir avant ", NamedTextColor.RED)
-				.append(Component.text(DELAY_BEFORE_ESCAPE + "s", NamedTextColor.AQUA)));
+				.append(Component.text(DELAY_BEFORE_ESCAPE.toSeconds() + "s", NamedTextColor.AQUA)));
 		scheduledCanLeaveMap = new BukkitRunnable() {
 
 			@Override
@@ -195,13 +195,13 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais vous enfuir", NamedTextColor.GOLD));
 				scheduledCanLeaveMap = null;
 			}
-		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BEFORE_ESCAPE_TICKS);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(DELAY_BEFORE_ESCAPE));
 	}
 
 	public void thiefScheduleCanCaptureArtefact() {
 		setCanCaptureArtefact(false);
 		wrapped.sendMessage(Component.text("Vous pouvez pas voler d'artefacts avant ", NamedTextColor.RED)
-				.append(Component.text(DELAY_BETWEEN_CAPTURE + "s", NamedTextColor.AQUA)));
+				.append(Component.text(DELAY_BETWEEN_CAPTURE.toSeconds() + "s", NamedTextColor.AQUA)));
 		scheduledCanCaptureArtefact = new BukkitRunnable() {
 
 			@Override
@@ -210,7 +210,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 				wrapped.sendMessage(Component.text("Vous pouvez désormais voler des artefacts", NamedTextColor.GOLD));
 				scheduledCanCaptureArtefact = null;
 			}
-		}.runTaskLater(Ioc.resolve(JavaPlugin.class), DELAY_BETWEEN_CAPTURE_TICKS);
+		}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(DELAY_BETWEEN_CAPTURE));
 	}
 
 	public void thiefEnterInside(Entrance entrance) {

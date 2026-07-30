@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.inventory.ItemStackBuilder;
 import fr.nekotine.core.inventory.menu.MenuInventory;
 import fr.nekotine.core.inventory.menu.element.ActionMenuItem;
@@ -20,6 +19,7 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
@@ -30,7 +30,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
-	private int money;
+
+	private int money = Ioc.resolve(ConfigManager.class).getConfig().game().preparation().money();;
 
 	private MenuInventory menu;
 
@@ -48,11 +49,6 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		super(wrapped);
 		if (wrapped == null) {
 			return;
-		}
-		try {
-			money = ConfigurationUtil.updateAndLoadYaml("config.yml", "config.yml").getInt("money", 1000);
-		} catch (Exception e) {
-			money = 1000;
 		}
 		// Menu page
 		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
