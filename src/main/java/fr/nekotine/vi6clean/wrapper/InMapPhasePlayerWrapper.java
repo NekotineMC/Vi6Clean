@@ -158,10 +158,12 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			mapLeaveBlockers.clear();
 		} else {
 			for (var entrance : map.getEntrances().values()) {
-				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, entrance.getBlockingBox(), b -> b.getType() == Material.AIR));
+				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, entrance.getBlockingBox(),
+						b -> b.getType() == Material.AIR));
 			}
 			for (var exit : map.getExits().values()) {
-				mapLeaveBlockers.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, exit, b -> b.getType() == Material.AIR));
+				mapLeaveBlockers
+						.addAll(canLeaveMapBlockingPatch.patchPlayer(wrapped, exit, b -> b.getType() == Material.AIR));
 			}
 		}
 	}
