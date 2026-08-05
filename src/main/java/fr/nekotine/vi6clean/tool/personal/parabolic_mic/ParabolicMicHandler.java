@@ -81,7 +81,8 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 							stand.setWaypointColor(Color.NAVY);
 						}
 						wrappingModule.getWrapper(p, PlayerWrapper.class).enemyTeam().forEach(en -> {
-							if (!statusModule.hasAny(en, empFlag)) {
+							if (!statusModule.hasAny(en, empFlag) && InventoryUtil.containTaggedItem(en.getInventory(),
+									TOOL_TYPE_KEY, getToolCode())) {
 								en.showEntity(plugin, e);
 							}
 						});
@@ -114,10 +115,23 @@ public class ParabolicMicHandler extends ToolHandler<ParabolicMicHandler.Parabol
 
 	@Override
 	protected void onAttachedToPlayer(ParabolicMic tool) {
+		var plugin = Ioc.resolve(JavaPlugin.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var player = tool.getOwner();
+		wrappingModule.getWrapper(player, PlayerWrapper.class).enemyTeam().forEach(en -> {
+			if (emitters.containsKey(en)) {
+				player.showEntity(plugin, emitters.get(en));
+			}
+		});
 	}
 
 	@Override
 	protected void onDetachFromPlayer(ParabolicMic tool) {
+		var plugin = Ioc.resolve(JavaPlugin.class);
+		var player = tool.getOwner();
+		for (var value : emitters.values()) {
+			player.hideEntity(plugin, value);
+		}
 	}
 
 	@Override

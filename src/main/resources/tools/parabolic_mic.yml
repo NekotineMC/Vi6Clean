@@ -8,3 +8,4 @@ lore:
    - <lore>Vous permet <important>d'entendre les ennemis qui bougent</important>
    - <lore>jusqu'à <variable><range> blocs</variable>.
 team:
+   - thief

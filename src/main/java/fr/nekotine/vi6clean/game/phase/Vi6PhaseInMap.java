@@ -174,7 +174,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		world.setGameRule(GameRules.TNT_EXPLODES, false);
 		world.setGameRule(GameRules.MOB_GRIEFING, false);
 		world.setGameRule(GameRules.RAIDS, false);
-		world.setGameRule(GameRules.LOCATOR_BAR, false);
+		world.setGameRule(GameRules.LOCATOR_BAR, true);
 		world.setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, false);
 		world.setGameRule(GameRules.PVP, true);
 		world.setGameRule(GameRules.SPECTATORS_GENERATE_CHUNKS, false);
