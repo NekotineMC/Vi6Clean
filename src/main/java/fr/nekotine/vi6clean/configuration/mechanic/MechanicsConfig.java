@@ -14,7 +14,7 @@ public class MechanicsConfig {
 
 	@Comment("Configuration de la suffocation des voleurs")
 	private SuffocationConfig suffocation = new SuffocationConfig();
-	
+
 	@Comment("Configuration de l'invisibilité")
 	private InvisibilityConfig invisibility = new InvisibilityConfig();
 
@@ -35,11 +35,11 @@ public class MechanicsConfig {
 	public void asthma(AsthmaConfig value) {
 		asthma = value;
 	}
-	
+
 	public SuffocationConfig suffocation() {
 		return suffocation;
 	}
-	
+
 	public void suffocation(SuffocationConfig value) {
 		suffocation = value;
 	}

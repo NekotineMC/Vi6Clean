@@ -16,7 +16,7 @@ public class InfiltrationPhaseConfig {
 
 	@Comment("Durée minimale entre la dernière capture d'un voleur est sa fuite")
 	private int delayBeforeEscapeSeconds = 30;
-	
+
 	@Comment("Durée en spéctateur à la fin de la partie")
 	private int endSpectatorTimeSeconds = 5;
 
@@ -37,11 +37,11 @@ public class InfiltrationPhaseConfig {
 	public void delayBetweenCapture(Duration value) {
 		delayBetweenCaptureSeconds = Math.toIntExact(value.toSeconds());
 	}
-	
+
 	public Duration delayBeforeEscape() {
 		return Duration.ofSeconds(delayBeforeEscapeSeconds);
 	}
-	
+
 	public void delayBeforeEscape(Duration value) {
 		delayBeforeEscapeSeconds = Math.toIntExact(value.toSeconds());
 	}

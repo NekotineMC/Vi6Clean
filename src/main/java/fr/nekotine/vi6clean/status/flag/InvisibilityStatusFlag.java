@@ -27,7 +27,7 @@ import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEff
 import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
 
 public class InvisibilityStatusFlag implements StatusFlag, Listener {
-	
+
 	private static final PotionEffect invisibleEffect = new PotionEffect(PotionEffectType.INVISIBILITY, -1, 0, false,
 			false, true);
 	private static InvisibilityStatusFlag instance;
@@ -44,7 +44,7 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 	}
 
 	//
-	
+
 	private ConfigManager configuration = Ioc.resolve(ConfigManager.class);
 
 	public InvisibilityStatusFlag() {
@@ -139,7 +139,9 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 			var pLoc = evt.getTo().clone().add(0, 0.2, 0);
 			var sound = InvisibilityStatusEffectType.get().equals(type);
 			for (Player enemy : wrapper.enemyTeam()) {
-				enemy.spawnParticle(Particle.BLOCK, pLoc, configuration.getConfig().game().mechanics().invisibility().particleCount(), 0, 0, 0, 0, block_under.getBlockData());
+				enemy.spawnParticle(Particle.BLOCK, pLoc,
+						configuration.getConfig().game().mechanics().invisibility().particleCount(), 0, 0, 0, 0,
+						block_under.getBlockData());
 				if (sound) {
 					Vi6Sound.INVISIBILITY_WALK.play(enemy, pLoc);
 				}

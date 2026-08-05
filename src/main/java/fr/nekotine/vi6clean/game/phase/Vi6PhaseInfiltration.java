@@ -147,7 +147,8 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				public void run() {
 					complete();
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime()));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(
+					Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime()));
 		}
 	}
 

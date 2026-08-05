@@ -28,7 +28,7 @@ public class ConfigManager implements IPluginModule {
 
 	public ConfigManager() {
 		var plugin = Ioc.resolve(JavaPlugin.class);
-		configPath = plugin.getDataPath().resolve("config_2.yml");
+		configPath = plugin.getDataPath().resolve("config.yml");
 		loader = YamlConfigurationLoader.builder().path(configPath).nodeStyle(NodeStyle.BLOCK).build();
 	}
 
