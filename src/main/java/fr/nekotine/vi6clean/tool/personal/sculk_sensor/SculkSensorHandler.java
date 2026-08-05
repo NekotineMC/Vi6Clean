@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.tool.personal.sculk_sensor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.Tag;
 import org.bukkit.block.data.type.SculkSensor.Phase;
 import org.bukkit.entity.Player;
@@ -37,6 +38,7 @@ import fr.nekotine.vi6clean.tool.ToolCode;
 import fr.nekotine.vi6clean.tool.ToolHandler;
 import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -50,8 +52,13 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 
 	private static final Tag<Material> REPLACABLES = new MaterialSetTag(
 			NamespacedKey.fromString("sculk_sensor_replacable", Ioc.resolve(JavaPlugin.class)), mat -> {
-				return mat == Material.AIR || Tag.STANDING_SIGNS.isTagged(mat) || Tag.WALL_SIGNS.isTagged(mat)
-						|| Tag.TRAPDOORS.isTagged(mat) || Tag.WOOL_CARPETS.isTagged(mat);
+				return mat == Material.AIR
+						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.SIGNS).contains(mat.asBlockType())
+						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.TRAPDOORS).contains(mat.asBlockType())
+						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.WOOL_CARPETS).contains(mat.asBlockType())
+						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.REPLACEABLE).contains(mat.asBlockType())
+						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.REPLACEABLE_BY_TREES)
+								.contains(mat.asBlockType());
 			});
 
 	public SculkSensorHandler() {
