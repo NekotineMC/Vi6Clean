@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.GameRules;
@@ -524,6 +525,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			return;
 		guardSafeTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(3);
+		artefact.getGuardWaypoint().setWaypointColor(Color.GREEN);
 	}
 
 	public void guardObjectiveStolen(Artefact artefact) {
@@ -532,6 +534,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			return;
 		guardStolenTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(1);
+		artefact.getGuardWaypoint().setWaypointColor(Color.RED);
 		if (--unfoundStolenArtefacts == 0) {
 			guardUnknownToSafe();
 		}
@@ -544,6 +547,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			return;
 		guardEscapedTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(0);
+		artefact.getGuardWaypoint().setWaypointColor(Color.MAROON);
 	}
 
 	public void guardSafeToUnknown() {
@@ -570,6 +574,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			return;
 		guardUnknownTeam.addEntry(name);
 		guardScoreboard.getScore(name).setScore(2);
+		artefact.getGuardWaypoint().setWaypointColor(Color.YELLOW);
 	}
 
 	/*
@@ -589,6 +594,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(2);
 		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.YELLOW));
+		artefact.clearThiefWaypoint();
 	}
 
 	public void thiefObjectiveEscaped(Artefact artefact) {

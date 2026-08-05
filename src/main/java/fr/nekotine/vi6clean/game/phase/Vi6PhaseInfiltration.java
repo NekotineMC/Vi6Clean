@@ -29,7 +29,6 @@ import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
-import fr.nekotine.vi6clean.map.artefact.Artefact;
 import fr.nekotine.vi6clean.map.artefact.ArtefactStealEvent;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper.LeaveState;
@@ -80,7 +79,6 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().spawnInMap((Map<Player, ThiefSpawn>) inputData);
 		game.sendMessage(Component.text("La phase d'infiltration débute.", NamedTextColor.GOLD));
-		getParent().getMap().getArtefacts().values().forEach(Artefact::unglow);
 		game.getThiefs().forEach(p -> p.showBossBar(bossbarThief));
 		game.getGuards().forEach(p -> p.showBossBar(bossbarGuard));
 	}

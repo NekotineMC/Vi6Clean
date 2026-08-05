@@ -5,12 +5,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.BlockDisplay;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.BoundingBox;
 
@@ -36,6 +44,9 @@ public class Artefact {
 
 	private static final double CAPTURE_AMOUNT_NEEDED = 200;
 
+	private final transient NamespacedKey transmitTrackingRangeAttributeKey = NamespacedKey
+			.fromString("artefact/waypoint_range", Ioc.resolve(JavaPlugin.class));
+
 	private double capture_advancement;
 
 	@MapDictKey
@@ -59,6 +70,25 @@ public class Artefact {
 
 	private boolean foundAfterCapture;
 
+	private ArmorStand thiefWaypoint;
+
+	private ArmorStand guardWaypoint;
+
+	public ArmorStand getThiefWaypoint() {
+		return thiefWaypoint;
+	}
+
+	public void clearThiefWaypoint() {
+		if (thiefWaypoint != null) {
+			thiefWaypoint.remove();
+		}
+		thiefWaypoint = null;
+	}
+
+	public ArmorStand getGuardWaypoint() {
+		return guardWaypoint;
+	}
+
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
 	}
@@ -80,12 +110,38 @@ public class Artefact {
 	public void setup(World world) {
 		boxDisplays = SpatialUtil.boundingBoxEdgeAsDisplayBlocks(world, getBoundingBox(),
 				Material.ORANGE_WOOL.createBlockData(), 0.06f);
-	}
-
-	public void unglow() {
-		for (var display : boxDisplays) {
-			display.setGlowing(false);
-		}
+		var plugin = Ioc.resolve(JavaPlugin.class);
+		var game = Ioc.resolve(Vi6Game.class);
+		thiefWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world), EntityType.ARMOR_STAND,
+				SpawnReason.CUSTOM, e -> {
+					e.setPersistent(false);
+					e.setVisibleByDefault(false);
+					if (e instanceof ArmorStand stand) {
+						stand.setMarker(true);
+						stand.setInvisible(true);
+						stand.setWaypointColor(Color.GREEN);
+						stand.getAttribute(Attribute.WAYPOINT_TRANSMIT_RANGE).addModifier(
+								new AttributeModifier(transmitTrackingRangeAttributeKey, 1000, Operation.ADD_NUMBER));
+					}
+					game.getThiefs().forEach(en -> {
+						en.showEntity(plugin, e);
+					});
+				});
+		guardWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world), EntityType.ARMOR_STAND,
+				SpawnReason.CUSTOM, e -> {
+					e.setPersistent(false);
+					e.setVisibleByDefault(false);
+					if (e instanceof ArmorStand stand) {
+						stand.setMarker(true);
+						stand.setInvisible(true);
+						stand.setWaypointColor(Color.GREEN);
+						stand.getAttribute(Attribute.WAYPOINT_TRANSMIT_RANGE).addModifier(
+								new AttributeModifier(transmitTrackingRangeAttributeKey, 1000, Operation.ADD_NUMBER));
+					}
+					game.getGuards().forEach(en -> {
+						en.showEntity(plugin, e);
+					});
+				});
 	}
 
 	public void clean() {
@@ -97,6 +153,14 @@ public class Artefact {
 				dis.remove();
 			}
 			boxDisplays.clear();
+		}
+		if (thiefWaypoint != null) {
+			thiefWaypoint.remove();
+			thiefWaypoint = null;
+		}
+		if (guardWaypoint != null) {
+			guardWaypoint.remove();
+			guardWaypoint = null;
 		}
 	}
 
