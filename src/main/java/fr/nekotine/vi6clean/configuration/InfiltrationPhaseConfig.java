@@ -19,14 +19,6 @@ public class InfiltrationPhaseConfig {
 
 	// Getters and setters
 
-	public int lostDurationSeconds() {
-		return lostDurationSeconds;
-	}
-
-	public void lostDurationSeconds(int value) {
-		lostDurationSeconds = value;
-	}
-
 	public Duration lostDuration() {
 		return Duration.ofSeconds(lostDurationSeconds);
 	}
@@ -35,28 +27,12 @@ public class InfiltrationPhaseConfig {
 		lostDurationSeconds = Math.toIntExact(value.toSeconds());
 	}
 
-	public int delayBetweenCaptureSeconds() {
-		return delayBetweenCaptureSeconds;
-	}
-
-	public void delayBetweenCaptureSeconds(int value) {
-		delayBetweenCaptureSeconds = value;
-	}
-
 	public Duration delayBetweenCapture() {
 		return Duration.ofSeconds(delayBetweenCaptureSeconds);
 	}
 
 	public void delayBetweenCapture(Duration value) {
 		delayBetweenCaptureSeconds = Math.toIntExact(value.toSeconds());
-	}
-
-	public int delayBeforeEscapeSeconds() {
-		return delayBeforeEscapeSeconds;
-	}
-
-	public void delayBeforeEscapeSeconds(int value) {
-		delayBeforeEscapeSeconds = value;
 	}
 
 	public Duration delayBeforeEscape() {

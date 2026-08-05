@@ -4,6 +4,7 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.IPluginModule;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
+import io.papermc.paper.util.Tick;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -61,8 +62,8 @@ public final class Majordom implements IPluginModule, Listener {
 				public void run() {
 					tryToggle(block);
 				}
-			}.runTaskLater(plugin,
-					Ioc.resolve(ConfigManager.class).getConfig().game().mechanics().majordom().delayTicks());
+			}.runTaskLater(plugin, Tick.tick()
+					.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().mechanics().majordom().delay()));
 			toClose.put(block, task);
 		}
 		openable.setOpen(!openable.isOpen());

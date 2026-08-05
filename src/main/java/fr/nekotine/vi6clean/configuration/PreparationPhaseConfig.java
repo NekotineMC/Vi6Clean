@@ -16,14 +16,6 @@ public class PreparationPhaseConfig {
 
 	// Getters and setters
 
-	public int durationSeconds() {
-		return durationSeconds;
-	}
-
-	public void durationSeconds(int value) {
-		durationSeconds = value;
-	}
-
 	public Duration duration() {
 		return Duration.ofSeconds(durationSeconds);
 	}

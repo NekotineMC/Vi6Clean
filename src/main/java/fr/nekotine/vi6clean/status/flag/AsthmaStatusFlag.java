@@ -1,5 +1,15 @@
 package fr.nekotine.vi6clean.status.flag;
 
+import java.util.HashMap;
+
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
+
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.status.flag.StatusFlag;
@@ -8,74 +18,23 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.status.event.EntityMurmurEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityMurmurStartEvent;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
-
-import java.util.HashMap;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSprintEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import io.papermc.paper.util.Tick;
 
 public class AsthmaStatusFlag implements StatusFlag, Listener {
 	private class AsthmaInfo {
 		private MovementMode mode;
-		private double consume_tick_count;
+		private int consume_tick_count = 0;
 		private int idle_tick_count;
-		private boolean cancelledFlying;
 		private boolean isMurmuring;
 
-		public AsthmaInfo(MovementMode mode, int consume_tick_count, int idle_tick_count, boolean isMurmuring) {
-			this.setMode(mode);
-			this.setConsumeTickCount(consume_tick_count);
-			this.setIdleTickCount(idle_tick_count);
-			this.setCancelledFlying(false);
-			this.setMurmuring(isMurmuring);
-		}
-
-		public boolean isMurmuring() {
-			return isMurmuring;
-		}
-
-		public void setMurmuring(boolean isMurmuring) {
-			this.isMurmuring = isMurmuring;
-		}
-
-		public MovementMode getMode() {
-			return mode;
-		}
-
-		public void setMode(MovementMode mode) {
+		public AsthmaInfo(MovementMode mode, int idle_tick_count, boolean isMurmuring) {
 			this.mode = mode;
-		}
-
-		public double getConsumeTickCount() {
-			return consume_tick_count;
-		}
-
-		public void setConsumeTickCount(double consume_tick_count) {
-			this.consume_tick_count = consume_tick_count;
-		}
-
-		public int getIdleTickCount() {
-			return idle_tick_count;
-		}
-
-		public void setIdleTickCount(int idle_tick_count) {
 			this.idle_tick_count = idle_tick_count;
-		}
-
-		public boolean isCancelledFlying() {
-			return cancelledFlying;
-		}
-
-		public void setCancelledFlying(boolean cancelledFlying) {
-			this.cancelledFlying = cancelledFlying;
+			this.isMurmuring = isMurmuring;
 		}
 	}
 
@@ -83,16 +42,8 @@ public class AsthmaStatusFlag implements StatusFlag, Listener {
 		SPRINTING, WALKING, IDLE
 	}
 
-	private int HALF_DRUMSTICK_CONSUME_TICK = (int) (20
-			* Ioc.resolve(JavaPlugin.class).getConfig().getDouble("half_drumstick_consumption_delay", 1));
-	private int HALF_DRUMSTICK_MOVING_REGEN_TICK = (int) (20
-			* Ioc.resolve(JavaPlugin.class).getConfig().getDouble("half_drumsitck_moving_regeneration_delay", 2));
-	private double IDLE_REGEN_MULTIPLIER = Ioc.resolve(JavaPlugin.class).getConfig()
-			.getDouble("idle_regeneration_multiplier", 2);
-	private int TICK_BEFORE_CONSIDER_IDLE = (int) (20
-			* Ioc.resolve(JavaPlugin.class).getConfig().getDouble("delay_before_considering_idle", 0.25));
-	private int MAX_HALF_DRUMSTICK_AFTER_CAPTURE = Ioc.resolve(JavaPlugin.class).getConfig()
-			.getInt("max_half_drumstick_after_capture", 10);
+	private ConfigManager configuration = Ioc.resolve(ConfigManager.class);
+
 	private static AsthmaStatusFlag instance;
 
 	public static final AsthmaStatusFlag get() {
@@ -116,11 +67,11 @@ public class AsthmaStatusFlag implements StatusFlag, Listener {
 	public void applyStatus(LivingEntity appliedTo) {
 		if (appliedTo instanceof Player player) {
 			var info = new AsthmaInfo(player.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING,
-					HALF_DRUMSTICK_MOVING_REGEN_TICK, TICK_BEFORE_CONSIDER_IDLE,
+					Tick.tick().fromDuration(configuration.getConfig().game().mechanics().asthma().idleDelay()),
 					Ioc.resolve(StatusFlagModule.class).hasAny(appliedTo, MurmurStatusFlag.get()));
 
 			patients.put(player, info);
-			updateActionBarMode(player, info.getMode(), info.isMurmuring());
+			updateActionBarMode(player);
 		}
 	}
 
@@ -130,36 +81,23 @@ public class AsthmaStatusFlag implements StatusFlag, Listener {
 	}
 
 	public void capture(Player player) {
-		if (!patients.containsKey(player))
-			return;
-		var info = patients.get(player);
-		var level = Math.min(MAX_HALF_DRUMSTICK_AFTER_CAPTURE, player.getFoodLevel());
+		var level = Math.min(configuration.getConfig().game().mechanics().asthma().maxFoodAfterCapture(),
+				player.getFoodLevel());
 		player.setFoodLevel(level);
-		if (info.getMode() != MovementMode.SPRINTING) {
-			info.setConsumeTickCount(HALF_DRUMSTICK_MOVING_REGEN_TICK);
-		}
 	}
 
 	//
 
-	private boolean updateFlying(Player player, boolean cancelledFlying) {
-		if (cancelledFlying && player.getFoodLevel() > 6) {
-			player.setAllowFlight(true);
-			return false;
+	private void updateActionBarMode(Player player) {
+		if (!patients.containsKey(player)) {
+			return;
 		}
-		if (player.getFoodLevel() <= 6 && player.getAllowFlight()) {
-			player.setAllowFlight(false);
-			return true;
+		var wrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+		if (wrapper.isEmpty()) {
+			return;
 		}
-		return cancelledFlying;
-	}
-
-	private void updateActionBarMode(Player player, MovementMode mode, boolean isMurmuring) {
-		InMapPhasePlayerWrapper wrapper = Ioc.resolve(WrappingModule.class).getWrapper(player,
-				InMapPhasePlayerWrapper.class);
-		if (wrapper != null) {
-			wrapper.updateStaminaComponent(mode, isMurmuring);
-		}
+		var info = patients.get(player);
+		wrapper.get().updateStaminaComponent(info.mode, info.isMurmuring);;
 	}
 
 	//
@@ -178,10 +116,9 @@ public class AsthmaStatusFlag implements StatusFlag, Listener {
 			return;
 		var info = patients.get(player);
 
-		info.setMode(evt.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING);
-		info.setConsumeTickCount(evt.isSprinting() ? HALF_DRUMSTICK_CONSUME_TICK : HALF_DRUMSTICK_MOVING_REGEN_TICK);
-		info.setIdleTickCount(TICK_BEFORE_CONSIDER_IDLE);
-		updateActionBarMode(player, info.getMode(), info.isMurmuring());
+		info.mode = evt.isSprinting() ? MovementMode.SPRINTING : MovementMode.WALKING;
+		info.idle_tick_count = 0;
+		updateActionBarMode(player);
 	}
 
 	@EventHandler
@@ -193,79 +130,85 @@ public class AsthmaStatusFlag implements StatusFlag, Listener {
 			return;
 		var info = patients.get(player);
 
-		if (info.getMode() == MovementMode.IDLE) {
-			info.setMode(MovementMode.WALKING);
-			updateActionBarMode(player, info.getMode(), info.isMurmuring());
+		if (info.mode == MovementMode.IDLE) {
+			info.mode = MovementMode.WALKING;
+			updateActionBarMode(player);
 		}
 
-		info.setIdleTickCount(TICK_BEFORE_CONSIDER_IDLE);
+		info.idle_tick_count = 0;
 	}
 
 	@EventHandler
 	private void onMurmurStart(EntityMurmurStartEvent evt) {
 		var ent = evt.getEntity();
-		if (patients.containsKey(ent)) {
-			var info = patients.get(ent);
-			info.setMurmuring(true);
-			updateActionBarMode((Player) ent, info.getMode(), info.isMurmuring());
+		if (!(ent instanceof Player player)) {
+			return;
+		}
+		if (patients.containsKey(player)) {
+			var info = patients.get(player);
+			info.isMurmuring = true;
+			updateActionBarMode(player);
 		}
 	}
 
 	@EventHandler
 	private void onMurmurEnd(EntityMurmurEndEvent evt) {
 		var ent = evt.getEntity();
-		if (patients.containsKey(ent)) {
-			var info = patients.get(ent);
-			info.setMurmuring(false);
-			updateActionBarMode((Player) ent, info.getMode(), info.isMurmuring());
+		if (!(ent instanceof Player player)) {
+			return;
+		}
+		if (patients.containsKey(player)) {
+			var info = patients.get(player);
+			info.isMurmuring = false;
+			updateActionBarMode(player);
 		}
 	}
 
 	@EventHandler
 	private void onTick(TickElapsedEvent evt) {
+
+		// Récupération des configs ici pour pouvoir les changer en runtime
+		var asthmaConfig = configuration.getConfig().game().mechanics().asthma();
+		var sprintUsageTick = Tick.tick().fromDuration(asthmaConfig.sprintConsumptionDelay());
+		var walkUsageTick = Tick.tick().fromDuration(asthmaConfig.walkRegenerationDelay());
+		var idleUsageTick = Tick.tick().fromDuration(asthmaConfig.idleRegenerationDelay());
+		var idleDelayTick = Tick.tick().fromDuration(asthmaConfig.idleDelay());
+
 		for (var entry : patients.entrySet()) {
 			var player = entry.getKey();
 			var info = entry.getValue();
-			var mode = info.getMode();
-			var usage_tick = info.getConsumeTickCount();
-			var idle_tick = info.getIdleTickCount();
-			var is_murmuring = info.isMurmuring();
 
-			switch (mode) {
+			if (info.mode != MovementMode.IDLE && ++info.idle_tick_count >= idleDelayTick) {
+				info.mode = MovementMode.IDLE;
+				updateActionBarMode(player);
+			}
+
+			info.consume_tick_count++;
+
+			switch (info.mode) {
 				case SPRINTING :
-					if (--usage_tick == 0) {
+					if (info.consume_tick_count >= sprintUsageTick) {
 						player.setFoodLevel(player.getFoodLevel() - 1);
-						usage_tick = HALF_DRUMSTICK_CONSUME_TICK;
+						info.consume_tick_count = 0;
 					}
 					break;
 				case WALKING :
-					if (--usage_tick == 0) {
-						if (!is_murmuring) {
+					if (info.consume_tick_count >= walkUsageTick) {
+						if (!info.isMurmuring) {
 							player.setFoodLevel(Math.min(20, player.getFoodLevel() + 1));
 						}
-						usage_tick = HALF_DRUMSTICK_MOVING_REGEN_TICK;
-					}
-					if (--idle_tick == 0) {
-						mode = MovementMode.IDLE;
-						updateActionBarMode(player, mode, is_murmuring);
+						info.consume_tick_count = 0;
 					}
 					break;
 				default :
-					usage_tick = usage_tick - IDLE_REGEN_MULTIPLIER;
-					if (usage_tick <= 0) {
-						if (!is_murmuring) {
+					if (info.consume_tick_count >= idleUsageTick) {
+						if (!info.isMurmuring) {
 							player.setFoodLevel(Math.min(20, player.getFoodLevel() + 1));
 						}
-						usage_tick = HALF_DRUMSTICK_MOVING_REGEN_TICK;
+						info.consume_tick_count = 0;
 					}
 					break;
 			}
-
-			var cancelledFlying = updateFlying(player, info.isCancelledFlying());
-			info.setIdleTickCount(idle_tick);
-			info.setConsumeTickCount(usage_tick);
-			info.setMode(mode);
-			info.setCancelledFlying(cancelledFlying);
 		}
 	}
 }

@@ -15,14 +15,6 @@ public class MajordomConfig {
 
 	// Getters and setters
 
-	public int delayTicks() {
-		return delayTicks;
-	}
-
-	public void delayTicks(int value) {
-		delayTicks = value;
-	}
-
 	public Duration delay() {
 		return Tick.of(delayTicks);
 	}
