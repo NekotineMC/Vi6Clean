@@ -12,6 +12,9 @@ public class MechanicsConfig {
 	@Comment("Configuration de l'énergie des voleurs")
 	private AsthmaConfig asthma = new AsthmaConfig();
 
+	@Comment("Configuration de la suffocation des voleurs")
+	private SuffocationConfig suffocation = new SuffocationConfig();
+
 	// Getters and setters
 
 	public MajordomConfig majordom() {
@@ -28,6 +31,14 @@ public class MechanicsConfig {
 
 	public void asthma(AsthmaConfig value) {
 		asthma = value;
+	}
+
+	public SuffocationConfig suffocation() {
+		return suffocation;
+	}
+
+	public void suffocation(SuffocationConfig value) {
+		suffocation = value;
 	}
 
 }
