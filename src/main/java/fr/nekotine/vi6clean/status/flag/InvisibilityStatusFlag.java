@@ -1,19 +1,7 @@
 package fr.nekotine.vi6clean.status.flag;
 
-import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.core.status.effect.StatusEffectModule;
-import fr.nekotine.core.status.effect.StatusEffectType;
-import fr.nekotine.core.status.flag.StatusFlag;
-import fr.nekotine.core.status.flag.StatusFlagModule;
-import fr.nekotine.core.util.EventUtil;
-import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.invisibility.InvisibilityStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.invisibility.SilentInvisibilityStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEffectType;
-import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
-
 import javax.annotation.Nullable;
+
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +12,22 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.status.effect.StatusEffectModule;
+import fr.nekotine.core.status.effect.StatusEffectType;
+import fr.nekotine.core.status.flag.StatusFlag;
+import fr.nekotine.core.status.flag.StatusFlagModule;
+import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
+import fr.nekotine.vi6clean.constant.Vi6Sound;
+import fr.nekotine.vi6clean.status.effect.invisibility.InvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.invisibility.SilentInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEffectType;
+import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
+
 public class InvisibilityStatusFlag implements StatusFlag, Listener {
+	
 	private static final PotionEffect invisibleEffect = new PotionEffect(PotionEffectType.INVISIBILITY, -1, 0, false,
 			false, true);
 	private static InvisibilityStatusFlag instance;
@@ -41,12 +44,8 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 	}
 
 	//
-
-	private final double STEP_DISTANCE = Ioc.resolve(JavaPlugin.class).getConfig()
-			.getDouble("invisibility.step_distance", 0.75);
-	private final double SQUARED_STEP_DISTANCE = STEP_DISTANCE * STEP_DISTANCE;
-	private final int PARTICLE_COUNT = Ioc.resolve(JavaPlugin.class).getConfig().getInt("invisibility.particle_count",
-			2);
+	
+	private ConfigManager configuration = Ioc.resolve(ConfigManager.class);
 
 	public InvisibilityStatusFlag() {
 		EventUtil.register(this);
@@ -134,12 +133,13 @@ public class InvisibilityStatusFlag implements StatusFlag, Listener {
 		var wrapper = Ioc.resolve(WrappingModule.class).getWrapper(evtP, PlayerWrapper.class);
 		var distance = wrapper.getSquaredWalkedDistance() + evt.getFrom().distanceSquared(evt.getTo());
 		var block_under = evt.getTo().clone().subtract(0, 0.1, 0).getBlock();
-		if (block_under.isSolid() && distance >= SQUARED_STEP_DISTANCE) {
+		var step_distance = configuration.getConfig().game().mechanics().invisibility().particleCount();
+		if (block_under.isSolid() && distance >= (step_distance * step_distance)) {
 			distance = 0;
 			var pLoc = evt.getTo().clone().add(0, 0.2, 0);
 			var sound = InvisibilityStatusEffectType.get().equals(type);
 			for (Player enemy : wrapper.enemyTeam()) {
-				enemy.spawnParticle(Particle.BLOCK, pLoc, PARTICLE_COUNT, 0, 0, 0, 0, block_under.getBlockData());
+				enemy.spawnParticle(Particle.BLOCK, pLoc, configuration.getConfig().game().mechanics().invisibility().particleCount(), 0, 0, 0, 0, block_under.getBlockData());
 				if (sound) {
 					Vi6Sound.INVISIBILITY_WALK.play(enemy, pLoc);
 				}
