@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.GameMode;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,8 +32,8 @@ import fr.nekotine.vi6clean.map.ThiefSpawn;
 import fr.nekotine.vi6clean.map.artefact.Artefact;
 import fr.nekotine.vi6clean.map.artefact.ArtefactStealEvent;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
-import fr.nekotine.vi6clean.wrapper.InfiltrationPhasePlayerWrapper;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper.LeaveState;
+import fr.nekotine.vi6clean.wrapper.InfiltrationPhasePlayerWrapper;
 import io.papermc.paper.util.Tick;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -142,15 +141,13 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
-			var spectatorTimeSeconds = Duration
-					.ofSeconds(Ioc.resolve(Configuration.class).getLong("game_end_spectator_time", 5));
 			new BukkitRunnable() {
 
 				@Override
 				public void run() {
 					complete();
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(spectatorTimeSeconds));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime()));
 		}
 	}
 
