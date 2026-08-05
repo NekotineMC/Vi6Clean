@@ -46,6 +46,7 @@ import fr.nekotine.core.text.tree.Leaf;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import fr.nekotine.vi6clean.wrapper.PreparationPhasePlayerWrapper;
@@ -105,7 +106,7 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 
 		// load configuration
 		try {
-			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("override_config", false)) {
+			if (Ioc.resolve(ConfigManager.class).getConfig().override_config()) {
 				configuration = ConfigurationUtil.overrideAndLoadYaml("tools/" + toolCode + ".yml",
 						"/tools/" + toolCode + ".yml");
 			} else {
