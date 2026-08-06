@@ -52,13 +52,13 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 
 	private static final Tag<Material> REPLACABLES = new MaterialSetTag(
 			NamespacedKey.fromString("sculk_sensor_replacable", Ioc.resolve(JavaPlugin.class)), mat -> {
-				return mat == Material.AIR
+				return !mat.isLegacy() && (mat == Material.AIR
 						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.SIGNS).contains(mat.asBlockType())
 						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.TRAPDOORS).contains(mat.asBlockType())
 						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.WOOL_CARPETS).contains(mat.asBlockType())
 						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.REPLACEABLE).contains(mat.asBlockType())
 						|| Registry.BLOCK.getTagValues(BlockTypeTagKeys.REPLACEABLE_BY_TREES)
-								.contains(mat.asBlockType());
+								.contains(mat.asBlockType()));
 			});
 
 	public SculkSensorHandler() {
