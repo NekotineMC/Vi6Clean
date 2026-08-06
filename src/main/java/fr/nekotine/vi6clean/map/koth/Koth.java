@@ -186,11 +186,17 @@ public class Koth {
 		tickAdvancement = 0;
 		boolean owningTeamCancelling = false;
 		Player firstEnemy = null;
-		for (var player : inside) {
+		var ite = inside.iterator();
+		while (ite.hasNext()) {
+			var player = ite.next();
 			var optWrapper = wrapping.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
 			if (optWrapper.isEmpty())
 				continue;
 
+			if (!optWrapper.get().isInside()) {
+				ite.remove();
+				continue;
+			}
 			if (optWrapper.get().getParentWrapper().getTeam() == owningTeam) {
 				owningTeamCancelling = true;
 			} else {
