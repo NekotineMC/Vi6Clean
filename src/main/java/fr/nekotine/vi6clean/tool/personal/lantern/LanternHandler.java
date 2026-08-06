@@ -41,6 +41,7 @@ import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.tool.Tool;
 import fr.nekotine.vi6clean.tool.ToolCode;
 import fr.nekotine.vi6clean.tool.ToolHandler;
+import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import net.kyori.adventure.sound.Sound;
@@ -66,7 +67,8 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			return;
 		}
 		var player = evt.getPlayer();
-		var optWrap = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		var wrappingModule = Ioc.resolve(WrappingModule.class);
+		var optWrap = wrappingModule.getWrapperOptional(player, PlayerWrapper.class);
 		if (optWrap.isEmpty()) {
 			return;
 		}
@@ -133,6 +135,10 @@ public class LanternHandler extends ToolHandler<LanternHandler.Lantern> {
 			return;
 		}
 		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+			return;
+		}
+		var inMapWrap = wrappingModule.getWrapper(player, InMapPhasePlayerWrapper.class);
+		if (inMapWrap == null || !inMapWrap.isInside()) {
 			return;
 		}
 		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
