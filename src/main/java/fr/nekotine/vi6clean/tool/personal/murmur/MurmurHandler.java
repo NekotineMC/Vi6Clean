@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.status.effect.StatusEffect;
@@ -36,6 +37,7 @@ public class MurmurHandler extends ToolHandler<MurmurHandler.Murmur> {
 	private final String MESSAGE = "<red>Vous êtes anormalement <b>essouflé</b><br>"
 			+ "Votre <b>stamina</b> et votre <b>air</b> ne peuvent plus remonter pendant <aqua>" + DURATION
 			+ "</aqua> secondes</red>";
+	private final int COOLDOWN_TICK = (int) (20 * getConfiguration().getDouble("cooldown", 60));
 
 	public MurmurHandler() {
 		super(Murmur::new);
@@ -55,26 +57,28 @@ public class MurmurHandler extends ToolHandler<MurmurHandler.Murmur> {
 
 	@EventHandler
 	private void onPlayerInteract(PlayerInteractEvent evt) {
-		var tool = getToolFromItem(evt.getItem());
-		if (tool == null) {
+		if (evt.getHand() != EquipmentSlot.HAND && !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
+		var statusModule = Ioc.resolve(StatusFlagModule.class);
 		var player = evt.getPlayer();
-		if (Ioc.resolve(StatusFlagModule.class).hasAny(player, EmpStatusFlag.get())) {
+		var item = evt.getItem();
+		var tool = getToolFromItem(item);
+		if (tool == null || statusModule.hasAny(player, EmpStatusFlag.get()) || player.hasCooldown(item)) {
 			return;
 		}
-		if (EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
-			evt.setCancelled(true);
-			var optWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
-			if (optWrapper.isPresent()) {
-				var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-				optWrapper.get().enemyTeamInMap().forEach(p -> {
-					p.sendMessage(MiniMessage.miniMessage().deserialize(MESSAGE));
-					statusEffectModule.addEffect(p, EFFECT);
-				});
-			}
-			remove(tool);
+
+		evt.setCancelled(true);
+		var optWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(player, PlayerWrapper.class);
+		if (optWrapper.isPresent()) {
+			var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
+			optWrapper.get().enemyTeamInMap().forEach(p -> {
+				p.sendMessage(MiniMessage.miniMessage().deserialize(MESSAGE));
+				statusEffectModule.addEffect(p, EFFECT);
+			});
 		}
+		// remove(tool);
+		player.setCooldown(item, COOLDOWN_TICK);
 	}
 
 	@EventHandler
