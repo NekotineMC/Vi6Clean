@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -255,6 +256,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		scoreboardGuard.addPlayer(player);
 		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
 		wrap.setTeam(Vi6Team.GUARD);
+		player.setGameMode(GameMode.ADVENTURE);
 		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var guard : guards) {
 			glowModule.glowEntityFor(guard, player);
@@ -285,6 +287,7 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 		scoreboardThief.addPlayer(player);
 		var wrap = Ioc.resolve(WrappingModule.class).getWrapper(player, PlayerWrapper.class);
 		wrap.setTeam(Vi6Team.THIEF);
+		player.setGameMode(GameMode.ADVENTURE);
 		var glowModule = Ioc.resolve(EntityGlowModule.class);
 		for (var thief : thiefs) {
 			glowModule.glowEntityFor(thief, player);
