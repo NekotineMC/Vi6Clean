@@ -1,6 +1,6 @@
 {
-  "near_distance": 1,
-  "far_distance": 16,
+  "near_distance": 5,
+  "far_distance": 15,
   "sprites": [
     "minecraft:default_0",
     "minecraft:default_1",
