@@ -83,10 +83,12 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 				statusEffectModule.removeAllEffectsOfType(player, SuffocatingStatusEffectType.get());
 				statusEffectModule.removeAllEffectsOfType(player, TazedStatusEffectType.get());
 				statusEffectModule.removeAllEffectsOfType(player, DiarrheaStatusEffectType.get());
+				player.setInvulnerable(true);
 				new BukkitRunnable() {
 
 					@Override
 					public void run() {
+						player.setInvulnerable(false);
 						Vi6Sound.DEAD_RINGER_UNCLOAK.play(player.getLocation());
 						remove(tool);
 					}
