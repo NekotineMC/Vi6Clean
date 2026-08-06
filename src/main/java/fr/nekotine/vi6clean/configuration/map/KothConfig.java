@@ -7,7 +7,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public class KothConfig {
 
 	@Comment("Nombre maximum de point de capture dans une map")
-	private int limit = 2;
+	private int limit = 3;
 
 	// Getters and setters
 
