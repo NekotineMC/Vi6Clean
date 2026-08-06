@@ -5,10 +5,13 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Registry;
 import org.bukkit.Tag;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.SculkSensor.Phase;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockReceiveGameEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -68,6 +71,12 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 
 	@EventHandler
 	private void onPlayerInterract(PlayerInteractEvent evt) {
+		if (evt.getAction() == Action.PHYSICAL && evt.getClickedBlock() != null
+				&& evt.getClickedBlock().getType() == Material.SCULK_SENSOR) {
+			evt.setCancelled(true);
+			return;
+		}
+
 		if (evt.getHand() != EquipmentSlot.HAND || !EventUtil.isCustomAction(evt, CustomAction.HIT_ANY)) {
 			return;
 		}
@@ -89,11 +98,21 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 	}
 
 	@EventHandler
+	private void onBlockRedstone(BlockRedstoneEvent evt) {
+		if (evt.getBlock().getBlockData() instanceof Openable) {
+			evt.setNewCurrent(evt.getOldCurrent());
+		}
+	}
+
+	@EventHandler
 	private void onSculkTriggered(BlockReceiveGameEvent evt) {
-		if (evt.getBlock().getType() != Material.SCULK_SENSOR) {
+		if (evt.getBlock().getType() != Material.SCULK_SENSOR || evt.isCancelled()) {
 			return;
 		}
-		if (evt.getEntity() instanceof Player player) {
+		if (evt.getEntity() == null) {
+			evt.setCancelled(true);
+			return;
+		} else if (evt.getEntity() instanceof Player player) {
 			var wrapModule = Ioc.resolve(WrappingModule.class);
 			var wrapper = wrapModule.getWrapperOptional(player, PlayerWrapper.class);
 			if (wrapper.isEmpty() || wrapper.get().isGuard()) {
