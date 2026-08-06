@@ -179,7 +179,11 @@ public abstract class ToolHandler<T extends Tool> implements Listener {
 	public void onPlayerDrop(PlayerDropItemEvent evt) {
 		var tool = getToolFromItem(evt.getItemDrop().getItemStack());
 		if (tool != null) {
-			detachFromOwner(tool);
+			if (isRune) {
+				evt.setCancelled(true);
+			} else {
+				detachFromOwner(tool);
+			}
 		}
 	}
 
