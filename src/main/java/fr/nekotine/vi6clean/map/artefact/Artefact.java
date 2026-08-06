@@ -115,7 +115,7 @@ public class Artefact {
 				Material.ORANGE_WOOL.createBlockData(), 0.06f);
 		var plugin = Ioc.resolve(JavaPlugin.class);
 		var game = Ioc.resolve(Vi6Game.class);
-		thiefWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world), EntityType.ARMOR_STAND,
+		thiefWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world).add(0.5, 0.5, 0.5), EntityType.ARMOR_STAND,
 				SpawnReason.CUSTOM, e -> {
 					e.setPersistent(false);
 					e.setVisibleByDefault(false);
@@ -131,7 +131,7 @@ public class Artefact {
 						en.showEntity(plugin, e);
 					});
 				});
-		guardWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world), EntityType.ARMOR_STAND,
+		guardWaypoint = (ArmorStand) world.spawnEntity(blockPosition.toLocation(world).add(0.5, 0.5, 0.5), EntityType.ARMOR_STAND,
 				SpawnReason.CUSTOM, e -> {
 					e.setPersistent(false);
 					e.setVisibleByDefault(false);
