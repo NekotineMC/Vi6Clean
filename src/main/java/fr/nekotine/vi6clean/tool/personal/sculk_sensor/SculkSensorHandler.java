@@ -39,6 +39,7 @@ import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
 import fr.nekotine.vi6clean.tool.Tool;
 import fr.nekotine.vi6clean.tool.ToolCode;
 import fr.nekotine.vi6clean.tool.ToolHandler;
+import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.wrapper.PlayerWrapper;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.registry.keys.tags.BlockTypeTagKeys;
@@ -115,7 +116,9 @@ public class SculkSensorHandler extends ToolHandler<SculkSensorHandler.SculkSens
 		} else if (evt.getEntity() instanceof Player player) {
 			var wrapModule = Ioc.resolve(WrappingModule.class);
 			var wrapper = wrapModule.getWrapperOptional(player, PlayerWrapper.class);
-			if (wrapper.isEmpty() || wrapper.get().isGuard()) {
+			var wrapperInMap = wrapModule.getWrapperOptional(player, InMapPhasePlayerWrapper.class);
+			if (wrapper.isEmpty() || wrapper.get().isGuard() || wrapperInMap.isEmpty()
+					|| !wrapperInMap.get().isInside()) {
 				evt.setCancelled(true);
 				return;
 			}
