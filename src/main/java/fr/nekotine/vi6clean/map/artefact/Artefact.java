@@ -44,6 +44,9 @@ public class Artefact {
 
 	private static final double CAPTURE_AMOUNT_NEEDED = 200;
 
+	private final transient NamespacedKey artefactWaypointStyleKey = NamespacedKey.fromString("artefact/default",
+			Ioc.resolve(JavaPlugin.class));
+
 	private final transient NamespacedKey transmitTrackingRangeAttributeKey = NamespacedKey
 			.fromString("artefact/waypoint_range", Ioc.resolve(JavaPlugin.class));
 
@@ -119,9 +122,10 @@ public class Artefact {
 					if (e instanceof ArmorStand stand) {
 						stand.setMarker(true);
 						stand.setInvisible(true);
+						stand.setWaypointStyle(artefactWaypointStyleKey);
 						stand.setWaypointColor(Color.GREEN);
 						stand.getAttribute(Attribute.WAYPOINT_TRANSMIT_RANGE).addModifier(
-								new AttributeModifier(transmitTrackingRangeAttributeKey, 1000, Operation.ADD_NUMBER));
+								new AttributeModifier(transmitTrackingRangeAttributeKey, 50, Operation.ADD_NUMBER));
 					}
 					game.getThiefs().forEach(en -> {
 						en.showEntity(plugin, e);
@@ -135,8 +139,9 @@ public class Artefact {
 						stand.setMarker(true);
 						stand.setInvisible(true);
 						stand.setWaypointColor(Color.GREEN);
+						stand.setWaypointStyle(artefactWaypointStyleKey);
 						stand.getAttribute(Attribute.WAYPOINT_TRANSMIT_RANGE).addModifier(
-								new AttributeModifier(transmitTrackingRangeAttributeKey, 1000, Operation.ADD_NUMBER));
+								new AttributeModifier(transmitTrackingRangeAttributeKey, 50, Operation.ADD_NUMBER));
 					}
 					game.getGuards().forEach(en -> {
 						en.showEntity(plugin, e);
