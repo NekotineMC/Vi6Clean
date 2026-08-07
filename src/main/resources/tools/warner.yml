@@ -1,5 +1,5 @@
 display_name: <green>Avertisseur
-price: 150
+price: 250
 amount_limit: -1
 shop_icon: ENDER_EYE
 delay: 2.0 #délai d'avertissement en secondes

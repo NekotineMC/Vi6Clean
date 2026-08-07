@@ -1,5 +1,5 @@
 display_name: <gold>Âme de vitesse
-price: 100
+price: 150
 amount_limit: 3
 shop_icon: GOLDEN_NAUTILUS_ARMOR
 speed_bonus: 0.01 # bonus de vitesse (0.1 de base)

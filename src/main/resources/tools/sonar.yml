@@ -1,9 +1,9 @@
 display_name: <gold>Sonar
-price: 400
+price: 650
 amount_limit: 1
 shop_icon: TARGET
 range: 5.0 #portée en blocs
-delay: 3.0 #délai en secondes
+delay: 2.0 #délai en secondes
 is_rune: false
 lore:
    - <lore><important>Détecte un ennemi</important> à

@@ -1,5 +1,5 @@
 display_name: <light_purple>Radar
-price: 400
+price: 300
 amount_limit: 1
 shop_icon: DAYLIGHT_DETECTOR
 delay: 5.0 #durée du scan en secondes

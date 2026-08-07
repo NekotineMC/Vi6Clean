@@ -12,7 +12,7 @@ public class PreparationPhaseConfig {
 	private int durationSeconds = 300;
 
 	@Comment("Argent donné au début de la phase de préparation")
-	private int money = 1000;
+	private int money = 2000;
 
 	// Getters and setters
 

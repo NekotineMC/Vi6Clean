@@ -1,5 +1,5 @@
 display_name: <gray>Ombre
-price: 250
+price: 600
 amount_limit: 2
 shop_icon: WITHER_SKELETON_SKULL
 kill_range: 1.0 #distance pour marcher sur l'ombre en blocs

@@ -1,5 +1,5 @@
 display_name: Déphasage
-price: 200
+price: 300
 amount_limit: 1
 shop_icon: IRON_NUGGET
 inv_delay: 20.0 # delai en secondes
