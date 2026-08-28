@@ -85,8 +85,8 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			.name(Component.text("Flashball de garde", NamedTextColor.GOLD)).unbreakable().flags(ItemFlag.values())
 			.attackDamage(3)
 			.attributeModifier(Attribute.ATTACK_SPEED,
-					new AttributeModifier(NamespacedKey.fromString("gun_cooldown", Ioc.resolve(JavaPlugin.class)), -3.4,
-							Operation.ADD_NUMBER)) // Default is 4, go to 0.6
+					new AttributeModifier(NamespacedKey.fromString("gun_cooldown", Ioc.resolve(JavaPlugin.class)), -2.0,
+							Operation.ADD_NUMBER)) // Default is 4, go to 2.0
 			.postApply(i -> {
 				i.setData(DataComponentTypes.ATTACK_RANGE,
 						AttackRange.attackRange().maxReach(64).maxCreativeReach(64).build());
