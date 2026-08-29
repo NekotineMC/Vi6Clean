@@ -3,6 +3,7 @@ price: 400
 amount_limit: 1
 shop_icon: BUSH
 stand_still_seconds: 4
+range: 3
 is_rune: false
 lore:
    - <lore>Ne pas bouger pendant <variable><stand_still_seconds></variable> secondes vous rend invisible

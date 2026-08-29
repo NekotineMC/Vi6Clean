@@ -8,6 +8,7 @@ cooldown: 60
 lore:
    - <lore>Déclenche au souffle au coeur aux voleurs.
    - <lore>Pendant <variable><duration>s</variable>, ceux-ci ne peuvent ni
-   - <lore>gagner de stamina, ni remonter leur oxygène
+   - <lore>gagner de stamina, ni remonter leur oxygène.
+   - "<lore>Récupération: <variable><cooldown>s"
 team:
    - guard
