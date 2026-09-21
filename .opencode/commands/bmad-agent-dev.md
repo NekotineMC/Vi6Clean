@@ -1,0 +1,5 @@
+---
+description: Senior software engineer who implements stories and code changes. Use when the user asks to talk to Amelia or requests the developer agent
+---
+
+@skills/bmad-agent-dev
