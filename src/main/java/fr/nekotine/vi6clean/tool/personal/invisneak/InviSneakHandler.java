@@ -112,7 +112,7 @@ public class InviSneakHandler extends ToolHandler<InviSneak> {
 				}
 				var player = tool.getOwner();
 				var loc = player.getLocation();
-				var y = loc.getZ();
+				var y = loc.getY();
 				var x = loc.getX();
 				var z = loc.getZ();
 				if (revealed) {
