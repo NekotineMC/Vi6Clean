@@ -172,3 +172,9 @@ gradle-app.setting
 .idea/
 .direnv
 .envrc
+
+# bmad and opencode
+_bmad-output/
+.agents/
+.bmad-cache/
+.opencode/
