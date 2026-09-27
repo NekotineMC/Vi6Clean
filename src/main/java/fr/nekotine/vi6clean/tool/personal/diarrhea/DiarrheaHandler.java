@@ -13,7 +13,7 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.DiarrheaStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -36,8 +36,8 @@ public class DiarrheaHandler extends ToolHandler<DiarrheaHandler.Diarrhea> {
 	private final int DURATION_USE_TICKS = (int) (20 * DURATION_USE);
 	private final int DURATION_HIT_TICKS = (int) (20 * DURATION_HIT);
 	private final int COOLDOWN_TICKS = (int) (20 * getConfiguration().getDouble("cooldown", 120));
-	private final StatusEffect EFFECT_USE = new StatusEffect(DiarrheaStatusEffectType.get(), DURATION_USE_TICKS);
-	private final StatusEffect EFFECT_HIT = new StatusEffect(DiarrheaStatusEffectType.get(), DURATION_HIT_TICKS);
+	private final StatusEffect EFFECT_USE = new StatusEffect(FlagBasedStatusEffectType.DIARRHEA, DURATION_USE_TICKS);
+	private final StatusEffect EFFECT_HIT = new StatusEffect(FlagBasedStatusEffectType.DIARRHEA, DURATION_HIT_TICKS);
 	private final String MESSAGE = "<red>Le gouvernement contrôle votre corps grâce à la 5G<br>"
 			+ "Les ondes déclenchent une <b>diarhée fulgurante</b> pendant <aqua>" + DURATION_USE + "s</aqua>";
 

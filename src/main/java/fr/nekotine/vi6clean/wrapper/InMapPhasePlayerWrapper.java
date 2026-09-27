@@ -17,7 +17,7 @@ import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.map.Entrance;
-import fr.nekotine.vi6clean.status.effect.AsthmaStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.status.flag.AsthmaStatusFlag.MovementMode;
 import io.papermc.paper.util.Tick;
@@ -54,7 +54,7 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			Ioc.resolve(JavaPlugin.class));
 
 	private final StatusEffect invisibleEffect = new StatusEffect(TrueInvisibilityStatusEffectType.get(), -1);
-	private final StatusEffect asthmaEffect = new StatusEffect(AsthmaStatusEffectType.get(), -1);
+	private final StatusEffect asthmaEffect = new StatusEffect(FlagBasedStatusEffectType.ASTHMA, -1);
 
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
 

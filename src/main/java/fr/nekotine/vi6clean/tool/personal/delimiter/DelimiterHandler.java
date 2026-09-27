@@ -37,7 +37,7 @@ import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Keys;
-import fr.nekotine.vi6clean.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -57,7 +57,7 @@ public class DelimiterHandler extends ToolHandler<DelimiterHandler.Delimiter> {
 	private final int COOLDOWN_TICKS = (int) (getConfiguration().getDouble("cooldown", 10) * 20);
 	private final int DURATION_TICKS = (int) (getConfiguration().getDouble("duration", 10) * 20);
 	private final double DIAMETER = getConfiguration().getDouble("diameter", 16);
-	private final StatusEffect SUFF_EFFECT = new StatusEffect(SuffocatingStatusEffectType.get(), -1);
+	private final StatusEffect SUFF_EFFECT = new StatusEffect(FlagBasedStatusEffectType.SUFFOCATING, -1);
 
 	public DelimiterHandler() {
 		super(Delimiter::new);

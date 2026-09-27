@@ -23,14 +23,14 @@ import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.map.koth.Koth;
 import fr.nekotine.vi6clean.map.koth.KothCode;
-import fr.nekotine.vi6clean.status.effect.DarkenedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
 
 @KothCode("light")
 public class LightKothEffect extends AbstractKothEffect implements TextPlaceholder {
-	private final StatusEffect unlimitedDarkened = new StatusEffect(DarkenedStatusEffectType.get(), -1);
+	private final StatusEffect unlimitedDarkened = new StatusEffect(FlagBasedStatusEffectType.DARKENED, -1);
 	private final PotionEffect unlimitedNightVision = new PotionEffect(PotionEffectType.NIGHT_VISION, -1, 0, false,
 			false, false);
 	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("capture_amount_other", 200);

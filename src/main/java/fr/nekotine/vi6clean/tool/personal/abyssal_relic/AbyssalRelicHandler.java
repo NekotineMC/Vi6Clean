@@ -18,7 +18,7 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.SuffocatingStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -36,7 +36,7 @@ public class AbyssalRelicHandler extends ToolHandler<AbyssalRelicHandler.Abyssal
 
 	private final double RANGE = getConfiguration().getDouble("range", 5.0);
 	private final StatusEffectModule EFFECT_MODULE;
-	private final StatusEffect EFFECT = new StatusEffect(SuffocatingStatusEffectType.get(), -1);
+	private final StatusEffect EFFECT = new StatusEffect(FlagBasedStatusEffectType.SUFFOCATING, -1);
 
 	public AbyssalRelicHandler() {
 		super(AbyssalRelic::new);

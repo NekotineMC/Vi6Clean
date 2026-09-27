@@ -14,7 +14,7 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.MurmurStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -33,7 +33,7 @@ public class MurmurHandler extends ToolHandler<MurmurHandler.Murmur> {
 
 	private final double DURATION = getConfiguration().getDouble("duration", 10.0);
 	private final int DURATION_TICKS = (int) (20 * DURATION);
-	private final StatusEffect EFFECT = new StatusEffect(MurmurStatusEffectType.get(), DURATION_TICKS);
+	private final StatusEffect EFFECT = new StatusEffect(FlagBasedStatusEffectType.MURMUR, DURATION_TICKS);
 	private final String MESSAGE = "<red>Vous êtes anormalement <b>essouflé</b><br>"
 			+ "Votre <b>stamina</b> et votre <b>air</b> ne peuvent plus remonter pendant <aqua>" + DURATION
 			+ "</aqua> secondes</red>";

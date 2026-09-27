@@ -11,7 +11,7 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.PlayerProfileUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -60,7 +60,7 @@ public class BearTrapHandler extends ToolHandler<BearTrap> {
 
 	private static final int FANG_ANIMATION_DURATION_TICK = 20; // Handcoded value in minecraft
 
-	private static final StatusEffect TRAPPED_EFFECT = new StatusEffect(TazedStatusEffectType.get(),
+	private static final StatusEffect TRAPPED_EFFECT = new StatusEffect(FlagBasedStatusEffectType.TAZED,
 			FANG_ANIMATION_DURATION_TICK);
 
 	private final PlayerProfile ARMED_PLAYER_PROFILE = PlayerProfileUtil.makeProfileFromSkinUrl(ARMED_SKIN_URL);

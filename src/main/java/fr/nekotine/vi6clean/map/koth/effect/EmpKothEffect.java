@@ -19,7 +19,7 @@ import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.map.koth.Koth;
 import fr.nekotine.vi6clean.map.koth.KothCode;
-import fr.nekotine.vi6clean.status.effect.EmpStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.TitlePart;
@@ -29,7 +29,7 @@ public class EmpKothEffect extends AbstractKothEffect implements TextPlaceholder
 	private final int AMOUNT_FOR_OTHER_CAPTURE = getConfiguration().getInt("capture_amount_other", 200);
 	private final int AMOUNT_FOR_GUARD_CAPTURE = getConfiguration().getInt("capture_amount_guard", 400);
 	private final String DISPLAY_TEXT = getConfiguration().getString("display_text", "NO TEXT");
-	private final StatusEffect effect = new StatusEffect(EmpStatusEffectType.get(), -1);
+	private final StatusEffect effect = new StatusEffect(FlagBasedStatusEffectType.EMP, -1);
 
 	//
 

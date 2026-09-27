@@ -34,7 +34,7 @@ import fr.nekotine.core.util.MobAiUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.OmniCaptedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -51,9 +51,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("watcher")
 public class WatcherHandler extends ToolHandler<WatcherHandler.Watcher> {
 
-	private final StatusEffect permanentGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), 0);
+	private final StatusEffect permanentGlowEffect = new StatusEffect(FlagBasedStatusEffectType.OMNICAPTED, 0);
 
-	private final StatusEffect lastingGlowEffect = new StatusEffect(OmniCaptedStatusEffectType.get(),
+	private final StatusEffect lastingGlowEffect = new StatusEffect(FlagBasedStatusEffectType.OMNICAPTED,
 			Tick.tick().fromDuration(Duration.ofSeconds(getConfiguration().getLong("last_delay_second", 1))));
 
 	private final double DETECTION_BLOCK_RANGE = getConfiguration().getDouble("range", 5);

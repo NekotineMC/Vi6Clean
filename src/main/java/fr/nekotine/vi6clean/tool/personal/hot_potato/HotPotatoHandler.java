@@ -11,7 +11,7 @@ import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.tool.Tool;
@@ -32,7 +32,7 @@ public class HotPotatoHandler extends ToolHandler<HotPotatoHandler.HotPotato> {
 	private final double DAMAGE = getConfiguration().getDouble("damage", 4);
 	private final double TAZ_DURATION = getConfiguration().getDouble("taz_duration", 4);
 	private final double VELOCITY_MULTIPLIER = getConfiguration().getDouble("velocity_multiplier", 1.5);
-	private final StatusEffect TAZ_EFFECT = new StatusEffect(TazedStatusEffectType.get(), (int) (20 * TAZ_DURATION));
+	private final StatusEffect TAZ_EFFECT = new StatusEffect(FlagBasedStatusEffectType.TAZED, (int) (20 * TAZ_DURATION));
 	private final String MESSAGE_START = "<red>Vous avez récupéré la patate chaude d'un adversaire !";
 	private final String MESSAGE_END = "<aqua>Jetez-la pour infliger un sort similaire aux ennemis";
 	private final String THIEF_MESSAGE = MESSAGE_START + "<br><gold>La patate vous inflige des dégâts<br>"

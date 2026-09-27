@@ -11,7 +11,7 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -43,7 +43,7 @@ public class TazerHandler extends ToolHandler<TazerHandler.Tazer> {
 
 	private final int TAZED_DURATION_TICK = (int) (20 * getConfiguration().getDouble("tazed_duration", 1));
 
-	private final StatusEffect tazedEffect = new StatusEffect(TazedStatusEffectType.get(), TAZED_DURATION_TICK);
+	private final StatusEffect tazedEffect = new StatusEffect(FlagBasedStatusEffectType.TAZED, TAZED_DURATION_TICK);
 
 	public TazerHandler() {
 		super(Tazer::new);

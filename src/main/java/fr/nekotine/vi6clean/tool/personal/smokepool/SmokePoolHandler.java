@@ -26,9 +26,7 @@ import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.DiarrheaStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.SuffocatingStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
@@ -144,9 +142,9 @@ public class SmokePoolHandler extends ToolHandler<SmokePoolHandler.SmokePool> {
 		Vi6Sound.SMOKEPOOL.play(ploc.getWorld(), ploc);
 		item.setData(DataComponentTypes.ITEM_MODEL, Material.GRAY_DYE.key());
 		var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
-		statusEffectModule.removeAllEffectsOfType(player, SuffocatingStatusEffectType.get());
-		statusEffectModule.removeAllEffectsOfType(player, TazedStatusEffectType.get());
-		statusEffectModule.removeAllEffectsOfType(player, DiarrheaStatusEffectType.get());
+		statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.SUFFOCATING);
+		statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.TAZED);
+		statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.DIARRHEA);
 		evt.setCancelled(true);
 	}
 

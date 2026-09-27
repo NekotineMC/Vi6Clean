@@ -33,7 +33,7 @@ import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.OmniCaptedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -62,7 +62,7 @@ public class TrapWireHandler extends ToolHandler<TrapWireHandler.TrapWire> {
 	private final double WIRE_LENGTH = getConfiguration().getDouble("wire_length", 5);
 	private final double DAMAGE = getConfiguration().getDouble("damage", 5);
 	private final int OMNI_DURATION = Math.round((float) (20 * getConfiguration().getDouble("omni_duration", 2)));
-	private final StatusEffect omniEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), OMNI_DURATION);
+	private final StatusEffect omniEffect = new StatusEffect(FlagBasedStatusEffectType.OMNICAPTED, OMNI_DURATION);
 
 	public TrapWireHandler() {
 		super(TrapWire::new);

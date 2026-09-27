@@ -18,7 +18,7 @@ import fr.nekotine.core.util.SpatialUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.OmniCaptedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -59,9 +59,9 @@ public class OmniCaptorHandler extends ToolHandler<OmniCaptorHandler.OmniCaptor>
 
 	private final double DETECTION_RANGE_SQUARED = DETECTION_BLOCK_RANGE * DETECTION_BLOCK_RANGE;
 
-	private StatusEffect temporaryEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), EFFECT_DURATION);
+	private StatusEffect temporaryEffect = new StatusEffect(FlagBasedStatusEffectType.OMNICAPTED, EFFECT_DURATION);
 
-	private StatusEffect unlimitedEffect = new StatusEffect(OmniCaptedStatusEffectType.get(), -1);
+	private StatusEffect unlimitedEffect = new StatusEffect(FlagBasedStatusEffectType.OMNICAPTED, -1);
 
 	public OmniCaptorHandler() {
 		super(OmniCaptor::new);

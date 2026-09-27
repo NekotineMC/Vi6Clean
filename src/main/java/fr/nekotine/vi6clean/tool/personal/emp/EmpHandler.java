@@ -14,7 +14,7 @@ import fr.nekotine.core.util.CustomAction;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.status.effect.EmpStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
 import fr.nekotine.vi6clean.status.flag.EmpStatusFlag;
@@ -32,7 +32,7 @@ public class EmpHandler extends ToolHandler<EmpHandler.Emp> {
 
 	private final int EMP_DURATION_TICKS = (int) (20 * getConfiguration().getDouble("duration", 5));
 
-	private final StatusEffect empEffect = new StatusEffect(EmpStatusEffectType.get(), EMP_DURATION_TICKS);
+	private final StatusEffect empEffect = new StatusEffect(FlagBasedStatusEffectType.EMP, EMP_DURATION_TICKS);
 
 	public EmpHandler() {
 		super(Emp::new);

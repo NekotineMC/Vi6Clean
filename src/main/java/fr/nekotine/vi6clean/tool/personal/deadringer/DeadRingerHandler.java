@@ -22,9 +22,7 @@ import fr.nekotine.core.util.InventoryUtil;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.constant.Vi6Keys;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
-import fr.nekotine.vi6clean.status.effect.DiarrheaStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.SuffocatingStatusEffectType;
-import fr.nekotine.vi6clean.status.effect.TazedStatusEffectType;
+import fr.nekotine.vi6clean.status.effect.FlagBasedStatusEffectType;
 import fr.nekotine.vi6clean.status.effect.invisibility.TrueInvisibilityStatusEffectType;
 import fr.nekotine.vi6clean.status.event.EntityEmpEndEvent;
 import fr.nekotine.vi6clean.status.event.EntityEmpStartEvent;
@@ -80,9 +78,9 @@ public class DeadRingerHandler extends ToolHandler<DeadRingerHandler.DeadRinger>
 				var tool = getToolFromItem(item);
 				var statusEffectModule = Ioc.resolve(StatusEffectModule.class);
 				statusEffectModule.addEffect(player, invisibleEffect);
-				statusEffectModule.removeAllEffectsOfType(player, SuffocatingStatusEffectType.get());
-				statusEffectModule.removeAllEffectsOfType(player, TazedStatusEffectType.get());
-				statusEffectModule.removeAllEffectsOfType(player, DiarrheaStatusEffectType.get());
+				statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.SUFFOCATING);
+				statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.TAZED);
+				statusEffectModule.removeAllEffectsOfType(player, FlagBasedStatusEffectType.DIARRHEA);
 				player.setInvulnerable(true);
 				new BukkitRunnable() {
 
