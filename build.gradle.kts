@@ -23,6 +23,9 @@ repositories {
     maven("https://repo.spongepowered.org/repository/maven-public/") {
         name = "sponge"
     }
+    maven("https://maven.citizensnpcs.co/repo") {
+        name = "citizens"
+    }
 }
 
 dependencies {
@@ -32,6 +35,9 @@ dependencies {
     compileOnly(libs.configurate)
     implementation(project(":NekotineCore"))
     compileOnly(libs.voicechat.api)
+    compileOnly(libs.citizens.main) {
+        exclude(group = "*", module = "*")
+    }
 }
 
 dependencyLocking {
