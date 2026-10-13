@@ -13,6 +13,9 @@ import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.bot.BotRegistryLoader;
+import fr.nekotine.vi6clean.bot.BotService;
+import fr.nekotine.vi6clean.bot.CitizensAvailability;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.game.Vi6Game;
@@ -63,6 +66,15 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			Vi6Styles.load();
 			var game = new Vi6Game();
 			Ioc.getProvider().registerSingleton(game);
+			// BotRegistry is not an IPluginModule and module auto-registration only scans
+			// fr.nekotine.core, so this line is what registers the roster at all. The
+			// registry class itself is never named here: a `new BotRegistry()` would be
+			// resolved by the verifier while Vi6Main is still linking, long before the
+			// guard below is reached.
+			if (CitizensAvailability.check() == CitizensAvailability.READY) {
+				BotRegistryLoader.load()
+						.ifPresent(bots -> Ioc.getProvider().registerSingletonInstanceAs(bots, BotService.class));
+			}
 			Ioc.getProvider().registerSingleton(new Majordom());
 			var moduleManager = Ioc.resolve(ModuleManager.class);
 			moduleManager.tryLoad(Majordom.class);
@@ -84,6 +96,11 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 
 	@Override
 	public void onDisable() {
+		// Unconditional: tryResolve already answers empty when nothing was registered,
+		// and gating on Citizens here is what skipped the cleanup exactly when
+		// survivors were most likely. It has to run before game.close(), which tears
+		// the lobby phase down and unregisters the scoreboard teams the teardown reads.
+		Ioc.getProvider().tryResolve(BotService.class).ifPresent(BotService::destroyAll);
 		var game = Ioc.resolve(Vi6Game.class);
 		game.close();
 		super.onDisable();
