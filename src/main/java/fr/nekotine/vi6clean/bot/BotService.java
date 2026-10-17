@@ -79,6 +79,107 @@ public interface BotService {
 	}
 
 	/**
+	 * What one removal request actually did.
+	 * <p>
+	 * {@code removed} is read back off the game after the teardown rather than
+	 * counted on the way in: {@code ObservableCollection.remove} swallows whatever
+	 * its own suppression callbacks throw, so a teardown that half failed still
+	 * returns normally and only a read of {@code getPlayerList()} /
+	 * {@code getGuards()} / {@code getThiefs()} can tell that apart from a clean
+	 * one. {@code guards} and {@code thieves} are the other way round, read before
+	 * the teardown, because nothing about a departed bot's team is knowable
+	 * afterwards.
+	 *
+	 * @param requested
+	 *            how many bots the operator asked to take out, the whole roster
+	 *            when the command carried no count
+	 * @param removed
+	 *            how many of them left the bot roster and Citizens, and whose
+	 *            departure the game roster agrees with -- a bot whose entity was
+	 *            already gone cannot be handed to {@code removePlayer}, and that
+	 *            one is logged rather than counted here
+	 * @param guards
+	 *            how many of the removed bots were on the guard team
+	 * @param thieves
+	 *            how many of the removed bots were on the thief team
+	 * @param failures
+	 *            one reason per bot that did not leave
+	 * @param rosterSize
+	 *            the roster after the request, which is the figure the operator
+	 *            needs in order to know what is left
+	 */
+	record RemoveReport(int requested, int removed, int guards, int thieves, List<String> failures, int rosterSize) {
+
+		/**
+		 * Same bound and same reason as {@link AddReport#MAX_REPORTED_FAILURES}: a
+		 * request of 64 uncooperative NPCs must not become 64 stack traces in the
+		 * sender's chat.
+		 */
+		private static final int MAX_REPORTED_FAILURES = 5;
+
+		/**
+		 * @return the one line an operator can read. The team split is there because a
+		 *         removal that was narrowed to a team has to prove it took that team,
+		 *         and the remaining roster is there because the removal is only half
+		 *         the question an operator asks it.
+		 */
+		public String describe() {
+			var head = removed + "/" + requested + " bot(s) retire(s) du roster, dont " + guards + " garde(s) et "
+					+ thieves + " voleur(s), roster restant " + rosterSize + " bot(s)";
+			if (failures.isEmpty()) {
+				return head + ".";
+			}
+			var shown = failures.stream().limit(MAX_REPORTED_FAILURES).toList();
+			var tail = failures.size() > shown.size()
+					? " | ... et " + (failures.size() - shown.size()) + " autre(s) echec(s)"
+					: "";
+			return head + ". Echecs : " + String.join(" | ", shown) + tail;
+		}
+
+	}
+
+	/**
+	 * One bot as the operator sees it.
+	 * <p>
+	 * Deliberately not {@link Bot}: that record is the identity of a bot and stays
+	 * the bare {@code (npcId, name)} pair, while everything here is a reading taken
+	 * live and is allowed to answer "I could not read this".
+	 *
+	 * @param team
+	 *            the team the bot really is on, or an explicit none/unreadable
+	 *            rather than a null the caller has to interpret
+	 * @param liveness
+	 *            whether Citizens currently has the bot spawned, which is a
+	 *            different question from whether it is still in the roster: a
+	 *            despawn is not a removal
+	 */
+	record BotStatus(String name, String team, String liveness) {
+
+		public String describe() {
+			return name + " | equipe " + team + " | " + liveness;
+		}
+
+	}
+
+	/**
+	 * The whole roster, as one report.
+	 *
+	 * @param botCount
+	 *            how many bots the roster holds, unreadable ones included
+	 * @param humanCount
+	 *            how many humans are connected, read from the server: the game
+	 *            roster holds the bots too, so it cannot be the source of this
+	 *            figure
+	 */
+	record RosterReport(int botCount, int humanCount, List<BotStatus> bots) {
+
+		public String header() {
+			return botCount + " bot(s) au roster, " + humanCount + " humain(s) connecte(s)";
+		}
+
+	}
+
+	/**
 	 * Spawns and admits {@code requested} bots. A pinned {@code teamName} puts
 	 * every one of them in that team, otherwise the balancing rule of the game
 	 * decides. A bot that fails to spawn, to be admitted or to be fully set up is
@@ -94,7 +195,40 @@ public interface BotService {
 	AddReport addBots(int requested, @Nullable String teamName);
 
 	/**
-	 * @return the live roster, keyed on the Citizens NPC id. Main thread only, like
+	 * Removes the {@code requested} newest bots, optionally narrowed to one team.
+	 * Every bot leaves through the same {@code game.removePlayer} a human leaves
+	 * through, and the Citizens store is flushed once so a restart does not bring
+	 * any of them back.
+	 * <p>
+	 * "Newest" is the roster insertion order walked backwards: it is what makes
+	 * {@code add 8} then {@code remove 3} take back the last three, with no
+	 * timestamp to invent. A request wider than the roster removes what there is
+	 * and reports that figure, never the requested one.
+	 * <p>
+	 * <b>Main thread only.</b>, like {@link #addBots(int, String)}.
+	 *
+	 * @return what the request did, never null
+	 */
+	RemoveReport removeBots(int requested, @Nullable String teamName);
+
+	/**
+	 * Reads the whole roster for the operator: one {@link BotStatus} per bot, plus
+	 * the bot and human counts. A bot that cannot be read is reported as unreadable
+	 * rather than dropped, because an operator who cannot account for a bot cannot
+	 * correct the roster either.
+	 * <p>
+	 * <b>Main thread only.</b>, like {@link #addBots(int, String)}.
+	 *
+	 * @return what the roster holds right now, never null
+	 */
+	RosterReport listBots();
+
+	/**
+	 * @return a copy of the roster's identities, keyed on the Citizens NPC id. It
+	 *         is the surface for a caller that needs the ids and names themselves;
+	 *         the operator facing report is {@link #listBots()}, which reads the
+	 *         roster directly and adds the readings this record deliberately does
+	 *         not carry. It is a snapshot, not a live view. Main thread only, like
 	 *         {@link #addBots(int, String)}
 	 */
 	Collection<Bot> getBots();

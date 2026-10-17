@@ -83,11 +83,109 @@ public class BotRegistry implements BotService {
 	private static final String LOBBY_REQUIRED = "les bots ne peuvent être ajoutés que pendant la phase lobby, "
 			+ "qui n'est pas en cours";
 
+	/**
+	 * Display values of the report, and they are deliberately never blank. A
+	 * reading that could not be taken, or a bot that is in no team at all, has to
+	 * read differently from a reading that came back clean: otherwise a check that
+	 * failed to run is reported to the operator as a check that passed.
+	 */
+	private static final String TEAM_NONE = "aucune equipe";
+
+	private static final String TEAM_UNREADABLE = "illisible";
+
+	/**
+	 * A team name that is neither guard nor thief is folded to this, so a typo can
+	 * only ever select nothing. Folding it to "no filter" would let a mistyped team
+	 * destroy the whole roster.
+	 */
+	private static final String TEAM_UNKNOWN_FILTER = "equipe inconnue";
+
+	private static final String LIVE = "spawnne";
+
+	private static final String NOT_SPAWNED = "non spawnne, donc invisible en jeu";
+
+	private static final String UNREADABLE = "illisible, ce qui n'est pas une reponse";
+
 	private static final ComponentLogger logger = NekotineLogger.make(BotRegistry.class);
 
-	private final Map<UUID, NPC> npcs = new LinkedHashMap<>();
+	private final Map<UUID, BotHandle> npcs = new LinkedHashMap<>();
 
 	private int nameCounter = 0;
+
+	/**
+	 * One roster entry: the NPC the operator thinks in terms of, and the exact
+	 * {@code Player} object that was handed to the game at admission.
+	 * <p>
+	 * The second field is what makes removal mean removal. {@code NPC#getEntity()}
+	 * answers null as soon as Citizens despawns the entity, and on this server it
+	 * does so within 20 ticks of the admission, long before an operator can run
+	 * {@code /game bot remove}. A teardown that derived the Player from the NPC at
+	 * that point would drop the bot from the bot roster and leave it sitting in
+	 * {@code getPlayerList()}, {@code getGuards()}, {@code getThiefs()} and both
+	 * scoreboard teams — where {@code Vi6PhaseInfiltration}'s bare {@code allMatch}
+	 * over {@code getThiefs()} would count it forever and the round could never be
+	 * won.
+	 * <p>
+	 * Deliberately not folded into {@link Bot}: that record is the Citizens-free
+	 * identity pair the command surface sees, and a {@code Player} handle has no
+	 * business in it.
+	 */
+	private record BotHandle(NPC npc, @Nullable Player player) {
+	}
+
+	/**
+	 * Every place a bot can still be after a teardown that reported it as gone, so
+	 * the two ends of a teardown can be compared instead of merely printed.
+	 *
+	 * @param roster
+	 *            the bot package's own roster, which every bot handed to
+	 *            {@link #retire} has to leave
+	 * @param guardEntries
+	 *            the scoreboard guard team. It is compared apart from
+	 *            {@link #guards} because the entry is only dropped from inside
+	 *            {@code ObservableCollection.remove}'s exception-swallowing
+	 *            callback loop, which is precisely where a half-failed teardown
+	 *            shows up
+	 */
+	private record GameState(int roster, int players, int guards, int thieves, int guardEntries, int thiefEntries) {
+
+		private static GameState of(Vi6Game game, int roster) {
+			var scoreboard = game.getScoreboard();
+			return new GameState(roster, game.getPlayerList().size(), game.getGuards().size(), game.getThiefs().size(),
+					teamEntries(scoreboard, TEAM_GUARD), teamEntries(scoreboard, TEAM_THIEF));
+		}
+
+		/**
+		 * What this state is expected to become once {@code targets} have been handed
+		 * to {@link #retire}. Counted from the game now, by object identity on the
+		 * handle recorded at admission, because nothing about a departed bot is
+		 * knowable afterwards. A target with no handle is expected to stay where it is:
+		 * the teardown has no way to reach it either.
+		 */
+		private GameState afterRemoving(Vi6Game game, List<BotHandle> targets) {
+			var held = 0;
+			var heldGuards = 0;
+			var heldThieves = 0;
+			for (var handle : targets) {
+				var player = handle.player();
+				if (player == null) {
+					continue;
+				}
+				if (game.getPlayerList().contains(player)) {
+					held++;
+				}
+				if (game.getGuards().contains(player)) {
+					heldGuards++;
+				}
+				if (game.getThiefs().contains(player)) {
+					heldThieves++;
+				}
+			}
+			return new GameState(roster - targets.size(), players - held, guards - heldGuards, thieves - heldThieves,
+					guardEntries - heldGuards, thiefEntries - heldThieves);
+		}
+
+	}
 
 	/**
 	 * One observation of one bot, read live off the Citizens object. Every field is
@@ -157,6 +255,7 @@ public class BotRegistry implements BotService {
 			}
 			String name = null;
 			NPC npc = null;
+			Player player = null;
 			try {
 				// The name lookup sits inside the per bot try on purpose: a registry that
 				// cannot be walked must skip one bot, not abandon the batch with no report
@@ -165,15 +264,17 @@ public class BotRegistry implements BotService {
 				// admitOne rolls its own bot back when it fails; holding the handle out here
 				// covers the window between "the game took it" and "the roster owns it", so a
 				// throw in that window cannot orphan a live NPC the roster never learns about.
-				npc = admitOne(npcRegistry, name, teamName, game);
-				npcs.put(npc.getUniqueId(), npc);
+				var handle = admitOne(npcRegistry, name, teamName, game);
+				npc = handle.npc();
+				player = handle.player();
+				npcs.put(npc.getUniqueId(), handle);
 				admitted.add(npc);
 			} catch (Exception e) {
-				rollback(game, npc, null);
+				rollback(game, npc, player);
 				failures.add(describeFailure(name, e));
 				logger.error("Le bot " + name + " n'a pas pu être ajouté au roster", e);
 			} catch (LinkageError err) {
-				rollback(game, npc, null);
+				rollback(game, npc, player);
 				failures.add(describeFailure(name, err));
 				logger.error("Le bot " + name + " n'a pas pu être ajouté au roster, une classe Citizens est "
 						+ "introuvable", err);
@@ -195,7 +296,8 @@ public class BotRegistry implements BotService {
 
 	@Override
 	public Collection<Bot> getBots() {
-		return npcs.values().stream().map(npc -> new Bot(npc.getUniqueId(), npc.getName())).toList();
+		return npcs.values().stream().map(handle -> new Bot(handle.npc().getUniqueId(), handle.npc().getName()))
+				.toList();
 	}
 
 	/**
@@ -205,6 +307,280 @@ public class BotRegistry implements BotService {
 	@Override
 	public int size() {
 		return npcs.size();
+	}
+
+	/**
+	 * Main thread only, like {@link #addBots(int, String)}.
+	 */
+	@Override
+	public RosterReport listBots() {
+		var game = resolveGameQuietly("La game n'a pas pu être résolue, les équipes des bots sont illisibles");
+		var bots = npcs.values().stream().map(handle -> statusOf(game, handle)).toList();
+		// The humans are counted by the server, never by the game: the game roster
+		// holds the bots too, so counting it here would report the operator's own
+		// team twice and the roster they just asked about never at all.
+		return new RosterReport(bots.size(), Bukkit.getOnlinePlayers().size(), bots);
+	}
+
+	/**
+	 * Main thread only, like {@link #addBots(int, String)}.
+	 * <p>
+	 * The selection is walked first and the teardown runs second, because
+	 * {@link #retire(NPC, Player)} mutates the very map the selection walks.
+	 */
+	@Override
+	public RemoveReport removeBots(int requested, @Nullable String teamName) {
+		var game = resolveGameQuietly("La game n'a pas pu être résolue, aucun bot n'a été retiré");
+		if (game == null) {
+			return new RemoveReport(requested, 0, 0, 0, List.of("la game n'est pas disponible"), npcs.size());
+		}
+		var selected = select(game, requested, normalizeTeam(teamName));
+		if (selected.isEmpty()) {
+			return new RemoveReport(requested, 0, 0, 0, List.of(), npcs.size());
+		}
+		// Read before the loop, not after it: the registry is read off the roster map
+		// and retire() empties that map one entry at a time, so after a full removal
+		// there is nothing left to read it from and the store would never be flushed.
+		var owning = owningRegistry();
+		// The state this request means to leave behind, so logDestroyedRoster has
+		// something to compare against instead of only printing the figures.
+		var expected = GameState.of(game, npcs.size()).afterRemoving(game, selected);
+		var removed = 0;
+		var guards = 0;
+		var thieves = 0;
+		var failures = new ArrayList<String>();
+		for (var handle : selected) {
+			var npc = handle.npc();
+			var name = safeName(npc);
+			// The team is read here, before the teardown, because once the bot is out of
+			// the game collections there is nothing left to read its membership from.
+			var team = teamOf(game, npc);
+			var player = playerFor(handle);
+			try {
+				retire(npc, player);
+			} catch (Exception e) {
+				// One uncooperative NPC must not cost the rest of the request, exactly
+				// like in destroyAll.
+				logger.error("Le retrait du bot " + name + " a echoue", e);
+				failures.add(describeFailure(name, e));
+				continue;
+			} catch (LinkageError err) {
+				logger.error("Le retrait du bot " + name + " a echoue, une classe Citizens est introuvable", err);
+				failures.add(describeFailure(name, err));
+				continue;
+			}
+			// ObservableCollection.remove swallows whatever its own callbacks throw, so
+			// removePlayer returning normally is not evidence that it worked. Reading the
+			// game back is, and it is the same discipline landedInRoster applies on the
+			// admission side. A bot whose departure could not be checked is a failure, not
+			// a success: RemoveReport.removed promises the game roster agrees, and a count
+			// that quietly dropped that clause is the one number an operator acts on.
+			if (player == null) {
+				logger.warn("Le bot " + name + " n'a aucun Player connu, sa présence dans la game n'a pas pu "
+						+ "être vérifiée après le retrait");
+				failures.add(name + " : aucun Player connu, présence dans la game non vérifiable");
+				continue;
+			}
+			if (stillInGame(game, npc, player)) {
+				logger.error("Le bot " + name + " est encore dans la game après son retrait");
+				failures.add(name + " : toujours présent dans la game après le retrait");
+				continue;
+			}
+			removed++;
+			if (TEAM_GUARD.equals(team)) {
+				guards++;
+			} else if (TEAM_THIEF.equals(team)) {
+				thieves++;
+			}
+		}
+		// retire() deliberately does not flush: destroyAll flushes once for a batch it
+		// knows is the last one. This batch is not that batch, so without this the
+		// deletion would sit in saves.yml until the next shutdown.
+		var flushed = flushStore(owning);
+		if (removed > 0 && !flushed) {
+			// The deletion is in memory only. Saying so is the whole point of asking
+			// flushStore whether it wrote: the AC promises a restart brings none of them
+			// back, and that promise is not the service's to make silently.
+			failures.add("le registre de NPCs n'a pas pu être écrit sur le disque, un redémarrage peut ramener "
+					+ removed + " bot(s)");
+		}
+		logDestroyedRoster(removed, expected);
+		return new RemoveReport(requested, removed, guards, thieves, List.copyOf(failures), npcs.size());
+	}
+
+	/**
+	 * The {@code requested} newest bots, optionally narrowed to one team.
+	 * <p>
+	 * {@code npcs} is a {@link LinkedHashMap} in insertion order, so walking a
+	 * snapshot of it backwards is "the ones the operator just added" without
+	 * inventing a timestamp nobody recorded. The snapshot also decouples the walk
+	 * from {@link #retire(NPC, Player)}, which removes from the live map.
+	 */
+	private List<BotHandle> select(Vi6Game game, int requested, @Nullable String teamName) {
+		var selected = new ArrayList<BotHandle>();
+		var roster = List.copyOf(npcs.values());
+		var cursor = roster.listIterator(roster.size());
+		while (cursor.hasPrevious() && selected.size() < requested) {
+			var handle = cursor.previous();
+			if (teamName == null || teamName.equals(teamOf(game, handle.npc()))) {
+				selected.add(handle);
+			}
+		}
+		return selected;
+	}
+
+	/**
+	 * @return the canonical name of the requested team, or null when no team was
+	 *         requested. A name that is neither team comes back as
+	 *         {@link #TEAM_UNKNOWN_FILTER}, which no bot can ever be on, so a typo
+	 *         removes nothing instead of removing everything.
+	 */
+	private static @Nullable String normalizeTeam(@Nullable String teamName) {
+		if (teamName == null) {
+			return null;
+		}
+		if (TEAM_GUARD.equalsIgnoreCase(teamName)) {
+			return TEAM_GUARD;
+		}
+		return TEAM_THIEF.equalsIgnoreCase(teamName) ? TEAM_THIEF : TEAM_UNKNOWN_FILTER;
+	}
+
+	/**
+	 * The team of one bot, read by object identity against the game's own
+	 * collections the way {@link #countTeam} reads membership, never by name or id,
+	 * and falling back to the scoreboard entry the way {@link #landedInRoster} does
+	 * so a bot mid-transition is reported rather than reported as teamless.
+	 *
+	 * @return {@link #TEAM_GUARD}, {@link #TEAM_THIEF}, or null when the bot is in
+	 *         neither
+	 */
+	private static @Nullable String teamOf(@Nullable Vi6Game game, NPC npc) {
+		if (game == null) {
+			return null;
+		}
+		var entity = readEntity(npc);
+		if (entity instanceof Player player) {
+			// Exactly one of the two, as landedInRoster insists: a bot on both or on
+			// neither is a broken state the scoreboard gets the last word on.
+			var guard = game.getGuards().contains(player);
+			var thief = game.getThiefs().contains(player);
+			if (guard != thief) {
+				return guard ? TEAM_GUARD : TEAM_THIEF;
+			}
+		}
+		return scoreboardTeamOf(game, npc);
+	}
+
+	private static @Nullable String scoreboardTeamOf(Vi6Game game, NPC npc) {
+		var scoreboard = game.getScoreboard();
+		if (scoreboard == null) {
+			return null;
+		}
+		var entry = scoreboard.getEntryTeam(safeName(npc));
+		if (entry == null) {
+			return null;
+		}
+		if (TEAM_GUARD.equalsIgnoreCase(entry.getName())) {
+			return TEAM_GUARD;
+		}
+		return TEAM_THIEF.equalsIgnoreCase(entry.getName()) ? TEAM_THIEF : null;
+	}
+
+	/**
+	 * One bot's report line. Every read is guarded on its own, so a bot the report
+	 * cannot see costs its own line and nothing else: dropping it would hand the
+	 * operator a roster that no longer matches the one the command is here to
+	 * expose.
+	 */
+	private BotStatus statusOf(@Nullable Vi6Game game, BotHandle handle) {
+		var npc = handle.npc();
+		var name = safeName(npc);
+		try {
+			return new BotStatus(name, describeTeam(game, npc), livenessOf(npc));
+		} catch (Exception e) {
+			logger.warn("L'état du bot " + name + " n'a pas pu être lu", e);
+		} catch (LinkageError err) {
+			logger.warn("L'état du bot " + name + " n'a pas pu être lu, une classe Citizens est introuvable", err);
+		}
+		return new BotStatus(name, TEAM_UNREADABLE, UNREADABLE);
+	}
+
+	private static String describeTeam(@Nullable Vi6Game game, NPC npc) {
+		if (game == null) {
+			return TEAM_UNREADABLE;
+		}
+		return switch (teamOf(game, npc)) {
+			case TEAM_GUARD -> "garde";
+			case TEAM_THIEF -> "voleur";
+			default -> TEAM_NONE;
+		};
+	}
+
+	/**
+	 * {@code NPC.isSpawned()} is the liveness read; there is no
+	 * {@code NPC.isAlive()}.
+	 * <p>
+	 * Both reads share one guard instead of going through {@link #readEntity(NPC)},
+	 * which collapses a throw into null: a null answer has to stay distinguishable
+	 * from a genuine {@code /npc despawn}, because "Citizens refused to answer" and
+	 * "there is no entity" are different facts and reporting the second for the
+	 * first is a check that can never fail.
+	 */
+	private static String livenessOf(NPC npc) {
+		try {
+			if (npc.getEntity() != null) {
+				return LIVE;
+			}
+			// Spawned but with no readable entity is neither of the two clean answers.
+			return npc.isSpawned() ? UNREADABLE : NOT_SPAWNED;
+		} catch (Exception e) {
+			logger.warn("L'etat d'un bot n'a pas pu etre lu", e);
+			return UNREADABLE;
+		} catch (LinkageError err) {
+			logger.warn("L'etat d'un bot n'a pas pu etre lu, une classe Citizens est introuvable", err);
+			return UNREADABLE;
+		}
+	}
+
+	/**
+	 * Whether the bot is still anywhere the game can see it.
+	 * <p>
+	 * The scoreboard teams are read through {@link #scoreboardTeamOf(Vi6Game, NPC)}
+	 * because they are emptied from inside {@code ObservableCollection.remove}'s
+	 * exception-swallowing callback loop: a teardown whose callback threw has
+	 * already dropped the bot from the collections and left its entry on the board,
+	 * and counting that bot as removed is exactly the claim this method exists to
+	 * refuse.
+	 */
+	private static boolean stillInGame(Vi6Game game, NPC npc, Player player) {
+		return game.getPlayerList().contains(player) || game.getGuards().contains(player)
+				|| game.getThiefs().contains(player) || scoreboardTeamOf(game, npc) != null;
+	}
+
+	private static @Nullable Player playerFor(BotHandle handle) {
+		var known = handle.player();
+		return known != null ? known : playerOf(handle.npc());
+	}
+
+	private static @Nullable Player playerOf(NPC npc) {
+		var entity = readEntity(npc);
+		return entity instanceof Player player ? player : null;
+	}
+
+	/**
+	 * The report paths must never be the reason a command fails to answer, so a
+	 * game that cannot be resolved degrades the report instead of failing it: the
+	 * roster is still listed, its teams just read as unreadable.
+	 */
+	private @Nullable Vi6Game resolveGameQuietly(String reason) {
+		try {
+			return Ioc.resolve(Vi6Game.class);
+		} catch (Exception e) {
+			logger.warn(reason, e);
+		} catch (LinkageError err) {
+			logger.warn(reason, err);
+		}
+		return null;
 	}
 
 	/**
@@ -219,11 +595,15 @@ public class BotRegistry implements BotService {
 		}
 		var count = npcs.size();
 		var owning = owningRegistry();
-		for (var npc : List.copyOf(npcs.values())) {
+		var targets = List.copyOf(npcs.values());
+		var expected = expectedAfterRemoving(targets);
+		for (var handle : targets) {
 			// One uncooperative NPC must not cost the whole teardown: the remaining bots,
-			// the roster clear and the store flush all still have to happen.
+			// the roster clear and the store flush all still have to happen. The handle
+			// recorded at admission is passed rather than re-derived, because a bot whose
+			// entity Citizens already despawned still has to leave the game collections.
 			try {
-				retire(npc, null);
+				retire(handle.npc(), handle.player());
 			} catch (Exception e) {
 				logger.warn("La destruction d'un bot a echoue", e);
 			} catch (LinkageError err) {
@@ -232,7 +612,21 @@ public class BotRegistry implements BotService {
 		}
 		npcs.clear();
 		flushStore(owning);
-		logDestroyedRoster(count);
+		logDestroyedRoster(count, expected);
+	}
+
+	/**
+	 * The shutdown has no report to attach an expectation to, so a game that cannot
+	 * be resolved here simply leaves the comparison out rather than comparing
+	 * against a guess.
+	 */
+	private @Nullable GameState expectedAfterRemoving(List<BotHandle> targets) {
+		var game = resolveGameQuietly(
+				"La game n'a pas pu être résolue, l'état apres destruction n'est pas " + "comparable à une attente");
+		if (game == null) {
+			return null;
+		}
+		return GameState.of(game, npcs.size()).afterRemoving(game, targets);
 	}
 
 	/**
@@ -240,9 +634,9 @@ public class BotRegistry implements BotService {
 	 * unmodified game path. Anything that goes wrong rolls the whole bot back, so
 	 * the roster never keeps a player the game failed to set up.
 	 *
-	 * @return the admitted NPC, only once it really landed
+	 * @return the admitted handle, only once it really landed
 	 */
-	private NPC admitOne(NPCRegistry npcRegistry, String name, @Nullable String teamName, Vi6Game game)
+	private BotHandle admitOne(NPCRegistry npcRegistry, String name, @Nullable String teamName, Vi6Game game)
 			throws Exception {
 		NPC npc = null;
 		Player player = null;
@@ -282,7 +676,9 @@ public class BotRegistry implements BotService {
 				throw new IllegalStateException(
 						"le bot " + name + " est dans le roster mais n'a pas été setup, une callback d'ajout a échoué");
 			}
-			return npc;
+			// The Player handed to the game travels back with the NPC: it is the only
+			// handle that can still reach this bot once Citizens has despawned its entity.
+			return new BotHandle(npc, player);
 		} catch (Exception e) {
 			rollback(game, npc, player);
 			throw e;
@@ -351,11 +747,21 @@ public class BotRegistry implements BotService {
 	}
 
 	/**
-	 * The single teardown path, shared by the shutdown and by the admission
-	 * rollback. Nothing here is allowed to throw: this runs from {@code onDisable},
-	 * where a throw would skip the rest of the shutdown.
+	 * The single teardown path, shared by the shutdown, the removal and the
+	 * admission rollback. Nothing here is allowed to throw: this runs from
+	 * {@code onDisable}, where a throw would skip the rest of the shutdown.
+	 * <p>
+	 * {@code knownPlayer} is the handle recorded at admission and is what every
+	 * normal caller passes. The {@code readEntity} fallback below is the last
+	 * resort, not the plan: it can only ever answer for an NPC that is still
+	 * spawned, which is not a state a bot is in for long on this server.
 	 */
 	private void retire(NPC npc, @Nullable Player knownPlayer) {
+		// The roster key is taken while the handle is certainly still valid. destroy()
+		// swallows its own failures, so re-reading the id off an NPC that has just
+		// been destroyed can leave a destroyed bot sitting in the roster, to be
+		// selected, torn down and counted again on every later request.
+		var npcId = npc.getUniqueId();
 		Player player = knownPlayer;
 		var entity = (Entity) null;
 		if (player == null) {
@@ -368,7 +774,7 @@ public class BotRegistry implements BotService {
 			removeFromGame(safeName(npc), player);
 		}
 		destroy(npc, entity);
-		npcs.remove(npc.getUniqueId());
+		npcs.remove(npcId);
 	}
 
 	/**
@@ -402,7 +808,7 @@ public class BotRegistry implements BotService {
 
 	private @Nullable NPCRegistry owningRegistry() {
 		try {
-			return npcs.values().stream().findFirst().map(NPC::getOwningRegistry).orElse(null);
+			return npcs.values().stream().findFirst().map(handle -> handle.npc().getOwningRegistry()).orElse(null);
 		} catch (Exception e) {
 			logger.warn("Le registre propriétaire des bots n'a pas pu être lu", e);
 			return null;
@@ -418,37 +824,58 @@ public class BotRegistry implements BotService {
 	 * {@code onDisable} ran, so the in memory deletion performed by
 	 * {@code npc.destroy()} would never reach disk on its own. Flushing once, after
 	 * the loop, is what makes the teardown durable.
+	 *
+	 * @return whether the store really was written, so a caller that promises the
+	 *         operator "a restart will not bring them back" can tell a delivered
+	 *         guarantee from an assumed one
 	 */
-	private void flushStore(@Nullable NPCRegistry registry) {
+	private boolean flushStore(@Nullable NPCRegistry registry) {
 		if (registry == null) {
 			logger.warn("Le registre proprietaire des bots est inconnu, l'ecriture apres destruction est sautee");
-			return;
+			return false;
 		}
 		try {
 			registry.saveToStore();
 			logger.info("Le registre de NPCs a ete ecrit sur le disque apres la destruction des bots");
+			return true;
 		} catch (Exception e) {
 			logger.warn("Le registre de NPCs n'a pas pu être écrit sur le disque après la destruction des bots", e);
 		} catch (LinkageError err) {
 			logger.warn("Le registre de NPCs n'a pas pu être écrit sur le disque, une classe Citizens est introuvable",
 					err);
 		}
+		return false;
 	}
 
 	/**
 	 * The teardown runs in {@code onDisable}, where the roster cannot be inspected
 	 * afterwards, so the evidence that the bots are gone from the game has to be in
-	 * the log.
+	 * the log — and for a removal the operator is owed it too.
+	 * <p>
+	 * {@code expected} is the state the request meant to leave behind, captured
+	 * before the teardown. A report nobody compares is a report that cannot fail,
+	 * which is exactly what round 1 shipped, so a disagreement is logged in the
+	 * {@code INVARIANT ROMPU} style {@link #logInvariant(Vi6Game, List, int)} uses.
 	 */
-	private void logDestroyedRoster(int destroyed) {
+	private void logDestroyedRoster(int destroyed, @Nullable GameState expected) {
 		try {
 			var game = Ioc.resolve(Vi6Game.class);
-			var scoreboard = game.getScoreboard();
-			logger.info(destroyed + " bot(s) ont été détruits | Etat de la game apres destruction : "
-					+ game.getPlayerList().size() + " joueur(s), " + game.getGuards().size() + " garde(s), "
-					+ game.getThiefs().size() + " voleur(s), equipe scoreboard " + TEAM_GUARD + "="
-					+ teamEntries(scoreboard, TEAM_GUARD) + " et " + TEAM_THIEF + "="
-					+ teamEntries(scoreboard, TEAM_THIEF));
+			var actual = GameState.of(game, npcs.size());
+			logger.info(destroyed + " bot(s) ont été détruits | Etat de la game apres destruction : " + actual.players()
+					+ " joueur(s), " + actual.guards() + " garde(s), " + actual.thieves()
+					+ " voleur(s), roster du bot package : " + actual.roster() + ", equipe scoreboard " + TEAM_GUARD
+					+ "=" + actual.guardEntries() + " et " + TEAM_THIEF + "=" + actual.thiefEntries());
+			if (expected != null && !expected.equals(actual)) {
+				logger.warn("INVARIANT ROMPU apres la destruction de " + destroyed + " bot(s) : "
+						+ describeDelta("roster", expected.roster(), actual.roster()) + ", "
+						+ describeDelta("joueur(s)", expected.players(), actual.players()) + ", "
+						+ describeDelta("garde(s)", expected.guards(), actual.guards()) + ", "
+						+ describeDelta("voleur(s)", expected.thieves(), actual.thieves()) + ", "
+						+ describeDelta("equipe scoreboard " + TEAM_GUARD, expected.guardEntries(),
+								actual.guardEntries())
+						+ ", " + describeDelta("equipe scoreboard " + TEAM_THIEF, expected.thiefEntries(),
+								actual.thiefEntries()));
+			}
 		} catch (Exception e) {
 			logger.warn("L'etat de la game apres destruction des bots n'a pas pu être lu", e);
 		} catch (LinkageError err) {
@@ -457,12 +884,16 @@ public class BotRegistry implements BotService {
 		}
 	}
 
-	private static String teamEntries(@Nullable Scoreboard scoreboard, String teamName) {
+	private static String describeDelta(String label, int expected, int actual) {
+		return label + " " + actual + " au lieu de " + expected + " (" + (actual - expected) + ")";
+	}
+
+	private static int teamEntries(@Nullable Scoreboard scoreboard, String teamName) {
 		if (scoreboard == null) {
-			return "absent";
+			return 0;
 		}
 		var team = scoreboard.getTeam(teamName);
-		return team == null ? "absente" : String.valueOf(team.getEntries().size());
+		return team == null ? 0 : team.getEntries().size();
 	}
 
 	private static boolean isLobbyRunning(Vi6Game game) {
