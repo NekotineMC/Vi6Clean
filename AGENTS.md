@@ -1,9 +1,9 @@
 <!-- bmad:context -->
-<!-- Verified 2026-09-25 against d82b73b. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-10-16 against 3a4fe3c. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## Vi6Clean
 
-PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight, shaded with NekotineCore. Planning artifacts live in `_bmad-output/`; `docs/` (named by `_bmad/config.yaml`) does not exist.
+PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight, shaded with NekotineCore. Planning artifacts live in `_bmad-output/`; `docs/` (named by `_bmad/config.toml`) does not exist.
 
 ## Policy
 
@@ -24,7 +24,7 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 - Build requires JDK 25 — toolchain is fixed at 25 and no toolchain resolver is configured, so Gradle cannot download it; use the wrapper (`./gradlew`, `gradlew.bat` on Windows).
 - Bare `gradlew` runs `out`: `spotlessApply` + `shadowJar`, then drops the jar into your running dev server (`Vi6CleanJarOutputPath` in user `~/.gradle/gradle.properties`) which restarts to load it; without that property the jar lands in `build/dist/`.
 - `gradlew build` runs `check`, which includes `spotlessCheck` — formatting drift and wildcard imports fail it, so run bare `gradlew` (or `spotlessApply`) first to fix instead of fail.
-- No tests exist — `src/test` is empty with no test dependencies, so verification means compiling and playing it on the server.
+- No tests exist and there are no test dependencies, so verification means compiling and exercising it — see "Checking a change on the dev server" below.
 - Dependency locking is on: run `gradlew --write-locks` after adding or changing dependencies, plain resolution fails otherwise.
 
 ## Conventions that differ from defaults
@@ -36,3 +36,11 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 - `docker/` holds a full dev server (world, plugin jars), but its Dockerfile is stale (temurin 21, Paper 1.20.4, expects a `-coreShaded` jar name Gradle no longer produces) — `docker build` is not the way to run a change; `gradlew` is.
 
 <!-- /bmad:context -->
+
+## Checking a change on the dev server
+
+The `minecraft-rcon` tools reach the running dev server: `_test_tool` for connectivity, `_read_logs` and `_log_size` for its log, `_execute_command` for a server console command. The server is expected to be up already — never launch one; a failed `_test_tool` means report it and stop.
+
+- The log carries server boot and plugin startup, so a change can be checked without a human playing it: read the log after a restart and look for the plugin's own entries and any stack trace.
+- `_execute_command restart` is allowed, and the server is back ~20s later — poll `_read_logs` until `RCON running on` appears rather than sleeping a fixed time.
+- Only commands registered `ExecutorType.ALL` run from the console — `/game lobby` and `/game bot add <count> [team]`. `/game team` and `/game ready` are `executesPlayer` and silently do nothing over RCON.
