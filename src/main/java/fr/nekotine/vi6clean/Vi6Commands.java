@@ -26,6 +26,17 @@ public class Vi6Commands {
 	private static final String REGISTRY_UNAVAILABLE = "Le registre de bots n'est pas disponible pour cette "
 			+ "session. Redémarrez le serveur avec Citizens installé et activé.";
 
+	// What each bot command could not do while Citizens is unusable. The reason
+	// belongs to CitizensAvailability.describe(), these belong to the executor that
+	// knows which of the three it refused, and degrade() below is the only place
+	// the two are joined -- so a fourth subcommand cannot ship a reason with no
+	// consequence, which is the defect this story exists to remove.
+	private static final String NO_BOT_ADDED = "Aucun bot n'a été ajouté.";
+
+	private static final String EMPTY_ROSTER = "Le roster contient 0 bot.";
+
+	private static final String NO_BOT_REMOVED = "Aucun bot n'a été retiré du roster.";
+
 	public static void registerCommands() {
 		gameCommands();
 	}
@@ -105,7 +116,7 @@ public class Vi6Commands {
 	private static void addBots(CommandSender sender, CommandArguments args) {
 		var availability = CitizensAvailability.check();
 		if (availability != CitizensAvailability.READY) {
-			say(sender, availability.describe(), NamedTextColor.RED);
+			degrade(sender, availability, NO_BOT_ADDED);
 			return;
 		}
 		var count = (Integer) args.get("count");
@@ -127,7 +138,7 @@ public class Vi6Commands {
 	private static void listBots(CommandSender sender, CommandArguments args) {
 		var availability = CitizensAvailability.check();
 		if (availability != CitizensAvailability.READY) {
-			say(sender, availability.describe(), NamedTextColor.RED);
+			degrade(sender, availability, EMPTY_ROSTER);
 			return;
 		}
 		Ioc.getProvider().tryResolve(BotService.class).ifPresentOrElse(service -> {
@@ -148,7 +159,7 @@ public class Vi6Commands {
 	private static void removeBots(CommandSender sender, CommandArguments args) {
 		var availability = CitizensAvailability.check();
 		if (availability != CitizensAvailability.READY) {
-			say(sender, availability.describe(), NamedTextColor.RED);
+			degrade(sender, availability, NO_BOT_REMOVED);
 			return;
 		}
 		Ioc.getProvider().tryResolve(BotService.class).ifPresentOrElse(service -> {
@@ -160,6 +171,16 @@ public class Vi6Commands {
 			var teamName = args.getOptional("teamName").map(Object::toString).orElse(null);
 			say(sender, service.removeBots(count, teamName).describe(), NamedTextColor.GREEN);
 		}, () -> say(sender, REGISTRY_UNAVAILABLE, NamedTextColor.RED));
+	}
+
+	/**
+	 * Refuses a bot command in the two halves the operator needs: why bots are
+	 * unusable, which only {@link CitizensAvailability} knows, and what the command
+	 * could not do, which only this class knows. Naming the same addition in front
+	 * of {@code list} and {@code remove} would be a lie.
+	 */
+	private static void degrade(CommandSender sender, CitizensAvailability availability, String consequence) {
+		say(sender, availability.describe() + " " + consequence, NamedTextColor.RED);
 	}
 
 	private static void say(CommandSender sender, String message, NamedTextColor color) {

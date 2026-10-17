@@ -50,15 +50,18 @@ public enum CitizensAvailability {
 	}
 
 	/**
-	 * @return the operator facing reason why no bot was created, empty when
+	 * The reason and nothing but the reason: this enum can only know why bots are
+	 * unavailable, never what the operator just failed to do with them. That
+	 * consequence belongs to the caller, which is the only place that knows whether
+	 * it was an addition, a listing or a removal that was refused.
+	 *
+	 * @return the operator facing reason why bots cannot be used, empty when
 	 *         Citizens is usable
 	 */
 	public String describe() {
 		return switch (this) {
-			case ABSENT ->
-				"Le plugin " + CITIZENS_PLUGIN + " est requis pour utiliser les bots, aucun bot n'a été ajouté.";
-			case DISABLED ->
-				"Le plugin " + CITIZENS_PLUGIN + " est installé mais pas activé, aucun bot n'a été ajouté.";
+			case ABSENT -> "Le plugin " + CITIZENS_PLUGIN + " est requis pour utiliser les bots.";
+			case DISABLED -> "Le plugin " + CITIZENS_PLUGIN + " est installé mais pas activé.";
 			case READY -> "";
 		};
 	}

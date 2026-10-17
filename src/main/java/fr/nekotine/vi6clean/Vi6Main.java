@@ -30,6 +30,20 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 
 	private final ComponentLogger logger = NekotineLogger.make(this);
 
+	/**
+	 * The one line a server without Citizens gets at boot. It names what actually
+	 * happened — the roster was never loaded, so the commands will refuse — rather
+	 * than "disabled", which would send an operator looking for a command toggle
+	 * that does not exist.
+	 */
+	private static final String BOOT_DEGRADED = "Roster de bots non chargé, les commandes de bot refuseront d'agir : {} {}";
+
+	/**
+	 * The remedy {@code REGISTRY_UNAVAILABLE} already names, repeated where the
+	 * operator reads it first.
+	 */
+	private static final String BOOT_REMEDY = "Redémarrez le serveur avec Citizens installé et activé.";
+
 	private UpdateFolderRestart autoRestart;
 
 	@Override
@@ -71,7 +85,15 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			// registry class itself is never named here: a `new BotRegistry()` would be
 			// resolved by the verifier while Vi6Main is still linking, long before the
 			// guard below is reached.
-			if (CitizensAvailability.check() == CitizensAvailability.READY) {
+			// The state is read once and both the branch and the line below it answer to
+			// that single reading, so the log can never describe a state different from
+			// the one the branch acted on. The else is what keeps the boot from being
+			// silent: without it a server without Citizens loaded the plugin and left the
+			// operator with a dead /game bot and nothing to act on.
+			var citizensAvailability = CitizensAvailability.check();
+			if (citizensAvailability != CitizensAvailability.READY) {
+				logger.info(BOOT_DEGRADED, citizensAvailability.describe(), BOOT_REMEDY);
+			} else {
 				BotRegistryLoader.load()
 						.ifPresent(bots -> Ioc.getProvider().registerSingletonInstanceAs(bots, BotService.class));
 			}
