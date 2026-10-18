@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -18,6 +19,7 @@ import fr.nekotine.vi6clean.bot.BotService;
 import fr.nekotine.vi6clean.bot.CitizensAvailability;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
+import fr.nekotine.vi6clean.debug.InjectionProbe;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.majordom.Majordom;
 import fr.nekotine.vi6clean.map.Vi6Map;
@@ -96,6 +98,13 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			} else {
 				BotRegistryLoader.load()
 						.ifPresent(bots -> Ioc.getProvider().registerSingletonInstanceAs(bots, BotService.class));
+				// TEMPORARY spike, delete with debug/InjectionProbe.java once its output has
+				// been read. The world is read inside the task, not here, so a map
+				// change during boot cannot point the probe at the previous world.
+				Bukkit.getScheduler().runTaskLater(this, () -> {
+					var probeWorld = game.getWorld();
+					InjectionProbe.run(probeWorld == null ? null : probeWorld.getSpawnLocation(), this);
+				}, InjectionProbe.BOOT_DELAY_TICKS);
 			}
 			Ioc.getProvider().registerSingleton(new Majordom());
 			var moduleManager = Ioc.resolve(ModuleManager.class);

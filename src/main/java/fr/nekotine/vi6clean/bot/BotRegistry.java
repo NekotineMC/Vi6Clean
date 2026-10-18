@@ -30,9 +30,9 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 /**
  * The bot roster. This class holds every reference to Citizens that new code
- * owns, and it is the only new class that calls into Citizens. The one
- * pre-existing exception is {@code debug/NpcProbe}, which the frozen intent
- * forbids touching and Epic 2 deletes.
+ * owns, and it is the only production class that calls into Citizens. The one
+ * other caller is the throwaway {@code debug/InjectionProbe}, which the frozen
+ * intent of Epic 2 story 2.1 adds and deletes in the same story.
  * <p>
  * Three invariants are load-bearing:
  * <ul>
