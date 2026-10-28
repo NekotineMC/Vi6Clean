@@ -178,4 +178,4 @@ _bmad-output/**/*.log
 .agents/
 .bmad-cache/
 .opencode/
-_bmad/
+_bmad/config.user.toml
