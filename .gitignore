@@ -174,8 +174,8 @@ gradle-app.setting
 .envrc
 
 # bmad and opencode
-_bmad-output/
+_bmad-output/**/*.log
 .agents/
 .bmad-cache/
 .opencode/
-_bmad/
+_bmad/config.user.toml
