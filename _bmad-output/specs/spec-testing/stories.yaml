@@ -1,0 +1,39 @@
+- id: "1"
+  title: paper-junit-server harness skeleton
+  description: >-
+    Create the paper-junit-server library as a submodule at Vi6Clean/paper-junit-server:
+    fixture, LauncherSessionListener, no-exit agent with self-check and shared Gradle wiring
+    (CAP-2, CAP-3, CAP-5, harness side of CAP-8; see harness-design.md).
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Verification is compile only; the first real server boot happens in story 2.
+    The GitHub repository does not exist yet: init the repo locally and record
+    https://github.com/XxGoldenbluexX/paper-junit-server.git as the submodule URL;
+    the user creates the remote and pushes after this story.
+- id: "2"
+  title: Wire Vi6 to paper-junit-server
+  description: >-
+    Add the submodule pin and includeBuild, the integrationTest suite through the harness,
+    the relocation change and the plain test suite (CAP-1, CAP-2), plus a Vi6-typed smoke
+    test that resolves Vi6Game (CAP-4).
+  spec_checkpoint: true
+  invoke_dev_with: >-
+    Never run bare gradlew (it restarts the dev server); lock only new configurations
+    and review the lockfile diff.
+- id: "3"
+  title: Vi6 game hooks for test isolation
+  description: >-
+    Let tests force map, teams and phase, shorten timers through config, and reset bots,
+    scoreboard and phase between tests (CAP-6).
+  spec_checkpoint: true
+- id: "4"
+  title: Bot-driven tests
+  description: >-
+    Scripted-bot tests of a tool or phase and autonomous-bot soak runs (CAP-7); blocked
+    until NekotineBots exposes its scripted-input API (spec-bots CAP-7).
+- id: "5"
+  title: NekotineBots adopts paper-junit-server
+  description: >-
+    NekotineBots tests itself through paper-junit-server with a tiny host plugin in its
+    own repository (CAP-8).

@@ -4,7 +4,7 @@ The mechanism the spike verified (`spike-findings.md`). This is the reference fo
 
 ## Where the code lives
 
-- **paper-junit-server** (`io.github.xxgoldenbluexx.paperjunitserver`; standalone library in its own repository; consumers add it as a git submodule plus `includeBuild`, like NekotineCore): the fixture (boot, `onMain`, waits, stop), the `LauncherSessionListener`, the no-exit agent, and the shared Gradle wiring (bundle staging, `integrationTest` suite, agent attachment). It may use paperweight directly. Consumers take it on test configurations only.
+- **paper-junit-server** (`fr.xxgoldenbluexx.paperjunitserver`; standalone library in its own repository; consumers add it as a git submodule plus `includeBuild`, like NekotineCore; in Vi6 the submodule sits at `paper-junit-server/`, next to `NekotineCore/`): the fixture (boot, `onMain`, waits, stop), the `LauncherSessionListener`, the no-exit agent, and the shared Gradle wiring (bundle staging, `integrationTest` suite, agent attachment). It may use paperweight directly. Consumers take it on test configurations only.
 - **Vi6:** game hooks (force map, teams, phase; reset; short-timer config) and the Vi6-typed tests. NekotineBots: its host plugin and tests.
 - NekotineCore is not involved, apart from the relocation change on the Vi6 side.
 
