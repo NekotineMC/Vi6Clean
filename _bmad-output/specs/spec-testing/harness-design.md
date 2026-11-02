@@ -26,7 +26,7 @@ flowchart BT
 
 ## Boot
 
-- The bundle location is a user-owned setting with no default; if it is missing, the run fails naming the setting. Gradle stages the bundle with a `Sync` task into `build/it-server/`. It copies only what the server needs, adds the Vi6 jar to `plugins/`, and rewrites `server.properties`: rcon off, free port. Staging happens in Gradle, not in JUnit, because the worker's `workingDir` must exist before the JVM starts.
+- The consumer sets the bundle path in its build (`paperJunitServer { bundle = ... }`), and there is no default bundle. A missing or non-directory bundle fails the run loudly. Gradle stages the bundle with a `Sync` task into `build/it-server/`. It copies only what the server needs, adds the Vi6 jar to `plugins/`, and rewrites `server.properties`: rcon off, free port. Staging happens in Gradle, not in JUnit, because the worker's `workingDir` must exist before the JVM starts.
 - The fixture calls `org.bukkit.craftbukkit.Main.main({"--nogui"})` on a daemon thread and waits until `Bukkit.getCurrentTick() > 0`. If the launcher thread dies, it fails at once with the cause.
 - JVM properties: `terminal.jline=false`, `terminal.ansi=false`, `com.mojang.eula.agree=true`; heap 3 GB.
 - `onMain` is `callSyncMethod(...).get(timeout)`. `awaitTicks` and `awaitUntil` poll on the main thread with a tick deadline.

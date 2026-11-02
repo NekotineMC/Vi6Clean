@@ -53,7 +53,7 @@ Pain to solve: every Vi6Clean change is verified by compiling, deploying to the 
 
 - Vi6, Core, ProtocolLib and WorldEdit classes are never on the test JVM classpath. Paper's plugin classloader asks its parent first, and `JavaPlugin` throws "requires to be created by a valid classloader". Core and Vi6 can't move to the shared classpath either: 16 Core files and 5 Vi6 files import ProtocolLib or WorldEdit.
 - One server boot per test JVM (~11.5 s measured). Tests are isolated by game reset, never by a server restart.
-- The user supplies and maintains the bundle (world, maps, plugin jars, configs) and keeps it in line with the production server; its location is one setting the user owns. The harness copies it under `build/` and adds the Vi6 jar. It never resolves plugin jars itself and never writes to the source folder.
+- The bundle is a folder whose path each consumer project sets in its build (Vi6: `test-bundle/` at the repository root, contents gitignored). Developers put the configs, plugin jars and worlds inside it and keep it in line with the production server. paper-junit-server ships no default bundle: if the bundle is missing or not a directory, `integrationTest` fails with a loud message. The harness copies the bundle under `build/` and adds the plugin jar. It never resolves plugin jars itself and never writes to the bundle folder.
 - The `fr.nekotine.core` relocation is dropped so tests import Core normally. CommandAPI is relocated to `fr.nekotine.core.commandapi`, matching Core's own shading. Core stays a shaded library, not a plugin.
 - The harness, **paper-junit-server** (fixture, session listener, no-exit agent, shared Gradle wiring), is its own standalone library for any Paper plugin, not branded as Nekotine. Its Maven group is `fr.xxgoldenbluexx` and its Java package `fr.xxgoldenbluexx.paperjunitserver`. Consumers pull it in like NekotineCore: a git submodule plus `includeBuild`. It may use paperweight directly. It is not part of NekotineCore, which has no paperweight. Vi6 keeps only its own game hooks and tests.
 - The harness is test-only: consumers take it on test configurations only, and it never enters a plugin's shaded jar.
@@ -85,4 +85,3 @@ Pain to solve: every Vi6Clean change is verified by compiling, deploying to the 
 - No CI builds Java (AGENTS.md), so the integration suite runs only locally and is invoked by hand.
 - Scripted bot inputs come from NekotineBots' library API (`spec-bots` CAP-7), so CAP-7 here waits on that library.
 - The user creates the paper-junit-server repository; this spec doesn't cover creating it.
-- The build has no default bundle location: if the setting is missing, `integrationTest` fails with a message naming the setting.

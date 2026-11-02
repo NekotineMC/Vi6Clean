@@ -19,3 +19,12 @@
 - source_spec: `_bmad-output/specs/spec-testing/stories/1-paper-junit-server-harness-skeleton.md`
   summary: The no-exit agent's fail-on-upgrade guard is not exercised by any test.
   evidence: A unit test in agent/ that builds a synthetic DedicatedServer class with the ClassFile API (onServerExit with and without System.exit) would pin both the patched flag and stack balance without a server.
+- source_spec: `_bmad-output/specs/spec-testing/stories/2-wire-vi6-to-paper-junit-server.md`
+  summary: A standalone gradlew build fails spotlessJavaCheck on existing formatting drift in FlagBasedStatusEffectType.java and HotPotatoHandler.java.
+  evidence: Both files are unchanged from the base commit, so this already fails before story 2; only spotlessApply build is green. Fix the drift in its own commit (or record it as a pitfall in AGENTS.md) before relying on build as the PR gate.
+- source_spec: `_bmad-output/specs/spec-testing/stories/2-wire-vi6-to-paper-junit-server.md`
+  summary: NekotineCore/AGENTS.md line 18 still says Vi6 relocates fr.nekotine.core to fr.nekotine.vi6clean.nekotinecore.
+  evidence: Story 2 dropped that relocation; the fix belongs in a NekotineCore PR (to dev), then a Vi6 gitlink bump.
+- source_spec: `_bmad-output/specs/spec-testing/stories/2-wire-vi6-to-paper-junit-server.md`
+  summary: NekotineCore PhaseMachine.isRunning() stays false after the first goTo, because the currentPhase == null branch returns without setting running = true.
+  evidence: Seen in story 2 review fixes: isRunning() was false on a healthy server after Vi6Game.start(); PhaseMachine.goTo lines 51-63. Vi6SmokeIT checks getPhase(Vi6PhaseLobby.class) instead. Fix it in a NekotineCore PR to dev, then switch the smoke test back to isRunning().
