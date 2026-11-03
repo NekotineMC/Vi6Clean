@@ -26,7 +26,7 @@ public abstract class AbstractKothEffect {
 
 		// load configuration
 		try {
-			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("override_config", false)) {
+			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("override-config", false)) {
 				configuration = ConfigurationUtil.overrideAndLoadYaml("koths/" + code + ".yml",
 						"/koths/" + code + ".yml");
 			} else {
