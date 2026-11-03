@@ -2,8 +2,7 @@
 id: SPEC-testing
 companions:
   - harness-design.md
-sources:
-  - ../../testing-strategy-brief.md
+sources: []
 ---
 
 > **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. Source documents listed in frontmatter are for traceability — consult them only if you need narrative rationale or prose color this contract intentionally omits.
