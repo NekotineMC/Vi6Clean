@@ -28,3 +28,9 @@
 - source_spec: `_bmad-output/specs/spec-testing/stories/2-wire-vi6-to-paper-junit-server.md`
   summary: NekotineCore PhaseMachine.isRunning() stays false after the first goTo, because the currentPhase == null branch returns without setting running = true.
   evidence: Seen in story 2 review fixes: isRunning() was false on a healthy server after Vi6Game.start(); PhaseMachine.goTo lines 51-63. Vi6SmokeIT checks getPhase(Vi6PhaseLobby.class) instead. Fix it in a NekotineCore PR to dev, then switch the smoke test back to isRunning().
+- source_spec: `_bmad-output/specs/spec-testing/stories/3-vi6-game-hooks-for-test-isolation.md`
+  summary: Tool configs are overwritten at boot even when config.yml says override-config false.
+  evidence: Vi6Main.onEnable calls ConfigManager.setupAsync() (runTaskAsynchronously) and then immediately builds every ToolHandler, whose constructor reads ConfigManager.getConfig().override_config() — still the in-memory default true. Fix by loading config.yml synchronously before discoverHandlers(), or by building handlers after the load; then a test can check tools with override false.
+- source_spec: `_bmad-output/specs/spec-testing/stories/3-vi6-game-hooks-for-test-isolation.md`
+  summary: No test observes the boot-time override of config.yml and tools/*.yml.
+  evidence: Both load once at boot, and the local test-bundle holds default values, so removing the override branch keeps Vi6ConfigIT green. Needs a stale-value fixture staged before boot (for example a harness bundle overlay); koths are covered in-process.

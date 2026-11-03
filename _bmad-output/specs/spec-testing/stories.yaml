@@ -22,10 +22,10 @@
     Never run bare gradlew (it restarts the dev server); lock only new configurations
     and review the lockfile diff.
 - id: "3"
-  title: Vi6 game hooks for test isolation
+  title: Map forcing and configuration reading tests
   description: >-
-    Let tests force map, teams and phase, shorten timers through config, and reset bots,
-    scoreboard and phase between tests (CAP-6).
+    Integration tests that force each map and reject an unknown one, and that check Vi6
+    reads config.yml, tools/*.yml and koths/*.yml (part of CAP-6; needs no players).
   spec_checkpoint: true
 - id: "4"
   title: Bot-driven tests

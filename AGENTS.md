@@ -40,7 +40,6 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 ## Known pitfalls
 
 - `docker/` is a stale, tracked server snapshot (temurin 21, Paper 1.20.4, expects a `-coreShaded` jar Gradle no longer produces) — don't use `docker build`, and don't treat `docker/plugins/Vi6Clean/` as source; edit `src/main/resources/` instead.
-- `override-config: true` overwrites server copies of `config.yml` and `tools/*.yml` with the jar defaults at boot, so hand-edits on the server are lost — tune in `src/main/resources/`.
-- KoTH configs do not follow that flag: `AbstractKothEffect` reads `override_config` (underscore) from Bukkit's config with default `false`, so server `koths/*.yml` only gain missing keys and keep their old values. Delete the server copy to pick up a changed default.
+- `override-config: true` overwrites server copies of `config.yml`, `tools/*.yml` and `koths/*.yml` with the jar defaults when they load (boot for config and tools, each game for KoTHs), so hand-edits on the server are lost — tune in `src/main/resources/`; with `override-config: false` server copies only gain missing keys and keep their old values, so delete a copy to pick up a changed default.
 
 <!-- /bmad:context -->
