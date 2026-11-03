@@ -1,6 +1,6 @@
 # Harness design
 
-The mechanism the spike verified (`spike-findings.md`). This is the reference for how CAP-2 to CAP-5 are built; the kernel holds the what.
+The mechanism the 2026-10-29 spike verified, now built in paper-junit-server. This is the reference for how CAP-2 to CAP-5 are built; the kernel holds the what.
 
 ## Where the code lives
 
@@ -21,8 +21,8 @@ flowchart BT
 
 - Test-JVM classpath: `mappedServerJar` plus paperweight's `mojangMappedServerRuntime`, JUnit, and the harness fixture (boot, `onMain`, waits). Nothing else.
 - Vi6-typed test classes live in a source set that is compiled against `main` but is **never** on the test runtime classpath. They are only passed to the `Test` task as `testClassesDirs`.
-- A `LauncherSessionListener` (registered in `META-INF/services`) boots the server in `launcherSessionOpened`. It then sets the thread context classloader to a `URLClassLoader` over those classes, whose parent is Vi6's plugin classloader. Gradle 9.4 reads the TCCL after opening the session and loads each test class with `Class.forName(name, false, tccl)`, so discovery and reports are native. The listener acts only when a system property is set, so other suites are unaffected. In Core, the plugin whose classloader becomes the parent is a setting (Vi6Clean, or NekotineBots' host plugin); the spike hard-coded `Vi6Clean`.
-- Not needed (spike Q5): the `vi6-testapi` module published through `ServicesManager`.
+- A `LauncherSessionListener` (registered in `META-INF/services`) boots the server in `launcherSessionOpened`. It then sets the thread context classloader to a `URLClassLoader` over those classes, whose parent is Vi6's plugin classloader. Gradle 9.4's `JUnitPlatformTestDefinitionProcessor` opens the session before it reads the TCCL, then loads each test class with `Class.forName(name, false, tccl)`, so discovery and reports are native. If a Gradle upgrade breaks the swap, start there. The listener acts only when a system property is set, so other suites are unaffected. The plugin whose classloader becomes the parent is the `targetPlugin` setting (Vi6Clean, or NekotineBots' host plugin).
+- Not needed: the `vi6-testapi` module published through `ServicesManager`.
 
 ## Boot
 
@@ -34,8 +34,16 @@ flowchart BT
 ## Stop
 
 - `DedicatedServer.onServerExit` ends with `System.exit(abnormalExit ? 70 : 0)`. It is called from `MinecraftServer.stopServer()`, and no flag skips it. JEP 486 removed the SecurityManager and offers no veto API.
+- Other `System.exit` calls are not patched: `ServerWatchdog`, `RestartCommand` and the bootstrap `Main`. A test that blocks the main thread for about a minute trips the watchdog, which kills the test JVM and loses the reports.
+- Rejected bypasses, if the agent needs replacing:
+  - A SecurityManager `checkExit`: gone since JDK 24.
+  - An agent on `java.lang.Runtime.exit`: catches every caller, but needs bootstrap retransformation and Byte Buddy.
+  - `junit5-system-exit`: turns every exit into an exception; it's built for asserting exit codes.
+  - Subclassing `DedicatedServer`: its construction sits in a lambda in `net.minecraft.server.Main.main`, which would have to be copied every Paper release.
 - **Primary:** a `-javaagent` (`java.lang.classfile`, ~40 lines) that removes that one call. The agent records whether it patched anything, and the harness fails the run if it did not. After `Bukkit.shutdown()` the harness joins the server thread (spike: 0.6–1.6 s) and fails if the thread is missing or still alive.
 - **Fallback, no agent:** a shutdown hook registered before `Bukkit.shutdown()`. It holds JVM shutdown open until Gradle's worker thread is itself inside `java.lang.Shutdown`, which means reporting is done. It is verified on `integrationTest` only, depends on Gradle internals, and server logging stops at exit.
+  - The process exit code is the server's, so an abnormal stop (70) fails the Gradle task.
+  - Release the hook once the worker is inside `java.lang.Shutdown`. Waiting for the worker thread to *end* deadlocks, because the worker blocks behind the hook; the spike hit a 2-minute timeout that way.
 
 ## Build wiring
 
@@ -59,6 +67,7 @@ Not built. Switch to it if the in-process design breaks after a Paper or Gradle 
   - A second jar to build and stage on every run.
   - The debugger attaches to a separate server process.
 - **Unchanged:** `onMain` is still needed, because tests can't block the main thread and still wait in ticks. The server is booted once, before any test, so `@BeforeAll`/`@AfterAll` still manage game state only.
+- **Pitfall:** a `Jar` task built from `provider { zipTree(filteredConfiguration) }` can stay UP-TO-DATE with stale content after the filter changes. Use real task inputs for the test-host jar (and for NekotineBots' host plugin).
 - **Cost:** a rework of the harness (fixture, Gradle plugin) and of story 2's wiring. Go through the spec first.
 
 ## Known noise and bugs

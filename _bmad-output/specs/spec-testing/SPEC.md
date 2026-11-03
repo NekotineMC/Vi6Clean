@@ -2,7 +2,6 @@
 id: SPEC-testing
 companions:
   - harness-design.md
-  - spike-findings.md
 sources:
   - ../../testing-strategy-brief.md
 ---
@@ -13,7 +12,7 @@ sources:
 
 ## Why
 
-Pain to solve: every Vi6Clean change is verified by compiling, deploying to the dev server and playing by hand. No tests exist, no CI builds Java, and the PR reviewer is the only gate. Upcoming work, NekotineBots and the bot-driven game, needs repeatable checks of phases, tools and win conditions. The spike (`spike-findings.md`, 2026-10-29) proved that a real Paper 26.2 server can run inside Gradle's test worker, so tests can be ordinary JUnit 5 classes against the real game instead of mocks.
+Pain to solve: every Vi6Clean change is verified by compiling, deploying to the dev server and playing by hand. No tests exist, no CI builds Java, and the PR reviewer is the only gate. Upcoming work, NekotineBots and the bot-driven game, needs repeatable checks of phases, tools and win conditions. The spike (2026-10-29) proved that a real Paper 26.2 server can run inside Gradle's test worker, so tests can be ordinary JUnit 5 classes against the real game instead of mocks.
 
 ## Capabilities
 
