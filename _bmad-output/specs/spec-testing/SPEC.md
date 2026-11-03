@@ -71,7 +71,7 @@ Pain to solve: every Vi6Clean change is verified by compiling, deploying to the 
 - MockBukkit: it only reaches 26.1.2 and can't model NMS, ProtocolLib, CommandAPI, dialogs or bots.
 - Vanilla GameTest.
 - Third-party frameworks: Paperwright, Plugwright, FancyInnovations.
-- RCON-and-log checks as the main way to verify, and a child-process server mode (the spike made it unnecessary).
+- RCON-and-log checks as the main way to verify, and a child-process server mode for now. The spike made it unnecessary; it is kept as plan B (→ `harness-design.md`).
 - CI: no CI builds Java, and the integration suite runs on a developer machine that has the bundle.
 - Distributing paper-junit-server as a published artifact or Gradle plugin. For now it is consumed only as a git submodule plus `includeBuild`.
 - Editing `spec-bots` now. Its "no JVM test suite" and "verification is RCON + log" lines are updated after this framework exists.

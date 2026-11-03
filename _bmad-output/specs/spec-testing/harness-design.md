@@ -44,6 +44,23 @@ flowchart BT
 - Lock new configurations only, and review the lockfile diff.
 - Never run bare `gradlew` while testing: its `out` task copies the jar into the dev server's `plugins/update` and restarts that server.
 
+## Plan B: JUnit launched from a test-host plugin
+
+Not built. Switch to it if the in-process design breaks after a Paper or Gradle upgrade. Two signs: the agent self-check fails because `onServerExit` was renamed or no longer calls `System.exit`, or Gradle stops loading test classes through the context classloader the session listener sets.
+
+- **Shape:**
+  - A test-host plugin, separate from the plugin under test so JUnit never ships in production, depends on that plugin and bundles JUnit and the compiled tests.
+  - Once the server is up, it runs the JUnit Platform `Launcher` on its own thread (not the main thread) and writes XML reports with the platform's reporting listener, then calls `Bukkit.shutdown()`.
+  - Gradle starts the staged server as a child process (`JavaExec`) and fails the build if the reports show failures.
+- **Gains:** test classes load through a plugin classloader the normal way, so there's no context-classloader swap and no dependence on Gradle internals. Paper's `System.exit` is just the end of the server process, so there's no no-exit agent. Any server works, even a full copy of production.
+- **Losses:**
+  - No native Gradle test integration: no per-test console output, and no `--tests` filter unless the plugin is passed the filters.
+  - No "run this test" from the IDE.
+  - A second jar to build and stage on every run.
+  - The debugger attaches to a separate server process.
+- **Unchanged:** `onMain` is still needed, because tests can't block the main thread and still wait in ticks. The server is booted once, before any test, so `@BeforeAll`/`@AfterAll` still manage game state only.
+- **Cost:** a rework of the harness (fixture, Gradle plugin) and of story 2's wiring. Go through the spec first.
+
 ## Known noise and bugs
 
 - Harmless on Windows: FAWE's LZ4 binding error and history warnings; OSHI registry and perf-counter errors.
