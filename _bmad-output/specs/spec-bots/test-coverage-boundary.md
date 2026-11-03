@@ -4,10 +4,10 @@ What a packet-driven bot run can verify in Vi6Clean, what each input reaches, an
 
 ## Harness
 
-Vi6Clean has an integration suite (`src/integrationTest`, run with `gradlew integrationTest`, never part of `build`). The suite boots one real Paper server in the test JVM per run through paper-junit-server, staged from the local `test-bundle/` (see `_bmad-output/specs/spec-testing/`).
+Vi6Clean has an integration suite (`src/integrationTest`, run with `gradlew integrationTest`, never part of `build`). The suite boots one real Paper server in the test JVM per run through paper-junit-server, staged from the local `test-bundle/` (usage in `paper-junit-server/README.md`, internals and plan B in `paper-junit-server/DESIGN.md`).
 - **Typed access:** tests use Vi6 and Core types directly, do game work through `PaperServer.onMain`, and wait with `awaitTicks`/`awaitUntil`.
 - **Existing tests:** `Vi6SmokeIT`, `Vi6MapIT` and `Vi6ConfigIT`, which need no players.
-- **Not built yet:** resetting the game between tests (phase, teams, scoreboard) waits for bots.
+- **Not built yet:** forcing teams and phase, short timers, and resetting the game between tests (phase, teams, scoreboard). These wait for bots.
 
 A bot run checked by assertions belongs in that suite. Runs that need a real player stay on the **booted dev server**, driven by console command and checked by reading the log.
 
