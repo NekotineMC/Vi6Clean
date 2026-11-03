@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.nekotine.core.configuration.ConfigurationUtil;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Team;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
@@ -26,7 +26,7 @@ public abstract class AbstractKothEffect {
 
 		// load configuration
 		try {
-			if (Ioc.resolve(JavaPlugin.class).getConfig().getBoolean("override_config", false)) {
+			if (Ioc.resolve(ConfigManager.class).getConfig().override_config()) {
 				configuration = ConfigurationUtil.overrideAndLoadYaml("koths/" + code + ".yml",
 						"/koths/" + code + ".yml");
 			} else {
