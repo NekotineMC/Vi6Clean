@@ -3,7 +3,7 @@
 
 ## Vi6Clean
 
-PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight userdev, NekotineCore shaded and relocated into the jar. BMad planning output (specs, refactoring notes) lives in `_bmad-output/` — read it for context; `docs/`, which `_bmad/config.toml` names as project knowledge, does not exist.
+PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight userdev, NekotineCore shaded into the jar (unrelocated, under `fr.nekotine.core`; CommandAPI relocated to `fr.nekotine.core.commandapi`, matching Core's own shading). BMad planning output (specs, refactoring notes) lives in `_bmad-output/` — read it for context; `docs/`, which `_bmad/config.toml` names as project knowledge, does not exist.
 
 ## Policy
 
@@ -18,7 +18,10 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 - Tool tuning: `src/main/resources/tools/<code>.yml`, loaded by `ToolHandler` via its `@ToolCode`. KoTH tuning: `src/main/resources/koths/<code>.yml`, loaded by `AbstractKothEffect`.
 - Game-wide options: Configurate records in `src/main/java/fr/nekotine/vi6clean/configuration/` (`Vi6Config` → server `config.yml`, keys in kebab-case).
 - `NekotineCore/` is a git submodule and its own repository — read `NekotineCore/AGENTS.md` before editing it.
-- `settings.gradle.kts` uses `includeBuild("NekotineCore")`, so the build compiles the submodule working tree, not the recorded pin — commit the gitlink (`git add NekotineCore`) in the same PR as any Core change.
+- `paper-junit-server/` is a second git submodule and its own repository (in-process Paper test harness, Gradle plugin `fr.xxgoldenbluexx.paper-junit-server`) — read `paper-junit-server/AGENTS.md` before editing it.
+- `settings.gradle.kts` uses `includeBuild("NekotineCore")` and `includeBuild("paper-junit-server")` (the latter also under `pluginManagement`), so the build compiles the submodules' working trees, not the recorded pins — commit the gitlink (`git add NekotineCore` / `git add paper-junit-server`) in the same PR as any change to either.
+- Tests: the plain JUnit suite (`src/test/java`, pure logic, no server; runs under `build`) is wired but empty — the folder doesn't exist yet and `gradlew test` reports NO-SOURCE until a test is added. `src/integrationTest/java` holds tests that run inside a real Paper server and use Vi6/Core types directly (`Ioc.resolve(...)`, `PaperServer.onMain(...)`).
+- `test-bundle/` is the integration-test server folder (configs, `worlds/`, ProtocolLib and FAWE jars and their config folders, `plugins/Vi6Clean/`). Its contents are gitignored except `README.md`, which lists what goes in; fill it locally from the dev server and keep it in line with production.
 - `datapacks/` is bundled into the jar by `shadowJar`; `resourcepacks/` is published separately (below).
 
 ## Running and verifying
@@ -26,8 +29,8 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 - Requires JDK 25 installed locally — the toolchain is pinned to 25 with no resolver, so Gradle cannot download it. Use the wrapper (`gradlew.bat` on Windows).
 - Bare `gradlew` runs the default `out` task: `spotlessApply` + `shadowJar`, then copies the jar to `Vi6CleanJarOutputPath` from `~/.gradle/gradle.properties`, or `build/dist/` without it. Dropping it into a server's `plugins/update/` restarts that server: `Vi6Main` starts NekotineCore's `UpdateFolderRestart`, which watches the update folder and calls `Bukkit.restart()` (needs `restart-script` set in `spigot.yml`, or the server just stops).
 - `gradlew build` runs `spotlessCheck` and fails on formatting drift or wildcard imports — run bare `gradlew` first so Spotless fixes them.
-- No tests exist (`src/test` is absent) — verify by compiling and playing on the dev server.
-- Dependency locking is on: run `gradlew --write-locks` after changing dependencies, or resolution fails.
+- `gradlew test` (also run by `build`) runs the plain suite. `gradlew integrationTest` stages `test-bundle/` plus the fresh shadow jar into `build/it-server/` and boots one in-process server for the run; `build` and `check` never run it, and it fails if `test-bundle/` is missing or Vi6Clean is not loaded or disabled. `Vi6Main.onEnable` only logs its exceptions, so a half-failed enable boots fine; `Vi6SmokeIT` checks that enable completed. Gameplay not covered by tests still needs the dev server.
+- Dependency locking is on: lock state is required after changing dependencies, or resolution fails. A full `gradlew --write-locks` re-resolves `26.2.build.+` and `11.2.+` and moves the dev bundle and CommandAPI; prefer `gradlew dependencies --configuration <name> --update-locks <group>:*` for just what changed, and review the lockfile diff.
 - `.github/workflows/gradle.yml` is a disabled legacy pipeline kept for reference (it triggers on a nonexistent `master` branch) — don't fix or re-enable it. `ressourcepacks.yml` is live: a push to `main` touching `resourcepacks/**` republishes the zips to the `dev` release.
 
 ## Conventions that differ from defaults
@@ -37,7 +40,6 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 ## Known pitfalls
 
 - `docker/` is a stale, tracked server snapshot (temurin 21, Paper 1.20.4, expects a `-coreShaded` jar Gradle no longer produces) — don't use `docker build`, and don't treat `docker/plugins/Vi6Clean/` as source; edit `src/main/resources/` instead.
-- `override-config: true` overwrites server copies of `config.yml` and `tools/*.yml` with the jar defaults at boot, so hand-edits on the server are lost — tune in `src/main/resources/`.
-- KoTH configs do not follow that flag: `AbstractKothEffect` reads `override_config` (underscore) from Bukkit's config with default `false`, so server `koths/*.yml` only gain missing keys and keep their old values. Delete the server copy to pick up a changed default.
+- `override-config: true` overwrites server copies of `config.yml`, `tools/*.yml` and `koths/*.yml` with the jar defaults when they load (boot for config and tools, each game for KoTHs), so hand-edits on the server are lost — tune in `src/main/resources/`; with `override-config: false` server copies only gain missing keys and keep their old values, so delete a copy to pick up a changed default.
 
 <!-- /bmad:context -->

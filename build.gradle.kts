@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 group = "fr.nekotine"
 version = "0.0.1"
 description = "vi6clean"
@@ -44,6 +46,7 @@ plugins {
     alias(libs.plugins.shadow)
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.21"
     id("com.diffplug.spotless") version "8.4.0"
+    id("fr.xxgoldenbluexx.paper-junit-server")
 }
 
 java {
@@ -74,6 +77,23 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     }
 }
 
+testing {
+    suites {
+        // Plain JUnit, no server: pure logic only (runs under build/check).
+        named<JvmTestSuite>("test") {
+            useJUnitJupiter("5.13.4")
+        }
+    }
+}
+
+// Integration suite (gradlew integrationTest, never part of build/check): an
+// in-process Paper server staged from test-bundle/ (see test-bundle/README.md).
+paperJunitServer {
+    targetPlugin = "Vi6Clean"
+    pluginJar = tasks.shadowJar.flatMap { it.archiveFile }
+    bundle = layout.projectDirectory.dir("test-bundle")
+}
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
@@ -83,12 +103,45 @@ tasks.withType<ProcessResources> {
 }
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
-    relocate("fr.nekotine.core", "fr.nekotine.vi6clean.nekotinecore")
-    relocate("dev.jorel.commandapi", "fr.nekotine.vi6clean.nekotinecore.commandapi")
+    // Core stays unrelocated so integration tests import its types; CommandAPI
+    // matches Core's own shading.
+    relocate("dev.jorel.commandapi", "fr.nekotine.core.commandapi")
 }
 
 tasks.shadowJar {
     archiveClassifier = ""
+}
+
+// Guards the relocation layout: Core unrelocated, CommandAPI under Core's package.
+val verifyShadowJarLayout by tasks.registering {
+    group = "verification"
+    description = "Fails if the shadow jar has the old Core relocation or unrelocated CommandAPI."
+    val jar = tasks.shadowJar.flatMap { it.archiveFile }
+    inputs.file(jar)
+    doLast {
+        val entries =
+            ZipFile(jar.get().asFile).use { zip ->
+                zip
+                    .entries()
+                    .asSequence()
+                    .map { it.name }
+                    .toList()
+            }
+        val forbidden =
+            entries.filter {
+                it.startsWith("fr/nekotine/vi6clean/nekotinecore/") || it.startsWith("dev/jorel/commandapi/")
+            }
+        if (forbidden.isNotEmpty()) {
+            throw GradleException("Shadow jar has forbidden entries, e.g. ${forbidden.take(5)}")
+        }
+        if (entries.none { it.startsWith("fr/nekotine/core/commandapi/") }) {
+            throw GradleException("Shadow jar has no entries under fr/nekotine/core/commandapi/")
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(verifyShadowJarLayout)
 }
 
 tasks.jar {

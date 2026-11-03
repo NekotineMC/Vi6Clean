@@ -27,7 +27,8 @@ public class FlagBasedStatusEffectType implements StatusEffectType {
 
 	public static final FlagBasedStatusEffectType MURMUR = new FlagBasedStatusEffectType(MurmurStatusFlag::get);
 
-	public static final FlagBasedStatusEffectType SUFFOCATING = new FlagBasedStatusEffectType(SuffocatingStatusFlag::get);
+	public static final FlagBasedStatusEffectType SUFFOCATING = new FlagBasedStatusEffectType(
+			SuffocatingStatusFlag::get);
 
 	public static final FlagBasedStatusEffectType OMNICAPTED = new FlagBasedStatusEffectType(OmniCaptedStatusFlag::get);
 
