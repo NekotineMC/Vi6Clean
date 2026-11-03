@@ -60,7 +60,7 @@ Vi6Clean is a two-team asymmetric game, usually played 2v2 and never beyond 3v3,
 - **Bots are ephemeral.** They never survive a server restart or `/reload`: NekotineBots removes every bot when its host plugin disables, and nothing persists or restores them.
 - **Bot failures are loud.** An exception in bot behaviour is caught and logged with the bot's name and the current phase; a bot never stops acting silently.
 - **Navigation and combat are separate problems.** Long-range travel uses A* over Bukkit block data, the Pathetic library or a precomputed per-map navigation graph; close-range PvP is a per-tick reactive controller. Baritone does not run server-side.
-- **Verification is a booted server.** No JVM test suite exists or is introduced; every acceptance check runs on the dev server over RCON and the log. → `test-coverage-boundary.md`
+- **Verification runs in the integration suite where it can.** Checks that need no human client run as integration tests on an in-process Paper server through paper-junit-server (`gradlew integrationTest`): scripted bots drive Vi6 there (spec-testing CAP-7), and NekotineBots tests itself the same way (spec-testing CAP-8). Checks that need real players or a human client, such as the fill 2v2 in front of real players, run on the dev server. → `test-coverage-boundary.md`
 
 ## Non-goals
 

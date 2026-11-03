@@ -122,6 +122,8 @@ Vi6 was built with the `fr.nekotine.core` relocation dropped. Three extra plugin
 
 ## Spike code (branch `spike/test-framework`)
 
+The branch was deleted on 2026-11-03 (last head `3c22c45`). The harness, fixture, agent and wiring now live in paper-junit-server and in Vi6's `integrationTest` suite. The paths below are historical.
+
 - `build.gradle.kts`: `integrationTest` suite, `integrationTestInPlugin` task, `prepareItServer`, `itAgentJar`, twin jars, relocation changes (all marked `SPIKE`).
 - Raw run output: `build/spike-logs/` (not versioned).
 - `src/integrationTest/…/it/`: `PaperServerExtension`, `InPluginSessionListener`, `ServerBootIT`, `PluginClassLoaderIT`, `CoreIsolationIT`.
