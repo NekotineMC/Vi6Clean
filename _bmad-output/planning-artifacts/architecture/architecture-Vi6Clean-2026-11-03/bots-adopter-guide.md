@@ -43,11 +43,11 @@ Walking and fighting are strategies you plug in (AD-8):
 
 ```text
 path = pathfinder.find(from, to, yourPassabilityRule)  // your game decides what is walkable
-walker.follow(bot, path)                                // owns the movement controls
-melee.engage(bot, target)                               // owns aim and hands
+walker.follow(bot, path)                                // writes movement, and aim along the path
+melee.engage(bot, target)                               // overrides aim, writes hands
 ```
 
-Each control group (movement, aim, hands) has one owner at a time, so the walker and the melee controller run together without fighting. The pathfinder never knows your game rules: you pass them in (AD-7).
+When the walker and the melee controller set the same controls in one tick, a fixed priority decides which applies: for aim, the walker's look first, then melee's overrides it (AD-5). The pathfinder never knows your game rules: you pass them in (AD-7).
 
 ## Rules your brain must follow
 

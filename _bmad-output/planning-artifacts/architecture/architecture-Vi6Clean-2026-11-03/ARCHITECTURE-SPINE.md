@@ -105,16 +105,18 @@ These come from the spec-bots constraints and bind here unchanged:
   - Position changes only through the body's server-physics step from the movement group. That step runs along the **movement heading**, not along the look. The result goes through `handleMovePlayer` as `Pos`/`PosRot` carrying the current look. A real client cannot separate heading from look; this is accepted because anti-cheat is a non-goal. Heading defaults to the look yaw.
   - There is no `setPosition`, teleport or dialog control. Inventory clicks and drop are added only when a consumer needs them.
 
-### AD-5: Host logic acts in the per-bot tick event; one owner per control group [ADOPTED]
+### AD-5: Host logic acts in the per-bot tick event; same-tick writes follow a fixed priority [ADOPTED, amended 2026-11-05]
 
 - **Binds:** CAP-3, CAP-4, CAP-5, CAP-8
-- **Prevents:** inputs landing a tick late, timing that depends on listener order, and two strategies overwriting each other's keys.
+- **Prevents:** inputs landing a tick late, timing that depends on listener order, and two strategies jittering a bot by overwriting each other's controls.
+- **Amendment (2026-11-05):** the user replaced the original one-owner-per-group rule (claims, plus a loud failure on a non-owner write) with the priority order below. Ownership forced every strategy to claim and release groups, and broke writers that had never claimed anything.
 - **Rule:**
   - Driven by Core's `TickingModule` `TickElapsedEvent`, the roster fires one Bukkit event per live bot on the main thread, in spawn order. It fires after pending acks are sent and before inputs are applied and physics steps.
   - Controls set during the event apply that same tick. Controls set anywhere else apply on the bot's next tick.
   - Strategies (walker, melee) run only from inside this event, never from their own `TickElapsedEvent` listener.
-  - Each control group (movement, aim, hands) has at most one owner per bot at a time. The walker owns movement. The melee controller, while active, owns aim and hands; otherwise the walker or brain owns aim.
-  - Owners of different groups run together in one tick with no ordering dependency. A write by a non-owner fails loudly.
+  - There is no ownership. Any writer (brain, walker, melee controller) may set any control group (movement, aim, hands), and no write fails.
+  - When several writers set the same group on a bot in one tick, a fixed priority order decides which write applies, whatever order the listeners ran in. A writer that sets nothing in a tick leaves the lower-priority write in place.
+  - For aim (head direction), the walker's write applies first and the melee controller's write overrides it. A bot therefore looks along its path, except while melee is aiming at a target. The full order for each group is fixed by the control-port story.
 
 ### AD-6: The shared path contract is Paper's `PathResult` [ADOPTED]
 
@@ -141,7 +143,7 @@ These come from the spec-bots constraints and bind here unchanged:
 - **Rule:**
   - `core` holds the walker and melee-controller interfaces and implementations: a vanilla-like walker now, a reinforcement-learning walker later. A caller picks one per use, and swapping it doesn't change the caller.
   - A strategy reads and drives its body only through the control port. The port mirrors AD-4's movement, aim and hands groups and exposes location, velocity, on-ground and look as world-space values.
-  - Keep-distance and strafing in melee are done by the walker following a moving goal.
+  - Melee positioning (a caller-set standoff distance and a positioning policy, such as close in, cut retreat, or keep distance and strafe) is done by the walker following a moving goal. In Vi6, PvP is one-sided: guards close in and cut off the thief's retreat, and thieves flee.
   - `bots` ships the bot adapter, which maps the port 1:1 onto AD-4. A mob adapter translates the same port.
 
 ### AD-9: Bot work runs on the main thread
@@ -258,7 +260,7 @@ sequenceDiagram
     R->>B: reset the listener's awaited position, run the player tick
     B->>S: teleport ack (latest id recorded by send) and player-loaded after join or respawn
     R->>H: per-bot tick event
-    H->>B: set controls (movement owner, aim owner, hands owner)
+    H->>B: set controls (same-tick writes resolved by priority: for aim, walker then melee)
     B->>S: changed inputs, hands, commands (inbound)
     B->>B: physics step along the movement heading
     B->>S: Pos/PosRot move packet with the current look (refusals diagnosed via PlayerFailMoveEvent)
