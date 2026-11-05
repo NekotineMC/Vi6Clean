@@ -27,3 +27,6 @@
 - source_spec: none
   summary: No test observes the boot-time override of config.yml and tools/*.yml.
   evidence: Both load once at boot, and the local test-bundle holds default values, so removing the override branch keeps Vi6ConfigIT green. Needs a stale-value fixture staged before boot (for example a harness bundle overlay); koths are covered in-process.
+- source_spec: `_bmad-output/specs/spec-bots/SPEC.md`
+  summary: NekotineCore ClientTrackModule never records sneak changes on 26.2, so a player who starts or stops sneaking while untracked (Vi6 Recall) comes back in the wrong sneak state. Affects humans today.
+  evidence: The module reads sneak only from ENTITY_ACTION (`getPlayerActions()` START/STOP_SNEAKING). On 26.2, `ServerboundPlayerCommandPacket.Action` has no sneak actions (sprint, sleep, riding jump, inventory, elytra only); sneak travels as `Input.shift` in `ServerboundPlayerInputPacket` (javap on the 26.2.build.65-beta dev bundle). Sprint recording still works. Untracked players' PLAYER_INPUT packets are also not cancelled. User decision (2026-11-05): fix after the bots work is complete, in a NekotineCore PR to dev, then a Vi6 gitlink bump. Bot-side checks on this module (bot identity in the `HashMap<Player, …>` lookup, `PacketContainer` reads) wait with it.
