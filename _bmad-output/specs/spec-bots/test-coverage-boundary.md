@@ -9,7 +9,7 @@ Vi6Clean has an integration suite (`src/integrationTest`, run with `gradlew inte
 - **Existing tests:** `Vi6SmokeIT`, `Vi6MapIT` and `Vi6ConfigIT`, which need no players.
 - **Not built yet:** forcing teams and phase, short timers, and resetting the game between tests (phase, teams, scoreboard). These wait for bots.
 
-A bot run checked by assertions belongs in that suite. Runs that need a real player stay on the **booted dev server**, driven by console command and checked by reading the log.
+Tests of the bots module itself live in NekotineCore, through a tiny host plugin on NekotineCore's own paper-junit-server submodule, and never depend on Vi6. Vi6's suite tests Vi6 and uses bots only as a driver. A bot run checked by assertions belongs in one of those suites. Runs that need a real player stay on the **booted dev server**, driven by console command and checked by reading the log.
 
 ## Input → event → Vi6 consumers
 
@@ -21,7 +21,7 @@ A bot run checked by assertions belongs in that suite. Runs that need a real pla
 | Sprint (`handlePlayerInput`) | `PlayerToggleSprintEvent` | `AsthmaStatusFlag:125` |
 | Move (`handleMovePlayer`) | `PlayerMoveEvent` | 14 handlers, incl. `Vi6PhaseInMap:360`, `TazedStatusFlag:64`, `ScoutHandler:135`, those gated on `hasChangedPosition()` / `hasExplicitlyChangedPosition()` |
 | Held slot (`handleSetCarriedItem`) | `PlayerItemHeldEvent` | `Vi6Game:333`, `TrapWireHandler`, `ItemChargeModule`, `BowChargeModule` |
-| Dialog answer (`handleCustomClickAction`) | `PlayerCustomClickEvent` + Paper click manager | `LobbyPhasePlayerWrapper:112-122`, `Vi6Game:345` |
+| Command (`handleChatCommand`) | `PlayerCommandPreprocessEvent`, then the command | `/game team`, `/game ready` (`Vi6Commands`) |
 
 All 26 `PlayerInteractEvent` handlers take the base event type, so right- and left-click cover them. Further input rules:
 
@@ -35,18 +35,19 @@ Team assignment and balance, the phase machine (`Vi6PhaseLobby` → `Preparation
 
 ## Not covered
 
-What a human *sees*: dialog rendering, resource-pack application, ProtocolLib visuals and glowing as a viewer, voice chat (already inert). Clientbound packets reach the bot's `send()`, but no client renders them.
+Dialogs: bots neither read nor answer them (`LobbyPhasePlayerWrapper:112-122`, `Vi6Game:345` stay human-only). What a human *sees*: dialog rendering, resource-pack application, ProtocolLib visuals and glowing as a viewer, voice chat (already inert). Clientbound packets reach the bot's `send()`, but no client renders them.
 
 ## Server settings a bot run needs
 
 - `online-mode=false` is not required by NMS bots but is already set.
 - `max-players=20` is enough for a 3v3, the largest realistic game.
+- `spawn-protection=0`, or non-op bots cannot click blocks near spawn. `test-bundle/server.properties` has 16 today.
 
 ## Demonstration
 
-1. Restart the dev server; confirm the NekotineBots self-test, run when Vi6 enables, passes in the log.
+1. Restart the dev server; confirm the bots self-test, run when Vi6 enables, passes in the log.
 2. Add 4 bots for a 2v2 with no human connected; repeat with 6 bots for a 3v3.
-3. Bots answer the lobby dialog; the lobby advances.
+3. Bots pick their teams and ready up through commands; the lobby advances.
 4. The round plays through preparation, in-map and infiltration to a win condition.
 5. The log records the result and no exception.
 
