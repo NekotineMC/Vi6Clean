@@ -2,6 +2,8 @@
 paper = "26.2.build.+"
 protocollib = "5.4.0"
 commandapi = "11.2.+"
+# Runtime CommandAPI shaded into the jar, pinned strictly to what the server runs.
+commandapi-runtime = "11.2.0"
 voicechat = "2.6.13"
 shadow = "9.4.+"
 configurate = "4.2.+"

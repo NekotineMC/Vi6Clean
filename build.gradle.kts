@@ -32,7 +32,19 @@ dependencies {
     compileOnly(libs.protocollib)
     compileOnly(libs.commandapi)
     compileOnly(libs.configurate)
-    implementation(project(":NekotineCore"))
+    // Core and bots are plain jars from the NekotineCore included build; this
+    // jar shades both and relocates CommandAPI (below).
+    implementation("fr.nekotine:core")
+    implementation("fr.nekotine:bots")
+    // The server runs CommandAPI 11.2.0; compile keeps the locked libs.commandapi.
+    runtimeOnly("dev.jorel:commandapi-paper-shade") {
+        version {
+            strictly(
+                libs.versions.commandapi.runtime
+                    .get(),
+            )
+        }
+    }
     compileOnly(libs.voicechat.api)
 }
 
@@ -104,7 +116,7 @@ tasks.withType<ProcessResources> {
 
 tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
     // Core stays unrelocated so integration tests import its types; CommandAPI
-    // matches Core's own shading.
+    // goes under Core's package, where Core used to shade it.
     relocate("dev.jorel.commandapi", "fr.nekotine.core.commandapi")
 }
 
@@ -112,10 +124,10 @@ tasks.shadowJar {
     archiveClassifier = ""
 }
 
-// Guards the relocation layout: Core unrelocated, CommandAPI under Core's package.
+// Guards the shading layout: Core and bots unrelocated, CommandAPI under Core's package.
 val verifyShadowJarLayout by tasks.registering {
     group = "verification"
-    description = "Fails if the shadow jar has the old Core relocation or unrelocated CommandAPI."
+    description = "Fails if the shadow jar misses Core or bots, has the old Core relocation or unrelocated CommandAPI."
     val jar = tasks.shadowJar.flatMap { it.archiveFile }
     inputs.file(jar)
     doLast {
@@ -129,13 +141,18 @@ val verifyShadowJarLayout by tasks.registering {
             }
         val forbidden =
             entries.filter {
-                it.startsWith("fr/nekotine/vi6clean/nekotinecore/") || it.startsWith("dev/jorel/commandapi/")
+                it.startsWith("fr/nekotine/vi6clean/nekotinecore/") || it.startsWith("dev/jorel/")
             }
         if (forbidden.isNotEmpty()) {
             throw GradleException("Shadow jar has forbidden entries, e.g. ${forbidden.take(5)}")
         }
         if (entries.none { it.startsWith("fr/nekotine/core/commandapi/") }) {
             throw GradleException("Shadow jar has no entries under fr/nekotine/core/commandapi/")
+        }
+        val required = listOf("fr/nekotine/core/NekotinePlugin.class", "fr/nekotine/core/bot/NekotineBots.class")
+        val missing = required.filterNot { it in entries }
+        if (missing.isNotEmpty()) {
+            throw GradleException("Shadow jar is missing $missing")
         }
     }
 }
