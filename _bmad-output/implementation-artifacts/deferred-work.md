@@ -30,3 +30,25 @@
 - source_spec: `_bmad-output/specs/spec-bots/SPEC.md`
   summary: NekotineCore ClientTrackModule never records sneak changes on 26.2, so a player who starts or stops sneaking while untracked (Vi6 Recall) comes back in the wrong sneak state. Affects humans today.
   evidence: The module reads sneak only from ENTITY_ACTION (`getPlayerActions()` START/STOP_SNEAKING). On 26.2, `ServerboundPlayerCommandPacket.Action` has no sneak actions (sprint, sleep, riding jump, inventory, elytra only); sneak travels as `Input.shift` in `ServerboundPlayerInputPacket` (javap on the 26.2.build.65-beta dev bundle). Sprint recording still works. Untracked players' PLAYER_INPUT packets are also not cancelled. User decision (2026-11-05): fix after the bots work is complete, in a NekotineCore PR to dev, then a Vi6 gitlink bump. Bot-side checks on this module (bot identity in the `HashMap<Player, …>` lookup, `PacketContainer` reads) wait with it.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Add a Vi6 verification task that fails when Vi6's resolved paperweight dev bundle differs from NekotineCore's `paper-devbundle` catalog pin.
+  evidence: Story 1.1 review (Blind Hunter, Edge Case Hunter and Verification Gap all flagged it). The pin match is prose-only; a full `gradlew --write-locks` in Vi6 moves the dev bundle silently. It has no effect while `bots` is a placeholder; add the check with Story 1.3's first NMS code.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Keep the paperweight userdev plugin version in one place, or document bumping it in both NekotineCore's catalog and Vi6's `plugins {}` block.
+  evidence: Story 1.1 review: `2.0.0-beta.21` is now written in both builds, and the AGENTS.md bump note covers only the dev bundle.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Make Vi6's `out` task run `verifyShadowJarLayout` before copying the jar to `Vi6CleanJarOutputPath`.
+  evidence: Story 1.1 review: the layout check runs only under `check`, so a broken layout can reach a server's `plugins/update/` through bare `gradlew`. This predates the story.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Record in Vi6 AGENTS.md that compile resolves CommandAPI 11.2.1-SNAPSHOT only from the local Gradle cache (codemc no longer lists it), so a fresh machine fails.
+  evidence: Story 1.1 implementation notes: re-resolving `11.2.+` dropped compile to 11.2.0. This predates the story.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Fix NekotineCore AGENTS.md wording: modules "build" plain jars (not "publish"), since nothing is published.
+  evidence: Story 1.1 review: line 11 says both "publish plain jars" and "Nothing is published".
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Make Vi6 AGENTS.md name the concrete locked dev bundle (26.2.build.65-beta, see gradle.lockfile) instead of the `26.2.build.+` selector when comparing with `paper-devbundle`.
+  evidence: Story 1.1 review: the new AGENTS.md line points at a range, not the version to compare.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
+  summary: Delete the editor backup `core/src/main/java/fr/nekotine/core/map/.$MapModule.drawio.bkp` from NekotineCore.
+  evidence: Story 1.1 review: a junk file, carried along by the source move into `core/`.

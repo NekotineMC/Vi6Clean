@@ -3,7 +3,7 @@
 
 ## Vi6Clean
 
-PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight userdev, NekotineCore shaded into the jar (unrelocated, under `fr.nekotine.core`; CommandAPI relocated to `fr.nekotine.core.commandapi`, matching Core's own shading). BMad planning output (specs, refactoring notes) lives in `_bmad-output/` — read it for context; `docs/`, which `_bmad/config.toml` names as project knowledge, does not exist.
+PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to steal artefacts (processors, solar panels) while defenders stop them. Java 25, Gradle 9.4.1 Kotlin DSL, Paper 26.2 via paperweight userdev, NekotineCore's `core` and `bots` modules (`fr.nekotine:core`, `fr.nekotine:bots`, plain jars) shaded into the jar unrelocated under `fr.nekotine.core`; Vi6 shades CommandAPI itself and relocates it to `fr.nekotine.core.commandapi` (runtime pinned strictly to 11.2.0, compile uses the locked `libs.commandapi`). BMad planning output (specs, refactoring notes) lives in `_bmad-output/` — read it for context; `docs/`, which `_bmad/config.toml` names as project knowledge, does not exist.
 
 ## Policy
 
@@ -19,6 +19,7 @@ PaperMC plugin for "Voleur Industriel 6" — thieves infiltrate a factory to ste
 - Game-wide options: Configurate records in `src/main/java/fr/nekotine/vi6clean/configuration/` (`Vi6Config` → server `config.yml`, keys in kebab-case).
 - `NekotineCore/` is a git submodule and its own repository — read `NekotineCore/AGENTS.md` before editing it.
 - `paper-junit-server/` is a second git submodule and its own repository (in-process Paper test harness, Gradle plugin `fr.xxgoldenbluexx.paper-junit-server`) — read `paper-junit-server/AGENTS.md` before editing it.
+- `bots` is pinned to the same dev bundle as Vi6 (`paper-devbundle` in `NekotineCore/gradle/libs.versions.toml` vs Vi6's locked `26.2.build.+`) — bump both together.
 - `settings.gradle.kts` uses `includeBuild("NekotineCore")` and `includeBuild("paper-junit-server")` (the latter also under `pluginManagement`), so the build compiles the submodules' working trees, not the recorded pins — commit the gitlink (`git add NekotineCore` / `git add paper-junit-server`) in the same PR as any change to either.
 - Tests: the plain JUnit suite (`src/test/java`, pure logic, no server; runs under `build`) is wired but empty — the folder doesn't exist yet and `gradlew test` reports NO-SOURCE until a test is added. `src/integrationTest/java` holds tests that run inside a real Paper server and use Vi6/Core types directly (`Ioc.resolve(...)`, `PaperServer.onMain(...)`).
 - `test-bundle/` is the integration-test server folder (configs, `worlds/`, ProtocolLib and FAWE jars and their config folders, `plugins/Vi6Clean/`). Its contents are gitignored except `README.md`, which lists what goes in; fill it locally from the dev server and keep it in line with production.
