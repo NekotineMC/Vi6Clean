@@ -14,11 +14,11 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") {
         name = "commandapi"
     }
-    /*
+    // ProtocolLib snapshots (the server runs 5.5.0-SNAPSHOT); only net.dmulloy2 resolves here.
     maven("https://repo.dmulloy2.net/repository/public/") {
-        name = "protocolib"
+        name = "protocollib"
+        content { includeGroup("net.dmulloy2") }
     }
-     */
     maven("https://maven.maxhenkel.de/repository/public") {
         name = "simplevoicechat"
     }
