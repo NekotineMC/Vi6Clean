@@ -1,6 +1,6 @@
 [versions]
 paper = "26.2.build.+"
-protocollib = "5.4.0"
+protocollib = "5.5.0-SNAPSHOT"
 commandapi = "11.2.+"
 # Runtime CommandAPI shaded into the jar, pinned strictly to what the server runs.
 commandapi-runtime = "11.2.0"
