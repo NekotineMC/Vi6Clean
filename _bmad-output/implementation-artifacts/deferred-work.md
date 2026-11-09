@@ -52,3 +52,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-1-nekotinecore-splits-into-core-and-bots-modules.md`
   summary: Delete the editor backup `core/src/main/java/fr/nekotine/core/map/.$MapModule.drawio.bkp` from NekotineCore.
   evidence: Story 1.1 review: a junk file, carried along by the source move into `core/`.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-2-nekotinecore-owns-paper-junit-server-and-boots-its-own-test-host.md`
+  summary: Vi6 AGENTS.md's gitlink order (harness, then NekotineCore, then Vi6) should say each inner commit is pushed, with its own PR, before the outer gitlink points at it.
+  evidence: Story 1.2 review (Blind Hunter): a gitlink to an unpushed commit breaks every recursive clone; the line omits the push step.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-2-nekotinecore-owns-paper-junit-server-and-boots-its-own-test-host.md`
+  summary: Pin the shadow plugin to an exact version in both NekotineCore's and Vi6's catalogs (both say `9.4.+`).
+  evidence: Story 1.2 review (Blind Hunter): plugin classpaths aren't covered by dependency locking, so the two builds in the composite can load different shadow versions over time.
