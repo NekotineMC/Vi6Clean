@@ -51,7 +51,7 @@ context:
 
 **Execution:**
 - [x] `src/integrationTest/java/fr/nekotine/vi6clean/it/Vi6BotMixedLobbyIT.java` -- new IT: spawn stand-in `Human_1` via `BotRoster.spawn` with no brain; cases from the I/O matrix (stand-in keeps guard; stand-in sends `/game team thief` first); stand-in readies last with `bot.sendCommand("game ready")`; assert 2v2 and preparation; capture the log over ~40 ticks of preparation and assert no error lines; remove the 3 bots with `/bot remove Bot_N` (the stand-in is a roster bot, so `remove all` would take it too) and assert they left the player list, teams and Garde/Voleur scoreboard teams while the stand-in is still in the game -- automated mirror of the dev-server check.
-- [ ] this spec -- add the dev-server procedure under Verification and, after the run, its result in Implementation Notes.
+- [x] this spec -- add the dev-server procedure under Verification and, after the run, its result in Implementation Notes.
 
 **Acceptance Criteria:**
 - Given the mixed-lobby IT, when `gradlew integrationTest` runs, then every case passes and earlier ITs stay green.
@@ -60,7 +60,11 @@ context:
 ## Implementation Notes
 
 - `Vi6BotMixedLobbyIT` covers both I/O rows (stand-in keeps guard; stand-in sends `/game team thief` first), each `@RepeatedTest(3)`. A log capture opens before `/bot add 3 any` (whose 3 reply lines are checked exactly) and asserts no error or exception through the add, the picks, the move to preparation, 40 idle ticks and the removal. The test waits until all 3 bots are ready, checks the lobby still waits for the stand-in, then the stand-in readies: preparation, 2 guards and 2 thiefs, stand-in's team unchanged. `/bot remove Bot_1..3` (each replies `1 bot(s) retiré(s)`) keeps preparation active and takes the bots off the player list, the guard/thief lists and the Garde/Voleur scoreboard teams; the stand-in stays online and in the game. `gradlew.bat integrationTest --tests Vi6BotMixedLobbyIT`: 6/6 green.
-- Dev-server check (real client): **not run yet** -- the operator runs the manual procedure under Verification and records the outcome here.
+- Dev-server check (real client), 2026-11-11, jar built from `bot` with Story 2.3 (bots self-test passed at boot), commands over RCON, the human on a real client: **passed**.
+  - 1 human in the lobby, auto-assigned Garde, kept that team. `/bot add 3 any` added Bot_1..3; each sent `/game team …` then `/game ready` as player commands. Teams: Garde = human + Bot_2, Voleur = Bot_1 + Bot_3 (2v2). The lobby held until the human readied.
+  - The human readied: the lobby tore down and `Vi6PhaseInMap` then `Vi6PhasePreparation` set up (00:37:41). Bot_2 stood idle in the guard room with the human.
+  - About 80 s of idle round: all 3 bots online and live in `/bot list`; 0 warn/error/exception lines in the log from `/bot add` on.
+  - `/bot remove all` mid-preparation: `3 bot(s) retiré(s)`; each bot went through the normal quit ("lost connection: Bot removed", "left the game", roster "left"). The human saw them leave the tab list and the team colours and stayed in the round as Garde; no phase change, still 0 warn/error/exception lines.
 
 ## Spec Change Log
 
