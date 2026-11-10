@@ -73,3 +73,12 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
   summary: Resync a bot's sprint (and sneak) with the server: when the sprint key is held but the server cleared sprinting (attack, damage, a cancelled `PlayerToggleSprintEvent`), resend START_SPRINTING as a client does.
   evidence: Review pass 1 (B2/E2), medium: `apply()` compares only with the last sent input, so after `setSprinting(false)` on the server `setSprint(true)` is a no-op until toggled off and on; matters once bots attack (Story 1.7, Epic 5 melee).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
+  summary: Add a release-use-item control (`ServerboundPlayerActionPacket` RELEASE_USE_ITEM) so bots can draw and loose bows, crossbows and tridents, eat on demand and stop blocking.
+  evidence: Story 1.7 scope (Never list): `useItem` only starts using an item; stopping early needs the release packet.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
+  summary: Continue block breaking: client-side break progress, then STOP_DESTROY_BLOCK (or ABORT_DESTROY_BLOCK), so bots break blocks that are not instant.
+  evidence: Story 1.7 scope (Never list): `startBreaking` sends only START_DESTROY_BLOCK, which breaks only instant blocks (creative, soft blocks).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
+  summary: Signed commands: `sendCommand` sends `ServerboundChatCommandPacket` (unsigned), so a command with signed arguments (`/msg`, `/say`...) is refused when the server enforces secure profiles; bots would need a chat session and `ServerboundChatCommandSignedPacket`.
+  evidence: Story 1.7 scope (Never list).
