@@ -5,6 +5,7 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.executors.ExecutorType;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.bot.Vi6BotCommands;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.wrapper.LobbyPhasePlayerWrapper;
 
@@ -12,6 +13,7 @@ public class Vi6Commands {
 
 	public static void registerCommands() {
 		gameCommands();
+		Vi6BotCommands.register();
 	}
 
 	private static void gameCommands() {

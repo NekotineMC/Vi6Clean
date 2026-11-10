@@ -97,3 +97,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-1-a-bot-joins-the-vi6-lobby-like-a-player.md`
   summary: On server stop with bots online, `Vi6Main.onDisable` closes the game before `super.onDisable()` unloads the roster, so bots quit after the game is torn down; check the log stays clean, or remove bots before `game.close()`.
   evidence: Review pass 1 (B7), medium unverified: stop the IT server with a bot online and look for exceptions after "Bot_x left the game".
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-2-the-operator-adds-lists-and-removes-bots-with-commands.md`
+  summary: Document the op-only `/bot add <count> <guard|thief|any>`, `/bot list` and `/bot remove <name|all>` commands and their 6-player cap in Vi6 `AGENTS.md` "Where things are".
+  evidence: Review pass 1 (B13): the commands exist only in code and the spec.
