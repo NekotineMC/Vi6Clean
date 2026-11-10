@@ -1,0 +1,13 @@
+{
+  "name": "minecraft-rcon-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP server: run commands on the Vi6 dev server over RCON and read its log",
+  "type": "module",
+  "main": "server.mjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "rcon-srcds": "^2.1.1",
+    "zod": "^3.25.0"
+  }
+}

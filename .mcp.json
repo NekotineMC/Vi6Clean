@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "minecraft-rcon": {
+      "type": "stdio",
+      "command": "node",
+      "args": [".claude/mcp/minecraft-rcon/server.mjs"]
+    }
+  }
+}
