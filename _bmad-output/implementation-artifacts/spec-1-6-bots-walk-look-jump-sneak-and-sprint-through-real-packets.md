@@ -2,7 +2,7 @@
 title: 'Story 1.6: Bots walk, look, jump, sneak and sprint through real packets'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '8a1ee5cc1e3c4b713634050b5e3830a3de8fc620'
 baseline_commit_nekotinecore: 'edc92732d2526367a4bc4d2a79786ac3589a554e'
@@ -69,13 +69,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/internal/BotPlayer.java` -- simulation window.
-- [ ] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/Bot.java` -- controls.
-- [ ] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/internal/BotBody.java` -- controls, apply step, neutral on fail, `BotPlayer`.
-- [ ] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/BotRoster.java` -- fail-move diagnosis, Javadoc.
-- [ ] `NekotineCore/bots-test-host/src/integrationTest/java/fr/nekotine/botstesthost/it/BotMovementIT.java` -- every matrix row; ProtocolLib `PacketAdapter`s on `PLAYER_INPUT`, `ENTITY_ACTION`, `POSITION_LOOK`; a Bukkit listener counting `PlayerToggleSneakEvent`, `PlayerToggleSprintEvent`, `PlayerMoveEvent`, `PlayerFailMoveEvent`.
-- [ ] `NekotineCore/README.md` -- controls line.
-- [ ] Vi6 gitlink -- commit the new NekotineCore pointer in the Vi6Clean PR.
+- [x] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/internal/BotPlayer.java` -- simulation window.
+- [x] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/Bot.java` -- controls.
+- [x] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/internal/BotBody.java` -- controls, apply step, neutral on fail, `BotPlayer`.
+- [x] `NekotineCore/bots/src/main/java/fr/nekotine/core/bot/BotRoster.java` -- fail-move diagnosis, Javadoc.
+- [x] `NekotineCore/bots-test-host/src/integrationTest/java/fr/nekotine/botstesthost/it/BotMovementIT.java` -- every matrix row; ProtocolLib `PacketAdapter`s on `PLAYER_INPUT`, `ENTITY_ACTION`, `POSITION_LOOK`; a Bukkit listener counting `PlayerToggleSneakEvent`, `PlayerToggleSprintEvent`, `PlayerMoveEvent`, `PlayerFailMoveEvent`.
+- [x] `NekotineCore/README.md` -- controls line.
+- [x] Vi6 gitlink -- commit the new NekotineCore pointer in the Vi6Clean PR.
 
 **Acceptance Criteria:**
 - Given an idle bot with no control change, when 200 ticks pass, then it is not kicked and stays on its platform.
@@ -83,9 +83,46 @@ context:
 
 ## Implementation Notes
 
+- Commits: NekotineCore `68aa27e`, `af371dc` (review pass 1 fixes) on `feat/bots-1-6-movement` (from `origin/bot`); Vi6Clean `e28d00a`, `522f07d` (gitlinks) and `e769d43` (docs) on `feat/bots-1-6-movement` (from local `bot`).
+- Beyond the code map: `BotSelfTest` now also checks member references made through an internal class (`BotPlayer` calls on `this`) when they resolve to a server member or to nothing; `BotPlayer` also overrides `gameEvent` (bounce events) and `move` (drops the movement recordings the simulation left, so block effects are not applied twice; spectator `noPhysics` moves are not counted).
+- ProtocolLib 5.5.0-SNAPSHOT names the input packet `PacketType.Play.Client.STEER_VEHICLE`; tests listen on it.
+- Not modelled, as specified: knockback, client sprint rules, flight up/down. Walk speed picks up a sprint change one tick late (the server refreshes it in its own tick). Elytra wall damage can apply inside the simulation (review E7b, rejected).
+- The implementation subagent pushed both branches and opened NekotineMC/NekotineCore#10 and NekotineMC/Vi6Clean#84 before review (outside the workflow); the review fix commits are not pushed yet.
+- Verified: NekotineCore `gradlew build` + `integrationTest` (14 `BotMovementIT`, 9 `BotSelfTestIT`, 10 `BotLifecycleIT`, 10 `BotTickIT`, 3 smoke); pass line `Bots self-test passed: 189 accessors in 6 classes`; no moved-wrongly/too-quickly lines. Vi6Clean bare `gradlew -PVi6CleanJarOutputPath=build/dist`, `build`, `integrationTest` green. No lockfile changes.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+Review pass 1 (2026-11-10). Layers: Blind Hunter (B), Edge Case Hunter (E), Verification Gap (G).
+
+| # | Finding | Verdict | Evidence | Route |
+|---|---------|---------|----------|-------|
+| E1 | A sneak/input listener that kicks the bot closes the channel; the sprint command then writes on a closed channel and fails the bot | low | `apply()` checks `isConnected()` only after both writes | patch |
+| B5 / E6 | Simulated-move counter assumes a recording per position change: the `noPhysics` (spectator) branch moves without recording, so a real server recording is removed | medium | `Entity#move` noPhysics branch calls `setPos` with no `addMovementThisTick`; `removeLatestMovementRecording` then drops the server's last entry | patch |
+| B1 / E3 | `fail()` clears getters but the server player keeps the last input (e.g. stays sneaking); Javadoc says every key is released | low | Frozen rule: a failed bot sends nothing; the Javadoc overstates it | patch (Javadoc) |
+| B3 | Server/plugin velocity (setVelocity, knockback) silently ignored, undocumented | low | Knockback deferred by user; Javadoc silent | patch (Javadoc) |
+| B10 / B11 | Getters return unclamped look; main-thread rule only on setters while Javadoc says "controls" | low | Code as described | patch (Javadoc) |
+| B6 / E5b | Creative/spectator flight up/down not modelled or documented | low | Excluded by the frozen Never; documented in the same Javadoc patch | patch (Javadoc) |
+| G1 / B9b | `inheritsExternal` never exercised: reverting it keeps `BotSelfTestIT` green | low | Gap as filed | patch |
+| G2 / B8 / B9a | Look change and pitch never shown to reach the server; initial-look check cannot fail (spawn at 0,0) | low | Gap as filed | patch |
+| G3 / B8 | Backward/left/right, sneak slowdown and sprint speedup have no movement assertion | low | Gap as filed | patch |
+| G4 | Teleport velocity reset untested on a moving bot | low | Gap as filed | patch |
+| G5 | Fall-distance rewind not observed (no health check) | low | Gap as filed | patch |
+| B8b | `PlayerJumpEvent` named in Javadoc, never asserted | low | Grep: no test listens to it | patch |
+| B14 | `unchangedControlsSendOnlyMoves` calls `cleanUp` twice | low | Direct deletion | patch |
+| B2 / E2 | Sprint/sneak compared only with the last sent input: a server-side `setSprinting(false)` (attack, damage) or a cancelled toggle is never resent, so the bot cannot sprint again without toggling | medium | Frozen rule sends on change only and leaves client sprint rules unmodelled; a real client re-sends START_SPRINTING when its local state differs | defer |
+| E7 / E9 | Simulated `travel` not side-effect-free: `stepOn`, walk animation | false | `stepOn` runs in `applyEffectsFromBlocks`, not `travel`; walk animation is client-only; walkDist sits behind the suppressed emission | reject |
+| E7b | Gliding bot can take `flyIntoWall` damage inside the simulation | low | `handleFallFlyingCollisions` hurts during `travelFallFlying`; elytra bots unlikely, fix adds a damage guard | reject |
+| B4 | Fluid caches stale, walkDist not restored | false | Simulation starts at the server position whose fluid flags the server just computed (same as the client's tick start); walkDist only changes inside the suppressed emission | reject |
+| B5b | A zero-length recording can leak | low | It records the current position, which the server's own move covers; no effect | reject |
+| E8 | Overrides that stop overriding pass the self-test | false | Every `BotPlayer` override calls `super`, whose Methodref is checked through `ServerPlayer` | reject |
+| E4 | Stale `clientOnGround` after a teleport allows one mid-air jump | low | A vanilla client keeps its on-ground flag across a teleport too; unlikely | reject |
+| E5a | Dead or riding bot still runs physics and sends moves | low | `handleMovePlayer` ignores immobile (dead) players and only takes rotation from passengers; riding is not in scope | reject |
+| B7 | Fail-move warnings not rate-limited | low | Frozen rule: one warning per event | reject |
+| B12 | `PosRot` every tick instead of client's minimal packets | low | Frozen rule: one move packet per tick | reject |
+| B13 | Boxed `Float` heading invites NPEs | low | Frozen API decision | reject |
+| B9c | Broken inherited member named under the internal owner | low | Cosmetic; the member name still identifies it | reject |
 
 ## Design Notes
 
