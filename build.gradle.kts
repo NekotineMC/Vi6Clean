@@ -149,7 +149,7 @@ val verifyShadowJarLayout by tasks.registering {
         if (entries.none { it.startsWith("fr/nekotine/core/commandapi/") }) {
             throw GradleException("Shadow jar has no entries under fr/nekotine/core/commandapi/")
         }
-        val required = listOf("fr/nekotine/core/NekotinePlugin.class", "fr/nekotine/core/bot/NekotineBots.class")
+        val required = listOf("fr/nekotine/core/NekotinePlugin.class", "fr/nekotine/core/bot/BotRoster.class")
         val missing = required.filterNot { it in entries }
         if (missing.isNotEmpty()) {
             throw GradleException("Shadow jar is missing $missing")
