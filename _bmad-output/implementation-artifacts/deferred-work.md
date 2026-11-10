@@ -85,3 +85,15 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
   summary: The sprint resync deferred from Story 1.6 is now reachable: a bot's `attack()` makes the server clear sprinting, and a held `setSprint(true)` is never resent.
   evidence: Review pass 1 (B3): `apply()` sends sprint only on control change; `Player#attack` calls `setSprinting(false)` on a sprint hit.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-1-a-bot-joins-the-vi6-lobby-like-a-player.md`
+  summary: Core's `ModuleManager.load` logs a module constructor exception and `Ioc.resolve` then returns a cached `null`, so Story 2.2's bot commands must treat a null `BotRoster` like an unavailable one ("bots unavailable"), or Core should stop caching null.
+  evidence: Review pass 1 (B2): `ModuleManager.load` catches `Exception` and never puts the type; `Vi6Main` now logs a French error when the resolve returns null.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-1-a-bot-joins-the-vi6-lobby-like-a-player.md`
+  summary: No integration test covers Vi6 enabling with bots unavailable (failed self-test or unbuildable roster): the game must still start and humans play.
+  evidence: Review pass 1 (B4), medium unverified: needs a way to make the self-test fail inside the IT server (a fault-injection hook in `bots` or a broken staged jar).
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-1-a-bot-joins-the-vi6-lobby-like-a-player.md`
+  summary: Guard AD-12 automatically: a plain test that fails when a file in `src/main/java` outside `fr.nekotine.vi6clean.bot` (and `Vi6Main`) references `fr.nekotine.core.bot`.
+  evidence: Review pass 1 (B6): the rule is checked only at review time; Stories 2.2-2.4 add the bot package.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-1-a-bot-joins-the-vi6-lobby-like-a-player.md`
+  summary: On server stop with bots online, `Vi6Main.onDisable` closes the game before `super.onDisable()` unloads the roster, so bots quit after the game is torn down; check the log stays clean, or remove bots before `game.close()`.
+  evidence: Review pass 1 (B7), medium unverified: stop the IT server with a bot online and look for exceptions after "Bot_x left the game".
