@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 11-11-2026 00:51
+last_updated: 11-11-2026 00:52
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -45,7 +45,7 @@ development_status:
   1-7-bots-use-their-hands-send-commands-and-respawn: done
   epic-1-retrospective: optional
 
-  epic-2: in-progress
+  epic-2: done
   2-1-a-bot-joins-the-vi6-lobby-like-a-player: done
   2-2-the-operator-adds-lists-and-removes-bots-with-commands: done
   2-3-bots-pick-their-team-and-ready-up-through-player-commands: done
