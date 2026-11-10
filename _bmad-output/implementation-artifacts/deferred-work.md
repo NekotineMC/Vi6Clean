@@ -67,3 +67,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks.md`
   summary: Make the bots self-test check that every overriding method in `bot.internal` still overrides a method of its external supertype.
   evidence: Review pass 2 (B2-1), medium, unverified for future code: an override without a `super` call (e.g. a new `BotConnection` override in 1.6/1.7) would silently stop being called after a Paper re-signature, and the self-test would pass.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
+  summary: Bots apply server-sent knockback: record `ClientboundSetEntityMotionPacket` for the bot's own entity (and explosion knockback) in `BotConnection#send` and start the next physics step from that velocity.
+  evidence: User decision (2026-11-10) while planning Story 1.6: deferred, likely to Epic 5 melee; until then bots ignore hits and explosions.
