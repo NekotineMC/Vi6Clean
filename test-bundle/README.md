@@ -6,7 +6,7 @@ Server folder that `gradlew integrationTest` stages into `build/it-server/` and 
 
 Copy these from the dev or production server:
 
-- `server.properties` (`level-name=world`; RCON and query are turned off at staging, the port is chosen per run), `bukkit.yml`, `spigot.yml`, `commands.yml`, `permissions.yml`, `help.yml`, `eula.txt`
+- `server.properties` (`level-name=world`; after copying, set `spawn-protection=0`, a test-only difference so non-op bots can click blocks near spawn; RCON and query are turned off at staging, the port is chosen per run), `bukkit.yml`, `spigot.yml`, `commands.yml`, `permissions.yml`, `help.yml`, `eula.txt`
 - `config/` (Paper configs)
 - `worlds/`
 - `plugins/ProtocolLib.jar` and `plugins/ProtocolLib/`

@@ -7,6 +7,7 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import fr.nekotine.core.NekotinePlugin;
 import fr.nekotine.core.autorestart.UpdateFolderRestart;
+import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.eventguard.PlayerDoubleEventGuard;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.logging.NekotineLogger;
@@ -44,6 +45,15 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 	public void onEnable() {
 		try {
 			super.onEnable();
+			try {
+				// Lance l'auto-test des bots maintenant: Core charge les modules à la demande
+				// ModuleManager log l'erreur du constructeur et renvoie null
+				if (Ioc.resolve(BotRoster.class) == null) {
+					logger.error("Les bots n'ont pas pu être chargés, ils sont indisponibles");
+				}
+			} catch (Exception | LinkageError e) {
+				logger.error("Une erreur est survenue lors du chargement des bots, ils sont indisponibles", e);
+			}
 			autoRestart = new UpdateFolderRestart();
 			/*-
 			try {
