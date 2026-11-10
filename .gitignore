@@ -179,6 +179,8 @@ _bmad-output/**/*.log
 .bmad-cache/
 .opencode/
 _bmad/config.user.toml
+.claude/mcp/*/node_modules/
+.claude/mcp/*/config.local.json
 
 # Integration-test server bundle: local, kept in line with production (see test-bundle/README.md)
 test-bundle/*
