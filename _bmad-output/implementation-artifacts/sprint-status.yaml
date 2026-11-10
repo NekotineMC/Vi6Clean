@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 11-10-2026 09:26
+last_updated: 11-10-2026 11:26
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -40,7 +40,7 @@ development_status:
   1-2-nekotinecore-owns-paper-junit-server-and-boots-its-own-test: done
   1-3-a-bot-joins-and-leaves-as-a-real-player: done
   1-4-bots-tick-in-a-per-bot-event-are-ephemeral-and-fail-in-isola: done
-  1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks: backlog
+  1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks: review
   1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets: backlog
   1-7-bots-use-their-hands-send-commands-and-respawn: backlog
   epic-1-retrospective: optional
