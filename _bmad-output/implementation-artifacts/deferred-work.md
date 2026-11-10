@@ -67,3 +67,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks.md`
   summary: Make the bots self-test check that every overriding method in `bot.internal` still overrides a method of its external supertype.
   evidence: Review pass 2 (B2-1), medium, unverified for future code: an override without a `super` call (e.g. a new `BotConnection` override in 1.6/1.7) would silently stop being called after a Paper re-signature, and the self-test would pass.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
+  summary: Bots apply server-sent knockback: record `ClientboundSetEntityMotionPacket` for the bot's own entity (and explosion knockback) in `BotConnection#send` and start the next physics step from that velocity.
+  evidence: User decision (2026-11-10) while planning Story 1.6: deferred, likely to Epic 5 melee; until then bots ignore hits and explosions.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
+  summary: Resync a bot's sprint (and sneak) with the server: when the sprint key is held but the server cleared sprinting (attack, damage, a cancelled `PlayerToggleSprintEvent`), resend START_SPRINTING as a client does.
+  evidence: Review pass 1 (B2/E2), medium: `apply()` compares only with the last sent input, so after `setSprinting(false)` on the server `setSprint(true)` is a no-op until toggled off and on; matters once bots attack (Story 1.7, Epic 5 melee).
