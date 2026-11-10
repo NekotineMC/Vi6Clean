@@ -9,16 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.config.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.junit.jupiter.api.AfterEach;
@@ -137,43 +130,5 @@ class Vi6BotLobbyIT {
 
 	private static org.bukkit.scoreboard.Objective sidebar() {
 		return Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class).getSidebarObjective();
-	}
-
-	/** Server log lines that carry an exception, captured while open. */
-	private static final class LogCapture extends AbstractAppender implements AutoCloseable {
-		private final Queue<String> failures = new ConcurrentLinkedQueue<>();
-		private final LoggerContext context;
-
-		LogCapture() {
-			super("Vi6BotLobbyIT-capture", null, null, true, Property.EMPTY_ARRAY);
-			context = (LoggerContext) LogManager.getContext(Bukkit.class.getClassLoader(), false);
-			start();
-			context.getConfiguration().getRootLogger().addAppender(this, null, null);
-			context.updateLoggers();
-		}
-
-		@Override
-		public void append(LogEvent evt) {
-			var thrown = evt.getThrown();
-			if (thrown == null) {
-				return;
-			}
-			failures.add(evt.getMessage().getFormattedMessage() + " " + thrown);
-		}
-
-		List<String> failures() {
-			return List.copyOf(failures);
-		}
-
-		void clear() {
-			failures.clear();
-		}
-
-		@Override
-		public void close() {
-			context.getConfiguration().getRootLogger().removeAppender(getName());
-			context.updateLoggers();
-			stop();
-		}
 	}
 }
