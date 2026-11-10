@@ -2,7 +2,7 @@
 title: 'Story 1.3: A bot joins and leaves as a real player'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: 'bd9459672f6cded93ea0612f6a09ec5c399f3248'
 baseline_commit_nekotinecore: '824410fb64a3e129f1efbef7cd39bb7a8e3056b9'
@@ -108,3 +108,31 @@ The bot calls `connection.tick()` rather than `resetPosition` + `doTick` by hand
 ## Spec Change Log
 
 ## Review Triage Log
+
+Review pass 1 (2026-11-10). Layers: Blind Hunter (B), Edge Case Hunter (E), Verification Gap (G).
+
+| # | Finding | Verdict | Evidence | Route |
+|---|---------|---------|----------|-------|
+| G1 / B3b | No test kicks a bot: the "lost connection → dropped from roster" branch is unpinned | low | Gap finding as filed; deleting the `isConnected` block in `onTick` leaves every IT green | patch |
+| B3a | Kicked bot is disconnected twice (second `PlayerQuitEvent` or warning) | false | `Connection.handleDisconnection` returns silently when `disconnectionHandled` is set (`javap`: `ifeq 29; goto 231`), so the second call is a no-op | reject |
+| G3 / B7 | Spawn refusals (invalid name, world-less location) untested | low | Gap finding as filed; only the duplicate-name branch is covered | patch |
+| B6a / E9 | `list()` skips `requireMainThread()` though the class doc says every method is main-thread only | low | `BotRoster.list()` reads the `ArrayList` with no thread check; one-line fix | patch |
+| E8 | Re-entrant `remove` from a `PlayerQuitEvent` listener logs "left" twice | low | `removeBody` logs after `bots.remove` unconditionally; fix is logging only when `bots.remove` returns true | patch |
+| B8 | `Receiving.onMain` queue recorded but never asserted | low | Field collected in the IT, no assertion reads it; assert it in the ProtocolLib test | patch |
+| G2 / B4 | `unload()` untested | low | Real gap, but the frozen decision puts the formal exit-path tests in 1.4, whose ACs cover `unload()` | reject |
+| B2 / E3 / G-other | `onTick` has no per-bot try/catch: one throwing bot stops the others' ticks | medium | Real, but the frozen Never excludes failure isolation (1.4 AC: log once, neutral, others keep ticking) | reject |
+| B1 / E4 | Join failing after `placeNewPlayer` leaves a ghost player | low | Not reached in any run; rollback adds branches; 1.4 failure isolation | reject |
+| E1 | An ack that disconnects the bot makes the next `writeInbound` throw | low | Acks carry the server's own ids, so a disconnecting ack is not reachable here; guard adds branches | reject |
+| E2 | Public `BotBody.writeInbound` after removal throws raw `ClosedChannelException` | low | Internal package, only the IT calls it; guard adds surface | reject |
+| E5 | `remove()` sets `removed` before flush; a throwing flush leaves the player online | low | Flush on an `EmbeddedChannel` never threw in runs; reordering adds try/finally branches | reject |
+| B6b / E6 | `state()` stays `ACTIVE` after removal | low | Spec defines only `ACTIVE`; a new state is public surface, 1.4 adds failed | reject |
+| E7 | Player-loaded ack not re-sent after respawn or dimension change | low | Respawn is Story 1.7 (epic: player-loaded after each respawn) | reject |
+| B5 / E13 | Bot player data saved on removal; offline name collision overwrites a real player's data | low | Offline UUID from name is required by the intent; wipe flags are 1.4 | reject |
+| B9 | Tests call `bot.player().getUniqueId()` off the main thread | low | `getUniqueId` reads an immutable field; no harm shown | reject |
+| B10 | NMS-leak check skips `internal`; `BotBody` is public | false | AD-3 confines NMS to `bot.internal` by design; public API is `fr.nekotine.core.bot` | reject |
+| B11 | README omits ProtocolLib requirement, `Ioc.resolve`, exceptions; Vi6 is wiring-only | low | Adopter guide is Story 7.2; Vi6 wiring-only is the plan (Epic 2) | reject |
+| E10 | NaN coordinates accepted | low | Unlikely; guard adds branches | reject |
+| E11 | Online-mode real player can join with a bot's name | low | Unlikely in the target setup; needs a login listener | reject |
+| E12 | Join skips login events, whitelist, bans, max-players | false | The intent mandates `placeNewPlayer` as the join path (epic AC) | reject |
+| E14 | IT cleanup leaks listeners if a remove throws | low | Unlikely; fix adds nested try blocks | reject |
+| G-other | 700-tick keep-alive test has a thin margin | false | A server cannot tick faster than 20 TPS, so 700 ticks is at least 35 s, past the ~31 s kick point | reject |
