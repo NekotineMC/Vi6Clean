@@ -18,6 +18,7 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.BotTeamIntent;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.game.Vi6Game;
+import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -63,11 +64,18 @@ class Vi6BotCommandsIT {
 
 		// LIST
 		var listed = run("bot list");
-		// The lobby balances joins (Bot_1 guard, Bot_2 thief, Bot_3 guard): a guard
-		// intent alone puts no bot in a team
+		// The lobby balances joins (Bot_1 guard, Bot_2 thief, Bot_3 guard), then
+		// Bot_2's brain sends /game team guard; Bot_1, spawned without the command,
+		// has no brain and is not ready, so the lobby stays
 		assertEquals(List.of("Bot_1 - intention: aucune, équipe: guard, état: actif",
-				"Bot_2 - intention: guard, équipe: thief, état: actif",
+				"Bot_2 - intention: guard, équipe: guard, état: actif",
 				"Bot_3 - intention: guard, équipe: guard, état: actif"), listed);
+
+		PaperServer.onMain(() -> {
+			assertTrue(Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseLobby.class) != null,
+					"the lobby advanced although Bot_1 is not ready");
+			return null;
+		});
 
 		// CAP
 		var refused = run("bot add 4 any");
