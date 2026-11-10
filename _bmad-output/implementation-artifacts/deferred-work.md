@@ -82,3 +82,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
   summary: Signed commands: `sendCommand` sends `ServerboundChatCommandPacket` (unsigned), so a command with signed arguments (`/msg`, `/say`...) is refused when the server enforces secure profiles; bots would need a chat session and `ServerboundChatCommandSignedPacket`.
   evidence: Story 1.7 scope (Never list).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
+  summary: The sprint resync deferred from Story 1.6 is now reachable: a bot's `attack()` makes the server clear sprinting, and a held `setSprint(true)` is never resent.
+  evidence: Review pass 1 (B3): `apply()` sends sprint only on control change; `Player#attack` calls `setSprinting(false)` on a sprint hit.

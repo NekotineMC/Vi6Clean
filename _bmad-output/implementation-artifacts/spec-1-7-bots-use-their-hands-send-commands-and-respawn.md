@@ -2,7 +2,7 @@
 title: 'Story 1.7: Bots use their hands, send commands and respawn'
 type: 'feature'
 created: '2026-11-10'
-status: 'in-progress'
+status: 'done'
 route: 'dispatch'
 baseline_commit: '1d508b2b2f7c233c8bb7d54d5cd1c4039eb65049'
 baseline_commit_nekotinecore: '3d6dc9896c32f4807ede1a88ee93f1caf9feea32'
@@ -101,10 +101,37 @@ context:
 - Hand checks: a `BlockFace` other than the six cube faces is an `IllegalArgumentException`, like a hand other than `HAND`/`OFF_HAND`; null block/entity is a `NullPointerException`. `"/"` alone is not blank and is sent as an empty command (the server answers "unknown command").
 - `BotMovementIT`'s `Structure`, `FLOOR_Y`, `structure()`, `build()` and `clear()` became package-private so `BotHandsIT` reuses the platform.
 - Verified: NekotineCore `gradlew build integrationTest` green (59 tests, `BotHandsIT` 13/13, self-test passes with 260 accessors in 6 classes); no "moved wrongly", "invalid carried item" or kick line for `Bot_Hands` in the server log. Vi6Clean bare `gradlew -PVi6CleanJarOutputPath=build/dist`, `gradlew build`, `gradlew integrationTest` green. No lockfile changes.
+- Review pass 1 fixes: NekotineCore `2b4262b` (empty commands refused after stripping `/`, one-shots dropped at once on a failed or removed bot, README line, 4 new `BotHandsIT` tests, exact counts); Vi6Clean gitlink `b74708b`. An entity interact fires only `PlayerInteractAtEntityEvent` on this Paper build. Re-verified: NekotineCore `build integrationTest` green (63 tests, `BotHandsIT` 17/17, self-test 260 accessors); Vi6Clean bare `gradlew`, `build`, `integrationTest` (10 tests) green. No lockfile changes.
+- The implementation subagent pushed both branches and opened NekotineMC/NekotineCore#11 and NekotineMC/Vi6Clean#85 before review (outside the workflow); the review fix commits are not pushed yet.
 
 ## Spec Change Log
 
 ## Review Triage Log
+
+Review pass 1 (2026-11-10). Layers: Blind Hunter (B), Edge Case Hunter (E), Verification Gap (G).
+
+| # | Finding | Verdict | Evidence | Route |
+|---|---------|---------|----------|-------|
+| B1 / E11 | README still says hands, commands and respawn come with the next story | low | `NekotineCore/README.md:90` keeps the old blockquote under the new line | patch |
+| B4 / E3 | `"/"` or `"/  "` passes the blank check and is sent as an empty command | low | `sendCommand` checks `isBlank()` before stripping the slash | patch |
+| E7 | One-shots called on a failed or removed bot pile up forever, holding their targets | low | `fail()` clears once; a failed bot only runs `tickFailed()`, so later calls are never drained; a brain acting every tick leaks | patch |
+| G1 | `useItem` look never shown to reach the server (`RIGHT_CLICK_BLOCK` via look untested) | low | Gap as filed | patch |
+| G2 / B9a | `interact` sneak flag never exercised with sneak held | low | Gap as filed | patch |
+| G3 / B6 | Held keys resent after respawn untested | low | Gap as filed | patch |
+| G4 | Dropping the rest of the queue when a one-shot's listener kicks the bot is untested | low | Gap as filed | patch |
+| B8 | Interact and start-breaking tests assert "not empty" instead of exact counts | low | `interactRightClicksThePig`, `startBreakingLeftClicksTheBlock` | patch |
+| B10 / G-other | "Queued, then dropped by the failure" comment claims what the test cannot observe | low | A failed bot never runs `apply()`; the clear is unobservable | patch (comment) |
+| B3 | Sprint resync deferral (1.6 B2/E2) is now reachable: an attack clears server sprint | medium | Pre-existing, already deferred; `attack()` makes it live | defer |
+| B2 / E1 | Attacking self, an item, an orb or an arrow gets the bot kicked | low | Real server behaviour, as for a client; a host bug; guard adds branches | reject |
+| B5 / E8 | A pending `setSlot` is overwritten by a server held-slot packet arriving the same tick | low | Frozen rule adopts the server slot as the control; rare | reject |
+| B7 | World-change ack untested | low | An extra loaded ack is a no-op when the server is not waiting | reject |
+| B9b | OFF_HAND, cascading one-shot, dead-bot, null-argument paths untested | low | Thin wrappers over tested paths | reject |
+| B11 | Code Map stale; spec status vs sprint status | false | Fix edits this build's spec; statuses are synced at the end of the workflow | reject |
+| B12 / E5 / E6 | Targets checked at queue time; world change or removal before send sends a stale packet | low | One-tick window; the server's reach checks and `PlayerUseUnknownEntityEvent` handle it as for a client | reject |
+| E2 | Illegal chat characters get the bot kicked | low | Server behaviour for any client; unlikely in host code | reject |
+| E4 | Command spam can kick the bot | low | Spigot spam rule applies to real clients alike | reject |
+| E9 | Null face throws NPE, not IAE | false | Null arguments throw NPE like null block/entity (documented in notes) | reject |
+| E10 | Test fails on a single-world server | false | It ran green: the test bundle has several worlds | reject |
 
 ## Design Notes
 
