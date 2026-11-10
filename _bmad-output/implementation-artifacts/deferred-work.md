@@ -58,3 +58,12 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-2-nekotinecore-owns-paper-junit-server-and-boots-its-own-test-host.md`
   summary: Pin the shadow plugin to an exact version in both NekotineCore's and Vi6's catalogs (both say `9.4.+`).
   evidence: Story 1.2 review (Blind Hunter): plugin classpaths aren't covered by dependency locking, so the two builds in the composite can load different shadow versions over time.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks.md`
+  summary: Test the self-test's class-initialization step (`Class.forName(name, true, loader)` reporting "initialization failed").
+  evidence: Review pass 1 (B8/G2): deleting that loop keeps every `BotSelfTestIT` test green; a real test needs a synthesized internal class with a throwing `<clinit>` and a custom class loader.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks.md`
+  summary: Assert in a test that BotsTestHost runs the bots self-test at enable (pass line in the boot log), not lazily on first `roster()` call.
+  evidence: Review pass 2 (G2-3): removing `Ioc.resolve(BotRoster.class)` from `BotsTestHost.onEnable` keeps every IT green; pin it when Vi6 adopts the roster (Story 2.1).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a-startup-self-test-turns-bots-off-loudly-when-nms-breaks.md`
+  summary: Make the bots self-test check that every overriding method in `bot.internal` still overrides a method of its external supertype.
+  evidence: Review pass 2 (B2-1), medium, unverified for future code: an override without a `super` call (e.g. a new `BotConnection` override in 1.6/1.7) would silently stop being called after a Paper re-signature, and the self-test would pass.
