@@ -2,28 +2,26 @@ package fr.nekotine.vi6clean.it;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.spongepowered.configurate.yaml.NodeStyle;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
-import fr.nekotine.vi6clean.configuration.GameConfig;
-import fr.nekotine.vi6clean.game.PhaseDurations;
-import fr.nekotine.vi6clean.game.PhaseDurations.Key;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
@@ -31,16 +29,11 @@ import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
 import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
 
 /**
- * Phases read their durations through {@link PhaseDurations}: config values by
- * default, test overrides when set, so a round runs in seconds.
+ * Phases read their durations from the live config when they are built, so a
+ * test shortens a round by setting them in memory and restores them with
+ * {@link ConfigManager#tryLoad()}.
  */
 class Vi6PhaseDurationsIT {
-
-	private static final Map<Key, Function<GameConfig, Duration>> CONFIG = Map.of(Key.PREPARATION,
-			c -> c.preparation().duration(), Key.INFILTRATION_LOST, c -> c.infiltration().lostDuration(),
-			Key.DELAY_BETWEEN_CAPTURE, c -> c.infiltration().delayBetweenCapture(), Key.DELAY_BEFORE_ESCAPE,
-			c -> c.infiltration().delayBeforeEscape(), Key.END_SPECTATOR_TIME,
-			c -> c.infiltration().endSpectatorTime());
 
 	private static final int TOLERANCE_TICKS = 5;
 
@@ -53,7 +46,9 @@ class Vi6PhaseDurationsIT {
 	@AfterEach
 	void reset() throws Exception {
 		PaperServer.onMain(() -> {
-			Ioc.resolve(PhaseDurations.class).clearOverrides();
+			// Nothing saves the in-memory config: reloading the file undoes the test's
+			// changes
+			Ioc.resolve(ConfigManager.class).tryLoad();
 			var roster = Ioc.resolve(BotRoster.class);
 			for (var bot : roster.list()) {
 				roster.remove(bot);
@@ -69,76 +64,41 @@ class Vi6PhaseDurationsIT {
 	}
 
 	@Test
-	void defaultsAreTheConfigValues() throws Exception {
+	void durationsKeepFractionsOfASecond() throws Exception {
 		PaperServer.onMain(() -> {
-			var durations = Ioc.resolve(PhaseDurations.class);
-			var game = Ioc.resolve(ConfigManager.class).getConfig().game();
-			assertEquals(Key.values().length, CONFIG.size(), "a key is missing from the test");
-			for (var key : Key.values()) {
-				assertEquals(CONFIG.get(key).apply(game), durations.get(key), key + " differs from config.yml");
-			}
-			return null;
-		});
-	}
-
-	@Test
-	void clearingOverridesRestoresTheConfigValues() throws Exception {
-		PaperServer.onMain(() -> {
-			var durations = Ioc.resolve(PhaseDurations.class);
-			var game = Ioc.resolve(ConfigManager.class).getConfig().game();
-			for (var key : Key.values()) {
-				durations.override(key, Duration.ofMillis(1500));
-				assertEquals(Duration.ofMillis(1500), durations.get(key), key + " override not returned");
-			}
-			durations.clearOverrides();
-			for (var key : Key.values()) {
-				assertEquals(CONFIG.get(key).apply(game), durations.get(key), key + " not back to config.yml");
-			}
-			return null;
-		});
-	}
-
-	@Test
-	void unoverriddenDurationsFollowAnEditedConfig() throws Exception {
-		PaperServer.onMain(() -> {
-			var infiltration = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration();
-			var original = infiltration.lostDuration();
+			var manager = Ioc.resolve(ConfigManager.class);
+			var path = Ioc.resolve(JavaPlugin.class).getDataPath().resolve("config.yml");
+			var original = Files.readAllBytes(path);
 			try {
-				infiltration.lostDuration(original.plusSeconds(17));
-				assertEquals(original.plusSeconds(17), Ioc.resolve(PhaseDurations.class).get(Key.INFILTRATION_LOST),
-						"get() did not read the edited config");
-			} finally {
-				infiltration.lostDuration(original);
-			}
-			return null;
-		});
-	}
+				var loader = YamlConfigurationLoader.builder().path(path).nodeStyle(NodeStyle.BLOCK).build();
+				var node = loader.load();
+				node.node("game", "preparation", "duration-seconds").set(1.5);
+				node.node("game", "infiltration", "end-spectator-time-seconds").set(0.25);
+				loader.save(node);
+				manager.tryLoad();
+				var game = manager.getConfig().game();
+				assertEquals(Duration.ofMillis(1500), game.preparation().duration(), "duration-seconds: 1.5");
+				assertEquals(Duration.ofMillis(250), game.infiltration().endSpectatorTime(),
+						"end-spectator-time-seconds: 0.25");
 
-	@Test
-	void invalidOverridesAreRejected() throws Exception {
-		PaperServer.onMain(() -> {
-			var durations = Ioc.resolve(PhaseDurations.class);
-			durations.override(Key.PREPARATION, Duration.ofSeconds(7));
-			for (var invalid : new Duration[]{null, Duration.ZERO, Duration.ofSeconds(-1), Duration.ofMillis(49),
-					Duration.ofMillis(50L * Integer.MAX_VALUE + 50)}) {
-				assertThrows(IllegalArgumentException.class, () -> durations.override(Key.PREPARATION, invalid),
-						"accepted " + invalid);
+				game.infiltration().lostDuration(Duration.ofMillis(2750));
+				assertEquals(Duration.ofMillis(2750), game.infiltration().lostDuration(), "setter lost the fraction");
+			} finally {
+				Files.write(path, original);
 			}
-			assertEquals(Duration.ofSeconds(7), durations.get(Key.PREPARATION),
-					"a rejected override replaced the value");
 			return null;
 		});
 	}
 
 	@RepeatedTest(3)
-	void roundEndsOnOverriddenTimers() throws Exception {
+	void roundEndsOnShortenedTimers() throws Exception {
 		PaperServer.onMain(() -> {
 			assertNotNull(game().getPhaseMachine().getPhase(Vi6PhaseLobby.class), "game is not in the lobby");
 			assertEquals(0, Ioc.resolve(BotRoster.class).list().size(), "leftover bots");
-			var durations = Ioc.resolve(PhaseDurations.class);
-			durations.override(Key.PREPARATION, Duration.ofSeconds(2));
-			durations.override(Key.INFILTRATION_LOST, Duration.ofSeconds(3));
-			durations.override(Key.END_SPECTATOR_TIME, Duration.ofSeconds(1));
+			var config = Ioc.resolve(ConfigManager.class).getConfig().game();
+			config.preparation().duration(Duration.ofSeconds(2));
+			config.infiltration().lostDuration(Duration.ofSeconds(3));
+			config.infiltration().endSpectatorTime(Duration.ofMillis(500));
 			return null;
 		});
 		try (var capture = new LogCapture()) {
@@ -151,19 +111,16 @@ class Vi6PhaseDurationsIT {
 			PaperServer.onMain(() -> {
 				assertEquals(2, game().getThiefs().size(), "thieves at preparation");
 				assertEquals(2, game().getGuards().size(), "guards at preparation");
-				return null;
-			});
-			// Brains would ready up again in the next lobby and start a new round
-			PaperServer.onMain(() -> {
+				// Brains would ready up again in the next lobby and start a new round
 				var bots = Ioc.resolve(ModuleManager.class).get(Vi6Bots.class);
 				Ioc.resolve(BotRoster.class).list().forEach(bot -> bots.setBrain(bot, null));
 				return null;
 			});
 			int infiltrationStart = awaitPhase(Vi6PhaseInfiltration.class, 40 + 100);
-			int lobbyStart = awaitPhase(Vi6PhaseLobby.class, 60 + 20 + 100);
+			int lobbyStart = awaitPhase(Vi6PhaseLobby.class, 60 + 10 + 100);
 
 			assertAround(40, infiltrationStart - preparationStart, "preparation length");
-			assertAround(60 + 20, lobbyStart - infiltrationStart, "infiltration lost timer + end spectator time");
+			assertAround(60 + 10, lobbyStart - infiltrationStart, "infiltration lost timer + end spectator time");
 			assertEquals(List.of(), capture.failures(), "an exception was logged during the round");
 		}
 	}

@@ -9,10 +9,10 @@ import fr.nekotine.core.status.effect.StatusEffect;
 import fr.nekotine.core.status.effect.StatusEffectModule;
 import fr.nekotine.core.wrapper.WrapperBase;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.constant.Vi6Sound;
 import fr.nekotine.vi6clean.constant.Vi6Team;
-import fr.nekotine.vi6clean.game.PhaseDurations;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
@@ -58,11 +58,11 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 
 	private static final BlockPatch canLeaveMapBlockingPatch = new BlockPatch(s -> s.setType(Material.BARRIER));
 
-	private final Duration DELAY_BETWEEN_CAPTURE = Ioc.resolve(PhaseDurations.class)
-			.get(PhaseDurations.Key.DELAY_BETWEEN_CAPTURE);
+	private final Duration DELAY_BETWEEN_CAPTURE = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration()
+			.delayBetweenCapture();
 
-	private final Duration DELAY_BEFORE_ESCAPE = Ioc.resolve(PhaseDurations.class)
-			.get(PhaseDurations.Key.DELAY_BEFORE_ESCAPE);
+	private final Duration DELAY_BEFORE_ESCAPE = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration()
+			.delayBeforeEscape();
 
 	private List<AppliedFakeBlockPatch> mapLeaveBlockers = new LinkedList<>();
 

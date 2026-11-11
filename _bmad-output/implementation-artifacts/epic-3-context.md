@@ -27,6 +27,7 @@ Give a Vi6 test author what they need to write fast, deterministic regression te
 
 ## Technical Decisions
 
+- **Short timers are plain config** (decided in Story 3.1): phases read `ConfigManager` durations when built, tests set them through the Configurate setters (fractional seconds allowed), and `ConfigManager.tryLoad()` restores `config.yml`. There is no separate duration module; the reset hook clears timer changes by reloading the config.
 - Tests live in `src/integrationTest/java` and run on the in-process Paper server (paper-junit-server). Vi6 tests test Vi6; bot-library behaviour is tested in NekotineCore, never here.
 - Vi6 bot code lives in `fr.nekotine.vi6clean.bot`; no Vi6 game-logic file checks whether a player is a bot.
 - `PhaseMachine.isRunning()` stays false after the first `goTo` (a deferred NekotineCore bug): check the phase with `getPhase(...)`, as `Vi6SmokeIT` does.

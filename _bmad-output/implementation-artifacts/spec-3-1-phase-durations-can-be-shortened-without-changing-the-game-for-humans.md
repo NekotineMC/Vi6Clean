@@ -14,59 +14,56 @@ context:
 
 ## Intent
 
-**Problem:** Phase timers are read straight from `ConfigManager` in field initializers (preparation 300 s, infiltration lost 240 s, plus capture/escape delays and end-of-game spectator time), so a test round takes real minutes and tests have no way to shorten it (FR19, AD-13).
+**Problem:** Phase timers are read from `ConfigManager` in field initializers (preparation 300 s, infiltration lost 240 s, plus capture/escape delays and end-of-game spectator time), so a test round takes real minutes (FR19, AD-13).
 
-**Approach:** Add one Vi6 point, `PhaseDurations`, through which every phase and the in-map wrapper read their durations. It returns the configured value unless a test has set an override; overrides are read when a phase (or wrapper) is constructed, so a test sets them before the phase starts and clears them when done. An integration test runs a 4-bot round on overridden timers and checks each phase ends on its overridden timer.
+**Approach:** The config is the seam. Phases are rebuilt on every `goTo` and read the live config when they are built, so a test shortens a round by setting the durations through the existing Configurate setters before the phase starts, and restores them with `ConfigManager.tryLoad()` (nothing saves the in-memory config). An integration test runs a 4-bot round on shortened timers and checks each phase ends on its shortened timer.
+
+**Decision (human, 2026-11-11):** no separate `PhaseDurations` module: phase durations are normal configuration. The config records store the five phase durations as fractional seconds (`double`) so tests can use sub-second values; the records still convert to and from `Duration` in their getters and setters, and the YAML keys stay the same.
 
 ## Boundaries & Constraints
 
-**Always:** with no override, every duration equals the live `config.yml` value at the time it is read (no caching of config), and `Vi6ConfigIT` stays green. The seam covers the five durations of `game.preparation` and `game.infiltration`: preparation `duration`, infiltration `lostDuration`, `delayBetweenCapture`, `delayBeforeEscape`, `endSpectatorTime`. Overrides persist until cleared, and clearing returns every duration to config.
+**Always:** with no change, every duration equals `config.yml`, and `Vi6ConfigIT` stays green. The five durations of `game.preparation` and `game.infiltration` (`duration`, `lostDuration`, `delayBetweenCapture`, `delayBeforeEscape`, `endSpectatorTime`) are read when their phase or wrapper is built.
 
-**Never:** no bot type, import or concept in the seam (AD-13), and no brain calls it. No change to `config.yml` defaults, the Configurate records, or game rules. Mechanic timers (Majordom, asthma, suffocation) are out of scope. No hot-change of a phase that is already running. No NekotineCore change.
+**Never:** no bot type or concept in main source for this, and no brain changes durations (AD-13). No change to default values or YAML key names. Mechanic timers (Majordom, asthma, suffocation) are out of scope. No NekotineCore change.
 
 ## I/O & Edge-Case Matrix
 
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|--------------|---------------------------|----------------|
-| No override | config default or edited `config.yml` | each getter returns the config value | N/A |
-| Override set | `override(PREPARATION, 2s)` before preparation starts | preparation completes ~40 ticks after it starts | N/A |
-| Override cleared | `clearOverrides()` | getters return config values again | N/A |
-| Invalid override | `null`, zero or negative duration | rejected | `IllegalArgumentException`, existing value kept |
+| Default config | unchanged `config.yml` | phases use the configured durations | N/A |
+| Fractional value | `duration-seconds: 1.5` in `config.yml`, or setter with 2750 ms | getter returns 1500 ms / 2750 ms | N/A |
+| Shortened in memory | setters before the round, then `tryLoad()` | phases end on the shortened timers; reload restores the file values | N/A |
 
 </frozen-after-approval>
 
 ## Code Map
 
-- `src/main/java/fr/nekotine/vi6clean/configuration/{PreparationPhaseConfig,InfiltrationPhaseConfig}.java` -- source of default values; read only, don't change.
-- `src/main/java/fr/nekotine/vi6clean/game/phase/Vi6PhasePreparation.java:112` -- `PREPARATION_DURATION_MAX_TICKS` field initializer; timer in `onTick` (~l.291); on timeout `handleComplete` picks a random spawn for thieves who chose none.
-- `src/main/java/fr/nekotine/vi6clean/game/phase/Vi6PhaseInfiltration.java:56` -- `infiltration_lost_duration_ticks` initializer; l.148 `endSpectatorTime()` read in `checkForCompletion`; `onTick` marks entering/inside thieves `LOST` when the timer runs out.
-- `src/main/java/fr/nekotine/vi6clean/wrapper/InMapPhasePlayerWrapper.java:61-65` -- `DELAY_BETWEEN_CAPTURE` / `DELAY_BEFORE_ESCAPE` initializers.
-- `src/main/java/fr/nekotine/vi6clean/game/Vi6Game.java:110-113` -- phases registered by constructor reference; `PhaseMachine` builds a new instance on each `goTo`, so initializers re-read per game. Machine loops back to the lobby.
-- `src/main/java/fr/nekotine/vi6clean/configuration/ConfigManager.java` -- `IPluginModule` pattern; config loads async, so read it on each call.
-- `src/integrationTest/java/fr/nekotine/vi6clean/it/Vi6BotBrainIT.java` -- reuse: `run("bot add 4 any")`, `awaitPreparation()`, `@AfterEach` remove bots + `goTo(Vi6PhaseLobby)`. Check phases with `getPhase(...)`, never `isRunning()`.
+- `src/main/java/fr/nekotine/vi6clean/configuration/{PreparationPhaseConfig,InfiltrationPhaseConfig}.java` -- the five `*Seconds` fields become `double`; getters `Duration.ofMillis(Math.round(s * 1000))`, setters `toMillis() / 1000.0`.
+- `src/main/java/fr/nekotine/vi6clean/game/phase/Vi6PhaseInfiltration.java` -- `endSpectatorTime()` was read when the round ended; now captured in a field initializer like the lost timer.
+- `src/main/java/fr/nekotine/vi6clean/game/phase/Vi6PhasePreparation.java`, `wrapper/InMapPhasePlayerWrapper.java` -- unchanged: already read config in field initializers.
+- `src/main/java/fr/nekotine/vi6clean/configuration/ConfigManager.java` -- `tryLoad()` re-reads `config.yml`; `save()` is called by nothing outside it.
 
 ## Tasks & Acceptance
 
 **Execution:**
-- [x] `src/main/java/fr/nekotine/vi6clean/game/PhaseDurations.java` -- new `IPluginModule` with a nested enum of the five durations; `Duration get(key)` (override or live config), `override(key, Duration)` (positive only), `clearOverrides()`; `unload()` clears overrides; Javadoc says it is a test seam read at phase construction -- single read point (AC 1).
-- [x] `Vi6PhasePreparation.java`, `Vi6PhaseInfiltration.java`, `InMapPhasePlayerWrapper.java` -- read the five durations through `Ioc.resolve(PhaseDurations.class)`; nothing else changes.
-- [x] `src/integrationTest/java/fr/nekotine/vi6clean/it/Vi6PhaseDurationsIT.java` -- (a) after config load, each getter equals the matching `ConfigManager` value; override then clear restores it; invalid overrides throw. (b) `@RepeatedTest(3)`: override preparation 2 s, lost 3 s, end spectator 1 s; `bot add 4 any`; record `Bukkit.getCurrentTick()` when preparation, infiltration and the next lobby appear; assert preparation lasted 40 ticks and infiltration ended 60 + 20 ticks after it began, each within ±5 ticks, and no error logged (`LogCapture`). `@AfterEach`: clear overrides, remove bots, back to lobby.
+- [x] Config records -- store the five durations as `double` seconds.
+- [x] `Vi6PhaseInfiltration.java` -- capture end spectator time at construction.
+- [x] `src/integrationTest/java/fr/nekotine/vi6clean/it/Vi6PhaseDurationsIT.java` -- (a) fractional seconds read from `config.yml` and kept by the setter; (b) `@RepeatedTest(3)`: preparation 2 s, lost 3 s, end spectator 0.5 s via setters; `bot add 4 any`; asserts 2v2, preparation 40 ticks and infiltration 60 + 10 ticks (±5), no error logged. `@AfterEach`: `tryLoad()`, remove bots, back to lobby.
 
 **Acceptance Criteria:**
-- Given no override, when any phase starts, then its durations equal `config.yml`, and `Vi6ConfigIT` passes unchanged.
-- Given preparation and infiltration-lost overridden to a few seconds, when a 4-bot game runs, then preparation ends on its overridden timer, infiltration ends on its lost timer plus end-spectator time, and the game returns to the lobby, 3 times in a row.
-- Given the change, when reviewed, then `PhaseDurations` imports nothing from `fr.nekotine.core.bot` or `fr.nekotine.vi6clean.bot`, and no file under `fr.nekotine.vi6clean.bot` references it.
+- Given an unchanged `config.yml`, when phases start, then they use its durations, and `Vi6ConfigIT` passes unchanged.
+- Given durations shortened in memory, when a 4-bot game runs, then each phase ends on its shortened timer and the game returns to the lobby, 3 times in a row.
 
 ## Implementation Notes
 
-- Implemented inline (no subagent). Branch `feat/bots-3-1-phase-durations` off `bot`.
-- `PhaseDurations` is not a NekotineCore module, so Core's auto-registration does not see it: `Vi6Main.onEnable` registers it in `Ioc` through `moduleManager.get(...)`, next to `ConfigManager` (file not in the Code Map). `ModuleManager.unloadAll` at disable calls its `unload()`, which clears overrides.
-- `Vi6PhaseDurationsIT.roundEndsOnOverriddenTimers` clears the bots' brains once preparation starts: otherwise the lobby brains ready up again in the next lobby and start another round before the lobby can be observed. It uses `Vi6Bots.setBrain(bot, null)` as a driver only; the seam itself has no bot reference.
-- Verified: `gradlew.bat` and `gradlew.bat build` green; `gradlew.bat integrationTest` 32 passed, 0 failed (incl. `Vi6ConfigIT`, 3 repetitions of the round test).
-- After review patches: `integrationTest` 33 passed, 0 failed.
-- `Vi6Main` uses `moduleManager.tryLoad(PhaseDurations.class)`: `ModuleManager.load` registers the instance in Ioc itself.
+- Branch `feat/bots-3-1-phase-durations` off `bot`, PR NekotineMC/Vi6Clean#90.
+- First version added a `PhaseDurations` module (commit 8ef196b); reworked on the human's call (see Spec Change Log).
+- `Vi6PhaseDurationsIT.roundEndsOnShortenedTimers` clears the bots' brains once preparation starts: otherwise they ready up in the next lobby and start another round before the lobby can be observed. `bot add 2 thief` + `bot add 2 guard` does not work: the thieves ready up and start preparation alone.
+- Verified after rework: `gradlew.bat` and `gradlew.bat build` green; `gradlew.bat integrationTest` 30 passed, 0 failed (incl. `Vi6ConfigIT`, 3 repetitions of the round test).
 
 ## Spec Change Log
+
+- 2026-11-11, human review of PR #90: the epic assumed the config was immutable, but the records have setters and nothing saves the in-memory config. Amended: dropped the `PhaseDurations` module and its call-site changes; tests set durations through the config setters and restore with `ConfigManager.tryLoad()`; the five durations are stored as fractional seconds. Avoids a second source of truth for durations. KEEP: end spectator time captured at phase construction; round test asserting 2v2 and clearing brains before the next lobby.
 
 ## Review Triage Log
 
@@ -88,17 +85,6 @@ context:
 | 14 | blind | Sprint status `in-progress` vs spec `in-review` | false | step-05 syncs the tracker at completion |
 | 15 | blind | Code Map omits `Vi6Main`; AC3 not enforced by a test | low | reject: fix edits this spec / AC3 checked by grep (no bot import in `PhaseDurations`, no reference from `vi6clean.bot`) |
 | 16 | verif-gap other | No test runs a phase with no override | false | `get()` falls through to config whenever no override is set; covered by defaults + edited-config tests |
-
-## Design Notes
-
-Durations stay captured at construction (the existing field initializers), so behaviour for humans is identical: an override only affects phases built after it is set. A keyed enum keeps the API to three methods that Story 3.2's reset can clear in one call, e.g.:
-
-```java
-var d = Ioc.resolve(PhaseDurations.class);
-d.override(PhaseDurations.Key.PREPARATION, Duration.ofSeconds(2));
-// ... run the game ...
-d.clearOverrides();
-```
 
 ## Verification
 
