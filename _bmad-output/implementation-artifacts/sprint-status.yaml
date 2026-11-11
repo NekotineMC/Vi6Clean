@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 11-11-2026 12:00
+last_updated: 11-11-2026 18:00
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -53,7 +53,7 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: in-progress
-  3-1-phase-durations-can-be-shortened-without-changing-the-game-f: review
+  3-1-phase-durations-can-be-shortened-without-changing-the-game-f: done
   3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests: backlog
   3-3-bots-drive-a-representative-tool-the-portable-teleporter: backlog
   3-4-bots-drive-the-phase-machine-koth-capture-and-scoring: backlog
