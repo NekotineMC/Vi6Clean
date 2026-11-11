@@ -9,7 +9,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public class PreparationPhaseConfig {
 
 	@Comment("Durée de la phase de preparation en secondes")
-	private int durationSeconds = 300;
+	private double durationSeconds = 300;
 
 	@Comment("Argent donné au début de la phase de préparation")
 	private int money = 2000;
@@ -17,11 +17,11 @@ public class PreparationPhaseConfig {
 	// Getters and setters
 
 	public Duration duration() {
-		return Duration.ofSeconds(durationSeconds);
+		return Duration.ofMillis(Math.round(durationSeconds * 1000));
 	}
 
 	public void duration(Duration value) {
-		durationSeconds = Math.toIntExact(value.toSeconds());
+		durationSeconds = value.toMillis() / 1000.0;
 	}
 
 	public int money() {

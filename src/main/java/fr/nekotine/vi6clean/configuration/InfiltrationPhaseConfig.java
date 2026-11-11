@@ -9,49 +9,49 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public class InfiltrationPhaseConfig {
 
 	@Comment("Durée sans capture d'artefact avant que les voleurs soit considérés comme perdu")
-	private int lostDurationSeconds = 240;
+	private double lostDurationSeconds = 240;
 
 	@Comment("Durée minimale entre deux capture d'artefact")
-	private int delayBetweenCaptureSeconds = 30;
+	private double delayBetweenCaptureSeconds = 30;
 
 	@Comment("Durée minimale entre la dernière capture d'un voleur est sa fuite")
-	private int delayBeforeEscapeSeconds = 30;
+	private double delayBeforeEscapeSeconds = 30;
 
 	@Comment("Durée en spéctateur à la fin de la partie")
-	private int endSpectatorTimeSeconds = 5;
+	private double endSpectatorTimeSeconds = 5;
 
 	// Getters and setters
 
 	public Duration lostDuration() {
-		return Duration.ofSeconds(lostDurationSeconds);
+		return Duration.ofMillis(Math.round(lostDurationSeconds * 1000));
 	}
 
 	public void lostDuration(Duration value) {
-		lostDurationSeconds = Math.toIntExact(value.toSeconds());
+		lostDurationSeconds = value.toMillis() / 1000.0;
 	}
 
 	public Duration delayBetweenCapture() {
-		return Duration.ofSeconds(delayBetweenCaptureSeconds);
+		return Duration.ofMillis(Math.round(delayBetweenCaptureSeconds * 1000));
 	}
 
 	public void delayBetweenCapture(Duration value) {
-		delayBetweenCaptureSeconds = Math.toIntExact(value.toSeconds());
+		delayBetweenCaptureSeconds = value.toMillis() / 1000.0;
 	}
 
 	public Duration delayBeforeEscape() {
-		return Duration.ofSeconds(delayBeforeEscapeSeconds);
+		return Duration.ofMillis(Math.round(delayBeforeEscapeSeconds * 1000));
 	}
 
 	public void delayBeforeEscape(Duration value) {
-		delayBeforeEscapeSeconds = Math.toIntExact(value.toSeconds());
+		delayBeforeEscapeSeconds = value.toMillis() / 1000.0;
 	}
 
 	public Duration endSpectatorTime() {
-		return Duration.ofSeconds(endSpectatorTimeSeconds);
+		return Duration.ofMillis(Math.round(endSpectatorTimeSeconds * 1000));
 	}
 
 	public void endSpectatorTime(Duration value) {
-		endSpectatorTimeSeconds = Math.toIntExact(value.toSeconds());
+		endSpectatorTimeSeconds = value.toMillis() / 1000.0;
 	}
 
 }

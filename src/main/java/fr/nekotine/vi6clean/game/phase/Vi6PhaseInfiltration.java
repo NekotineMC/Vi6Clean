@@ -55,6 +55,8 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			0, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
 	private final int infiltration_lost_duration_ticks = Tick.tick()
 			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().lostDuration());
+	private final int endSpectatorTicks = Tick.tick()
+			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime());
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
 
@@ -145,8 +147,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				public void run() {
 					complete();
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(
-					Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime()));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), endSpectatorTicks);
 		}
 	}
 
