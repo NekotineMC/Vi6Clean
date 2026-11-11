@@ -100,3 +100,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-2-the-operator-adds-lists-and-removes-bots-with-commands.md`
   summary: Document the op-only `/bot add <count> <guard|thief|any>`, `/bot list` and `/bot remove <name|all>` commands and their 6-player cap in Vi6 `AGENTS.md` "Where things are".
   evidence: Review pass 1 (B13): the commands exist only in code and the spec.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-1-phase-durations-can-be-shortened-without-changing-the-game-for-humans.md`
+  summary: No test shows that DELAY_BETWEEN_CAPTURE and DELAY_BEFORE_ESCAPE overrides reach InMapPhasePlayerWrapper's capture and escape unlock timers.
+  evidence: Vi6PhaseDurationsIT checks only PhaseDurations.get for these keys, and its round has no thief inside the map, so thiefScheduleCanCaptureArtefact / thiefScheduleCanLeaveMap never run; Story 3.4 should assert canCaptureArtefact and canLeaveMap turn true after the overridden ticks.

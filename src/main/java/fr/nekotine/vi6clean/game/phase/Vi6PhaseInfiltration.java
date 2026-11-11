@@ -25,8 +25,8 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
+import fr.nekotine.vi6clean.game.PhaseDurations;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
 import fr.nekotine.vi6clean.map.artefact.ArtefactStealEvent;
@@ -54,7 +54,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 							.text("Volez puis échappez vous", NamedTextColor.GRAY).decorate(TextDecoration.ITALIC)),
 			0, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
 	private final int infiltration_lost_duration_ticks = Tick.tick()
-			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().lostDuration());
+			.fromDuration(Ioc.resolve(PhaseDurations.class).get(PhaseDurations.Key.INFILTRATION_LOST));
+	private final int endSpectatorTicks = Tick.tick()
+			.fromDuration(Ioc.resolve(PhaseDurations.class).get(PhaseDurations.Key.END_SPECTATOR_TIME));
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
 
@@ -145,8 +147,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				public void run() {
 					complete();
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(
-					Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime()));
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), endSpectatorTicks);
 		}
 	}
 

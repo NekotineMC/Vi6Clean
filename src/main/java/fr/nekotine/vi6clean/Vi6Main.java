@@ -16,6 +16,7 @@ import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
+import fr.nekotine.vi6clean.game.PhaseDurations;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.majordom.Majordom;
 import fr.nekotine.vi6clean.map.Vi6Map;
@@ -81,6 +82,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			var cmanager = moduleManager.get(ConfigManager.class);
 			cmanager.setupAsync();
 			Ioc.getProvider().registerSingleton(cmanager);
+			moduleManager.tryLoad(PhaseDurations.class);
 			Vi6ResourcePack.setup();
 			var container = new ToolHandlerContainer();
 			container.discoverHandlers();

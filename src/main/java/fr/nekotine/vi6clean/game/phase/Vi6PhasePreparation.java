@@ -45,7 +45,7 @@ import fr.nekotine.core.usable.Usable;
 import fr.nekotine.core.util.ItemStackUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
-import fr.nekotine.vi6clean.configuration.ConfigManager;
+import fr.nekotine.vi6clean.game.PhaseDurations;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
 import fr.nekotine.vi6clean.tool.ToolHandlerContainer;
@@ -110,7 +110,7 @@ public class Vi6PhasePreparation extends CollectionPhase<Vi6PhaseInMap, Player> 
 			0, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 
 	private final int PREPARATION_DURATION_MAX_TICKS = Tick.tick()
-			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().preparation().duration());
+			.fromDuration(Ioc.resolve(PhaseDurations.class).get(PhaseDurations.Key.PREPARATION));
 	private int preparationDurationTicks = 0;
 
 	public Vi6PhasePreparation(IPhaseMachine machine) {
