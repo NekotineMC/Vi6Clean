@@ -84,6 +84,19 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 
 	private boolean debug = false;
 
+	private @Nullable List<ForcedKoth> forcedKoths;
+
+	/**
+	 * A KoTH to spawn whatever the limit and probabilities say.
+	 *
+	 * @param koth
+	 *            the KoTH's name in the map
+	 * @param effect
+	 *            the effect's code ({@code emp}, {@code light}, {@code regen})
+	 */
+	public record ForcedKoth(String koth, String effect) {
+	}
+
 	public Vi6Game() {
 		// add/remove players from scoreboard team
 		guards.addAdditionCallback(this::setupGuard);
@@ -320,6 +333,23 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	/**
+	 * @return the KoTHs the next map phase spawns instead of the random roll, or
+	 *         {@code null} for the random roll
+	 */
+	public @Nullable List<ForcedKoth> getForcedKoths() {
+		return forcedKoths;
+	}
+
+	/**
+	 * Replaces the random KoTH roll of the next map phases: exactly these KoTHs
+	 * spawn, with these effects (an empty list spawns none). {@code null} restores
+	 * the random roll.
+	 */
+	public void setForcedKoths(@Nullable List<ForcedKoth> forcedKoths) {
+		this.forcedKoths = forcedKoths == null ? null : List.copyOf(forcedKoths);
 	}
 
 	@EventHandler
