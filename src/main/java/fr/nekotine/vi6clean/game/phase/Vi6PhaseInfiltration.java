@@ -13,6 +13,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Nullable;
 
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
@@ -59,6 +61,9 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime());
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
+	// Ends the round after the end-spectator time; a teardown before then cancels
+	// it
+	private @Nullable BukkitTask completionTask;
 
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
@@ -90,6 +95,10 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getThiefs().forEach(p -> p.hideBossBar(bossbarThief));
 		game.getGuards().forEach(p -> p.hideBossBar(bossbarGuard));
+		if (completionTask != null) {
+			completionTask.cancel();
+			completionTask = null;
+		}
 	}
 
 	@Override
@@ -141,10 +150,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
-			new BukkitRunnable() {
+			completionTask = new BukkitRunnable() {
 
 				@Override
 				public void run() {
+					completionTask = null;
 					complete();
 				}
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), endSpectatorTicks);

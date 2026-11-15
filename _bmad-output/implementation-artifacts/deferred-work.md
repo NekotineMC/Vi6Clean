@@ -103,3 +103,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-1-phase-durations-can-be-shortened-without-changing-the-game-for-humans.md`
   summary: No test shows that shortened delay-between-capture and delay-before-escape values reach InMapPhasePlayerWrapper's capture and escape unlock timers.
   evidence: Vi6PhaseDurationsIT's round has no thief inside the map, so thiefScheduleCanCaptureArtefact / thiefScheduleCanLeaveMap never run; Story 3.4 should assert canCaptureArtefact and canLeaveMap turn true after the shortened ticks.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests.md`
+  summary: No test checks that the random KoTH roll still spawns KoTHs when no override is set (it now sits in the else branch of the forced-KoTH check).
+  evidence: Review pass 1 (verification-gap): no IT reads Koth.getEffect() on a normal round; a deterministic test needs the koths/*.yml probabilities pinned to 1 (default 0.8).
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests.md`
+  summary: A phase setup that throws leaves PhaseMachine wedged (old phase still current but torn down, new phases registered), so Vi6GameReset's goTo(Vi6PhaseLobby) returns early and the test hooks' "did not start" checks never fire.
+  evidence: Review pass 1 (edge-case E1, E2): NekotineCore PhaseMachine.goTo registers phases in makePhase before setup and does not roll back on a setup exception; Story 3.2 sidesteps it for forced KoTHs by validating in Vi6PhaseInMap's constructor. Fix belongs in NekotineCore.

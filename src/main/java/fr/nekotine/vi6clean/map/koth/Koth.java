@@ -20,6 +20,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.map.annotation.GenerateCommandFor;
@@ -116,6 +117,14 @@ public class Koth {
 		return displayLocation;
 	}
 
+	/**
+	 * @return the effect this KoTH was set up with, or {@code null} when it is not
+	 *         set up
+	 */
+	public @Nullable AbstractKothEffect getEffect() {
+		return isEnabled ? effect : null;
+	}
+
 	//
 
 	public void setup(AbstractKothEffect effect, World world) {
@@ -174,7 +183,10 @@ public class Koth {
 		display.remove();
 		if (model != null) {
 			model.remove();
+			model = null;
 		}
+		isEnabled = false;
+		effect = null;
 	}
 
 	public void tick() {

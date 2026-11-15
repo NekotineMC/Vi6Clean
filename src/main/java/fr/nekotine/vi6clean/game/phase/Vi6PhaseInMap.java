@@ -2,10 +2,13 @@ package fr.nekotine.vi6clean.game.phase;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -38,6 +41,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Team;
+import org.jetbrains.annotations.Nullable;
 
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent;
 
@@ -68,6 +72,7 @@ import fr.nekotine.vi6clean.map.Vi6Map;
 import fr.nekotine.vi6clean.map.artefact.Artefact;
 import fr.nekotine.vi6clean.map.koth.AbstractKothEffect;
 import fr.nekotine.vi6clean.map.koth.Koth;
+import fr.nekotine.vi6clean.map.koth.KothCode;
 import fr.nekotine.vi6clean.map.koth.effect.EmpKothEffect;
 import fr.nekotine.vi6clean.map.koth.effect.LightKothEffect;
 import fr.nekotine.vi6clean.map.koth.effect.RegenKothEffect;
@@ -106,7 +111,10 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 	private int phaseDurationTicks = 0;
 
 	public Vi6PhaseInMap(IPhaseMachine machine) {
-		super(machine);
+		// Before the field initializers register scoreboard teams, and before the
+		// machine tears the current phase down: a bad override leaves the game as it
+		// was
+		super(checkForcedKoths(machine));
 		Ioc.resolve(ModuleManager.class).tryLoad(TickingModule.class);
 
 		var scoreboard = Ioc.resolve(Vi6Game.class).getScoreboard();
@@ -153,6 +161,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		var metadata = mapModule.getMapMetadata(mapName);
 		map = mapModule.getContent(metadata, Vi6Map.class);
 		Objects.requireNonNull(map, "La map n'a pas pus etre chargee");
+		var forcedKoths = resolveForcedKoths(map, game.getForcedKoths());
 		var world = game.getWorld();
 		world.setTime(DayTime.MIDNIGHT);
 		world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
@@ -220,30 +229,44 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 			tool.startHandling();
 		}
 		// KOTH
-		List<AbstractKothEffect> kothEffects = new LinkedList<>(
-				Arrays.asList(new EmpKothEffect(), new LightKothEffect(), new RegenKothEffect()));
-		List<Koth> koths = new LinkedList<>(map.getKoths().values());
-		var limit = Ioc.resolve(ConfigManager.class).getConfig().game().map().koth().limit();
-		Collections.shuffle(kothEffects);
-		Collections.shuffle(koths);
 		var nbKothSpawned = 0;
 		var random = new Random();
-		var count = 0;
 		var lightKothInMap = false;
-		while (count < limit && kothEffects.size() > 0 && koths.size() > 0) {
-			count++;
-			var effect = kothEffects.remove(0);
-			var probability = effect.getProbability();
-			if (random.nextDouble() > probability) {
-				continue;
+		if (forcedKoths != null) {
+			for (var forced : forcedKoths) {
+				var koth = forced.koth();
+				var effect = forced.effect().get();
+				nbKothSpawned++;
+				koth.setup(effect, world);
+				logger.info(Component.text(String.format("Spawning forced koth at %s (%s) typed %s", koth.getName(),
+						koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
+				if ("light".equals(effect.getCode())) {
+					lightKothInMap = true;
+				}
 			}
-			nbKothSpawned++;
-			var koth = koths.remove(0);
-			koth.setup(effect, world);
-			logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s", koth.getName(),
-					koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
-			if (effect.getCode() == "light") {
-				lightKothInMap = true;
+		} else {
+			List<AbstractKothEffect> kothEffects = new LinkedList<>(
+					Arrays.asList(new EmpKothEffect(), new LightKothEffect(), new RegenKothEffect()));
+			List<Koth> koths = new LinkedList<>(map.getKoths().values());
+			var limit = Ioc.resolve(ConfigManager.class).getConfig().game().map().koth().limit();
+			Collections.shuffle(kothEffects);
+			Collections.shuffle(koths);
+			var count = 0;
+			while (count < limit && kothEffects.size() > 0 && koths.size() > 0) {
+				count++;
+				var effect = kothEffects.remove(0);
+				var probability = effect.getProbability();
+				if (random.nextDouble() > probability) {
+					continue;
+				}
+				nbKothSpawned++;
+				var koth = koths.remove(0);
+				koth.setup(effect, world);
+				logger.info(Component.text(String.format("Spawning koth at %s (%s) typed %s", koth.getName(),
+						koth.getDisplayLocation(), effect.getCode())), NamedTextColor.GOLD);
+				if ("light".equals(effect.getCode())) {
+					lightKothInMap = true;
+				}
 			}
 		}
 
@@ -269,6 +292,64 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		Ioc.resolve(Majordom.class).enable();
 
 		game.getPlayerList().forEach(p -> p.setLevel(0));
+	}
+
+	/**
+	 * @throws IllegalArgumentException
+	 *             if the KoTH override does not fit the game's map, see
+	 *             {@link #resolveForcedKoths}
+	 */
+	private static IPhaseMachine checkForcedKoths(IPhaseMachine machine) {
+		var game = Ioc.resolve(Vi6Game.class);
+		var forced = game.getForcedKoths();
+		if (forced != null) {
+			var mapModule = Ioc.resolve(IMapModule.class);
+			var map = mapModule.getContent(mapModule.getMapMetadata(game.getMapName()), Vi6Map.class);
+			Objects.requireNonNull(map, "La map n'a pas pus etre chargee");
+			resolveForcedKoths(map, forced);
+		}
+		return machine;
+	}
+
+	private record ResolvedKoth(Koth koth, Supplier<AbstractKothEffect> effect) {
+	}
+
+	private static final Map<String, Supplier<AbstractKothEffect>> KOTH_EFFECTS_BY_CODE = Map.of(
+			EmpKothEffect.class.getAnnotation(KothCode.class).value(), EmpKothEffect::new,
+			LightKothEffect.class.getAnnotation(KothCode.class).value(), LightKothEffect::new,
+			RegenKothEffect.class.getAnnotation(KothCode.class).value(), RegenKothEffect::new);
+
+	/**
+	 * @return the forced KoTHs with their map KoTH and effect, or {@code null} when
+	 *         nothing is forced
+	 * @throws IllegalArgumentException
+	 *             if a KoTH is not in the map, is forced twice, or an effect code
+	 *             is unknown
+	 */
+	private static @Nullable List<ResolvedKoth> resolveForcedKoths(Vi6Map map,
+			@Nullable List<Vi6Game.ForcedKoth> forced) {
+		if (forced == null) {
+			return null;
+		}
+		var resolved = new LinkedList<ResolvedKoth>();
+		var seen = new HashSet<String>();
+		for (var entry : forced) {
+			var koth = map.getKoths().get(entry.koth());
+			if (koth == null) {
+				throw new IllegalArgumentException("KoTH forcé inconnu: " + entry.koth() + " (la map a: "
+						+ String.join(", ", map.getKoths().keySet()) + ")");
+			}
+			if (!seen.add(entry.koth())) {
+				throw new IllegalArgumentException("KoTH forcé deux fois: " + entry.koth());
+			}
+			var effect = KOTH_EFFECTS_BY_CODE.get(entry.effect());
+			if (effect == null) {
+				throw new IllegalArgumentException("Effet de KoTH forcé inconnu: " + entry.effect() + " (connus: "
+						+ String.join(", ", KOTH_EFFECTS_BY_CODE.keySet()) + ")");
+			}
+			resolved.add(new ResolvedKoth(koth, effect));
+		}
+		return resolved;
 	}
 
 	@Override
