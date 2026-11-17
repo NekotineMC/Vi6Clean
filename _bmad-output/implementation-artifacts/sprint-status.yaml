@@ -52,7 +52,7 @@ development_status:
   2-4-bots-fill-a-lobby-with-humans: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
+  epic-3: done
   3-1-phase-durations-can-be-shortened-without-changing-the-game-f: done
   3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests: done
   3-3-bots-drive-a-representative-tool-the-portable-teleporter: done
