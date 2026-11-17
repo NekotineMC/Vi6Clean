@@ -11,6 +11,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Server log lines captured while open: every message, error lines, and lines
@@ -18,11 +19,18 @@ import org.bukkit.Bukkit;
  */
 final class LogCapture extends AbstractAppender implements AutoCloseable {
 
-	private final Queue<String> failures = new ConcurrentLinkedQueue<>();
+	/**
+	 * A captured line.
+	 *
+	 * @param tick
+	 *            the server tick when it was appended
+	 * @param thrown
+	 *            its exception, or {@code null}
+	 */
+	record Line(int tick, Level level, String message, @Nullable Throwable thrown) {
+	}
 
-	private final Queue<String> errors = new ConcurrentLinkedQueue<>();
-
-	private final Queue<String> messages = new ConcurrentLinkedQueue<>();
+	private final Queue<Line> lines = new ConcurrentLinkedQueue<>();
 
 	private final LoggerContext context;
 
@@ -36,36 +44,32 @@ final class LogCapture extends AbstractAppender implements AutoCloseable {
 
 	@Override
 	public void append(LogEvent evt) {
-		var message = evt.getMessage().getFormattedMessage();
-		messages.add(message);
-		if (evt.getLevel().isMoreSpecificThan(Level.ERROR)) {
-			errors.add(message);
-		}
-		var thrown = evt.getThrown();
-		if (thrown != null) {
-			failures.add(message + " " + thrown);
-		}
+		lines.add(new Line(Bukkit.getCurrentTick(), evt.getLevel(), evt.getMessage().getFormattedMessage(),
+				evt.getThrown()));
+	}
+
+	/** @return every line, of every level, in order */
+	List<Line> lines() {
+		return List.copyOf(lines);
 	}
 
 	/** @return the lines that carry an exception */
 	List<String> failures() {
-		return List.copyOf(failures);
+		return lines.stream().filter(l -> l.thrown() != null).map(l -> l.message() + " " + l.thrown()).toList();
 	}
 
 	/** @return the error lines, without their exception */
 	List<String> errors() {
-		return List.copyOf(errors);
+		return lines.stream().filter(l -> l.level().isMoreSpecificThan(Level.ERROR)).map(Line::message).toList();
 	}
 
 	/** @return every message, of every level, without its exception */
 	List<String> messages() {
-		return List.copyOf(messages);
+		return lines.stream().map(Line::message).toList();
 	}
 
 	void clear() {
-		failures.clear();
-		errors.clear();
-		messages.clear();
+		lines.clear();
 	}
 
 	@Override

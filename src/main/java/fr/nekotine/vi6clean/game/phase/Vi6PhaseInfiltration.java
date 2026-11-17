@@ -2,11 +2,14 @@ package fr.nekotine.vi6clean.game.phase;
 
 import java.time.Duration;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,6 +76,10 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 	// Ends the round after the end-spectator time; a teardown before then cancels
 	// it
 	private @Nullable BukkitTask completionTask;
+	// Pending death delays and the tick each is due. Kept by the phase, not the
+	// player, so a dead thief who quits still has his artefacts lost and is waited
+	// for
+	private final Map<BukkitRunnable, Integer> pendingDeathDelays = new LinkedHashMap<>();
 
 	public Vi6PhaseInfiltration(IPhaseMachine machine) {
 		super(machine);
@@ -108,6 +115,36 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			completionTask.cancel();
 			completionTask = null;
 		}
+		// The round is over: a death delay left must not touch the next one
+		for (var task : pendingDeathDelays.keySet()) {
+			task.cancel();
+		}
+		pendingDeathDelays.clear();
+	}
+
+	/**
+	 * Runs {@code action} after {@code delayTicks}, unless the phase is torn down
+	 * first. The round does not end before it runs.
+	 */
+	public void scheduleDeathDelay(Runnable action, int delayTicks) {
+		var task = new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				pendingDeathDelays.remove(this);
+				action.run();
+			}
+		};
+		task.runTaskLater(Ioc.resolve(JavaPlugin.class), delayTicks);
+		pendingDeathDelays.put(task, Bukkit.getCurrentTick() + delayTicks);
+	}
+
+	/**
+	 * @return the ticks left before the last pending death delay runs, 0 if none
+	 */
+	public int getPendingDeathDelayTicks() {
+		var now = Bukkit.getCurrentTick();
+		return pendingDeathDelays.values().stream().mapToInt(due -> Math.max(0, due - now)).max().orElse(0);
 	}
 
 	@Override
@@ -160,6 +197,11 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
+			// After the pending death delays, so their artefacts are lost first
+			var delay = endSpectatorTicks;
+			if (!pendingDeathDelays.isEmpty()) {
+				delay = Math.max(delay, getPendingDeathDelayTicks() + 1);
+			}
 			completionTask = new BukkitRunnable() {
 
 				@Override
@@ -167,10 +209,25 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 					completionTask = null;
 					// Logged now: leaves later in the same tick and pending deaths are on the
 					// check-list
-					logRoundResult(endedOnLostTimer);
-					complete();
+					logThenComplete(() -> logRoundResult(endedOnLostTimer), Vi6PhaseInfiltration.this::complete,
+							e -> logger.warn("Could not log the round result", e));
 				}
-			}.runTaskLater(Ioc.resolve(JavaPlugin.class), endSpectatorTicks);
+			}.runTaskLater(Ioc.resolve(JavaPlugin.class), delay);
+		}
+	}
+
+	/**
+	 * Runs {@code log}, then {@code complete} whatever {@code log} throws: an
+	 * exception goes to {@code warn}, an {@link Error} is rethrown after
+	 * {@code complete} ran.
+	 */
+	static void logThenComplete(Runnable log, Runnable complete, Consumer<Exception> warn) {
+		try {
+			log.run();
+		} catch (Exception e) {
+			warn.accept(e);
+		} finally {
+			complete.run();
 		}
 	}
 

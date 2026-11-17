@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.logging.log4j.Level;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.map.IMapModule;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.configuration.GameConfig;
@@ -300,6 +302,91 @@ class Vi6TestHooksIT {
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
 			assertEquals(List.of(), capture.errors(), "an error was logged");
 		}
+	}
+
+	@RepeatedTest(3)
+	void mapChangeClearsTheKothOverride() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			assertCleanLobby();
+			var koth = forcedKoths().firstKey();
+			Vi6TestHooks.forceKoths(new ForcedKoth(koth, "emp"));
+			PaperServer.onMain(() -> {
+				var game = game();
+				var original = game.getMapName();
+				try {
+					game.setMapName(original);
+					assertEquals(List.of(new ForcedKoth(koth, "emp")), game.getForcedKoths(),
+							"override cleared on the same map");
+					var other = otherLoadableMap(original);
+					assertNull(game.getForcedKoths(), "override kept on map " + other);
+				} finally {
+					game.setMapName(original);
+				}
+				return null;
+			});
+			var cleared = capture.lines().stream()
+					.filter(l -> l.message().startsWith("KoTH override cleared") && l.level() == Level.INFO).count();
+			assertEquals(1, cleared, "KoTH override cleared info lines: " + capture.messages());
+			assertEquals(List.of(), capture.failures(), "an exception was logged");
+			assertEquals(List.of(), capture.errors(), "an error was logged");
+		}
+	}
+
+	@RepeatedTest(3)
+	void mapPhaseWarnsOnlyWithATestOverride() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			assertCleanLobby();
+			var bots = Vi6TestHooks.spawnBots(2);
+			Vi6TestHooks.putOnTeams(List.of(bots.get(0).player()), List.of(bots.get(1).player()));
+			Vi6TestHooks.goToInfiltration(null);
+			assertEquals(List.of(), overrideWarnings(capture), "override warning with config.yml defaults");
+
+			Vi6TestHooks.reset();
+			capture.clear();
+			bots = Vi6TestHooks.spawnBots(2);
+			Vi6TestHooks.putOnTeams(List.of(bots.get(0).player()), List.of(bots.get(1).player()));
+			Vi6TestHooks.forceKoths();
+			PaperServer.onMain(() -> {
+				config().infiltration().lostDuration(Duration.ofSeconds(7));
+				return null;
+			});
+			Vi6TestHooks.goToInfiltration(null);
+			var warnings = overrideWarnings(capture);
+			assertEquals(1, warnings.size(), "override warnings: " + warnings);
+			assertTrue(warnings.get(0).contains("forced KoTHs []"), "no forced KoTHs in: " + warnings.get(0));
+			assertTrue(warnings.get(0).contains("lost-duration-seconds 240.0s -> 7.0s"),
+					"no changed duration in: " + warnings.get(0));
+			assertEquals(List.of(), capture.failures(), "an exception was logged");
+			assertEquals(List.of(), capture.errors(), "an error was logged");
+		}
+	}
+
+	private static List<String> overrideWarnings(LogCapture capture) {
+		return capture.lines().stream().filter(l -> l.level() == Level.WARN)
+				.filter(l -> l.message().startsWith("Map phase started with test overrides active: "))
+				.map(LogCapture.Line::message).toList();
+	}
+
+	/**
+	 * Switches the game to the first other map by name that loads; main thread
+	 * only.
+	 *
+	 * @return its name
+	 */
+	private static String otherLoadableMap(String current) {
+		var names = Ioc.resolve(IMapModule.class).listMaps().stream().map(m -> m.getName())
+				.filter(n -> !n.equals(current)).sorted().toList();
+		for (var name : names) {
+			try {
+				game().setMapName(name);
+				return name;
+			} catch (RuntimeException e) {
+				// Its world is not in the bundle: try the next one
+			}
+		}
+		throw new IllegalStateException("no other loadable map than " + current + " in " + names);
 	}
 
 	private static void assertCleanLobby() throws Exception {

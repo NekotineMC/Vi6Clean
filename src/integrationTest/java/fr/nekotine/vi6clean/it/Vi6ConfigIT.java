@@ -79,6 +79,37 @@ class Vi6ConfigIT {
 	}
 
 	@Test
+	void invalidDurationFallsBackToItsDefault() throws Exception {
+		try (var capture = new LogCapture()) {
+			PaperServer.onMain(() -> {
+				var manager = Ioc.resolve(ConfigManager.class);
+				var path = Ioc.resolve(JavaPlugin.class).getDataPath().resolve("config.yml");
+				var original = Files.readAllBytes(path);
+				try {
+					var fileLoader = loader(path);
+					var node = fileLoader.load();
+					node.node("game", "preparation", "duration-seconds").set(123);
+					node.node("game", "infiltration", "lost-duration-seconds").set(0);
+					fileLoader.save(node);
+					manager.tryLoad();
+					assertEquals(new Vi6Config().game().infiltration().lostDuration(),
+							manager.getConfig().game().infiltration().lostDuration(),
+							"lost-duration-seconds: 0 did not fall back to its default");
+					assertEquals(Duration.ofSeconds(123), manager.getConfig().game().preparation().duration(),
+							"a valid key in the same file was not loaded as written");
+				} finally {
+					Files.write(path, original);
+					manager.tryLoad();
+				}
+				return null;
+			});
+			var warnings = capture.messages().stream()
+					.filter(m -> m.contains("game.infiltration.lost-duration-seconds: 0.0 (")).toList();
+			assertEquals(1, warnings.size(), "warnings naming the key and the bad value: " + capture.messages());
+		}
+	}
+
+	@Test
 	void configFileIsKebabCaseAndReloadsToLiveConfig() throws Exception {
 		Path path = PaperServer.onMain(() -> Ioc.resolve(JavaPlugin.class).getDataPath().resolve("config.yml"));
 		assertTrue(Files.isRegularFile(path), "config.yml missing: " + path);

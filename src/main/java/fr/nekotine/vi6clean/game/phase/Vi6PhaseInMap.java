@@ -162,6 +162,7 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		map = mapModule.getContent(metadata, Vi6Map.class);
 		Objects.requireNonNull(map, "La map n'a pas pus etre chargee");
 		var forcedKoths = resolveForcedKoths(map, game.getForcedKoths());
+		warnIfOverridden(game);
 		var world = game.getWorld();
 		world.setTime(DayTime.MIDNIGHT);
 		world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
@@ -292,6 +293,26 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		Ioc.resolve(Majordom.class).enable();
 
 		game.getPlayerList().forEach(p -> p.setLevel(0));
+	}
+
+	/**
+	 * Logs one warning when the test overrides are active (forced KoTHs, or phase
+	 * durations changed since {@code config.yml} was loaded), so a round played
+	 * with them by mistake shows in the log.
+	 */
+	private void warnIfOverridden(Vi6Game game) {
+		var overrides = new LinkedList<String>();
+		var forced = game.getForcedKoths();
+		if (forced != null) {
+			overrides.add("forced KoTHs " + forced);
+		}
+		var durations = Ioc.resolve(ConfigManager.class).describeDurationChanges();
+		if (!durations.isEmpty()) {
+			overrides.add("durations changed since load: " + durations);
+		}
+		if (!overrides.isEmpty()) {
+			logger.warn("Map phase started with test overrides active: " + String.join("; ", overrides));
+		}
 	}
 
 	/**

@@ -86,6 +86,18 @@ context:
 | 15 | blind | Code Map omits `Vi6Main`; AC3 not enforced by a test | low | reject: fix edits this spec / AC3 checked by grep (no bot import in `PhaseDurations`, no reference from `vi6clean.bot`) |
 | 16 | verif-gap other | No test runs a phase with no override | false | `get()` falls through to config whenever no override is set; covered by defaults + edited-config tests |
 
+**Superseded by the rework (Epic 3 retro, F1).** Rows 1, 2, 4, 8, 9, 10 and 15 describe patches to the `PhaseDurations` module, which the rework deleted with its patches; they were never applied to the shipped code. Their text above is kept as reviewed. Status after `spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`:
+
+| # | Status |
+|---|--------|
+| 1 | Reinstated: the config setters reject a duration under 1 tick, and `config.yml` loads fall back to the key's default with a warning (`DurationRules`). |
+| 2 | Reinstated: same check, above `Integer.MAX_VALUE` ticks. |
+| 4 | Superseded, not reinstated: `Vi6Main` still uses `moduleManager.get(ConfigManager.class)` plus `registerSingleton`. |
+| 8 | Reinstated in another form: `Vi6PhaseInMap.globalSetup` logs one WARN when forced KoTHs are set or durations differ from those last loaded. |
+| 9 | Superseded: no `PhaseDurations` module, so no thread contract to document. |
+| 10 | Superseded: no `get(key)`; the config setters reject `null` with an `IllegalArgumentException` naming the field. |
+| 15 | Superseded: no `PhaseDurations` module; no Vi6 game-logic class imports `fr.nekotine.core.bot`. |
+
 ## Verification
 
 **Commands:**

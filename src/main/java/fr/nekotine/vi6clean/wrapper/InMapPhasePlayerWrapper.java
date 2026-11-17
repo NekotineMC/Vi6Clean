@@ -29,6 +29,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -273,21 +274,27 @@ public class InMapPhasePlayerWrapper extends WrapperBase<Player> {
 			switch (leaveState) {
 				case DEAD :
 					// Check for game end after deadringer delay
-					new BukkitRunnable() {
-						@Override
-						public void run() {
-							stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
-							game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
-									.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
-									.append(Component.text(stolen.size(), NamedTextColor.AQUA))
-									.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
-							// Check for game end
-							var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
-							if (infiltrationPhase != null) {
-								infiltrationPhase.checkForCompletion();
-							}
+					Runnable afterDelay = () -> {
+						stolen.forEach(a -> phaseInMap.thiefObjectiveLost(a));
+						game.sendMessage(wrapped.displayName().color(NamedTextColor.AQUA)
+								.append(Component.text(" est mort avec ", NamedTextColor.GOLD))
+								.append(Component.text(stolen.size(), NamedTextColor.AQUA))
+								.append(Component.text(" artéfacts!", NamedTextColor.GOLD)));
+						// Check for game end
+						var infiltrationPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+						if (infiltrationPhase != null) {
+							infiltrationPhase.checkForCompletion();
 						}
-					}.runTaskLater(Ioc.resolve(JavaPlugin.class), Tick.tick().fromDuration(deathDelay));
+					};
+					// Owned by the infiltration phase: cancelled when the round is torn down, not
+					// when this player is (a dead thief who quits still loses his artefacts)
+					var deathPhase = game.getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+					var delayTicks = Tick.tick().fromDuration(deathDelay);
+					if (deathPhase != null) {
+						deathPhase.scheduleDeathDelay(afterDelay, delayTicks);
+					} else {
+						Bukkit.getScheduler().runTaskLater(Ioc.resolve(JavaPlugin.class), afterDelay, delayTicks);
+					}
 					return;
 				case ALIVE :
 					stolen.forEach(a -> phaseInMap.thiefObjectiveEscaped(a));
