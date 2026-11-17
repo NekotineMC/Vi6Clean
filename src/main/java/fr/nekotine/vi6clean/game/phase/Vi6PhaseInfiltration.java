@@ -1,9 +1,11 @@
 package fr.nekotine.vi6clean.game.phase;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import fr.nekotine.core.game.phase.CollectionPhase;
 import fr.nekotine.core.game.phase.IPhaseMachine;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.state.RegisteredEventListenerState;
 import fr.nekotine.core.state.State;
@@ -31,6 +34,7 @@ import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.map.ThiefSpawn;
+import fr.nekotine.vi6clean.map.artefact.Artefact;
 import fr.nekotine.vi6clean.map.artefact.ArtefactStealEvent;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
 import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper.LeaveState;
@@ -40,10 +44,13 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 
 public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player> implements Listener {
+
+	private final ComponentLogger logger = NekotineLogger.make();
 
 	private final BossBar bossbarGuard = BossBar.bossBar(
 			Component.text("Infiltration", NamedTextColor.LIGHT_PURPLE)
@@ -61,6 +68,8 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 			.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().game().infiltration().endSpectatorTime());
 	private int stealDurationTicks = 0;
 	private boolean isHandlingCompletion = false;
+	// Why the round ends, set when completion starts
+	private boolean endedOnLostTimer;
 	// Ends the round after the end-spectator time; a teardown before then cancels
 	// it
 	private @Nullable BukkitTask completionTask;
@@ -147,6 +156,7 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				return;
 			}
 			isHandlingCompletion = true;
+			endedOnLostTimer = stealDurationTicks >= infiltration_lost_duration_ticks;
 			game.sendMessage(Component.text("La partie est finie", NamedTextColor.GOLD));
 			game.showTitle(Title.title(Component.text("Fin de partie", NamedTextColor.GOLD), Component.empty(),
 					Times.times(Duration.ofMillis(500), Duration.ofSeconds(1), Duration.ofSeconds(1))));
@@ -155,10 +165,36 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 				@Override
 				public void run() {
 					completionTask = null;
+					// Logged now: leaves later in the same tick and pending deaths are on the
+					// check-list
+					logRoundResult(endedOnLostTimer);
 					complete();
 				}
 			}.runTaskLater(Ioc.resolve(JavaPlugin.class), endSpectatorTicks);
 		}
+	}
+
+	/**
+	 * Logs the round's result on one line: why it ended and each artefact's state,
+	 * read from the thieves' check-list.
+	 */
+	private void logRoundResult(boolean lostTimer) {
+		var inMap = getParent();
+		var artefacts = inMap.getMap().getArtefacts().values().stream().sorted(Comparator.comparing(Artefact::getName))
+				.map(a -> a.getName() + "=" + artefactState(inMap.getThiefArtefactScore(a)))
+				.collect(Collectors.joining(", "));
+		logger.info("Round ended: reason=" + (lostTimer ? "lost-timer" : "all-thieves-left") + ", artefacts=["
+				+ artefacts + "]");
+	}
+
+	private static String artefactState(int thiefScore) {
+		return switch (thiefScore) {
+			case 3 -> "safe";
+			case 2 -> "stolen";
+			case 1 -> "escaped";
+			case 0 -> "lost";
+			default -> "unknown(" + thiefScore + ")";
+		};
 	}
 
 	@EventHandler

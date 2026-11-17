@@ -13,14 +13,16 @@ import org.apache.logging.log4j.core.config.Property;
 import org.bukkit.Bukkit;
 
 /**
- * Server log lines captured while open: error lines, and lines that carry an
- * exception.
+ * Server log lines captured while open: every message, error lines, and lines
+ * that carry an exception.
  */
 final class LogCapture extends AbstractAppender implements AutoCloseable {
 
 	private final Queue<String> failures = new ConcurrentLinkedQueue<>();
 
 	private final Queue<String> errors = new ConcurrentLinkedQueue<>();
+
+	private final Queue<String> messages = new ConcurrentLinkedQueue<>();
 
 	private final LoggerContext context;
 
@@ -35,6 +37,7 @@ final class LogCapture extends AbstractAppender implements AutoCloseable {
 	@Override
 	public void append(LogEvent evt) {
 		var message = evt.getMessage().getFormattedMessage();
+		messages.add(message);
 		if (evt.getLevel().isMoreSpecificThan(Level.ERROR)) {
 			errors.add(message);
 		}
@@ -54,9 +57,15 @@ final class LogCapture extends AbstractAppender implements AutoCloseable {
 		return List.copyOf(errors);
 	}
 
+	/** @return every message, of every level, without its exception */
+	List<String> messages() {
+		return List.copyOf(messages);
+	}
+
 	void clear() {
 		failures.clear();
 		errors.clear();
+		messages.clear();
 	}
 
 	@Override
