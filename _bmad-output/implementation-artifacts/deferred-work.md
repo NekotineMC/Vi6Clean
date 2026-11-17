@@ -109,3 +109,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests.md`
   summary: A phase setup that throws leaves PhaseMachine wedged (old phase still current but torn down, new phases registered), so Vi6GameReset's goTo(Vi6PhaseLobby) returns early and the test hooks' "did not start" checks never fire.
   evidence: Review pass 1 (edge-case E1, E2): NekotineCore PhaseMachine.goTo registers phases in makePhase before setup and does not roll back on a setup exception; Story 3.2 sidesteps it for forced KoTHs by validating in Vi6PhaseInMap's constructor. Fix belongs in NekotineCore.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-3-bots-drive-a-representative-tool-the-portable-teleporter.md`
+  summary: `SharedActionBar` may register a `TickElapsedEvent` listener per game and never unregister it.
+  evidence: while debugging Story 3.3, `TickElapsedEvent` had 6 `SharedActionBar` listeners in one integrationTest run and 8 in the next; not investigated. Settle by counting the event's `HandlerList` registrations before and after two consecutive games.
