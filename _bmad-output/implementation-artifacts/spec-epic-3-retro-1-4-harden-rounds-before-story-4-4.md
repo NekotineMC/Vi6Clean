@@ -106,7 +106,7 @@ context:
   - `Vi6ConfigIT`: an invalid `config.yml` duration falls back to its default, with its warning, while a valid key in the same file loads as written.
 - [x] `_bmad-output/implementation-artifacts/spec-3-1-*.md`: mark Review Triage Log rows 1, 2, 4, 8, 9, 10 and 15 as superseded by the rework. Leave the rows' original text alone, and point to this spec where it reinstates the fix.
 - [x] `AGENTS.md`: the plain test suite is no longer empty, so update the Tests bullet.
-- [ ] `sprint-status.yaml`: set retro action items 1–4 to `done` once the work is merged.
+- [x] `sprint-status.yaml`: set retro action items 1–4 to `done` once the work is merged.
 
 **Acceptance Criteria:**
 - Given the jar defaults, when a round runs, then no override WARN is logged and every existing integration test passes unchanged.

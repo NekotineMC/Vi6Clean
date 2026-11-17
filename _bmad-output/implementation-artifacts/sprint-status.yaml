@@ -95,7 +95,7 @@ action_items:
       and log a warning whenever a map phase is built while a KoTH override or changed
       durations are active (F3, F2)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
   - id: "epic-3-retro-item-2-before-story-4-4-store-the-dead-death-de"
     epic: 3
@@ -104,14 +104,14 @@ action_items:
       time, pending death delays) so the round result never reads a dead thief artefact
       as stolen (F4, F5)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
   - id: "epic-3-retro-item-3-before-story-4-4-guard-logroundresult-in"
     epic: 3
     action: "Before Story 4.4: guard logRoundResult in the Vi6PhaseInfiltration completion
       task so an exception there cannot stop complete() (F6)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
   - id: "epic-3-retro-item-4-before-story-4-4-validate-phase-duration"
     epic: 3
@@ -119,7 +119,7 @@ action_items:
       on load (finite, at least 1 tick, at most int ticks) and correct the Story 3.1
       Review Triage Log rows describing the dropped PhaseDurations patches (F1)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
   - id: "epic-3-retro-item-5-in-vi6phasemachinebotit-assert-cancaptur"
     epic: 3
