@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 17-11-2026 16:13
+last_updated: 11-17-2026 16:44
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -57,7 +57,7 @@ development_status:
   3-2-vi6-test-hooks-set-a-game-up-and-reset-it-between-tests: done
   3-3-bots-drive-a-representative-tool-the-portable-teleporter: done
   3-4-bots-drive-the-phase-machine-koth-capture-and-scoring: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 
   epic-4: backlog
   4-1-players-can-pick-a-thief-entrance-with-a-command: backlog
@@ -88,3 +88,53 @@ development_status:
   7-1-bots-fill-a-2v2-in-front-of-real-players: backlog
   7-2-the-adopter-guide-matches-the-shipped-bots-api: backlog
   epic-7-retrospective: optional
+action_items:
+  - id: "epic-3-retro-item-1-before-story-4-4-clear-or-revalidate-the"
+    epic: 3
+    action: "Before Story 4.4: clear or revalidate the forced-KoTH override in Vi6Game.setMapName,
+      and log a warning whenever a map phase is built while a KoTH override or changed
+      durations are active (F3, F2)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-3-retro-item-2-before-story-4-4-store-the-dead-death-de"
+    epic: 3
+    action: "Before Story 4.4: store the DEAD death-delay task in InMapPhasePlayerWrapper
+      and cancel it in tearDown; schedule infiltration completion after max(end-spectator
+      time, pending death delays) so the round result never reads a dead thief artefact
+      as stolen (F4, F5)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-3-retro-item-3-before-story-4-4-guard-logroundresult-in"
+    epic: 3
+    action: "Before Story 4.4: guard logRoundResult in the Vi6PhaseInfiltration completion
+      task so an exception there cannot stop complete() (F6)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-3-retro-item-4-before-story-4-4-validate-phase-duration"
+    epic: 3
+    action: "Before Story 4.4: validate phase durations in the config setters and
+      on load (finite, at least 1 tick, at most int ticks) and correct the Story 3.1
+      Review Triage Log rows describing the dropped PhaseDurations patches (F1)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-3-retro-item-5-in-vi6phasemachinebotit-assert-cancaptur"
+    epic: 3
+    action: "In Vi6PhaseMachineBotIT, assert canCaptureArtefact and canLeaveMap are
+      false right after entry and the steal and open within the shortened delay plus
+      tolerance; then remove the Story 3.1 entry from deferred-work.md (F8)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-3-retro-item-6-before-story-4-5-move-awaitphase-asserta"
+    epic: 3
+    action: "Before Story 4.5: move awaitPhase, assertAround, game() and one pair
+      of assertNear variants into shared IT support, migrate Vi6PhaseDurationsIT to
+      Vi6TestHooks.reset() and forced KoTHs, delete the stale onMain comments in Vi6TestHooksIT
+      (A2, A4, F11)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
