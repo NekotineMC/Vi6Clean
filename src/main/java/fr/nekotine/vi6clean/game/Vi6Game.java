@@ -237,6 +237,12 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 					+ " n'existe pas.\nSeul ont été trouvé: " + String.join(", ", Bukkit.getWorlds().stream()
 							.map(ww -> ww.getKey().asMinimalString()).collect(Collectors.toList())));
 		}
+		// The override names this map's KoTHs: it would make every start throw on
+		// another map
+		if (forcedKoths != null && !name.equals(mapName)) {
+			forcedKoths = null;
+			logger.info("KoTH override cleared: the map changed from " + mapName + " to " + name);
+		}
 		mapName = name;
 		world = w.get();
 		var loc = world.getSpawnLocation();

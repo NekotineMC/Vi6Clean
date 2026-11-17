@@ -22,7 +22,11 @@ public class ConfigManager implements IPluginModule {
 
 	private final YamlConfigurationLoader loader;
 
-	private Vi6Config config = new Vi6Config();
+	// Assigned by the async setup task, read on the main thread
+	private volatile Vi6Config config = new Vi6Config();
+
+	// The durations as last loaded or defaulted, to tell test overrides apart
+	private volatile DurationSnapshot loadedDurations = DurationSnapshot.of(config);
 
 	private BukkitTask loadConfigTask;
 
@@ -36,12 +40,17 @@ public class ConfigManager implements IPluginModule {
 		if (configPath.toFile().exists()) {
 			try {
 				var configNode = loader.load();
-				config = configNode.get(Vi6Config.class);
+				// An empty file has no root node: defaults
+				var loaded = configNode.get(Vi6Config.class, new Vi6Config());
+				for (var warning : DurationRules.resetInvalidDurations(loaded)) {
+					logger.warn(warning);
+				}
+				use(loaded);
 			} catch (ConfigurateException e) {
 				logger.warn(
 						"Une erreur est survenue lors du chargement de la configuration, les valeurs par défaut vont être utilisées",
 						e);
-				config = new Vi6Config();
+				use(new Vi6Config());
 			}
 			logger.info("Configuration rechargée");
 		}
@@ -77,7 +86,7 @@ public class ConfigManager implements IPluginModule {
 					// Override configuration if specified
 					if (config.override_config()) {
 						saveDefaults();
-						config = new Vi6Config();
+						use(new Vi6Config());
 						logger.info(
 								"Configuration écrasée avec les valeurs par défaut du plugin (comme spécifié par \"override-config\")");
 					}
@@ -92,6 +101,20 @@ public class ConfigManager implements IPluginModule {
 
 	public Vi6Config getConfig() {
 		return config;
+	}
+
+	/**
+	 * @return the phase durations that differ from the ones last loaded or
+	 *         defaulted (changed through the setters, as tests do), described for a
+	 *         log line, or an empty string when none do
+	 */
+	public String describeDurationChanges() {
+		return loadedDurations.describeChanges(DurationSnapshot.of(config));
+	}
+
+	private void use(Vi6Config loaded) {
+		loadedDurations = DurationSnapshot.of(loaded);
+		config = loaded;
 	}
 
 	@Override

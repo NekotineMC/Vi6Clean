@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.RepeatedTest;
 
 import fr.nekotine.core.bot.Bot;
+import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
@@ -78,6 +80,9 @@ class Vi6PhaseMachineBotIT {
 	private static final int SHORT_DELAY_TICKS = 10;
 
 	private static final String RESULT_PREFIX = "Round ended: ";
+
+	/** {@code InMapPhasePlayerWrapper}'s 3 s death delay. */
+	private static final int DEATH_DELAY_TICKS = 60;
 
 	// Each test starts with a reset; this one keeps the next test class clean
 	@AfterEach
@@ -131,7 +136,8 @@ class Vi6PhaseMachineBotIT {
 
 			assertAround(40, infiltrationStart - preparationStart, "preparation length");
 			assertAround(60 + 10, lobbyStart - infiltrationStart, "infiltration lost timer + end spectator time");
-			assertEquals(expectedResult("lost-timer", artefactNames, null), roundResult(capture), "round result line");
+			assertEquals(expectedResult("lost-timer", artefactNames, Map.of()), roundResult(capture),
+					"round result line");
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
 			assertEquals(List.of(), capture.errors(), "an error was logged");
 		}
@@ -272,11 +278,211 @@ class Vi6PhaseMachineBotIT {
 					return null;
 				});
 			}
-			assertEquals(expectedResult("all-thieves-left", artefactNames, artefactName), roundResult(capture),
-					"round result line");
+			assertEquals(expectedResult("all-thieves-left", artefactNames, Map.of(artefactName, "escaped")),
+					roundResult(capture), "round result line");
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
 			assertEquals(List.of(), capture.errors(), "an error was logged");
 		}
+	}
+
+	@RepeatedTest(3)
+	void lastThiefOutDiesWithAStolenArtefact() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			var round = stealRound(1);
+			var thiefA = round.thieves().get(0);
+			steal(round, thiefA);
+			int deathTick = kill(thiefA.player());
+			awaitPhase(Vi6PhaseLobby.class, DEATH_DELAY_TICKS + 10 + 40);
+
+			assertResultAfterDeath(capture, round, deathTick);
+			assertEquals(List.of(), capture.failures(), "an exception was logged");
+			assertEquals(List.of(), capture.errors(), "an error was logged");
+		}
+	}
+
+	@RepeatedTest(3)
+	void otherThiefEscapesDuringTheDeathDelay() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			var round = stealRound(2);
+			var botA = round.thieves().get(0);
+			var botB = round.thieves().get(1);
+			// B waits inside until it may leave
+			enterMap(botB, round.spawn());
+			PaperServer.awaitUntil(() -> inMapWrapper(botB.player()).canLeaveMap(), SHORT_DELAY_TICKS + 20);
+			steal(round, botA);
+			int deathTick = kill(botA.player());
+
+			// B leaves within the death delay: every thief has left
+			var exit = PaperServer.onMain(() -> map().getExits().get(round.spawn()));
+			stepInto(botB, exit, null);
+			PaperServer.onMain(() -> {
+				assertTrue(inMapWrapper(botB.player()).hasLeft(), "thief B did not leave");
+				assertTrue(Bukkit.getCurrentTick() < deathTick + DEATH_DELAY_TICKS,
+						"thief B left after the death delay");
+				return null;
+			});
+			awaitPhase(Vi6PhaseLobby.class, DEATH_DELAY_TICKS + 10 + 40);
+
+			assertResultAfterDeath(capture, round, deathTick);
+			assertEquals(List.of(), capture.failures(), "an exception was logged");
+			assertEquals(List.of(), capture.errors(), "an error was logged");
+		}
+	}
+
+	@RepeatedTest(3)
+	void earlyLobbyCancelsAPendingDeathDelay() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			// B stays outside: the death does not end the round
+			var round = stealRound(2);
+			var botA = round.thieves().get(0);
+			steal(round, botA);
+			int deathTick = kill(botA.player());
+			var infiltration = PaperServer.onMain(() -> {
+				var phase = game().getPhaseMachine().getPhase(Vi6PhaseInfiltration.class);
+				assertNotNull(phase, "the round ended on the death");
+				assertTrue(phase.getPendingDeathDelayTicks() > 0, "no pending death delay after the death");
+				game().getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
+				assertTrue(Bukkit.getCurrentTick() < deathTick + DEATH_DELAY_TICKS, "lobby after the death delay");
+				return phase;
+			});
+			PaperServer.onMain(() -> {
+				assertNotNull(game().getPhaseMachine().getPhase(Vi6PhaseLobby.class), "not in the lobby");
+				assertEquals(0, infiltration.getPendingDeathDelayTicks(), "death delay still pending");
+				return null;
+			});
+			PaperServer.awaitUntil(() -> Bukkit.getCurrentTick() > deathTick + DEATH_DELAY_TICKS + 10,
+					DEATH_DELAY_TICKS + 20);
+
+			assertEquals(List.of(), capture.failures(), "an exception was logged");
+			assertEquals(List.of(), capture.errors(), "an error was logged");
+		}
+	}
+
+	@RepeatedTest(3)
+	void deadThiefWhoQuitsStillLosesHisArtefacts() throws Exception {
+		Vi6TestHooks.reset();
+		try (var capture = new LogCapture()) {
+			// B stays outside: the death does not end the round
+			var round = stealRound(2);
+			var botA = round.thieves().get(0);
+			var botB = round.thieves().get(1);
+			steal(round, botA);
+			int deathTick = kill(botA.player());
+			// A quits within the death delay
+			PaperServer.onMain(() -> {
+				Ioc.resolve(BotRoster.class).remove(botA);
+				assertTrue(Bukkit.getCurrentTick() < deathTick + DEATH_DELAY_TICKS, "quit after the death delay");
+				return null;
+			});
+			PaperServer.awaitUntil(() -> Bukkit.getCurrentTick() > deathTick + DEATH_DELAY_TICKS + 5,
+					DEATH_DELAY_TICKS + 20);
+			PaperServer.onMain(() -> {
+				assertNotNull(game().getPhaseMachine().getPhase(Vi6PhaseInfiltration.class),
+						"round ended with thief B still out of the map");
+				assertEquals(0, thiefScore(round.artefact()), "thief board score after the quit and the delay");
+				return null;
+			});
+
+			// B enters, then escapes: every thief has left
+			enterMap(botB, round.spawn());
+			PaperServer.awaitUntil(() -> inMapWrapper(botB.player()).canLeaveMap(), SHORT_DELAY_TICKS + 20);
+			var exit = PaperServer.onMain(() -> map().getExits().get(round.spawn()));
+			stepInto(botB, exit, null);
+			awaitPhase(Vi6PhaseLobby.class, 10 + 60);
+
+			assertEquals(expectedResult("all-thieves-left", round.artefacts(), Map.of(round.artefact(), "lost")),
+					roundResult(capture), "round result line");
+			// Pre-existing, see deferred-work.md: Artefact keeps a player who quit inside
+			// its capture box, and its tick then NPEs on his removed wrapper
+			var unrelated = "getArtefactComponent()";
+			assertEquals(List.of(), capture.failures().stream().filter(f -> !f.contains(unrelated)).toList(),
+					"an exception was logged");
+			assertEquals(List.of(),
+					capture.lines().stream().filter(l -> l.level().isMoreSpecificThan(Level.ERROR))
+							.filter(l -> l.thrown() == null || !String.valueOf(l.thrown()).contains(unrelated))
+							.map(LogCapture.Line::message).toList(),
+					"an error was logged");
+		}
+	}
+
+	/**
+	 * A round in infiltration with one guard, thieves, short delays and no KoTH.
+	 *
+	 * @param thieves
+	 *            the thief bots
+	 * @param artefact
+	 *            the artefact to steal
+	 * @param artefacts
+	 *            every artefact of the map, by name
+	 * @param spawn
+	 *            the thief spawn, entrance and exit used
+	 */
+	private record StealRound(List<Bot> thieves, String artefact, List<String> artefacts, String spawn) {
+	}
+
+	private static StealRound stealRound(int thiefCount) throws Exception {
+		var bots = Vi6TestHooks.spawnBots(1 + thiefCount);
+		var thieves = bots.subList(1, bots.size());
+		Vi6TestHooks.putOnTeams(List.of(bots.get(0).player()), players(thieves));
+		Vi6TestHooks.forceKoths();
+		var artefactName = PaperServer.onMain(() -> {
+			var config = Ioc.resolve(ConfigManager.class).getConfig().game().infiltration();
+			config.lostDuration(Duration.ofSeconds(30));
+			config.delayBetweenCapture(SHORT_DELAY);
+			config.delayBeforeEscape(SHORT_DELAY);
+			config.endSpectatorTime(Duration.ofMillis(500));
+			return firstZoneWithoutGuard(Vi6TestHooks.currentMap().getArtefacts(), Artefact::getBoundingBox);
+		});
+		var artefactNames = PaperServer
+				.onMain(() -> Vi6TestHooks.currentMap().getArtefacts().keySet().stream().sorted().toList());
+		var spawnName = PaperServer.onMain(Vi6PhaseMachineBotIT::spawnWithEntranceAndExit);
+		Vi6TestHooks.goToInfiltration(spawnName);
+		return new StealRound(thieves, artefactName, artefactNames, spawnName);
+	}
+
+	/**
+	 * {@code thief} enters, waits until it may steal, then steals the round's
+	 * artefact.
+	 */
+	private static void steal(StealRound round, Bot thief) throws Exception {
+		enterMap(thief, round.spawn());
+		PaperServer.awaitUntil(() -> inMapWrapper(thief.player()).canCaptureArtefact(), SHORT_DELAY_TICKS + 20);
+		var artefact = PaperServer.onMain(() -> map().getArtefacts().get(round.artefact()));
+		stepInto(thief, artefact.getBoundingBox(), artefact.getBlockPosition());
+		PaperServer.awaitUntil(artefact::isCaptured, CAPTURE_TICKS + CAPTURE_MARGIN_TICKS);
+		PaperServer.onMain(() -> {
+			assertEquals(2, thiefScore(round.artefact()), "thief board score after the steal");
+			return null;
+		});
+	}
+
+	/**
+	 * Kills {@code player} through the real death handlers.
+	 *
+	 * @return the tick of the death
+	 */
+	private static int kill(Player player) throws Exception {
+		return PaperServer.onMain(() -> {
+			player.setHealth(0);
+			assertTrue(inMapWrapper(player).hasLeft(), player.getName() + " has not left on its death");
+			return Bukkit.getCurrentTick();
+		});
+	}
+
+	/**
+	 * The result line reads the stolen artefact {@code lost}, and was logged no
+	 * earlier than the end of the death delay.
+	 */
+	private static void assertResultAfterDeath(LogCapture capture, StealRound round, int deathTick) {
+		assertEquals(expectedResult("all-thieves-left", round.artefacts(), Map.of(round.artefact(), "lost")),
+				roundResult(capture), "round result line");
+		var resultTick = capture.lines().stream().filter(l -> l.message().startsWith(RESULT_PREFIX))
+				.mapToInt(LogCapture.Line::tick).findFirst().orElseThrow();
+		assertTrue(resultTick - deathTick >= DEATH_DELAY_TICKS,
+				"result logged " + (resultTick - deathTick) + " ticks after the death, before the death delay");
 	}
 
 	/** Records each artefact steal as {@code "<thief> stole <artefact>"}. */
@@ -500,15 +706,12 @@ class Vi6PhaseMachineBotIT {
 	}
 
 	/**
-	 * @param escaped
-	 *            the one artefact carried out, every other being safe, or
-	 *            {@code null} for all safe
+	 * @param states
+	 *            the state of each artefact that is not safe
 	 */
-	private static String expectedResult(String reason, List<String> artefacts, @Nullable String escaped) {
-		return RESULT_PREFIX
-				+ "reason=" + reason + ", artefacts=[" + artefacts.stream()
-						.map(a -> a + "=" + (a.equals(escaped) ? "escaped" : "safe")).collect(Collectors.joining(", "))
-				+ "]";
+	private static String expectedResult(String reason, List<String> artefacts, Map<String, String> states) {
+		return RESULT_PREFIX + "reason=" + reason + ", artefacts=[" + artefacts.stream()
+				.map(a -> a + "=" + states.getOrDefault(a, "safe")).collect(Collectors.joining(", ")) + "]";
 	}
 
 	// Phases

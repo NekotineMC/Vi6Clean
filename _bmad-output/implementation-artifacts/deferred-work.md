@@ -115,3 +115,30 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-4-bots-drive-the-phase-machine-koth-capture-and-scoring.md`
   summary: Assert the `stolen` and `lost` artefact states of the round result line (a thief bot dies carrying an artefact; the lost timer ends the round while a thief inside holds one).
   evidence: Story 3.4's tests only produce `safe` and `escaped`; swapping the `case 2`/`case 0` mapping in `Vi6PhaseInfiltration.artefactState` passes every test. Story 4.4 extends this line and needs these scenarios.
+- source_spec: none
+  summary: Epic 3 retro items 5–6 (integration-test hygiene): assert the capture and escape gates are closed at first and open within the shortened delay in `Vi6PhaseMachineBotIT` and close the Story 3.1 entry above; move `awaitPhase`, `assertAround`, `game()` and one pair of `assertNear` variants into shared IT support, migrate `Vi6PhaseDurationsIT` to `Vi6TestHooks.reset()` and forced KoTHs, delete the stale "only reach the log" comments in `Vi6TestHooksIT`.
+  evidence: Split from the Epic 3 retro action-items build (2026-11-17); the user chose to do items 1–4 (pre-Story 4.4 game-code fixes) first. Item 5's asserts depend on the round timing item 2 changes. Due before Story 4.5's soak test.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: A `config.yml` that sets `game`, `game.preparation` or `game.infiltration` to null may make `DurationSnapshot.of` throw an NPE that escapes `ConfigManager.tryLoad` (it catches only `ConfigurateException`).
+  evidence: Review pass 1 (B6, E5), medium unverified. `DurationRules.resetInvalidDurations` null-checks these sections but the snapshot does not. To settle, load a `config.yml` with `infiltration: ~` in an IT and see whether Configurate keeps the field defaults.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: The `AGENTS.md` Tests bullet says plain tests need "no Bukkit or Ioc", but plain tests may load classes that import Bukkit/Paper types (they need no running server and no Ioc).
+  evidence: Review pass 1 (B13). Agent-context files are deferred by the build workflow.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: `Vi6Main` still registers a module with `get` plus `registerSingleton`, which NPEs if the module failed to load (Story 3.1 triage row 4, superseded by the rework, not reinstated).
+  evidence: Review pass 1 (B14). The Story 3.1 spec's "Superseded by the rework" note records it; nothing tracked it.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: A non-numeric duration in `config.yml` (a Configurate type error) still resets the whole config to defaults, unlike the per-key fallback for out-of-range values.
+  evidence: Review pass 1 (E6), pre-existing: `tryLoad` catches `ConfigurateException` and uses `new Vi6Config()`. A fix needs a lenient per-key read, and the same applies to every non-duration key.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: A player who quits while standing in an artefact's capture box stays in `Artefact.inside`, so `Artefact.tick` throws a `NullPointerException` every tick on `getWrapper(p, InMapPhasePlayerWrapper.class).getArtefactComponent()` (`Artefact.java:196`, also `:217` for guards) until the round ends.
+  evidence: Pre-existing, found by `Vi6PhaseMachineBotIT.deadThiefWhoQuitsStillLosesHisArtefacts` (thief killed in the box, then his bot removed), which filters only this NPE out of its no-exception check. Fix: drop the player from `inside` on quit or wrapper teardown, or skip players with no wrapper; then remove the filter.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: `Vi6PhaseInfiltration.itemTearDown` calls `removeWrapper(null, InfiltrationPhasePlayerWrapper.class)`, which removes nothing, so thieves keep a stale infiltration wrapper after the round. A death in a later preparation or in-map phase then takes the DEAD branch with old stolen artefacts and an untracked death task (the fallback in `InMapPhasePlayerWrapper.thiefLeaveMap`).
+  evidence: Review pass 2 (blind and edge-case layers). `WrappingModule.removeWrapper` looks up `store.get(source)` and does nothing for a null source. Fix: pass `item`, then drop the fallback branch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: No test drives the round's completion task through `Vi6PhaseInfiltration.logThenComplete`; reverting the call site to `logRoundResult(...); complete();` keeps every test green.
+  evidence: Review pass 2 (verification gap). `RoundCompletionTest` covers the helper alone. A covering IT needs a hook that makes `logRoundResult` throw inside a real round.
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
+  summary: No test checks that `ConfigManager.setupAsync` with `override-config: true` resets the duration snapshot; without that reset every map phase would log a false override WARN.
+  evidence: Review pass 2 (verification gap). Every IT reloads through `tryLoad()` before asserting. A covering test needs a boot config whose durations are not the defaults.
