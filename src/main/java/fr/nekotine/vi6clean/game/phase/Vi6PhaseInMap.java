@@ -684,6 +684,14 @@ public class Vi6PhaseInMap extends CollectionPhase<Vi6PhaseGlobal, Player> imple
 		thiefScoreboard.getScore(name).customName(Component.text(name, NamedTextColor.AQUA));
 	}
 
+	/**
+	 * @return the artefact's score on the thieves' check-list: 3 safe, 2 stolen, 1
+	 *         escaped, 0 lost
+	 */
+	public int getThiefArtefactScore(Artefact artefact) {
+		return thiefScoreboard.getScore(artefact.getName()).getScore();
+	}
+
 	public void thiefObjectiveLost(Artefact artefact) {
 		var name = artefact.getName();
 		thiefScoreboard.getScore(name).setScore(0);

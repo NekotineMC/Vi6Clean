@@ -112,3 +112,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-3-3-bots-drive-a-representative-tool-the-portable-teleporter.md`
   summary: `SharedActionBar` may register a `TickElapsedEvent` listener per game and never unregister it.
   evidence: while debugging Story 3.3, `TickElapsedEvent` had 6 `SharedActionBar` listeners in one integrationTest run and 8 in the next; not investigated. Settle by counting the event's `HandlerList` registrations before and after two consecutive games.
+- source_spec: `_bmad-output/implementation-artifacts/spec-3-4-bots-drive-the-phase-machine-koth-capture-and-scoring.md`
+  summary: Assert the `stolen` and `lost` artefact states of the round result line (a thief bot dies carrying an artefact; the lost timer ends the round while a thief inside holds one).
+  evidence: Story 3.4's tests only produce `safe` and `escaped`; swapping the `case 2`/`case 0` mapping in `Vi6PhaseInfiltration.artefactState` passes every test. Story 4.4 extends this line and needs these scenarios.
