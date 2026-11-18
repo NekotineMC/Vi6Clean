@@ -3,6 +3,7 @@ package fr.nekotine.vi6clean.bot;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,18 +32,32 @@ public class Vi6Bots implements IPluginModule, Listener {
 
 	private final Map<Bot, BotBrain> brains = new HashMap<>();
 
+	// One source for every brain: bots tick in roster order, so a seed gives the
+	// same picks
+	private final Random random = new Random();
+
 	public Vi6Bots() {
 		EventUtil.register(this);
 	}
 
-	/** Records the bot's team intent and hands it to a new lobby brain. */
+	/** Records the bot's team intent and hands it to a new standard brain. */
 	public void setIntent(Bot bot, BotTeamIntent intent) {
 		intents.put(bot, intent);
-		brains.put(bot, new LobbyBrain(intent));
+		brains.put(bot, PhaseBrain.standard(intent, random));
 	}
 
 	public @Nullable BotTeamIntent getIntent(Bot bot) {
 		return intents.get(bot);
+	}
+
+	/** @return the bot's brain, or {@code null} if it has none */
+	public @Nullable BotBrain getBrain(Bot bot) {
+		return brains.get(bot);
+	}
+
+	/** Reseeds the random source of every brain's choices. */
+	public void seedRandom(long seed) {
+		random.setSeed(seed);
 	}
 
 	/** Replaces the bot's brain; {@code null} leaves the bot idle. */
@@ -63,9 +78,14 @@ public class Vi6Bots implements IPluginModule, Listener {
 	/** @return the team a bot's lobby brain asked for in this lobby, if any */
 	@Nullable BotTeamIntent pickedTeam(Player player) {
 		for (var entry : brains.entrySet()) {
-			if (entry.getValue() instanceof LobbyBrain lobby && entry.getKey().player().equals(player)) {
-				return lobby.pickedTeam();
+			if (!entry.getKey().player().equals(player)) {
+				continue;
 			}
+			var brain = entry.getValue();
+			if (brain instanceof PhaseBrain phases) {
+				brain = phases.lobby();
+			}
+			return brain instanceof LobbyBrain lobby ? lobby.pickedTeam() : null;
 		}
 		return null;
 	}
