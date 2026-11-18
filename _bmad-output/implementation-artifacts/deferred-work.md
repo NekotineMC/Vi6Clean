@@ -145,3 +145,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-1-players-can-pick-a-thief-entrance-with-a-command.md`
   summary: No test checks the chat messages `/game entrance` sends (the "Entrée X sélectionnée" confirmation and the red refusals), so the refusal tests for an outsider and for infiltration pass even if the command never ran.
   evidence: Review pass 1 (verification gap, blind and edge-case layers). The `Bot` interface exposes no received chat and nothing hooks `Player.sendMessage`. A fix needs a received-chat capture in NekotineCore `bots` or the test harness; until then, check the messages by hand on the dev server.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-2-players-can-mark-themselves-ready-in-preparation-with-a-command.md`
+  summary: No test checks the chat messages `/game prepready` sends (the "Prêt" / "En attente" confirmations and the red refusal), so the infiltration refusal test only fails on a logged exception.
+  evidence: Review pass 1 (verification gap, blind and edge-case layers). Same cause as the Story 4.1 entry: the `Bot` interface exposes no received chat. One received-chat capture in NekotineCore `bots` or the harness would settle both.

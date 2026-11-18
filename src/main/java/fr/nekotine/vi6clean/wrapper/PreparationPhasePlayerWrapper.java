@@ -45,6 +45,12 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	private ComponentDisplayMenuItem moneyIndicator;
 
+	/** The "Prêt" toggle on the shop page. */
+	private BooleanInputMenuItem readyItem;
+
+	/** The "Prêt" toggle on the runes page. */
+	private BooleanInputMenuItem runesReadyItem;
+
 	public PreparationPhasePlayerWrapper(Player wrapped) {
 		super(wrapped);
 		if (wrapped == null) {
@@ -52,7 +58,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		}
 		// Menu page
 		moneyIndicator = new ComponentDisplayMenuItem(new ItemStack(Material.GOLD_INGOT), this::getMoneyDisplay);
-		var readyItem = new BooleanInputMenuItem(
+		readyItem = new BooleanInputMenuItem(
 				ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase, this::setReadyForNextPhase);
@@ -79,7 +85,7 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 		toolbar.addTool(runesItem);
 		menu = new MenuInventory(toolbar, 6);
 		// Runes page
-		var runesReadyItem = new BooleanInputMenuItem(
+		runesReadyItem = new BooleanInputMenuItem(
 				ItemStackUtil.make(Material.EMERALD_BLOCK, Component.text("Prêt", NamedTextColor.GREEN)),
 				ItemStackUtil.make(Material.REDSTONE_BLOCK, Component.text("En attente", NamedTextColor.RED)),
 				this::isReadyForNextPhase, this::setReadyForNextPhase);
@@ -123,6 +129,11 @@ public class PreparationPhasePlayerWrapper extends WrapperBase<Player> {
 
 	public void setReadyForNextPhase(boolean readyForNextPhase) {
 		this.readyForNextPhase = readyForNextPhase;
+		// Shows a state set outside the menu (the /game prepready command)
+		if (readyItem != null) {
+			readyItem.askRedraw();
+			runesReadyItem.askRedraw();
+		}
 		if (readyForNextPhase) {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class).checkForCompletion();
 		}
