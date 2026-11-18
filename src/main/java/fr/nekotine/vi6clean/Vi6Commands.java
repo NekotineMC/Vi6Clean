@@ -61,7 +61,10 @@ public class Vi6Commands {
 				.executesPlayer((p, args) -> {
 					selectEntrance(p, (String) args.get("name"));
 				});
-		gameC.withSubcommands(lobby, team, ready, entrance);
+		var prepReady = new CommandAPICommand("prepready").executesPlayer(info -> {
+			togglePreparationReady(info.sender());
+		});
+		gameC.withSubcommands(lobby, team, ready, entrance, prepReady);
 		gameC.register();
 	}
 
@@ -106,4 +109,26 @@ public class Vi6Commands {
 		prepWrapper.get().setSelectedSpawn(spawn);
 	}
 
+	/**
+	 * Toggles {@code player}'s preparation ready state, as the "Prêt" menu toggle
+	 * does; preparation ends once every player is ready. Refuses with a red message
+	 * outside preparation or for a player not in the game.
+	 */
+	private static void togglePreparationReady(Player player) {
+		var preparation = Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class);
+		var prepWrapper = Ioc.resolve(WrappingModule.class).getWrapperOptional(player,
+				PreparationPhasePlayerWrapper.class);
+		if (preparation == null || prepWrapper.isEmpty()) {
+			player.sendMessage(Component.text("On se déclare prêt seulement pendant la préparation de la partie",
+					NamedTextColor.RED));
+			return;
+		}
+		var wrapper = prepWrapper.get();
+		var ready = !wrapper.isReadyForNextPhase();
+		// Confirm before the setter: the last ready player ends preparation in it
+		player.sendMessage(ready
+				? Component.text("Prêt", NamedTextColor.GREEN)
+				: Component.text("En attente", NamedTextColor.RED));
+		wrapper.setReadyForNextPhase(ready);
+	}
 }
