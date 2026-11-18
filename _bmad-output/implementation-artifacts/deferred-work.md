@@ -142,3 +142,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-epic-3-retro-1-4-harden-rounds-before-story-4-4.md`
   summary: No test checks that `ConfigManager.setupAsync` with `override-config: true` resets the duration snapshot; without that reset every map phase would log a false override WARN.
   evidence: Review pass 2 (verification gap). Every IT reloads through `tryLoad()` before asserting. A covering test needs a boot config whose durations are not the defaults.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-1-players-can-pick-a-thief-entrance-with-a-command.md`
+  summary: No test checks the chat messages `/game entrance` sends (the "Entrée X sélectionnée" confirmation and the red refusals), so the refusal tests for an outsider and for infiltration pass even if the command never ran.
+  evidence: Review pass 1 (verification gap, blind and edge-case layers). The `Bot` interface exposes no received chat and nothing hooks `Player.sendMessage`. A fix needs a received-chat capture in NekotineCore `bots` or the test harness; until then, check the messages by hand on the dev server.
