@@ -14,6 +14,7 @@ import fr.nekotine.core.logging.NekotineLogger;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.util.EventUtil;
+import fr.nekotine.vi6clean.bot.Vi6Run;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.Vi6Styles;
 import fr.nekotine.vi6clean.game.Vi6Game;
@@ -86,6 +87,7 @@ public class Vi6Main extends NekotinePlugin implements Listener {
 			container.discoverHandlers();
 			Ioc.getProvider().registerSingleton(container);
 			game.start();
+			moduleManager.tryLoad(Vi6Run.class);
 			EventUtil.register(this);
 		} catch (Exception e) {
 			logger.error("Une erreur est survenue lors de l'activation du plugin", e);
