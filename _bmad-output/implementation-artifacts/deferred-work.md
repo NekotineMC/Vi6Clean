@@ -148,3 +148,12 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-2-players-can-mark-themselves-ready-in-preparation-with-a-command.md`
   summary: No test checks the chat messages `/game prepready` sends (the "Prêt" / "En attente" confirmations and the red refusal), so the infiltration refusal test only fails on a logged exception.
   evidence: Review pass 1 (verification gap, blind and edge-case layers). Same cause as the Story 4.1 entry: the `Bot` interface exposes no received chat. One received-chat capture in NekotineCore `bots` or the harness would settle both.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-4-the-operator-starts-an-unattended-run-with-one-command.md`
+  summary: No test proves `bot run <count> <seed>` replays a run: the seed is logged and passed to `Vi6Bots.seedRandom`, but nothing compares the brains' choices across two runs with the same seed.
+  evidence: Review pass 1 (verification gap, blind). Removing `bots.seedRandom(seed)` keeps `Vi6BotRunIT` green. Story 4.5's soak test is the natural place: run the same seed twice and compare entrance picks or teams.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-4-the-operator-starts-an-unattended-run-with-one-command.md`
+  summary: The humans-online paths of `bot run` (humans kept, `6 - humans` bots added, refusal when no room) and the partial-spawn rollback never run in a test.
+  evidence: Review pass 1 (verification gap). The harness has no human player; check them on the dev server in Story 4.6.
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-4-the-operator-starts-an-unattended-run-with-one-command.md`
+  summary: `/bot run <count> [seed]` has no operator documentation (looping games, seed replay, humans reducing the bot count); AGENTS.md "Running and verifying" is the likely home.
+  evidence: Review pass 1 (blind). Agent-context files are edited outside story builds.

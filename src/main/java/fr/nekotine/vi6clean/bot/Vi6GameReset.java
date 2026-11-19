@@ -22,18 +22,36 @@ public final class Vi6GameReset {
 	}
 
 	/**
-	 * Removes every bot through the roster (which deletes their saved files),
-	 * forgets their Vi6 brains, goes back to the lobby, clears the KoTH override,
-	 * reloads {@code config.yml} (undoing in-memory duration changes) and resets
-	 * the game scoreboard entries of the removed bots. Humans stay in the game.
+	 * {@link #clearBots()}, then clears the KoTH override and reloads
+	 * {@code config.yml} (undoing in-memory duration changes). The test hooks'
+	 * reset.
 	 *
 	 * @throws IllegalStateException
 	 *             off the main thread
 	 */
 	public static void reset() {
+		clearBots();
+		var game = Ioc.resolve(Vi6Game.class);
+		game.setForcedKoths(null);
+		Ioc.resolve(ConfigManager.class).tryLoad();
+	}
+
+	/**
+	 * Aborts the active unattended run, removes every bot through the roster (which
+	 * deletes their saved files), forgets their Vi6 brains, goes back to the lobby
+	 * and resets the game scoreboard entries of the removed bots. Humans stay in
+	 * the game; the live config and the KoTH override are kept. The run command's
+	 * reset.
+	 *
+	 * @throws IllegalStateException
+	 *             off the main thread
+	 */
+	public static void clearBots() {
 		if (!Bukkit.isPrimaryThread()) {
-			throw new IllegalStateException("Vi6GameReset.reset() must run on the main thread");
+			throw new IllegalStateException("Vi6GameReset must run on the main thread");
 		}
+		var modules = Ioc.resolve(ModuleManager.class);
+		modules.get(Vi6Run.class).abort();
 		var removedNames = new ArrayList<String>();
 		var roster = Ioc.resolve(BotRoster.class);
 		if (roster != null && roster.isAvailable()) {
@@ -43,11 +61,9 @@ public final class Vi6GameReset {
 				roster.remove(bot);
 			}
 		}
-		Ioc.resolve(ModuleManager.class).get(Vi6Bots.class).forgetAllBut(List.of());
+		modules.get(Vi6Bots.class).forgetAllBut(List.of());
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
-		game.setForcedKoths(null);
-		Ioc.resolve(ConfigManager.class).tryLoad();
 		var scoreboard = game.getScoreboard();
 		for (var name : removedNames) {
 			scoreboard.resetScores(name);

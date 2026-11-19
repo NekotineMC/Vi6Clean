@@ -36,7 +36,9 @@ import org.junit.jupiter.api.RepeatedTest;
 import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
+import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.bot.Vi6Run;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.constant.InMapState;
 import fr.nekotine.vi6clean.constant.Vi6Team;
@@ -80,6 +82,9 @@ class Vi6PhaseMachineBotIT {
 	private static final int SHORT_DELAY_TICKS = 10;
 
 	private static final String RESULT_PREFIX = "Round ended: ";
+
+	/** The run summary of a round where one artefact was stolen and carried out. */
+	private static final String GAME_ENDED_PREFIX = "Game ended: game=1, reason=all-thieves-left, stolen=1, escaped=1, duration=";
 
 	/** {@code InMapPhasePlayerWrapper}'s 3 s death delay. */
 	private static final int DEATH_DELAY_TICKS = 60;
@@ -138,6 +143,10 @@ class Vi6PhaseMachineBotIT {
 			assertAround(60 + 10, lobbyStart - infiltrationStart, "infiltration lost timer + end spectator time");
 			assertEquals(expectedResult("lost-timer", artefactNames, Map.of()), roundResult(capture),
 					"round result line");
+			// A run would log its line the tick after the lobby
+			PaperServer.awaitTicks(2);
+			assertTrue(capture.messages().stream().noneMatch(m -> m.startsWith("Game ended:")),
+					"a summary line without a run: " + capture.messages());
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
 			assertEquals(List.of(), capture.errors(), "an error was logged");
 		}
@@ -212,6 +221,11 @@ class Vi6PhaseMachineBotIT {
 					.onMain(() -> Vi6TestHooks.currentMap().getArtefacts().keySet().stream().sorted().toList());
 			var spawnName = PaperServer.onMain(Vi6PhaseMachineBotIT::spawnWithEntranceAndExit);
 			Vi6TestHooks.goToInfiltration(spawnName);
+			// A run active when the round ends logs its summary line
+			PaperServer.onMain(() -> {
+				Ioc.resolve(ModuleManager.class).get(Vi6Run.class).begin(3, 3, 0L);
+				return null;
+			});
 
 			var steals = new ConcurrentLinkedQueue<String>();
 			var recorder = new StealRecorder(steals);
@@ -280,6 +294,11 @@ class Vi6PhaseMachineBotIT {
 			}
 			assertEquals(expectedResult("all-thieves-left", artefactNames, Map.of(artefactName, "escaped")),
 					roundResult(capture), "round result line");
+			PaperServer.awaitUntil(() -> capture.messages().stream().anyMatch(m -> m.startsWith(GAME_ENDED_PREFIX)),
+					20);
+			var summaries = capture.messages().stream().filter(m -> m.startsWith("Game ended:")).toList();
+			assertEquals(1, summaries.size(), "summary lines: " + summaries);
+			assertTrue(summaries.getFirst().startsWith(GAME_ENDED_PREFIX), summaries.getFirst());
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
 			assertEquals(List.of(), capture.errors(), "an error was logged");
 		}

@@ -31,6 +31,7 @@ import fr.nekotine.core.state.State;
 import fr.nekotine.core.ticking.TickTimeStamp;
 import fr.nekotine.core.ticking.TickingModule;
 import fr.nekotine.core.ticking.event.TickElapsedEvent;
+import fr.nekotine.core.util.EventUtil;
 import fr.nekotine.core.util.collection.ObservableCollection;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
@@ -233,15 +234,18 @@ public class Vi6PhaseInfiltration extends CollectionPhase<Vi6PhaseInMap, Player>
 
 	/**
 	 * Logs the round's result on one line: why it ended and each artefact's state,
-	 * read from the thieves' check-list.
+	 * read from the thieves' check-list. Then fires {@link Vi6RoundEndEvent}.
 	 */
 	private void logRoundResult(boolean lostTimer) {
 		var inMap = getParent();
-		var artefacts = inMap.getMap().getArtefacts().values().stream().sorted(Comparator.comparing(Artefact::getName))
-				.map(a -> a.getName() + "=" + artefactState(inMap.getThiefArtefactScore(a)))
+		var scores = new LinkedHashMap<String, Integer>();
+		inMap.getMap().getArtefacts().values().stream().sorted(Comparator.comparing(Artefact::getName))
+				.forEach(a -> scores.put(a.getName(), inMap.getThiefArtefactScore(a)));
+		var artefacts = scores.entrySet().stream().map(e -> e.getKey() + "=" + artefactState(e.getValue()))
 				.collect(Collectors.joining(", "));
-		logger.info("Round ended: reason=" + (lostTimer ? "lost-timer" : "all-thieves-left") + ", artefacts=["
-				+ artefacts + "]");
+		var reason = lostTimer ? Vi6RoundEndEvent.Reason.LOST_TIMER : Vi6RoundEndEvent.Reason.ALL_THIEVES_LEFT;
+		logger.info("Round ended: reason=" + reason.code() + ", artefacts=[" + artefacts + "]");
+		EventUtil.call(new Vi6RoundEndEvent(reason, scores));
 	}
 
 	private static String artefactState(int thiefScore) {

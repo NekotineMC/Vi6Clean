@@ -143,6 +143,8 @@ public class Vi6Game implements ForwardingAudience, AutoCloseable, Listener {
 			logger.error("Une erreur est survenue lors du chargement de la game", e);
 			this.close();
 		}
+		// Bukkit stacks a listener registered twice: each start would add a handler
+		EventUtil.unregister(this);
 		EventUtil.register(this);
 	}
 
