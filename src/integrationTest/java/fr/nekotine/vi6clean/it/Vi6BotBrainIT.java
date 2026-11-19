@@ -20,8 +20,8 @@ import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.game.Vi6Game;
+import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
-import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
 import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
@@ -58,7 +58,7 @@ class Vi6BotBrainIT {
 		});
 		assertEquals(4, run("bot add 4 any").size());
 
-		awaitPreparation();
+		awaitInfiltration();
 		var teams = teams();
 		assertEquals(Map.of("Bot_1", "guard", "Bot_2", "thief", "Bot_3", "guard", "Bot_4", "thief"), teams);
 	}
@@ -67,14 +67,14 @@ class Vi6BotBrainIT {
 	void thiefIntentJoinsThiefsAndReadiesAlone() throws Exception {
 		// The join path makes a lone player a guard: only the brain makes it a thief
 		assertEquals(List.of("Bot_1 ajouté (thief)"), run("bot add 1 thief"));
-		awaitPreparation();
+		awaitInfiltration();
 		assertEquals(Map.of("Bot_1", "thief"), teams());
 	}
 
 	@Test
 	void anyBotsBalanceAgainInTheNextLobby() throws Exception {
 		run("bot add 4 any");
-		awaitPreparation();
+		awaitInfiltration();
 		PaperServer.onMain(() -> {
 			var roster = Ioc.resolve(BotRoster.class);
 			for (var bot : roster.list()) {
@@ -91,14 +91,15 @@ class Vi6BotBrainIT {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
 			return null;
 		});
-		awaitPreparation();
+		awaitInfiltration();
 		assertEquals(Map.of("Bot_1", "guard", "Bot_3", "thief"), teams());
 	}
 
-	private static void awaitPreparation() throws Exception {
-		// The lobby completes only once every player in it is ready
+	private static void awaitInfiltration() throws Exception {
+		// The lobby completes only once every player in it is ready, then
+		// preparation only once every player readies up again, well before its timer
 		PaperServer.awaitUntil(
-				() -> Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhasePreparation.class) != null, 200);
+				() -> Ioc.resolve(Vi6Game.class).getPhaseMachine().getPhase(Vi6PhaseInfiltration.class) != null, 200);
 	}
 
 	private static Map<String, String> teams() throws Exception {

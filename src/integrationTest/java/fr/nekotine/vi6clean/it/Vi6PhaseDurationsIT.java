@@ -20,6 +20,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.vi6clean.bot.LobbyBrain;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
@@ -103,8 +104,15 @@ class Vi6PhaseDurationsIT {
 		});
 		try (var capture = new LogCapture()) {
 			// Separate thief and guard adds would start preparation before the guards join
-			assertTrue(PaperServer.onMain(() -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bot add 4 any")),
-					"bot add not dispatched");
+			assertTrue(PaperServer.onMain(() -> {
+				var added = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bot add 4 any");
+				// Preparation brains would end preparation before its timer: lobby only
+				var bots = Ioc.resolve(ModuleManager.class).get(Vi6Bots.class);
+				for (var bot : Ioc.resolve(BotRoster.class).list()) {
+					bots.setBrain(bot, new LobbyBrain(bots.getIntent(bot)));
+				}
+				return added;
+			}), "bot add not dispatched");
 
 			int preparationStart = awaitPhase(Vi6PhasePreparation.class, 200);
 			// The lost timer ends the round only with thieves in the map
