@@ -1,5 +1,8 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6Asserts.assertAround;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.awaitPhase;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.spongepowered.configurate.yaml.NodeStyle;
@@ -23,7 +27,6 @@ import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.LobbyBrain;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
@@ -32,11 +35,9 @@ import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
 /**
  * Phases read their durations from the live config when they are built, so a
  * test shortens a round by setting them in memory and restores them with
- * {@link ConfigManager#tryLoad()}.
+ * {@link ConfigManager#tryLoad()}, which {@link Vi6TestHooks#reset()} calls.
  */
 class Vi6PhaseDurationsIT {
-
-	private static final int TOLERANCE_TICKS = 5;
 
 	@BeforeAll
 	static void waitForAsyncConfigLoad() throws Exception {
@@ -44,24 +45,15 @@ class Vi6PhaseDurationsIT {
 		PaperServer.awaitTicks(40);
 	}
 
+	@BeforeEach
+	void resetBefore() throws Exception {
+		Vi6TestHooks.reset();
+	}
+
 	@AfterEach
-	void reset() throws Exception {
-		PaperServer.onMain(() -> {
-			// Nothing saves the in-memory config: reloading the file undoes the test's
-			// changes
-			Ioc.resolve(ConfigManager.class).tryLoad();
-			var roster = Ioc.resolve(BotRoster.class);
-			for (var bot : roster.list()) {
-				roster.remove(bot);
-			}
-			return null;
-		});
-		PaperServer.awaitTicks(2);
-		PaperServer.onMain(() -> {
-			Ioc.resolve(Vi6Game.class).getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
-			return null;
-		});
-		PaperServer.awaitTicks(2);
+	void resetForOtherTests() throws Exception {
+		// Reloads config.yml: nothing saves the in-memory durations
+		Vi6TestHooks.reset();
 	}
 
 	@Test
@@ -102,6 +94,8 @@ class Vi6PhaseDurationsIT {
 			config.infiltration().endSpectatorTime(Duration.ofMillis(500));
 			return null;
 		});
+		// No KoTH: a random roll would vary the round between repetitions
+		Vi6TestHooks.forceKoths();
 		try (var capture = new LogCapture()) {
 			// Separate thief and guard adds would start preparation before the guards join
 			assertTrue(PaperServer.onMain(() -> {
@@ -131,26 +125,5 @@ class Vi6PhaseDurationsIT {
 			assertAround(60 + 10, lobbyStart - infiltrationStart, "infiltration lost timer + end spectator time");
 			assertEquals(List.of(), capture.failures(), "an exception was logged during the round");
 		}
-	}
-
-	private static int awaitPhase(Class<?> phase, int timeoutTicks) throws Exception {
-		var reachedAt = new int[]{-1};
-		PaperServer.awaitUntil(() -> {
-			if (game().getPhaseMachine().getPhase(phase) != null) {
-				reachedAt[0] = Bukkit.getCurrentTick();
-				return true;
-			}
-			return false;
-		}, timeoutTicks);
-		return reachedAt[0];
-	}
-
-	private static void assertAround(int expectedTicks, int actualTicks, String what) {
-		assertTrue(Math.abs(actualTicks - expectedTicks) <= TOLERANCE_TICKS,
-				what + ": expected " + expectedTicks + " ticks (±" + TOLERANCE_TICKS + "), was " + actualTicks);
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }

@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,7 +19,6 @@ import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.Vi6Commands;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
@@ -243,9 +243,5 @@ class Vi6SpawnSelectIT {
 	private static void assertClean(LogCapture capture) {
 		assertEquals(List.of(), capture.failures(), "an exception was logged");
 		assertEquals(List.of(), capture.errors(), "an error was logged");
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }

@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,7 +29,6 @@ import fr.nekotine.vi6clean.bot.BotTeamIntent;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.bot.Vi6Run;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
@@ -247,9 +247,5 @@ class Vi6BotRunIT {
 		var sender = Bukkit.createCommandSender(c -> out.add(PlainTextComponentSerializer.plainText().serialize(c)));
 		assertTrue(Bukkit.dispatchCommand(sender, command), "command not dispatched: " + command);
 		return out;
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }

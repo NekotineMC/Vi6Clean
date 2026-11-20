@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6Asserts.assertNearHorizontally;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -18,7 +20,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.logging.log4j.Level;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.junit.jupiter.api.AfterEach;
@@ -32,7 +33,6 @@ import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.configuration.GameConfig;
 import fr.nekotine.vi6clean.constant.InMapState;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.Vi6Game.ForcedKoth;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInMap;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
@@ -62,7 +62,6 @@ class Vi6TestHooksIT {
 	@RepeatedTest(3)
 	void hooksSetAnInfiltrationUp() throws Exception {
 		Vi6TestHooks.reset();
-		// Assertion errors inside onMain only reach the log: the capture sees them
 		try (var capture = new LogCapture()) {
 			assertCleanLobby();
 			var bots = Vi6TestHooks.spawnBots(2);
@@ -83,7 +82,7 @@ class Vi6TestHooksIT {
 				assertEquals(InMapState.ENTERING, wrapping.getWrapper(thief, InMapPhasePlayerWrapper.class).getState(),
 						"thief state");
 				var spawn = Vi6TestHooks.thiefSpawn(null).getSpawnPoint().toLocation(game().getWorld());
-				assertNear(spawn, thief.getLocation(), 4, "thief not at the first thief spawn");
+				assertNearHorizontally(spawn, thief.getLocation(), 4, "thief not at the first thief spawn");
 				assertTrue(wrapping.getWrapper(guard, InMapPhasePlayerWrapper.class).isInside(), "guard not inside");
 				var effects = new TreeMap<String, String>();
 				map.getKoths().forEach((name, koth) -> {
@@ -119,7 +118,7 @@ class Vi6TestHooksIT {
 			Vi6TestHooks.place(guard, target);
 			// Read after the ack: a refused teleport would have been rolled back
 			PaperServer.onMain(() -> {
-				assertNear(target, guard.getLocation(), 0.6, "guard not placed");
+				assertNearHorizontally(target, guard.getLocation(), 0.6, "guard not placed");
 				return null;
 			});
 			assertEquals(List.of(), capture.failures(), "an exception was logged");
@@ -130,7 +129,6 @@ class Vi6TestHooksIT {
 	@RepeatedTest(3)
 	void resetCleansAGameUp() throws Exception {
 		Vi6TestHooks.reset();
-		// Assertion errors inside onMain only reach the log: the capture sees them
 		try (var capture = new LogCapture()) {
 			assertCleanLobby();
 			var original = PaperServer.onMain(() -> {
@@ -209,7 +207,6 @@ class Vi6TestHooksIT {
 	@RepeatedTest(3)
 	void forcedKothsAreCheckedAndCanBeEmpty() throws Exception {
 		Vi6TestHooks.reset();
-		// Assertion errors inside onMain only reach the log: the capture sees them
 		try (var capture = new LogCapture()) {
 			assertCleanLobby();
 			var bots = Vi6TestHooks.spawnBots(2);
@@ -262,7 +259,6 @@ class Vi6TestHooksIT {
 	@RepeatedTest(3)
 	void hooksGoToPreparationAndANamedThiefSpawn() throws Exception {
 		Vi6TestHooks.reset();
-		// Assertion errors inside onMain only reach the log: the capture sees them
 		try (var capture = new LogCapture()) {
 			assertCleanLobby();
 			var bots = Vi6TestHooks.spawnBots(2);
@@ -286,7 +282,7 @@ class Vi6TestHooksIT {
 			Vi6TestHooks.goToInfiltration(spawnName);
 			PaperServer.onMain(() -> {
 				var spawn = Vi6TestHooks.thiefSpawn(spawnName).getSpawnPoint().toLocation(game().getWorld());
-				assertNear(spawn, thief.getLocation(), 4, "thief not at thief spawn " + spawnName);
+				assertNearHorizontally(spawn, thief.getLocation(), 4, "thief not at thief spawn " + spawnName);
 				return null;
 			});
 
@@ -420,19 +416,7 @@ class Vi6TestHooksIT {
 		});
 	}
 
-	private static void assertNear(Location expected, Location actual, double yTolerance, String what) {
-		assertEquals(expected.getWorld(), actual.getWorld(), what + ": world");
-		var dx = expected.getX() - actual.getX();
-		var dz = expected.getZ() - actual.getZ();
-		assertTrue(Math.sqrt(dx * dx + dz * dz) < 0.1 && Math.abs(expected.getY() - actual.getY()) < yTolerance,
-				what + ": expected " + expected.toVector() + ", was " + actual.toVector());
-	}
-
 	private static GameConfig config() {
 		return Ioc.resolve(ConfigManager.class).getConfig().game();
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }

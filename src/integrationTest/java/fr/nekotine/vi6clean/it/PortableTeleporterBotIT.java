@@ -1,5 +1,7 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6Asserts.assertNear;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +35,6 @@ import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.bot.BotState;
 import fr.nekotine.core.ioc.Ioc;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.tool.Tool;
 import fr.nekotine.vi6clean.tool.ToolHandler;
@@ -366,12 +367,6 @@ class PortableTeleporterBotIT {
 		assertNear(feet, at, what);
 	}
 
-	private static void assertNear(Location expected, Location actual, String what) {
-		assertEquals(expected.getWorld(), actual.getWorld(), what + ": world");
-		assertTrue(expected.toVector().distance(actual.toVector()) < 0.1,
-				what + ": expected " + expected.toVector() + ", was " + actual.toVector());
-	}
-
 	/**
 	 * @return a listener recording each {@code ENTITY_METADATA} packet sent to
 	 *         {@code viewer}, after every other listener changed it
@@ -404,9 +399,5 @@ class PortableTeleporterBotIT {
 	}
 
 	private record Sample(int tick, Location location) {
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }
