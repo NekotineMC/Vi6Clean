@@ -3,6 +3,8 @@ package fr.nekotine.vi6clean.it;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import org.bukkit.Location;
 
 /** Assertions shared by the integration tests. */
@@ -47,5 +49,14 @@ public final class Vi6Asserts {
 		var dz = expected.getZ() - actual.getZ();
 		assertTrue(Math.sqrt(dx * dx + dz * dz) < NEAR_BLOCKS && Math.abs(expected.getY() - actual.getY()) < yTolerance,
 				what + ": expected " + expected.toVector() + ", was " + actual.toVector());
+	}
+
+	/**
+	 * Asserts that {@code capture} holds no line with an exception and no error
+	 * line.
+	 */
+	static void assertCleanLog(LogCapture capture) {
+		assertEquals(List.of(), capture.failures(), "an exception was logged");
+		assertEquals(List.of(), capture.errors(), "an error was logged");
 	}
 }

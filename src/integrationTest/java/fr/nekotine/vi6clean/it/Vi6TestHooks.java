@@ -1,10 +1,13 @@
 package fr.nekotine.vi6clean.it;
 
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,6 +21,7 @@ import fr.nekotine.core.map.IMapModule;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.bot.Vi6GameReset;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.Vi6Game.ForcedKoth;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
@@ -28,17 +32,31 @@ import fr.nekotine.vi6clean.tool.Tool;
 import fr.nekotine.vi6clean.tool.ToolHandler;
 import fr.nekotine.vi6clean.tool.ToolHandlerContainer;
 import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 
 /**
- * Sets a Vi6 game up for a test and resets it between tests. Call from the test
- * thread: each hook runs its game work on the main thread, and the hooks that
- * then wait {@link #ACK_TICKS} ticks, long enough for a bot to ack, wait off
- * it.
+ * Integration-test support, in two groups. The set-up hooks set a Vi6 game up
+ * for a test and reset it between tests: call them from the test thread; each
+ * runs its game work on the main thread, and those that then wait
+ * {@link #ACK_TICKS} ticks, long enough for a bot to ack, wait off it. The run
+ * and log helpers ({@link #shortTimersWithoutKoths}, {@link #run},
+ * {@link #dispatch}, {@link #awaitGameEnded}, {@link #gameEndedLines},
+ * {@link #savedFiles}) drive and check {@code /bot run} games, which tests of
+ * an unattended run use instead of the set-up hooks.
  */
 public final class Vi6TestHooks {
 
 	/** Ticks for a teleport to reach a bot and its ack to come back. */
 	private static final int ACK_TICKS = 3;
+
+	/** Ticks a game of a {@code /bot run} may take, map loads included. */
+	public static final int GAME_TIMEOUT_TICKS = 600;
+
+	/** The summary line {@code Vi6Run} logs for each game of a run. */
+	public static final Pattern GAME_ENDED = Pattern.compile(
+			"Game ended: game=(\\d+), reason=(lost-timer|all-thieves-left), stolen=(\\d+), escaped=(\\d+), duration=(\\d+)s");
 
 	private Vi6TestHooks() {
 	}
@@ -229,5 +247,75 @@ public final class Vi6TestHooks {
 	/** @return the Vi6 game */
 	public static Vi6Game game() {
 		return Ioc.resolve(Vi6Game.class);
+	}
+
+	/**
+	 * Short phases and no KoTH, until {@link #reset()}: a game of an idle-bot run
+	 * then ends on the lost timer within {@link #GAME_TIMEOUT_TICKS}.
+	 */
+	public static void shortTimersWithoutKoths() throws Exception {
+		PaperServer.onMain(() -> {
+			var config = Ioc.resolve(ConfigManager.class).getConfig().game();
+			config.preparation().duration(Duration.ofSeconds(2));
+			config.infiltration().lostDuration(Duration.ofSeconds(3));
+			config.infiltration().endSpectatorTime(Duration.ofMillis(500));
+			return null;
+		});
+		forceKoths();
+	}
+
+	/**
+	 * Waits for a {@code Game ended: game=<game>} line, then asserts it is the only
+	 * one.
+	 */
+	public static void awaitGameEnded(LogCapture capture, int game) throws Exception {
+		PaperServer.awaitUntil(() -> !gameEndedLines(capture, game).isEmpty(), GAME_TIMEOUT_TICKS);
+		var lines = gameEndedLines(capture, game);
+		if (lines.size() != 1) {
+			throw new AssertionError("game " + game + " lines: " + lines);
+		}
+	}
+
+	/**
+	 * @return the captured {@code Game ended: game=<game>} lines, each asserted
+	 *         {@link #GAME_ENDED well-formed}
+	 */
+	public static List<String> gameEndedLines(LogCapture capture, int game) {
+		var lines = capture.messages().stream().filter(m -> m.startsWith("Game ended: game=" + game + ",")).toList();
+		for (var line : lines) {
+			if (!GAME_ENDED.matcher(line).matches()) {
+				throw new AssertionError("malformed line: " + line);
+			}
+		}
+		return lines;
+	}
+
+	/** @return the player's data, stats and advancements files; main thread only */
+	public static List<Path> savedFiles(Player player) {
+		var server = MinecraftServer.getServer();
+		var uuid = player.getUniqueId().toString();
+		return List.of(server.getWorldPath(LevelResource.PLAYER_DATA_DIR).resolve(uuid + ".dat"),
+				server.getWorldPath(LevelResource.PLAYER_STATS_DIR).resolve(uuid + ".json"),
+				server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve(uuid + ".json"));
+	}
+
+	/** Dispatches {@code command} on the main thread; see {@link #dispatch}. */
+	public static List<String> run(String command) throws Exception {
+		return PaperServer.onMain(() -> dispatch(command));
+	}
+
+	/**
+	 * Dispatches {@code command} as {@link Bukkit#dispatchCommand} does, from a
+	 * sender that records what it is sent. Main thread only.
+	 *
+	 * @return the plain text of the messages sent back
+	 */
+	public static List<String> dispatch(String command) {
+		var out = new ArrayList<String>();
+		var sender = Bukkit.createCommandSender(c -> out.add(PlainTextComponentSerializer.plainText().serialize(c)));
+		if (!Bukkit.dispatchCommand(sender, command)) {
+			throw new AssertionError("command not dispatched: " + command);
+		}
+		return out;
 	}
 }
