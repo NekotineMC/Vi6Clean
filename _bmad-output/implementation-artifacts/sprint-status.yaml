@@ -65,7 +65,7 @@ development_status:
   4-3-bot-brains-get-through-preparation-and-stay-idle-in-map: done
   4-4-the-operator-starts-an-unattended-run-with-one-command: done
   4-5-a-soak-test-runs-4-bot-and-6-bot-games-to-a-result: done
-  4-6-unattended-runs-work-on-the-dev-server: backlog
+  4-6-unattended-runs-work-on-the-dev-server: review
   epic-4-retrospective: optional
 
   epic-5: backlog

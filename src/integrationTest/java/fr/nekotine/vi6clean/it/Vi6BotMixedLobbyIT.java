@@ -14,12 +14,14 @@ import java.util.TreeMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 
 import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
@@ -38,6 +40,11 @@ class Vi6BotMixedLobbyIT {
 
 	private static final List<String> BOTS = List.of("Bot_1", "Bot_2", "Bot_3");
 
+	@BeforeEach
+	void shortLobbyReadyDelay() throws Exception {
+		Vi6TestHooks.shortLobbyReadyDelay();
+	}
+
 	@AfterEach
 	void resetToLobby() throws Exception {
 		PaperServer.onMain(() -> {
@@ -50,6 +57,8 @@ class Vi6BotMixedLobbyIT {
 		PaperServer.awaitTicks(2);
 		PaperServer.onMain(() -> {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
+			// Undoes the short lobby ready delay
+			Ioc.resolve(ConfigManager.class).tryLoad();
 			return null;
 		});
 		PaperServer.awaitTicks(2);

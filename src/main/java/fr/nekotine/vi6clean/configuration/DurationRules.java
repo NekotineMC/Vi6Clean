@@ -70,21 +70,24 @@ final class DurationRules {
 	}
 
 	/**
-	 * Resets every invalid phase duration of {@code config} to its default.
+	 * Resets every invalid duration of {@code config} (phase durations and the bot
+	 * lobby ready delay) to its default.
 	 *
 	 * @return one warning per reset key, empty when all are valid
 	 */
 	static List<String> resetInvalidDurations(Vi6Config config) {
 		var warnings = new ArrayList<String>();
 		var game = config.game();
-		if (game == null) {
-			return warnings;
+		if (game != null) {
+			if (game.preparation() != null) {
+				game.preparation().resetInvalidDurations("game.preparation", warnings);
+			}
+			if (game.infiltration() != null) {
+				game.infiltration().resetInvalidDurations("game.infiltration", warnings);
+			}
 		}
-		if (game.preparation() != null) {
-			game.preparation().resetInvalidDurations("game.preparation", warnings);
-		}
-		if (game.infiltration() != null) {
-			game.infiltration().resetInvalidDurations("game.infiltration", warnings);
+		if (config.bots() != null) {
+			config.bots().resetInvalidDurations("bots", warnings);
 		}
 		return warnings;
 	}

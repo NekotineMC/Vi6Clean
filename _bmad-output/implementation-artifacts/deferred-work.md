@@ -160,3 +160,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-5-a-soak-test-runs-4-bot-and-6-bot-games-to-a-result.md`
   summary: The soak test's "no stale `Bot_` scoreboard entry" check cannot fail for first-run bots, because the 6-bot run reuses `Bot_1`..`Bot_4` and all are online again when it runs.
   evidence: Review pass 1 (edge-case, verification-gap). The check moved verbatim from `Vi6BotRunIT`, which had the same weakness. `Vi6TestHooksIT` already pins per-name scoreboard cleanup after `reset()`. A real check would record the first run's scores and teams per name and assert them reset before the new bots join.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-6-unattended-runs-work-on-the-dev-server.md`
+  summary: Add a `/bot stop` command that ends an unattended run and leaves an empty lobby.
+  evidence: A run loops until the next `bot run` or a reset; on the dev server the only console way to stop one is `bot remove all`, and the next `bot run` must land inside the 10 s lobby ready delay.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-4-6-unattended-runs-work-on-the-dev-server.md`
+  summary: `Vi6BotBrainIT` sets the short lobby ready delay without the 40-tick wait for the async config load that five other ITs do (unverified, medium if true).
+  evidence: If `ConfigManager.setupAsync` can finish after the class's first test starts, the loaded config replaces the 1 s delay and the brain tests wait 10 s per lobby or time out. Settle by checking when the async load completes relative to the first IT.
