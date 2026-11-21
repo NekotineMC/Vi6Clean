@@ -7,12 +7,16 @@ import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.core.wrapper.WrappingModule;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.wrapper.LobbyPhasePlayerWrapper;
+import io.papermc.paper.util.Tick;
 
 /**
- * In each lobby, joins the team of its intent with {@code /game team}, then
- * readies up with {@code /game ready}, once.
+ * In each lobby, joins the team of its intent with {@code /game team} at once,
+ * then readies up with {@code /game ready} once
+ * {@code bots.lobby-ready-delay-seconds} have passed, so an operator can still
+ * type between two games of a run.
  */
 public class LobbyBrain implements BotBrain {
 
@@ -23,6 +27,14 @@ public class LobbyBrain implements BotBrain {
 	private @Nullable LobbyPhasePlayerWrapper actedIn;
 
 	private @Nullable BotTeamIntent picked;
+
+	// Ticks since this brain's first tick in the current lobby
+	private int ticksInLobby;
+
+	// The ready delay in ticks, read when the lobby is first seen
+	private int readyAfterTicks;
+
+	private boolean readied;
 
 	public LobbyBrain(BotTeamIntent intent) {
 		this.intent = intent;
@@ -35,15 +47,24 @@ public class LobbyBrain implements BotBrain {
 		if (wrapper == null) {
 			actedIn = null;
 			picked = null;
+			readied = false;
 			return;
 		}
-		if (wrapper == actedIn) {
-			return;
+		if (wrapper != actedIn) {
+			actedIn = wrapper;
+			ticksInLobby = 0;
+			readied = false;
+			readyAfterTicks = Tick.tick()
+					.fromDuration(Ioc.resolve(ConfigManager.class).getConfig().bots().lobbyReadyDelay());
+			picked = pickTeam(bot);
+			bot.sendCommand("game team " + picked.code());
+		} else {
+			ticksInLobby++;
 		}
-		actedIn = wrapper;
-		picked = pickTeam(bot);
-		bot.sendCommand("game team " + picked.code());
-		bot.sendCommand("game ready");
+		if (!readied && ticksInLobby >= readyAfterTicks) {
+			readied = true;
+			bot.sendCommand("game ready");
+		}
 	}
 
 	/**

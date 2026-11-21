@@ -48,6 +48,7 @@ class Vi6PhaseDurationsIT {
 	@BeforeEach
 	void resetBefore() throws Exception {
 		Vi6TestHooks.reset();
+		Vi6TestHooks.shortLobbyReadyDelay();
 	}
 
 	@AfterEach
