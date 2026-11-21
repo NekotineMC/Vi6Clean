@@ -136,5 +136,5 @@ action_items:
       Vi6TestHooks.reset() and forced KoTHs, delete the stale onMain comments in Vi6TestHooksIT
       (A2, A4, F11)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
