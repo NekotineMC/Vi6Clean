@@ -1,5 +1,9 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6Asserts.TOLERANCE_TICKS;
+import static fr.nekotine.vi6clean.it.Vi6Asserts.assertAround;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.awaitPhase;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -62,8 +66,6 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
  * the round ending when the last thief escapes.
  */
 class Vi6PhaseMachineBotIT {
-
-	private static final int TOLERANCE_TICKS = 5;
 
 	/** Ticks for a control to reach the server and the bot to stop moving. */
 	private static final int SETTLE_TICKS = 5;
@@ -731,28 +733,5 @@ class Vi6PhaseMachineBotIT {
 	private static String expectedResult(String reason, List<String> artefacts, Map<String, String> states) {
 		return RESULT_PREFIX + "reason=" + reason + ", artefacts=[" + artefacts.stream()
 				.map(a -> a + "=" + states.getOrDefault(a, "safe")).collect(Collectors.joining(", ")) + "]";
-	}
-
-	// Phases
-
-	private static int awaitPhase(Class<?> phase, int timeoutTicks) throws Exception {
-		var reachedAt = new int[]{-1};
-		PaperServer.awaitUntil(() -> {
-			if (game().getPhaseMachine().getPhase(phase) != null) {
-				reachedAt[0] = Bukkit.getCurrentTick();
-				return true;
-			}
-			return false;
-		}, timeoutTicks);
-		return reachedAt[0];
-	}
-
-	private static void assertAround(int expectedTicks, int actualTicks, String what) {
-		assertTrue(Math.abs(actualTicks - expectedTicks) <= TOLERANCE_TICKS,
-				what + ": expected " + expectedTicks + " ticks (±" + TOLERANCE_TICKS + "), was " + actualTicks);
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }

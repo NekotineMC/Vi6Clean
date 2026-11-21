@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -207,7 +208,26 @@ public final class Vi6TestHooks {
 				.sorted(Comparator.comparingDouble(Location::getX).thenComparingDouble(Location::getZ)).toList();
 	}
 
-	private static Vi6Game game() {
+	/**
+	 * Waits until the game is in {@code phase}, failing with an
+	 * {@link AssertionError} after {@code timeoutTicks} ticks.
+	 *
+	 * @return the server tick at which the phase was first seen
+	 */
+	public static int awaitPhase(Class<?> phase, int timeoutTicks) throws Exception {
+		var reachedAt = new int[]{-1};
+		PaperServer.awaitUntil(() -> {
+			if (game().getPhaseMachine().getPhase(phase) != null) {
+				reachedAt[0] = Bukkit.getCurrentTick();
+				return true;
+			}
+			return false;
+		}, timeoutTicks);
+		return reachedAt[0];
+	}
+
+	/** @return the Vi6 game */
+	public static Vi6Game game() {
 		return Ioc.resolve(Vi6Game.class);
 	}
 }

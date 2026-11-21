@@ -1,5 +1,6 @@
 package fr.nekotine.vi6clean.it;
 
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,7 +27,6 @@ import fr.nekotine.vi6clean.bot.PhaseBrain;
 import fr.nekotine.vi6clean.bot.PreparationBrain;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
-import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
 import fr.nekotine.vi6clean.wrapper.PreparationPhasePlayerWrapper;
@@ -234,9 +234,5 @@ class Vi6BotPreparationIT {
 
 	private static Vi6Bots vi6Bots() {
 		return Ioc.resolve(ModuleManager.class).get(Vi6Bots.class);
-	}
-
-	private static Vi6Game game() {
-		return Ioc.resolve(Vi6Game.class);
 	}
 }
