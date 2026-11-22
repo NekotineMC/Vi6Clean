@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 2026-11-21
+last_updated: 11-22-2026 16:45
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -66,7 +66,7 @@ development_status:
   4-4-the-operator-starts-an-unattended-run-with-one-command: done
   4-5-a-soak-test-runs-4-bot-and-6-bot-games-to-a-result: done
   4-6-unattended-runs-work-on-the-dev-server: done
-  epic-4-retrospective: optional
+  epic-4-retrospective: done
 
   epic-5: backlog
   5-1-a-control-port-lets-strategies-drive-a-body-with-a-priority: backlog
@@ -138,3 +138,36 @@ action_items:
     owner: "dev"
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-11-17.md"
+  - id: "epic-4-retro-item-7-before-epic-5-make-a-stalled-run-visible"
+    epic: 4
+    action: "Before Epic 5: make a stalled run visible: Vi6Run warns once when no
+      game ends within lobby delay + preparation + lost timer + a margin, naming the
+      phase and the unready players; a player leaving during the lobby or preparation
+      re-runs that phase's completion check (F1)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
+  - id: "epic-4-retro-item-8-check-bot-run-with-one-human-online-on-t"
+    epic: 4
+    action: "Check /bot run with one human online on the dev server (human kept, 6
+      - humans bots, no-room refusal), record it in a note under _bmad-output/, and
+      retarget or close the deferred-work entry that points at Story 4.6 (F2)"
+    owner: "operator with dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
+  - id: "epic-4-retro-item-9-say-in-the-run-démarré-message-and-the-p"
+    epic: 4
+    action: "Say in the Run démarré message and the pending /bot run operator documentation
+      that the seed replays bot picks, not KoTHs; optionally add seed= to each Game
+      ended line (F5)"
+    owner: "dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
+  - id: "epic-4-retro-item-10-when-a-story-starts-grep-deferred-work-m"
+    epic: 4
+    action: "When a story starts, grep deferred-work.md and open action_items for
+      its story number, and list each hit in the spec as a task or an explicit non-goal
+      (P1, P2)"
+    owner: "sm/dev"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
