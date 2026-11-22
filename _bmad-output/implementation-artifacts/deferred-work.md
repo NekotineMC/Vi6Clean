@@ -69,10 +69,10 @@
   evidence: Review pass 2 (B2-1), medium, unverified for future code: an override without a `super` call (e.g. a new `BotConnection` override in 1.6/1.7) would silently stop being called after a Paper re-signature, and the self-test would pass.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
   summary: Bots apply server-sent knockback: record `ClientboundSetEntityMotionPacket` for the bot's own entity (and explosion knockback) in `BotConnection#send` and start the next physics step from that velocity.
-  evidence: User decision (2026-11-10) while planning Story 1.6: deferred, likely to Epic 5 melee; until then bots ignore hits and explosions.
+  evidence: User decision (2026-11-10) while planning Story 1.6: deferred, likely to Epic 5 melee; until then bots ignore hits and explosions. Retargeted to Story 6.1 by Story 5.1 (Epic 4 retro item 10): melee moved to Epic 6.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-6-bots-walk-look-jump-sneak-and-sprint-through-real-packets.md`
   summary: Resync a bot's sprint (and sneak) with the server: when the sprint key is held but the server cleared sprinting (attack, damage, a cancelled `PlayerToggleSprintEvent`), resend START_SPRINTING as a client does.
-  evidence: Review pass 1 (B2/E2), medium: `apply()` compares only with the last sent input, so after `setSprinting(false)` on the server `setSprint(true)` is a no-op until toggled off and on; matters once bots attack (Story 1.7, Epic 5 melee).
+  evidence: Review pass 1 (B2/E2), medium: `apply()` compares only with the last sent input, so after `setSprinting(false)` on the server `setSprint(true)` is a no-op until toggled off and on; matters once bots attack (Story 1.7, Epic 5 melee). Retargeted to Story 6.1 by Story 5.1 (Epic 4 retro item 10): melee moved to Epic 6.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-7-bots-use-their-hands-send-commands-and-respawn.md`
   summary: Add a release-use-item control (`ServerboundPlayerActionPacket` RELEASE_USE_ITEM) so bots can draw and loose bows, crossbows and tridents, eat on demand and stop blocking.
   evidence: Story 1.7 scope (Never list): `useItem` only starts using an item; stopping early needs the release packet.
@@ -172,3 +172,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-epic-4-retro-1-make-a-stalled-run-visible.md`
   summary: Add a regression test for `Vi6GameReset.clearBots()` leaving the remaining lobby players unready, so a `/bot run` rollback cannot start a game for a ready human alone.
   evidence: The IT harness cannot put a non-bot player online and `clearBots()` removes every bot, so the step is untested; extracting it into a `Vi6PhaseLobby` method would make it testable with ready bots.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-1-a-control-port-lets-strategies-drive-a-body-with-a-priority.md`
+  summary: `NekotineCore/AGENTS.md` still says every file under `core/src/test` is commented out and `gradlew test` runs zero tests; Story 5.1 added `ControlArbiterTest` and the JUnit launcher that lets `core` tests run.
+  evidence: Review pass 1 (verification gap). Agent-context files are edited outside story builds; refresh the line with bmad-project-context in NekotineCore.
