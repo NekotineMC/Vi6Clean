@@ -21,9 +21,9 @@ import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 /**
- * Phase durations: the setters reject what is not between 1 tick and
- * {@link Integer#MAX_VALUE} ticks, and an invalid value in {@code config.yml}
- * falls back to its key's default with a warning.
+ * Phase durations and the bot lobby ready delay: the setters reject what is not
+ * between 1 tick and {@link Integer#MAX_VALUE} ticks, and an invalid value in
+ * {@code config.yml} falls back to its key's default with a warning.
  */
 class PhaseDurationValidationTest {
 
@@ -45,7 +45,8 @@ class PhaseDurationValidationTest {
 				new Field("lostDuration", infiltration::lostDuration, infiltration::lostDuration),
 				new Field("delayBetweenCapture", infiltration::delayBetweenCapture, infiltration::delayBetweenCapture),
 				new Field("delayBeforeEscape", infiltration::delayBeforeEscape, infiltration::delayBeforeEscape),
-				new Field("endSpectatorTime", infiltration::endSpectatorTime, infiltration::endSpectatorTime));
+				new Field("endSpectatorTime", infiltration::endSpectatorTime, infiltration::endSpectatorTime),
+				new Field("lobbyReadyDelay", config.bots()::lobbyReadyDelay, config.bots()::lobbyReadyDelay));
 	}
 
 	static Stream<Arguments> validValues() {
@@ -100,6 +101,35 @@ class PhaseDurationValidationTest {
 				"warning does not name the key and the bad value " + expectedValue + ": " + warning);
 		assertTrue(warning.contains("0.05 s") && warning.contains("107374182.35 s"),
 				"warning does not give the bounds in seconds: " + warning);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {"-1", ".nan", "0"})
+	void invalidLobbyReadyDelayFallsBackToTenSeconds(String yamlValue) throws Exception {
+		var config = load("""
+				game:
+				  preparation:
+				    duration-seconds: 12
+				bots:
+				  lobby-ready-delay-seconds: %s
+				""".formatted(yamlValue));
+		var warnings = DurationRules.resetInvalidDurations(config);
+
+		assertEquals(Duration.ofSeconds(10), config.bots().lobbyReadyDelay(), "bad delay not defaulted");
+		assertEquals(Duration.ofSeconds(12), config.game().preparation().duration(), "valid key not kept");
+		assertEquals(1, warnings.size(), "warnings: " + warnings);
+		assertTrue(warnings.get(0).contains("bots.lobby-ready-delay-seconds: "),
+				"warning does not name the key: " + warnings.get(0));
+	}
+
+	@Test
+	void validLobbyReadyDelayIsKept() throws Exception {
+		var config = load("""
+				bots:
+				  lobby-ready-delay-seconds: 1.5
+				""");
+		assertEquals(List.of(), DurationRules.resetInvalidDurations(config));
+		assertEquals(Duration.ofMillis(1500), config.bots().lobbyReadyDelay());
 	}
 
 	@Test

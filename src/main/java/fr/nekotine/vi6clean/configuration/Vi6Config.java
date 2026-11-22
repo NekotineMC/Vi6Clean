@@ -12,6 +12,9 @@ public class Vi6Config {
 	@Comment("Configuration des différentes étapes de la partie")
 	private GameConfig game = new GameConfig();
 
+	@Comment("Configuration des bots")
+	private BotsConfig bots = new BotsConfig();
+
 	public boolean override_config() {
 		return override_config;
 	}
@@ -28,6 +31,14 @@ public class Vi6Config {
 
 	public void game(GameConfig value) {
 		game = value;
+	}
+
+	public BotsConfig bots() {
+		return bots;
+	}
+
+	public void bots(BotsConfig value) {
+		bots = value;
 	}
 
 }

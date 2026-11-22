@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bukkit.Bukkit;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,7 @@ import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
+import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
@@ -30,6 +32,11 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
  * lobby advances with no human.
  */
 class Vi6BotBrainIT {
+
+	@BeforeEach
+	void shortLobbyReadyDelay() throws Exception {
+		Vi6TestHooks.shortLobbyReadyDelay();
+	}
 
 	@AfterEach
 	void resetToLobby() throws Exception {
@@ -43,6 +50,8 @@ class Vi6BotBrainIT {
 		PaperServer.awaitTicks(2);
 		PaperServer.onMain(() -> {
 			Ioc.resolve(Vi6Game.class).getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
+			// Undoes the short lobby ready delay
+			Ioc.resolve(ConfigManager.class).tryLoad();
 			return null;
 		});
 		PaperServer.awaitTicks(2);

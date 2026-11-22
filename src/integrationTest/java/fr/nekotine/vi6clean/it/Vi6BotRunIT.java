@@ -2,7 +2,9 @@ package fr.nekotine.vi6clean.it;
 
 import static fr.nekotine.vi6clean.it.Vi6Asserts.assertCleanLog;
 import static fr.nekotine.vi6clean.it.Vi6TestHooks.GAME_TIMEOUT_TICKS;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.SHORT_LOBBY_READY_DELAY_TICKS;
 import static fr.nekotine.vi6clean.it.Vi6TestHooks.awaitGameEnded;
+import static fr.nekotine.vi6clean.it.Vi6TestHooks.dispatch;
 import static fr.nekotine.vi6clean.it.Vi6TestHooks.game;
 import static fr.nekotine.vi6clean.it.Vi6TestHooks.run;
 import static fr.nekotine.vi6clean.it.Vi6TestHooks.shortTimersWithoutKoths;
@@ -24,18 +26,22 @@ import fr.nekotine.core.bot.Bot;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.bot.BotTeamIntent;
 import fr.nekotine.vi6clean.bot.Vi6Bots;
 import fr.nekotine.vi6clean.bot.Vi6Run;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseInfiltration;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
 import fr.nekotine.vi6clean.game.phase.Vi6PhasePreparation;
+import fr.nekotine.vi6clean.wrapper.LobbyPhasePlayerWrapper;
 import fr.xxgoldenbluexx.paperjunitserver.PaperServer;
 
 /**
  * {@code /bot run} starts an unattended run from a clean roster; its games loop
- * and each logs one summary line once back in the lobby. {@link Vi6SoakIT}
- * checks the phases of a game, a second run's clean start and seed replay.
+ * and each logs one summary line once back in the lobby, where the bots wait
+ * the lobby ready delay before readying up so another run can start.
+ * {@link Vi6SoakIT} checks the phases of a game, a second run's clean start and
+ * seed replay.
  */
 class Vi6BotRunIT {
 
@@ -72,6 +78,54 @@ class Vi6BotRunIT {
 			// The games loop on their own
 			awaitGameEnded(capture, 2);
 
+			assertCleanLog(capture);
+		}
+	}
+
+	private record Start(List<String> out, int tick) {
+	}
+
+	@Test
+	void aRunStartsInTheLobbyWindowOfALoopingRun() throws Exception {
+		Vi6TestHooks.reset();
+		shortTimersWithoutKoths();
+		try (var capture = new LogCapture()) {
+			run("bot run 4 42");
+			awaitGameEnded(capture, 1);
+			// The line is logged the tick after the lobby starts
+			int endedAt = PaperServer.onMain(Bukkit::getCurrentTick);
+			PaperServer.awaitTicks(3);
+			var started = PaperServer.onMain(() -> {
+				assertTrue(Bukkit.getCurrentTick() - endedAt < SHORT_LOBBY_READY_DELAY_TICKS,
+						"too late into the lobby to check the window: " + (Bukkit.getCurrentTick() - endedAt)
+								+ " ticks");
+				var game = game();
+				assertNotNull(game.getPhaseMachine().getPhase(Vi6PhaseLobby.class), "not in the lobby");
+				var wrapping = Ioc.resolve(WrappingModule.class);
+				for (var bot : Ioc.resolve(BotRoster.class).list()) {
+					var player = bot.player();
+					assertTrue(game.getGuards().contains(player) || game.getThiefs().contains(player),
+							bot.name() + " is on no team");
+					var wrapper = wrapping.getWrapperOptional(player, LobbyPhasePlayerWrapper.class).orElseThrow();
+					assertFalse(wrapper.isReadyForNextPhase(), bot.name() + " readied before the delay");
+				}
+				assertCleanLog(capture);
+				capture.clear();
+				return new Start(dispatch("bot run 6 7"), Bukkit.getCurrentTick());
+			});
+			var out = started.out();
+			int startedAt = started.tick();
+			assertEquals(1, out.size(), "start output: " + out);
+			assertTrue(out.getFirst().startsWith("Run démarré: 6 bot(s)"), out.getFirst());
+			assertTrue(capture.messages().contains("Run started: requested=6, added=6, seed=7"),
+					"no start line in " + capture.messages());
+
+			// The new run's bots also wait for the delay before readying up
+			int preparationAt = Vi6TestHooks.awaitPhase(Vi6PhasePreparation.class, 200);
+			assertTrue(preparationAt - startedAt >= SHORT_LOBBY_READY_DELAY_TICKS,
+					"the lobby ended " + (preparationAt - startedAt) + " ticks after the start, before the "
+							+ SHORT_LOBBY_READY_DELAY_TICKS + "-tick ready delay");
+			awaitGameEnded(capture, 1);
 			assertCleanLog(capture);
 		}
 	}

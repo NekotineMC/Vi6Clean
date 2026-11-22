@@ -54,6 +54,9 @@ public final class Vi6TestHooks {
 	/** Ticks a game of a {@code /bot run} may take, map loads included. */
 	public static final int GAME_TIMEOUT_TICKS = 600;
 
+	/** The lobby ready delay {@link #shortLobbyReadyDelay} sets, in ticks. */
+	public static final int SHORT_LOBBY_READY_DELAY_TICKS = 20;
+
 	/** The summary line {@code Vi6Run} logs for each game of a run. */
 	public static final Pattern GAME_ENDED = Pattern.compile(
 			"Game ended: game=(\\d+), reason=(lost-timer|all-thieves-left), stolen=(\\d+), escaped=(\\d+), duration=(\\d+)s");
@@ -250,8 +253,9 @@ public final class Vi6TestHooks {
 	}
 
 	/**
-	 * Short phases and no KoTH, until {@link #reset()}: a game of an idle-bot run
-	 * then ends on the lost timer within {@link #GAME_TIMEOUT_TICKS}.
+	 * Short phases, a {@link #shortLobbyReadyDelay short lobby ready delay} and no
+	 * KoTH, until {@link #reset()}: a game of an idle-bot run then ends on the lost
+	 * timer within {@link #GAME_TIMEOUT_TICKS}.
 	 */
 	public static void shortTimersWithoutKoths() throws Exception {
 		PaperServer.onMain(() -> {
@@ -261,7 +265,23 @@ public final class Vi6TestHooks {
 			config.infiltration().endSpectatorTime(Duration.ofMillis(500));
 			return null;
 		});
+		shortLobbyReadyDelay();
 		forceKoths();
+	}
+
+	/**
+	 * Sets {@code bots.lobby-ready-delay-seconds} to
+	 * {@link #SHORT_LOBBY_READY_DELAY_TICKS} ticks until {@link #reset()} (which
+	 * reloads {@code config.yml}): lobby brains ready up that long after their team
+	 * pick instead of 10 s. Call it in the set-up of every test whose bots go
+	 * through a lobby by their brains, after any reset.
+	 */
+	public static void shortLobbyReadyDelay() throws Exception {
+		PaperServer.onMain(() -> {
+			Ioc.resolve(ConfigManager.class).getConfig().bots()
+					.lobbyReadyDelay(Duration.ofMillis(SHORT_LOBBY_READY_DELAY_TICKS * 50L));
+			return null;
+		});
 	}
 
 	/**
