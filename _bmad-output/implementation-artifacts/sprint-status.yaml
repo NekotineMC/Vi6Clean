@@ -59,13 +59,13 @@ development_status:
   3-4-bots-drive-the-phase-machine-koth-capture-and-scoring: done
   epic-3-retrospective: done
 
-  epic-4: in-progress
+  epic-4: done
   4-1-players-can-pick-a-thief-entrance-with-a-command: done
   4-2-players-can-mark-themselves-ready-in-preparation-with-a-comm: done
   4-3-bot-brains-get-through-preparation-and-stay-idle-in-map: done
   4-4-the-operator-starts-an-unattended-run-with-one-command: done
   4-5-a-soak-test-runs-4-bot-and-6-bot-games-to-a-result: done
-  4-6-unattended-runs-work-on-the-dev-server: review
+  4-6-unattended-runs-work-on-the-dev-server: done
   epic-4-retrospective: optional
 
   epic-5: backlog
