@@ -59,7 +59,7 @@ public final class Vi6TestHooks {
 
 	/** The summary line {@code Vi6Run} logs for each game of a run. */
 	public static final Pattern GAME_ENDED = Pattern.compile(
-			"Game ended: game=(\\d+), reason=(lost-timer|all-thieves-left), stolen=(\\d+), escaped=(\\d+), duration=(\\d+)s");
+			"Game ended: game=(\\d+), reason=(lost-timer|all-thieves-left), stolen=(\\d+), escaped=(\\d+), duration=(\\d+)s, seed=(-?\\d+)");
 
 	private Vi6TestHooks() {
 	}
