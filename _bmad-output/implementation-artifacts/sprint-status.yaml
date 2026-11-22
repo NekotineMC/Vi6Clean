@@ -161,7 +161,7 @@ action_items:
       that the seed replays bot picks, not KoTHs; optionally add seed= to each Game
       ended line (F5)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
   - id: "epic-4-retro-item-10-when-a-story-starts-grep-deferred-work-m"
     epic: 4

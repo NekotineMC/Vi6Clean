@@ -90,7 +90,7 @@ public class Vi6Run implements IPluginModule, Listener {
 			var seconds = (endNanos - run.gameStartNanos) / 1_000_000_000L;
 			run.gameStartNanos = endNanos;
 			logger.info("Game ended: game=" + run.games + ", reason=" + reason + ", stolen=" + stolen + ", escaped="
-					+ escaped + ", duration=" + seconds + "s");
+					+ escaped + ", duration=" + seconds + "s, seed=" + run.seed);
 		});
 	}
 

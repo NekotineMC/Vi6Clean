@@ -55,7 +55,11 @@ public class Vi6Bots implements IPluginModule, Listener {
 		return brains.get(bot);
 	}
 
-	/** Reseeds the random source of every brain's choices. */
+	/**
+	 * Reseeds the random source of every brain's choices. A run's seed replays only
+	 * these choices today; KoTH placement and effects stay unseeded until the seed
+	 * drives them too (planned, with KoTH map generation).
+	 */
 	public void seedRandom(long seed) {
 		random.setSeed(seed);
 	}
