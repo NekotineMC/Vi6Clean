@@ -168,3 +168,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-4-6-unattended-runs-work-on-the-dev-server.md`
   summary: `Vi6BotBrainIT` sets the short lobby ready delay without the 40-tick wait for the async config load that five other ITs do (unverified, medium if true).
   evidence: If `ConfigManager.setupAsync` can finish after the class's first test starts, the loaded config replaces the 1 s delay and the brain tests wait 10 s per lobby or time out. Settle by checking when the async load completes relative to the first IT.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-epic-4-retro-1-make-a-stalled-run-visible.md`
+  summary: Add a regression test for `Vi6GameReset.clearBots()` leaving the remaining lobby players unready, so a `/bot run` rollback cannot start a game for a ready human alone.
+  evidence: The IT harness cannot put a non-bot player online and `clearBots()` removes every bot, so the step is untested; extracting it into a `Vi6PhaseLobby` method would make it testable with ready bots.

@@ -8,9 +8,11 @@ import org.bukkit.Bukkit;
 import fr.nekotine.core.bot.BotRoster;
 import fr.nekotine.core.ioc.Ioc;
 import fr.nekotine.core.module.ModuleManager;
+import fr.nekotine.core.wrapper.WrappingModule;
 import fr.nekotine.vi6clean.configuration.ConfigManager;
 import fr.nekotine.vi6clean.game.Vi6Game;
 import fr.nekotine.vi6clean.game.phase.Vi6PhaseLobby;
+import fr.nekotine.vi6clean.wrapper.LobbyPhasePlayerWrapper;
 
 /**
  * Puts the game back to a clean lobby: shared by the integration-test hooks and
@@ -40,7 +42,8 @@ public final class Vi6GameReset {
 	 * Aborts the active unattended run, removes every bot through the roster (which
 	 * deletes their saved files), forgets their Vi6 brains, goes back to the lobby
 	 * and resets the game scoreboard entries of the removed bots. Humans stay in
-	 * the game; the live config and the KoTH override are kept. The run command's
+	 * the game, unready, so the bots' quits cannot start a game for the humans
+	 * left; the live config and the KoTH override are kept. The run command's
 	 * reset.
 	 *
 	 * @throws IllegalStateException
@@ -64,6 +67,11 @@ public final class Vi6GameReset {
 		modules.get(Vi6Bots.class).forgetAllBut(List.of());
 		var game = Ioc.resolve(Vi6Game.class);
 		game.getPhaseMachine().goTo(Vi6PhaseLobby.class, null);
+		var wrapping = Ioc.resolve(WrappingModule.class);
+		for (var player : game.getPlayerList()) {
+			wrapping.getWrapperOptional(player, LobbyPhasePlayerWrapper.class)
+					.ifPresent(w -> w.setReadyForNextPhase(false));
+		}
 		var scoreboard = game.getScoreboard();
 		for (var name : removedNames) {
 			scoreboard.resetScores(name);
