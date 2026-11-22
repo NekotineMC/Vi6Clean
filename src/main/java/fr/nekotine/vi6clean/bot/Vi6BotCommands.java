@@ -91,8 +91,8 @@ public class Vi6BotCommands {
 						return;
 					}
 					var toAdd = Math.min(count, room);
-					// Today the seed replays the bots' picks only (KoTH placement and effects are
-					// unseeded); later it will drive more of a run, like KoTH map generation
+					// Today the seed replays only the thief bots' entrance picks (see README.md);
+					// later it will drive more of a run, like KoTH map generation
 					var seed = args.getOptional("seed").map(Long.class::cast).orElseGet(System::nanoTime);
 					Vi6GameReset.clearBots();
 					var modules = Ioc.resolve(ModuleManager.class);
@@ -109,11 +109,10 @@ public class Vi6BotCommands {
 					}
 					modules.get(Vi6Run.class).begin(count, added.size(), seed);
 					game.start();
-					sender.sendMessage(
-							Component.text(
-									"Run démarré: " + added.size() + " bot(s) ajouté(s) sur " + count
-											+ " demandés, seed " + seed + " (rejoue les choix des bots, pas les KoTH)",
-									NamedTextColor.GREEN));
+					sender.sendMessage(Component.text(
+							"Run démarré: " + added.size() + " bot(s) ajouté(s) sur " + count + " demandés, seed "
+									+ seed + " (rejoue seulement les entrées choisies par les bots voleurs)",
+							NamedTextColor.GREEN));
 				});
 		var list = new CommandAPICommand("list").withPermission(CommandPermission.OP).executes((sender, _) -> {
 			var roster = availableRoster(sender);

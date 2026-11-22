@@ -56,9 +56,10 @@ public class Vi6Bots implements IPluginModule, Listener {
 	}
 
 	/**
-	 * Reseeds the random source of every brain's choices. A run's seed replays only
-	 * these choices today; KoTH placement and effects stay unseeded until the seed
-	 * drives them too (planned, with KoTH map generation).
+	 * Reseeds the random source of every brain's choices, today only the thief
+	 * bots' entrance picks (team picks are deterministic). The rest of a game,
+	 * KoTHs included, stays unseeded until a run's seed drives it too (planned,
+	 * with KoTH map generation).
 	 */
 	public void seedRandom(long seed) {
 		random.setSeed(seed);
