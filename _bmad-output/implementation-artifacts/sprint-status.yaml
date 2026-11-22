@@ -145,7 +145,7 @@ action_items:
       phase and the unready players; a player leaving during the lobby or preparation
       re-runs that phase's completion check (F1)"
     owner: "dev"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-4-retro-2026-11-22.md"
   - id: "epic-4-retro-item-8-check-bot-run-with-one-human-online-on-t"
     epic: 4
