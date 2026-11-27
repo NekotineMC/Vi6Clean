@@ -176,3 +176,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-1-a-control-port-lets-strategies-drive-a-body-with-a-priority.md`
   summary: `NekotineCore/AGENTS.md` still says every file under `core/src/test` is commented out and `gradlew test` runs zero tests; Story 5.1 added `ControlArbiterTest` and the JUnit launcher that lets `core` tests run.
   evidence: Review pass 1 (verification gap). Agent-context files are edited outside story builds; refresh the line with bmad-project-context in NekotineCore.
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-4-vi6-passability-rules-respect-entrances-exits-and-gates.md`
+  summary: No test has a walking guard bot follow `Vi6PathRules.guard` through a field placed with `ForcefieldHandler#placeField`.
+  evidence: Unverified (medium if wrong): the field opens only while the guard's feet are within the gate box expanded by 1; a 5.5 roaming IT crossing an active field would settle whether the walker gets through before its stuck timer.

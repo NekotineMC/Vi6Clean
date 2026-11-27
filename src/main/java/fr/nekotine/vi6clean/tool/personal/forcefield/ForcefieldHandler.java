@@ -39,6 +39,12 @@ import net.kyori.adventure.text.format.TextDecoration;
 @ToolCode("forcefield")
 public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield> {
 
+	/**
+	 * What a placed, closed field fills its gate with; an opened or removed field
+	 * is air.
+	 */
+	public static final Material FIELD_MATERIAL = Material.GRAY_STAINED_GLASS;
+
 	private Map<String, DoorData> fieldsDisplay = new HashMap<>();
 
 	private final int FORCEFIELD_NB_MAX = getConfiguration().getInt("nbmax", 2);
@@ -158,7 +164,7 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 			var world = Ioc.resolve(Vi6Game.class).getWorld();
 			var fields = map.getGates();
 			var fieldBound = fields.get(field);
-			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, FIELD_MATERIAL);
 		}
 		door.activated = true;
 	}
@@ -182,7 +188,7 @@ public class ForcefieldHandler extends ToolHandler<ForcefieldHandler.Forcefield>
 			var world = Ioc.resolve(Vi6Game.class).getWorld();
 			var fields = map.getGates();
 			var fieldBound = fields.get(field);
-			BukkitUtil.fillBoundingBoxWith(world, fieldBound, Material.GRAY_STAINED_GLASS);
+			BukkitUtil.fillBoundingBoxWith(world, fieldBound, FIELD_MATERIAL);
 		}
 		door.playerOpened = false;
 	}
