@@ -16,7 +16,7 @@ context:
 
 **Problem:** In infiltration, Vi6 bots stand idle (`PhaseBrain.IDLE`), so a bot-filled round shows nothing. Stories 5.2-5.4 provide a pathfinder, a walker and Vi6's per-role path rules, but no brain uses them (FR9, FR18, AD-12).
 
-**Approach:** Add a `RoamingBrain` in `fr.nekotine.vi6clean.bot`. Each bot gets its own `PathWalker` over `bot.body()`, and all bots share one `AStarPathFinder`. A guard walks to random map areas under `Vi6PathRules.guard`. A thief walks first into an entrance trigger box under `thiefOutside`, then roams under `thiefInside(map, false)`. The brain picks a new goal on arrival or when stuck. `Vi6Bots` offers the brain; Story 5.6 wires it into `/bot run`.
+**Approach:** Add a `RoamingBrain` in `fr.nekotine.vi6clean.bot`. Each bot gets its own `PathWalker` over `bot.body()`, and all bots share one `AStarPathFinder`. A guard walks to random map areas under `Vi6PathRules.guard`. A thief roams the same areas, under `thiefOutside` while entering (its path goes through an entrance), then under `thiefInside(map, false)`. The brain picks a new goal on arrival or when stuck. `Vi6Bots` offers the brain; Story 5.6 wires it into `/bot run`.
 
 ## Boundaries & Constraints
 
@@ -24,7 +24,7 @@ context:
 - Decisions (auto-validated, 2026-11-27):
   - Bots roam in infiltration only, through `PhaseBrain`'s in-map slot. Preparation keeps `PreparationBrain`.
   - Areas are the standable spots of the map's artefact capture boxes, room captor trigger boxes and KoTH boxes. A box with no standable spot is skipped. The list is computed once per round.
-  - An entering thief targets the entrance trigger box nearest it (box centre distance), because Vi6 keeps no selected entrance after preparation and any trigger box lets a thief in. On stuck, it tries the next nearest, cycling. With no standable spot, the goal is the box centre.
+  - An entering thief roams the same areas as an inside thief, under `thiefOutside`: every area is inside the map, so its path goes through an entrance (human decision, 2026-11-27). When it becomes `INSIDE`, it keeps its goal, searched again under `thiefInside`.
   - An inside thief never asks to leave (leaving and stealing belong to 5.6).
   - Goals are drawn from the `RandomGenerator` shared by `Vi6Bots` (seedable, as in Story 4.3). The next goal differs from the current one when there is more than one area.
   - The stuck bound is the walker's `DEFAULT_STUCK_TICKS`. After `ARRIVED` or `STUCK`, a new goal is set on the bot's next tick.
@@ -43,7 +43,7 @@ context:
 | Scenario | Input / State | Expected Output / Behavior | Error Handling |
 |----------|--------------|---------------------------|----------------|
 | Guard, infiltration | inside map | walks to area A, then on `ARRIVED` to area B ≠ A | N/A |
-| Thief `ENTERING` | at its spawn | walks into the nearest entrance trigger box, becomes `INSIDE`, then roams | stuck → next entrance |
+| Thief `ENTERING` | at its spawn | walks to an area through an entrance, becomes `INSIDE`, keeps the goal, then roams | stuck → next area |
 | Walker `STUCK` | blocked | new goal next tick | N/A |
 | One area only | map with one area | same goal again | N/A |
 | No area | map without areas | idles, no exception | N/A |
@@ -62,7 +62,7 @@ context:
 - `NekotineCore/core/.../navigation/PathWalker.java` -- `walkTo(goal, finder, rule)`, `tick()` returns `WalkStatus`, `stop()`. Main thread only. One walker per brain, built on first tick over `bot.body()`.
 - `.../game/phase/Vi6PhaseInMap.java:455` `getMap()`. `Vi6Game#getWorld()`, `getGuards()`, `getThiefs()`.
 - `.../wrapper/InMapPhasePlayerWrapper.java` -- `getState()` (`ENTERING`/`INSIDE`/`LEFT`), `hasLeft()`, via `WrappingModule#getWrapperOptional`.
-- Map: `Artefact#getBoundingBox()`, `RoomCaptor#getTriggerBox()`, `Koth#getBoundingBox()`, `Entrance#getEntranceTriggerBox()`. Collections may be `null`.
+- Map: `Artefact#getBoundingBox()`, `RoomCaptor#getTriggerBox()`, `Koth#getBoundingBox()`. Collections may be `null`.
 - `src/integrationTest/.../it/Vi6TestHooks.java` -- `spawnBots`, `putOnTeams`, `forceKoths()`, `goToInfiltration(spawn)`, `reset()`. `Vi6MapSpots.spawnWithEntranceAndExit()`. `Vi6Asserts.assertCleanLog`, `LogCapture`. `Vi6BotBrainIT.throwingBrainStopsAndTheBotStays` is the failure pattern.
 
 ## Tasks & Acceptance
@@ -70,7 +70,7 @@ context:
 **Execution:**
 - [x] `.../bot/BotBrain.java`, `PhaseBrain.java` -- `halt` and its call on slot change.
 - [x] `.../bot/RoamAreas.java` -- `standableSpot(World, BoundingBox)` (nullable), `areas(Vi6Map, World)` (sorted by name, so the order is deterministic) and `pick(List, current, RandomGenerator)`.
-- [x] `.../bot/RoamingBrain.java` -- the brain: per-round areas and walker, role rules, entrance cycling, `goal()` and `goalsPicked()` getters for tests, and `halt`.
+- [x] `.../bot/RoamingBrain.java` -- the brain: per-round areas and walker, role rules, goal kept on entering → inside, `goal()` and `goalsPicked()` getters for tests, and `halt`.
 - [x] `.../bot/Vi6Bots.java` -- shared finder, `roamingBrain()`, and neutral movement on failure.
 - [x] `src/test/java/fr/nekotine/vi6clean/bot/RoamAreasTest.java` -- `pick`: never the current goal with two or more areas; the same seed gives the same sequence; one area; empty → `null`.
 - [x] `src/integrationTest/.../it/Vi6RoamingIT.java` -- (a) 2v2 on the default config timers with no KoTH: hook bots with `PhaseBrain(IDLE, IDLE, roamingBrain())`, `goToInfiltration(spawnWithEntranceAndExit())`, then sample each tick until the lobby. Both thieves become `INSIDE`. Each bot picks at least 3 goals. No bot goes more than 100 ticks without either moving 1 block or picking a new goal, until the round ends. Every bot stays online. Clean log. (b) The injected throwing finder row.
@@ -83,6 +83,8 @@ context:
 ## Implementation Notes
 
 ## Spec Change Log
+
+- 2026-11-27, human review after the build: entrance targeting dropped. An entering thief roams the same areas under `thiefOutside`, so its path goes through an entrance; on becoming `INSIDE` it keeps its goal. Removes `nextEntrance`/entrance cycling, which makes triage rows 4, 7 and 12 moot (the deferred-work entry of row 12 is removed). KEEP: per-role rules, fresh search on a role change, halt and failure release.
 
 ## Review Triage Log
 
@@ -113,7 +115,7 @@ context:
 
 ```java
 if (status == ARRIVED || status == STUCK || goal == null) {
-    goal = entering ? nextEntrance() : RoamAreas.pick(areas, goal, random);
+    goal = RoamAreas.pick(areas, goal, random);
     if (goal != null) walker.walkTo(goal, finder, rule);   // rule from current role
 }
 status = walker.tick();

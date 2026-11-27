@@ -1,7 +1,5 @@
 package fr.nekotine.vi6clean.bot;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.random.RandomGenerator;
@@ -31,12 +29,12 @@ import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
  *
  * <ul>
  * <li>A guard roams under {@link Vi6PathRules#guard}.</li>
- * <li>A thief still {@link InMapState#ENTERING entering} walks into the
- * entrance trigger box nearest it (by box centre), under
- * {@link Vi6PathRules#thiefOutside}; when stuck, or arrived but still outside,
- * it tries the next nearest, cycling. Once {@link InMapState#INSIDE inside}, it
- * roams under {@link Vi6PathRules#thiefInside thiefInside(map, false)}: it
- * never asks to leave.</li>
+ * <li>A thief still {@link InMapState#ENTERING entering} roams the same areas
+ * under {@link Vi6PathRules#thiefOutside}: every area is inside the map, so its
+ * path goes through an entrance. Once {@link InMapState#INSIDE inside}, it
+ * keeps its goal, searched again under {@link Vi6PathRules#thiefInside
+ * thiefInside(map, false)}, and roams under that rule: it never asks to
+ * leave.</li>
  * </ul>
  *
  * <p>
@@ -44,7 +42,7 @@ import fr.nekotine.vi6clean.wrapper.InMapPhasePlayerWrapper;
  * walker reports {@link WalkStatus#ARRIVED} or {@link WalkStatus#STUCK} (after
  * {@link PathWalker#DEFAULT_STUCK_TICKS} ticks with no progress). Areas are
  * drawn with the shared random source, never the current goal again when there
- * are two or more. With no area (or no entrance), the bot idles.
+ * are two or more. With no area, the bot idles.
  *
  * <p>
  * Areas are computed once per round, a round being one
@@ -71,11 +69,6 @@ public class RoamingBrain implements BotBrain {
 	private @Nullable InMapPhasePlayerWrapper round;
 
 	private @Nullable List<Location> areas;
-
-	/** Entrance goals, nearest first, computed when the thief starts entering. */
-	private @Nullable List<Location> entrances;
-
-	private int entranceIndex;
 
 	private @Nullable Location goal;
 
@@ -113,8 +106,6 @@ public class RoamingBrain implements BotBrain {
 			idle();
 			round = wrapper;
 			areas = null;
-			entrances = null;
-			entranceIndex = 0;
 		}
 		var game = Ioc.resolve(Vi6Game.class);
 		var inMap = game.getPhaseMachine().getPhase(Vi6PhaseInMap.class);
@@ -141,16 +132,19 @@ public class RoamingBrain implements BotBrain {
 			return;
 		}
 		if (goalMode != null && mode != goalMode) {
-			// A new role: a fresh walk under its own rule, from its first goal
+			// A new role: a fresh search under its own rule. A thief that just got
+			// inside keeps walking to the area it was entering for.
 			walker.stop();
-			goal = null;
 			status = null;
+			if (goal != null && goalMode == Mode.ENTERING && mode == Mode.INSIDE) {
+				goalMode = mode;
+				walker.walkTo(goal, finder, rule(mode, map));
+			} else {
+				goal = null;
+			}
 		}
 		if (goal == null || status == WalkStatus.ARRIVED || status == WalkStatus.STUCK) {
-			boolean failed = status == WalkStatus.ARRIVED || status == WalkStatus.STUCK;
-			var next = mode == Mode.ENTERING
-					? nextEntrance(map, world, player.getLocation(), failed)
-					: pickArea(map, world);
+			var next = pickArea(map, world);
 			if (next == null) {
 				idle();
 				return;
@@ -168,48 +162,6 @@ public class RoamingBrain implements BotBrain {
 			areas = RoamAreas.areas(map, world);
 		}
 		return RoamAreas.pick(areas, goal, random);
-	}
-
-	/**
-	 * @param advance
-	 *            whether the last entrance walk ended (stuck, or arrived but still
-	 *            outside): only then is the next entrance tried
-	 */
-	private @Nullable Location nextEntrance(Vi6Map map, World world, Location from, boolean advance) {
-		if (entrances == null) {
-			entrances = entrances(map, world, from);
-			entranceIndex = 0;
-		} else if (advance && !entrances.isEmpty()) {
-			entranceIndex = (entranceIndex + 1) % entrances.size();
-		}
-		return entrances.isEmpty() ? null : entrances.get(entranceIndex);
-	}
-
-	/**
-	 * @return a goal per entrance trigger box (a standable spot, else its centre),
-	 *         nearest {@code from} first by box centre, then by name
-	 */
-	private static List<Location> entrances(Vi6Map map, World world, Location from) {
-		record Candidate(String name, double distance, Location goal) {
-		}
-		var candidates = new ArrayList<Candidate>();
-		var all = map.getEntrances();
-		if (all != null) {
-			for (var entry : all.entrySet()) {
-				var entrance = entry.getValue();
-				var box = entrance == null ? null : entrance.getEntranceTriggerBox();
-				if (box == null) {
-					continue;
-				}
-				var centre = box.getCenter();
-				var spot = RoamAreas.standableSpot(world, box);
-				var target = spot != null ? spot : centre.toLocation(world);
-				candidates.add(
-						new Candidate(String.valueOf(entry.getKey()), centre.distanceSquared(from.toVector()), target));
-			}
-		}
-		candidates.sort(Comparator.comparingDouble(Candidate::distance).thenComparing(Candidate::name));
-		return candidates.stream().map(Candidate::goal).toList();
 	}
 
 	private static PathRule rule(Mode mode, Vi6Map map) {
