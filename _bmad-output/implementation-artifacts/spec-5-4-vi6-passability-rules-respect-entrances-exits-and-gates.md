@@ -2,7 +2,7 @@
 title: 'Story 5.4: Vi6 passability rules respect entrances, exits and gates'
 type: 'feature'
 created: '2026-11-23'
-status: 'ready-for-dev'
+status: 'done'
 baseline_commit: 'fa17f2389b3b4a0224aa80e1c45b38e6720e7776'
 route: 'dispatch'
 review_loop_iteration: 0
@@ -61,13 +61,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `NekotineCore/core/.../navigation/PathRule.java`, `.../astar/AStarSearch.java`, `AStarSearchTest.java` and new `Passage.java` -- the override and its use; tests: the core-override matrix row, default rule unchanged, not asked outside the view.
-- [ ] `src/main/java/fr/nekotine/vi6clean/bot/Vi6PathRules.java` -- `guard(Vi6Map)`, `thiefOutside(Vi6Map)`, `thiefInside(Vi6Map, boolean leaving)`, plus a package-private factory over plain box lists.
-- [ ] `ForcefieldHandler.java` -- public field-material constant, used by its fills and by the rule.
-- [ ] `src/test/java/fr/nekotine/vi6clean/bot/Vi6PathRulesTest.java` -- the matrix on hand-built boxes; a fake `BlockData` (e.g. a `java.lang.reflect.Proxy` answering `getMaterial`) for the gate rows.
-- [ ] `src/integrationTest/.../it/Vi6MapSpots.java` -- moved helpers; `Vi6PhaseMachineBotIT` calls them.
-- [ ] `src/integrationTest/.../it/Vi6PathRulesIT.java` -- in infiltration with a guard bot and a thief bot at a spawn with a same-named entrance and exit: guard path to a standable spot in an exit is not reached and no point's cell overlaps an exit or blocking box, while `PathRule.ANY` reaches it; inside thief (after `enterMap`) to its exit: not reached with `leaving` false, reached with true; a gate between two standable cells filled with the field material then air (restored after): guard crosses it closed, thief only open.
-- [ ] `NekotineCore/README.md` -- mention `PathRule#passage` in the pathfinder entry (French). `NekotineCore` gitlink -- bump.
+- [x] `NekotineCore/core/.../navigation/PathRule.java`, `.../astar/AStarSearch.java`, `AStarSearchTest.java` and new `Passage.java` -- the override and its use; tests: the core-override matrix row, default rule unchanged, not asked outside the view.
+- [x] `src/main/java/fr/nekotine/vi6clean/bot/Vi6PathRules.java` -- `guard(Vi6Map)`, `thiefOutside(Vi6Map)`, `thiefInside(Vi6Map, boolean leaving)`, plus a package-private factory over plain box lists.
+- [x] `ForcefieldHandler.java` -- public field-material constant, used by its fills and by the rule.
+- [x] `src/test/java/fr/nekotine/vi6clean/bot/Vi6PathRulesTest.java` -- the matrix on hand-built boxes; a fake `BlockData` (e.g. a `java.lang.reflect.Proxy` answering `getMaterial`) for the gate rows.
+- [x] `src/integrationTest/.../it/Vi6MapSpots.java` -- moved helpers; `Vi6PhaseMachineBotIT` calls them.
+- [x] `src/integrationTest/.../it/Vi6PathRulesIT.java` -- in infiltration with a guard bot and a thief bot at a spawn with a same-named entrance and exit: guard path to a standable spot in an exit is not reached and no point's cell overlaps an exit or blocking box, while `PathRule.ANY` reaches it; inside thief (after `enterMap`) to its exit: not reached with `leaving` false, reached with true; a gate between two standable cells filled with the field material then air (restored after): guard crosses it closed, thief only open.
+- [x] `NekotineCore/README.md` -- mention `PathRule#passage` in the pathfinder entry (French). `NekotineCore` gitlink -- bump.
 
 **Acceptance Criteria:**
 - Given `Vi6PathRules`, when reviewed, then it reads map data only through `Vi6Map`'s public getters, and NekotineCore names no Vi6 concept (AD-7).
@@ -75,11 +75,32 @@ context:
 
 ## Implementation Notes
 
+- `Vi6PathRules.of(forbidden, gates, field)` takes the field material: `ForcefieldHandler`'s superclass resolves `Ioc` in its static initializer, so the plain unit test cannot load the constant; the public factories pass `ForcefieldHandler.FIELD_MATERIAL`.
+- The test map's `Hangar` entrance has an empty blocking box, so the IT checks the first entrance by name whose blocking box holds blocks.
+
 ## Spec Change Log
 
 - 2026-11-23, human renegotiation after approval: `PathRule#opens` (open-only hook) replaced by `PathRule#passage` returning `Passage` (`DEFAULT`, `OPEN`, `FLOOR`, `BLOCKED`), so a rule can open and close blocks, not only open them. Per-search, per-body override chosen over an editable shared snapshot or graph, because guards and thieves need different answers in the same area. KEEP: the Vi6 role rules and the forcefield decisions are unchanged.
 
 ## Review Triage Log
+
+| # | Layer | Finding | Verdict | Route | Evidence |
+|---|-------|---------|---------|-------|----------|
+| 1 | verification-gap, blind | No IT asserts which roles refuse an entrance blocking box; the trigger-box check could skip silently | medium | patch | Fixed: the IT now checks every cell of the first non-empty blocking box against all four rules (the test spawn's own box is empty) and requires a trigger cell outside forbidden boxes. |
+| 2 | edge-case | A thief may be routed on top of a closed field, then fall when it opens | low | reject | Intent says thieves override nothing; gates span floor to ceiling on the test maps, so there is no headroom on top. |
+| 3 | edge-case | Null blocking box NPEs the IT helper | false | reject | `Entrance#getBlockingBox` defaults to `new BoundingBox()` and is never null. |
+| 4 | edge-case | Empty `PathResult` makes `subList(1, 0)` throw | false | reject | Every `AStarPath` holds at least its start. |
+| 5 | edge-case | Unreachable could come from node budget, not the rule | false | reject | The `ANY` search from the same start reaches the same goal within budget; the goal cell itself is forbidden. |
+| 6 | edge-case, blind | Gate IT depends on map geometry (detour within margin, exact width compare, middle column) | low | reject | Deterministic on the test bundle and passing; gate boxes come from the block-box command (integers). |
+| 7 | edge-case | Unused `InMapPhasePlayerWrapper` import left in `Vi6PhaseMachineBotIT` | low | patch | Removed. |
+| 8 | blind | `PassageGrid` reads each block up to three times and wraps `PathRule.ANY` too | low | reject | Each block is cached once per search; walker ITs and searches stay green; a skip path adds a branch for no measured cost. |
+| 9 | blind | An `OPEN` override on a door drops the `DOOR` hint; a crossed field is hinted `WALK` | false | reject | Spec defines `OPEN` as air; the walker needs no hint since the field opens within 1 block. |
+| 10 | blind | No test has a walking guard cross a real placed field | maybe-false (medium if true) | defer | Walker and brains are 5.5 scope; deferred. |
+| 11 | blind | Guard rule opens any gray stained glass in a gate, active field or not | low | reject | Spec decision: material in a gate box; only the handler fills that material there. |
+| 12 | blind | `BukkitUtil.fillBoundingBoxWith` footprint differs from strict overlap on fractional/negative boxes | low | reject | Pre-existing helper; gate boxes are integer block boxes. |
+| 13 | blind | Unit test copies `GRAY_STAINED_GLASS`, nothing ties it to the constant | low | patch | The gate IT now asserts the constant equals the copy. |
+| 14 | blind | `thiefOutside(map)` ignores its map | low | patch | Javadoc now says the map is unused and why it is taken. |
+| 15 | blind | Missing blank line after the `Vi6MapSpots` constructor | low | patch | Added. |
 
 ## Design Notes
 
