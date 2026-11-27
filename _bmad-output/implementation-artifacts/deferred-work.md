@@ -179,3 +179,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-4-vi6-passability-rules-respect-entrances-exits-and-gates.md`
   summary: No test has a walking guard bot follow `Vi6PathRules.guard` through a field placed with `ForcefieldHandler#placeField`.
   evidence: Unverified (medium if wrong): the field opens only while the guard's feet are within the gate box expanded by 1; a 5.5 roaming IT crossing an active field would settle whether the walker gets through before its stuck timer.
+
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-5-vi6-bots-roam-between-map-areas-for-the-whole-round.md`
+  summary: No test has an entering roaming thief whose nearest entrance is unreachable cycle to the next entrance and still get inside.
+  evidence: `RoamingBrain.nextEntrance` cycling is exercised by no test. Settling it needs a fixture that blocks the nearest entrance (fits with the 5.4 forcefield walking deferral).

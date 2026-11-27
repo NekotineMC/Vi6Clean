@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 11-05-2026 20:46
-last_updated: 11-27-2026 19:30
+last_updated: 11-27-2026 22:00
 project: Vi6Clean
 project_key: NOKEY
 tracking_system: file-system
@@ -73,7 +73,7 @@ development_status:
   5-2-a-pathfinder-port-with-an-implementation-chosen-for-vi6: done
   5-3-a-vanilla-like-walker-follows-any-pathresult: done
   5-4-vi6-passability-rules-respect-entrances-exits-and-gates: done
-  5-5-vi6-bots-roam-between-map-areas-for-the-whole-round: backlog
+  5-5-vi6-bots-roam-between-map-areas-for-the-whole-round: review
   5-6-the-unattended-run-uses-roaming-bots: backlog
   epic-5-retrospective: optional
 

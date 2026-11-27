@@ -11,4 +11,12 @@ import fr.nekotine.core.bot.Bot;
 public interface BotBrain {
 
 	void tick(Bot bot);
+
+	/**
+	 * Called, inside the bot's {@code BotTickEvent}, once when this brain stops
+	 * being ticked (e.g. {@link PhaseBrain} leaves its phase): a brain that drives
+	 * movement over several ticks releases it here. Does nothing by default.
+	 */
+	default void halt(Bot bot) {
+	}
 }
